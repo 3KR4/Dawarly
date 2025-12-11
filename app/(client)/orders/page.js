@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import "@/styles/pages/tables.css";
-import "@/styles/forms.css";
+import "@/styles/client/forms.css";
 import { orders } from "@/data";
 import Link from "next/link";
 import { FaBoxOpen } from "react-icons/fa";
@@ -46,7 +46,7 @@ function Orders() {
                         <div className="images">
                           {item.cart.slice(0, 3).map((x, index) => (
                             <Image
-                            key={index}
+                              key={index}
                               src={x?.image}
                               alt={x?.name}
                               fill

@@ -3,7 +3,7 @@ import React, { useContext, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { categories } from "@/data";
-import { mainContext } from "@/Contexts/mainContext";
+import { settings } from "@/Contexts/settings";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import SwiperCore from "swiper";
@@ -14,7 +14,7 @@ import "swiper/css/effect-fade";
 function Categories() {
   SwiperCore.use([Autoplay, EffectFade, Pagination]);
 
-  const { screenSize } = useContext(mainContext);
+  const { screenSize } = useContext(settings);
   const swiperRef = useRef(null);
 
   useEffect(() => {
@@ -28,7 +28,8 @@ function Categories() {
 
   return (
     <div className="categories">
-      <div className="title-holder">
+      xxx
+      {/* <div className="title-holder">
         <h1 className="main-title">
           <hr />
           Categories
@@ -89,8 +90,8 @@ function Categories() {
         ))}
       </Swiper>
 
-      {/* ✅ الباجنيشن الخارجي */}
-      <ul className="swiper-pagination custom-pagination backhome"></ul>
+     
+      <ul className="swiper-pagination custom-pagination backhome"></ul> */}
     </div>
   );
 }

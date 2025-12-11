@@ -1,0 +1,68 @@
+"use client";
+import { createContext, useState } from "react";
+
+export const selectors = createContext();
+
+export const SelectorsProvider = ({ children }) => {
+  // global
+  const [compsInput, setCompsInput] = useState({
+    tags: "",
+    cats: "",
+    specs: "",
+    images: "",
+  });
+  const [compsErrors, setCompsErrors] = useState({
+    tags: "",
+    cats: "",
+    specs: "",
+    images: "",
+  });
+  const updateCompsInput = (key, value) => {
+    setCompsInput((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+  const updateCompsError = (key, value) => {
+    setCompsErrors((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  // Tags
+  const [tags, setTags] = useState([]);
+
+  // Specific
+  const [specifications, setSpecifications] = useState([]);
+
+  const [images, setImages] = useState([]);
+
+  const [isSubmited, setisSubmited] = useState(false);
+
+  // Category select
+  const [selectedCat, setSelectedCat] = useState("");
+
+  return (
+    <selectors.Provider
+      value={{
+        tags,
+        setTags,
+        images,
+        setImages,
+        specifications,
+        setSpecifications,
+        compsInput,
+        compsErrors,
+        updateCompsInput,
+        updateCompsError,
+        selectedCat,
+        setSelectedCat,
+        isSubmited,
+        setisSubmited,
+      }}
+    >
+      {children}
+    </selectors.Provider>
+  );
+};

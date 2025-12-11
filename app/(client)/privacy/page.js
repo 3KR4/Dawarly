@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="legal-document container">
       <div className="document-section">
-        <h1>Privacy Policy - Masr360</h1>
+        <h1>Privacy Policy - dawarly</h1>
         <div className="metadata">
           <p>
             <strong>Effective Date:</strong> [Insert Date]
@@ -18,14 +18,14 @@ export default function PrivacyPolicy() {
 
         <h2>1. Introduction</h2>
         <p>
-          Welcome to <strong>Masr360</strong>, a smart tourism platform that
+          Welcome to <strong>dawarly</strong>, a smart tourism platform that
           blends culture, technology, and gamified exploration across Egypt.
         </p>
         <p>
           This Privacy Policy explains how we collect, use, and protect your
           personal information when you visit our website or mobile application.
         </p>
-        <p>By using Masr360, you consent to this Privacy Policy.</p>
+        <p>By using dawarly, you consent to this Privacy Policy.</p>
 
         <h2>2. Information We Collect</h2>
         <p>
@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
         </ul>
 
         <h2>4. Sharing of Information</h2>
-        <p>Masr360 does not sell or rent your personal data.</p>
+        <p>dawarly does not sell or rent your personal data.</p>
         <p>We may share limited data only in the following cases:</p>
         <ul className="sharing-list">
           <li>
@@ -106,7 +106,7 @@ export default function PrivacyPolicy() {
         </ul>
         <p>
           Requests can be made via email:{" "}
-          <a href="mailto:privacy@masr360.com">privacy@masr360.com</a>
+          <a href="mailto:privacy@dawarly.com">privacy@dawarly.com</a>
         </p>
 
         <h2>7. Data Retention</h2>
@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
 
         <h2>8. Cookies and Tracking Technologies</h2>
         <p>
-          Masr360 uses cookies to improve performance and personalize content.
+          dawarly uses cookies to improve performance and personalize content.
         </p>
         <p>You can manage or disable cookies in your browser settings.</p>
         <p>For details, please review our Cookie Policy.</p>
@@ -130,12 +130,12 @@ export default function PrivacyPolicy() {
           Our platform may contain links to third-party websites or vendors.
         </p>
         <p>
-          Masr360 is not responsible for their privacy practices, and we
+          dawarly is not responsible for their privacy practices, and we
           recommend reviewing their policies separately.
         </p>
 
         <h2>10. Changes to This Policy</h2>
-        <p>Masr360 may update this Privacy Policy periodically.</p>
+        <p>dawarly may update this Privacy Policy periodically.</p>
         <p>Updates will be posted with a new "Last Updated" date.</p>
         <p>
           Continued use of the platform after updates means you accept the
@@ -148,10 +148,10 @@ export default function PrivacyPolicy() {
           contact us at:
         </p>
         <p>
-          <a href="mailto:privacy@masr360.com">privacy@masr360.com</a>
+          <a href="mailto:privacy@dawarly.com">privacy@dawarly.com</a>
         </p>
         <p>
-          <a href="http://www.masr360.com">www.masr360.com</a>
+          <a href="http://www.dawarly.com">www.dawarly.com</a>
         </p>
       </div>
 
@@ -169,7 +169,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. Introduction</h2>
         <p>
-          Welcome to Masr360, a smart tourism platform that helps users explore
+          Welcome to dawarly, a smart tourism platform that helps users explore
           Egypt through interactive experiences, gamified challenges, and
           authentic local products.
         </p>
@@ -177,48 +177,48 @@ export default function PrivacyPolicy() {
           By accessing or using our website or mobile app, you agree to these
           Terms and Conditions.
         </p>
-        <p>If you do not agree, please stop using Masr360 immediately.</p>
+        <p>If you do not agree, please stop using dawarly immediately.</p>
 
         <h2>2. Definitions</h2>
         <ul className="definitions-list">
           <li>
-            <strong>"Platform":</strong> The Masr360 website and mobile
+            <strong>"Platform":</strong> The dawarly website and mobile
             application.
           </li>
           <li>
-            <strong>"User":</strong> Any person using Masr360 services.
+            <strong>"User":</strong> Any person using dawarly services.
           </li>
           <li>
             <strong>"Partner" or "Vendor":</strong> Cafés, restaurants,
-            artisans, or tour agencies listed on Masr360.
+            artisans, or tour agencies listed on dawarly.
           </li>
           <li>
-            <strong>"We", "Us", "Our":</strong> The Masr360 management team.
+            <strong>"We", "Us", "Our":</strong> The dawarly management team.
           </li>
         </ul>
 
         <h2>3. Use of the Platform</h2>
         <ul className="platform-use-list">
           <li>Users must be at least 13 years old.</li>
-          <li>You agree to use Masr360 only for lawful purposes.</li>
+          <li>You agree to use dawarly only for lawful purposes.</li>
           <li>
             You are responsible for maintaining your account and password.
           </li>
           <li>
-            Masr360 reserves the right to suspend or terminate any account
+            dawarly reserves the right to suspend or terminate any account
             violating these terms.
           </li>
         </ul>
 
         <h2>4. Services</h2>
-        <p>Masr360 provides:</p>
+        <p>dawarly provides:</p>
         <ul className="services-list">
           <li>Access to digital tourism content and local experiences.</li>
           <li>Gamified exploration challenges.</li>
           <li>A marketplace for authentic Egyptian handmade products.</li>
         </ul>
         <p>
-          Masr360 acts as a digital intermediary and is not directly responsible
+          dawarly acts as a digital intermediary and is not directly responsible
           for the services or products provided by third-party vendors.
         </p>
 
@@ -227,7 +227,7 @@ export default function PrivacyPolicy() {
           <li>
             Payments are processed securely via authorized third-party gateways.
           </li>
-          <li>Masr360 does not store full payment card details.</li>
+          <li>dawarly does not store full payment card details.</li>
           <li>Prices are displayed in USD or EGP.</li>
           <li>
             Users are responsible for ensuring accuracy before confirming a
@@ -237,14 +237,14 @@ export default function PrivacyPolicy() {
 
         <h2>6. Refunds and Cancellations</h2>
         <p>
-          Refunds follow the Masr360 Refund & Cancellation Policy, available on
+          Refunds follow the dawarly Refund & Cancellation Policy, available on
           our website.
         </p>
 
         <h2>7. Partner Listings and Content</h2>
         <ul className="partner-listings-list">
           <li>
-            Masr360 may verify, modify, or remove listings violating its
+            dawarly may verify, modify, or remove listings violating its
             policies.
           </li>
           <li>
@@ -257,7 +257,7 @@ export default function PrivacyPolicy() {
         </ul>
 
         <h2>8. Limitation of Liability</h2>
-        <p>Masr360 is not liable for:</p>
+        <p>dawarly is not liable for:</p>
         <ul className="liability-list">
           <li>Loss or damage from third-party services.</li>
           <li>Inaccuracies or cancellations by vendors.</li>
@@ -270,7 +270,7 @@ export default function PrivacyPolicy() {
 
         <h2>9. Intellectual Property</h2>
         <p>
-          All content (logo, design, text, images, and code) belongs to Masr360.
+          All content (logo, design, text, images, and code) belongs to dawarly.
         </p>
         <p>
           Reproduction or modification without written consent is prohibited.
@@ -285,7 +285,7 @@ export default function PrivacyPolicy() {
         <h2>11. Contact</h2>
         <p>For questions, contact:</p>
         <p>
-          <a href="mailto:legal@masr360.com">legal@masr360.com</a>
+          <a href="mailto:legal@dawarly.com">legal@dawarly.com</a>
         </p>
       </div>
 
@@ -300,7 +300,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. What Are Cookies?</h2>
         <p>
-          Cookies are small files stored on your device when visiting Masr360.
+          Cookies are small files stored on your device when visiting dawarly.
         </p>
         <p>They help us improve your experience and remember preferences.</p>
 
@@ -319,12 +319,12 @@ export default function PrivacyPolicy() {
         <h2>4. Third-Party Cookies</h2>
         <p>Some cookies come from third parties (e.g., analytics, ads).</p>
         <p>
-          Masr360 has no control over these and recommends checking their
+          dawarly has no control over these and recommends checking their
           policies.
         </p>
 
         <h2>5. Policy Updates</h2>
-        <p>Masr360 may update this Cookie Policy periodically.</p>
+        <p>dawarly may update this Cookie Policy periodically.</p>
         <p>Please review it regularly for the latest version.</p>
       </div>
 
@@ -342,7 +342,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. Overview</h2>
         <p>
-          This Vendor Agreement defines the collaboration between Masr360
+          This Vendor Agreement defines the collaboration between dawarly
           ("Platform") and the Vendor (café, restaurant, artisan, or tour
           operator).
         </p>
@@ -357,8 +357,8 @@ export default function PrivacyPolicy() {
           <li>Avoid posting illegal or misleading content.</li>
         </ul>
 
-        <h2>3. Masr360 Responsibilities</h2>
-        <ul className="masr360-responsibilities-list">
+        <h2>3. dawarly Responsibilities</h2>
+        <ul className="dawarly-responsibilities-list">
           <li>Promote vendor listings on the platform.</li>
           <li>Manage customer communication and payment processing.</li>
           <li>Offer analytics and visibility through the platform.</li>
@@ -368,7 +368,7 @@ export default function PrivacyPolicy() {
         <ul className="fees-list">
           <li>Vendors pay annual subscription fees based on category.</li>
           <li>
-            Masr360 retains a small commission per transaction or booking.
+            dawarly retains a small commission per transaction or booking.
           </li>
           <li>Settlements occur monthly or as agreed.</li>
         </ul>
@@ -376,14 +376,14 @@ export default function PrivacyPolicy() {
         <h2>5. Intellectual Property</h2>
         <ul className="vendor-ip-list">
           <li>
-            Vendors grant Masr360 permission to use images and logos for
+            Vendors grant dawarly permission to use images and logos for
             marketing.
           </li>
           <li>Vendors must ensure all uploaded content respects copyrights.</li>
         </ul>
 
         <h2>6. Termination</h2>
-        <p>Masr360 can suspend or terminate vendor accounts in case of:</p>
+        <p>dawarly can suspend or terminate vendor accounts in case of:</p>
         <ul className="termination-list">
           <li>Violations of policies</li>
           <li>Repeated customer complaints</li>
@@ -393,7 +393,7 @@ export default function PrivacyPolicy() {
 
         <h2>7. Liability</h2>
         <p>
-          Masr360 is not responsible for delivery delays, damages, or
+          dawarly is not responsible for delivery delays, damages, or
           vendor-related disputes.
         </p>
         <p>Each vendor operates independently under Egyptian law.</p>
@@ -410,7 +410,7 @@ export default function PrivacyPolicy() {
 
         <h2>10. Contact</h2>
         <p>
-          <a href="mailto:partners@masr360.com">partners@masr360.com</a>
+          <a href="mailto:partners@dawarly.com">partners@dawarly.com</a>
         </p>
       </div>
     </div>

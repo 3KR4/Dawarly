@@ -1,28 +1,27 @@
 "use client";
 import React, { useState, useRef, useContext } from "react";
-import "@/styles/pages/cart.css";
-import "@/styles/pages/tables.css";
+import "@/styles/client/tables.css";
 import "@/styles/dashboard/globals.css";
 import { FaSearch } from "react-icons/fa";
-import { filters, tourismCategories, productCategories, govs } from "@/data";
+import { govs, filterss, productCategories } from "@/data";
 import Link from "next/link";
-import Navigations from "@/components/Navigations";
+import Navigations from "@/components/tools/Navigations";
 import { IoIosClose } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
-import { dashboard } from "@/Contexts/dashboard";
+import { filters } from "@/Contexts/filters";
+import { settings } from "@/Contexts/settings";
 import { getBreadcrumbItems } from "@/utlies/getBreadcrumbItems ";
 
 function Head() {
   const {
-    pathname,
-    searchParams,
     searchText,
     setSearchText,
     filtersState,
     selectedCats,
     updateFilter,
-  } = useContext(dashboard);
+  } = useContext(filters);
+  const { pathname, searchParams } = useContext(settings);
 
   const inputRef = useRef(null);
   const navigationitems = getBreadcrumbItems(pathname, searchParams);
@@ -38,8 +37,8 @@ function Head() {
   const currentFilters =
     navigationitems.length === 0
       ? []
-      : filters?.find((x) => x.id == navigationitems[0]?.name)?.sorting ||
-        filters?.find((x) => x.id === "main")?.sorting;
+      : filterss?.find((x) => x.id == navigationitems[0]?.name)?.sorting ||
+        filterss?.find((x) => x.id === "main")?.sorting;
 
   function getBaseName(name) {
     if (!name) return "";
@@ -62,24 +61,13 @@ function Head() {
     const cleanPath = pathname.split("?")[0];
     return cleanPath + "/form";
   }
-console.log(navigationitems[0]?.name);
+  console.log(navigationitems[0]?.name);
 
-  const citys =
-    navigationitems[0]?.name == "places list" ||
-    navigationitems[0]?.name == "events list" ||
-    navigationitems[0]?.name == "nights list"
-      ? govs
-      : undefined;
-  const cats =
-    navigationitems[0]?.name == "places list" ||
-    navigationitems[0]?.name == "events list" ||
-    navigationitems[0]?.name == "nights list"
-      ? tourismCategories
-      : navigationitems[0]?.name == "products list"
-      ? productCategories
-      : undefined;
-  const subCats = tourismCategories?.find(
-    (x) => x.name == selectedCats.cat
+  const citys = govs;
+  const cats = productCategories;
+
+  const subCats = productCategories?.find(
+    (x) => x?.name == selectedCats?.cat
   )?.subcategories;
 
   const filteredGovs = citys?.filter((x) =>
@@ -87,17 +75,12 @@ console.log(navigationitems[0]?.name);
   );
 
   const filteredCats = cats?.filter((x) =>
-    x.name.toLowerCase().includes(catsSearch.toLowerCase())
+    x?.name.toLowerCase().includes(catsSearch.toLowerCase())
   );
 
   const filteredSubCats = subCats?.filter((x) =>
-    x.name.toLowerCase().includes(catsSearch.toLowerCase())
+    x?.name.toLowerCase().includes(catsSearch.toLowerCase())
   );
-
-  console.log("citys :", citys);
-  console.log("cats :", cats);
-  console.log("subCats :", subCats);
-  
 
   return (
     <div className="head">
@@ -200,10 +183,10 @@ console.log(navigationitems[0]?.name);
                       placeholder={"filter by categories:"}
                       className="search-input"
                     />
-                  ) : !selectedCats.cat ? (
+                  ) : !selectedCats?.cat ? (
                     "filter by categories:"
                   ) : (
-                    `cat: ${selectedCats.cat}`
+                    `cat: ${selectedCats?.cat}`
                   )}
                 </h4>
                 {activeMenu == "cat" ? (
@@ -225,20 +208,20 @@ console.log(navigationitems[0]?.name);
                     <button
                       key={index}
                       className={`${
-                        selectedCats.cat == x.name ? "active" : ""
+                        selectedCats?.cat == x?.name ? "active" : ""
                       }`}
                       onClick={() => {
-                        if (selectedCats.cat === x.name) {
+                        if (selectedCats?.cat === x?.name) {
                           updateFilter("cat", "", "categories");
                         } else {
-                          updateFilter("cat", x.name, "categories");
+                          updateFilter("cat", x?.name, "categories");
                         }
                         updateFilter("subCat", "", "categories");
                         setActiveMenu(null);
                         setCatsSearch("");
                       }}
                     >
-                      {x.icon} {x.name}
+                      {x.icon} {x?.name}
                     </button>
                   ))
                 ) : (
@@ -289,19 +272,19 @@ console.log(navigationitems[0]?.name);
                     <button
                       key={index}
                       className={`${
-                        selectedCats.subCat == x.name ? "active" : ""
+                        selectedCats.subCat == x?.name ? "active" : ""
                       }`}
                       onClick={() => {
-                        if (selectedCats.subCat === x.name) {
+                        if (selectedCats.subCat === x?.name) {
                           updateFilter("subCat", "", "categories");
                         } else {
-                          updateFilter("subCat", x.name, "categories");
+                          updateFilter("subCat", x?.name, "categories");
                         }
                         setActiveMenu(null);
                         setCatsSearch("");
                       }}
                     >
-                      {x.name}
+                      {x?.name}
                     </button>
                   ))
                 ) : (
@@ -352,7 +335,7 @@ console.log(navigationitems[0]?.name);
                           }
                           onClick={() => updateFilter(x.id, y.value, "filters")}
                         >
-                          {y.name}
+                          {y?.name}
                         </li>
                       ))}
                     </ul>

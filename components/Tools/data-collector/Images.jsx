@@ -4,10 +4,10 @@ import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { FaCloudUploadAlt, FaHashtag, FaLink } from "react-icons/fa";
 import Image from "next/image";
-import { forms } from "@/Contexts/forms";
+import { selectors } from "@/Contexts/selectors";
 
 function Images() {
-  const { images, setImages, isSubmited } = useContext(forms);
+  const { images, setImages, isSubmited } = useContext(selectors);
 
   const inputFileRef = useRef(null);
   const [isDrag, setIsDrag] = useState(false);

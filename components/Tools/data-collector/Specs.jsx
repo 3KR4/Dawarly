@@ -1,12 +1,12 @@
 import React from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
-import { forms } from "@/Contexts/forms";
+import { selectors } from "@/Contexts/selectors";
 import { useContext } from "react";
 
 function Specs() {
   const { specifications, setSpecifications, compsErrors, updateCompsError } =
-    useContext(forms);
+    useContext(selectors);
 
   const addSpecification = () => {
     // check if any existing spec is invalid

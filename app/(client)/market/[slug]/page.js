@@ -6,9 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaCircleCheck } from "react-icons/fa6";
-import Navigations from "@/components/Navigations";
+import Navigations from "@/components/tools/Navigations";
 import Rating from "@mui/material/Rating";
-import DisplayPrice from "@/components/DisplayPrice";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import { getService } from "@/services/api/getService";
 
@@ -85,11 +84,7 @@ export default function ProductDetails() {
             <span className="count">{product?.reviewsCount} Reviews</span>
           </div>
 
-          <DisplayPrice
-            price={product?.price}
-            sale={product?.sale}
-            stock={product?.stock}
-          />
+          <div className="price">{product?.price}</div>
 
           <div className="Availability">
             <div className="hold">

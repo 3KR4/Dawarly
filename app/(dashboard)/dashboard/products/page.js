@@ -1,21 +1,19 @@
 "use client";
 import React, { useContext, useState, useRef } from "react";
 import Rating from "@mui/material/Rating";
-import Pagination from "@/components/settings/Pagination";
+import Pagination from "@/components/tools/Pagination";
 
 import Image from "next/image";
-import "@/styles/pages/cart.css";
-import "@/styles/pages/tables.css";
+import "@/styles/client/tables.css";
 import { FaTrashAlt, FaEye } from "react-icons/fa";
-import DisplayPrice from "@/components/DisplayPrice";
-import { mainContext } from "@/Contexts/mainContext";
+import { settings } from "@/Contexts/settings";
 import { products } from "@/data";
 import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 
 export default function Products() {
-  const { screenSize } = useContext(mainContext);
+  const { screenSize } = useContext(settings);
 
   return (
     <div className="dash-holder">
@@ -67,13 +65,7 @@ export default function Products() {
                   </div>
 
                   <div className="item-price">
-                    <DisplayPrice
-                      price={item?.price}
-                      sale={item?.sale}
-                      stock={item?.stock}
-                      qty={item?.quantity}
-                      dashboard={true}
-                    />
+                    <div className="price">{item.price}</div>
                   </div>
                   <div className="item-rating">
                     <h4>{item?.reviewsCount} review</h4>

@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useContext } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
-import { forms } from "@/Contexts/forms";
+import { selectors } from "@/Contexts/selectors";
 
 function Tags() {
   const {
@@ -12,7 +12,7 @@ function Tags() {
     updateCompsError,
     compsErrors,
     updateCompsInput,
-  } = useContext(forms);
+  } = useContext(selectors);
 
   const addTag = () => {
     const trimmed = compsInput.tags.trim();

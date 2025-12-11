@@ -1,13 +1,9 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { createContext, useState } from "react";
 
-export const dashboard = createContext();
+export const filters = createContext();
 
-export const DashBoardProvider = ({ children }) => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+export const FiltersProvider = ({ children }) => {
   const [searchText, setSearchText] = useState("");
   const [filtersState, setFiltersState] = useState({
     name: "",
@@ -35,10 +31,8 @@ export const DashBoardProvider = ({ children }) => {
     }
   };
   return (
-    <dashboard.Provider
+    <filters.Provider
       value={{
-        pathname,
-        searchParams,
         searchText,
         setSearchText,
         selectedCats,
@@ -47,6 +41,6 @@ export const DashBoardProvider = ({ children }) => {
       }}
     >
       {children}
-    </dashboard.Provider>
+    </filters.Provider>
   );
 };

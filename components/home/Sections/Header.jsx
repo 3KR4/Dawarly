@@ -1,18 +1,18 @@
 "use client";
-import "@/styles/components/header.css";
+import "@/styles/client/header.css";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import * as MdIcons from "react-icons/md";
 import { FaAngleRight, FaAngleDown } from "react-icons/fa6";
-import { mainContext } from "@/Contexts/mainContext";
+import { settings } from "@/Contexts/settings";
 import { IoMenu, IoClose } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import { MdLogout } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { FaCartShopping, FaUser } from "react-icons/fa6";
-import MiniCart from "@/components/MiniCart";
+import AdsCard from "@/components/home/AdsCard";
 import { navLinks } from "@/data";
 
 function Header() {
@@ -22,7 +22,7 @@ function Header() {
     setActiveNav(null);
   }, [pathname]);
 
-  const { screenSize } = useContext(mainContext);
+  const { screenSize } = useContext(settings);
   const [isLogin, setIsLogin] = useState(true);
   const [activeNav, setActiveNav] = useState(null);
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -159,7 +159,6 @@ function Header() {
             <>
               <button className="btn cart">
                 <FaCartShopping title="Cart" />
-                <MiniCart />
               </button>
               <button className="btn user">
                 <FaUser title="Login / Register" />

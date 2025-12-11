@@ -4,10 +4,11 @@ import { useState, useContext } from "react";
 
 import { IoIosArrowDown } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
-import { forms } from "@/Contexts/forms";
+import { selectors } from "@/Contexts/selectors";
 
 function SelectOptions() {
-  const { compsInput, selectedCat, setSelectedCat ,updateCompsInput } = useContext(forms);
+  const { compsInput, selectedCat, setSelectedCat, updateCompsInput } =
+    useContext(selectors);
   const [activeCat, setActiveCat] = useState(false);
 
   const filteredCategories = productCategories.filter((x) =>

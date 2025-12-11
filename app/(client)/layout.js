@@ -1,8 +1,11 @@
 import { Roboto } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { MainProvider } from "@/Contexts/mainContext";
-import "@/styles/globals.css";
+import Header from "@/components/home/Sections/Header";
+import Footer from "@/components/home/Sections/Footer";
+import { SettingsProvider } from "@/Contexts/settings";
+import { FiltersProvider } from "@/Contexts/filters";
+import { SelectorsProvider } from "@/Contexts/selectors";
+
+import "@/styles/client/globals.css";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -12,22 +15,22 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "Masr360",
+  title: "dawarly",
   description:
-    "Explore hidden gems, exciting night spots, and real Egyptian culture with Masr360. Your journey starts here — fun, local, and unforgettable.",
+    "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
 
   openGraph: {
-    title: "Masr360",
+    title: "dawarly",
     description:
-      "Explore hidden gems, exciting night spots, and real Egyptian culture with Masr360. Your journey starts here — fun, local, and unforgettable.",
-    url: "https://masr360.vercel.app/",
-    siteName: "Masr360",
+      "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
+    url: "https://dawarly.vercel.app/",
+    siteName: "dawarly",
     images: [
       {
         url: "/full-logo.jpg",
         width: 1000,
         height: 1000,
-        alt: "Masr360-logo",
+        alt: "dawarly-logo",
       },
     ],
     locale: "en_US",
@@ -44,11 +47,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={roboto.className}>
       <body>
-        <MainProvider>
-          <Header />
-          {children}
-          <Footer />
-        </MainProvider>
+        <SettingsProvider>
+          <FiltersProvider>
+            <SelectorsProvider>
+              <Header />
+              {children}
+              <Footer />
+            </SelectorsProvider>
+          </FiltersProvider>
+        </SettingsProvider>
       </body>
     </html>
   );

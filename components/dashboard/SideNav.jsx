@@ -1,15 +1,13 @@
 "use client";
-import "@/styles/components/header.css";
+import "@/styles/client/header.css";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { mainContext } from "@/Contexts/mainContext";
 import { RiGovernmentFill } from "react-icons/ri";
 
-import { PiCardsThreeFill } from "react-icons/pi";
 import { PiCardsFill } from "react-icons/pi";
 import { FaHeadset } from "react-icons/fa6";
-import { FaUsersCog, FaUsers } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 
 import {
   FaPlaceOfWorship,
@@ -27,7 +25,6 @@ import { usePathname } from "next/navigation";
 function SideNav() {
   const pathname = usePathname();
   const isActive = (path) => pathname == path;
-  console.log(pathname);
 
   const [isNavOpen, setIsNavOpen] = useState(null);
   useEffect(() => {
@@ -96,51 +93,6 @@ function SideNav() {
           </div>
         </Link>
 
-        <Link
-          href="/dashboard/governorates"
-          className={isActive("/dashboard/governorates") ? "active a" : " a"}
-        >
-          <div className="hold">
-            <h4>governorates</h4>
-            <RiGovernmentFill />
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/places"
-          className={isActive("/dashboard/places") ? "active a" : " a"}
-        >
-          <div className="hold">
-            <h4>places</h4>
-            <FaPlaceOfWorship />
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/nights"
-          className={isActive("/dashboard/nights") ? "active a" : " a"}
-        >
-          <div className="hold">
-            <h4>nights</h4>
-            <FaMoon />
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/events"
-          className={isActive("/dashboard/events") ? "active a" : " a"}
-        >
-          <div className="hold">
-            <h4>events</h4>
-            <MdEventNote />
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/games"
-          className={isActive("/dashboard/games") ? "active a" : " a"}
-        >
-          <div className="hold">
-            <h4>games</h4>
-            <FaChartPie />
-          </div>
-        </Link>
         <Link
           href="/dashboard/orders"
           className={isActive("/dashboard/orders") ? "active a" : " a"}

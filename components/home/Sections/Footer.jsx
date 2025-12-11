@@ -1,5 +1,5 @@
 "use client";
-import "@/styles/components/footer.css";
+import "@/styles/client/footer.css";
 
 import React from "react";
 import Image from "next/image";
@@ -25,7 +25,7 @@ const Footer = () => {
         <Image
           className="logo"
           src="/logo-transparent.png"
-          alt="Masr360 Logo"
+          alt="dawarly Logo"
           fill
         />
 
@@ -34,7 +34,7 @@ const Footer = () => {
           <div className="about">
             <h4>Contact Us</h4>
             <p>
-              Email: <a href="mailto:info@masr360.com">info@masr360.com</a>
+              Email: <a href="mailto:info@dawarly.com">info@dawarly.com</a>
             </p>
             <p>
               Phone: <a href="tel:+201000000000">+20 100 000 0000</a>
@@ -44,28 +44,28 @@ const Footer = () => {
             <h4>Social</h4>
             <div className="holder">
               <a
-                href="https://www.instagram.com/masr360.eg/"
+                href="https://www.instagram.com/dawarly.eg/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <AiFillInstagram />
               </a>
               <a
-                href="https://www.linkedin.com/company/masr360%C2%B0/"
+                href="https://www.linkedin.com/company/dawarly%C2%B0/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaLinkedinIn />
               </a>
               <a
-                href="https://www.facebook.com/Masr360e/"
+                href="https://www.facebook.com/dawarlye/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaFacebookF />
               </a>
               <a
-                href="https://www.tiktok.com/@masr360.travel/"
+                href="https://www.tiktok.com/@dawarly.travel/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -100,7 +100,7 @@ const Footer = () => {
 
       {/* Privacy & Rights */}
       <p className="privacy">
-        © {new Date().getFullYear()} Masr360. All rights reserved. |
+        © {new Date().getFullYear()} dawarly. All rights reserved. |
         <Link href="/privacy" className="privacy-link">
           {""}
           Privacy Policy

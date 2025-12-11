@@ -1,13 +1,11 @@
 import Image from "next/image";
-import "@/styles/pages/home.css";
-import Navigations from "@/components/Navigations";
+import "@/styles/client/pages/home.css";
+import Navigations from "@/components/tools/Navigations";
 
 export default function DashBoard() {
   return (
     <>
-      <div className="dash-holder">
-        <Navigations items={[]} container={`no`} isDashBoard={true} />
-      </div>
+      <div className="overview">overview</div>
     </>
   );
 }

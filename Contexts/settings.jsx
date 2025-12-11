@@ -2,9 +2,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-export const mainContext = createContext();
+export const settings = createContext();
 
-export const MainProvider = ({ children }) => {
+export const SettingsProvider = ({ children }) => {
   const [screenSize, setScreenSize] = useState(null);
   const [isReady, setIsReady] = useState(false); // ← جديد
   const pathname = usePathname();
@@ -34,8 +34,8 @@ export const MainProvider = ({ children }) => {
   }
 
   return (
-    <mainContext.Provider value={{ pathname, screenSize }}>
+    <settings.Provider value={{ pathname, screenSize }}>
       {children}
-    </mainContext.Provider>
+    </settings.Provider>
   );
 };

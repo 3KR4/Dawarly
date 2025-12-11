@@ -21,7 +21,7 @@ export default function Navigations({
         <Link href={"/"}>home</Link>
       ) : (
         <>
-          <Link href={"/"}>masr360</Link>
+          <Link href={"/"}>dawarly</Link>
           <span className={`separator`}>/ </span>
           <Link href={"/dashboard"}>dashboard</Link>
         </>

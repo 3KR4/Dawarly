@@ -1,18 +1,17 @@
 "use client";
 import React, { useRef, useContext } from "react";
-import { mainContext } from "@/Contexts/mainContext";
 import { CircleAlert } from "lucide-react";
 import { useForm } from "react-hook-form";
 import "@/styles/dashboard/forms.css";
-import Tags from "@/components/dashboard/forms/Tags";
-import Images from "@/components/dashboard/forms/Images";
-import Specs from "@/components/dashboard/forms/Specs";
-import SelectOptions from "@/components/dashboard/forms/SelectOptions";
-import { forms } from "@/Contexts/forms";
+import Tags from "@/components/tools/data-collector/Tags";
+import Images from "@/components/tools/data-collector/Images";
+import Specs from "@/components/tools/data-collector/Specs";
+import SelectOptions from "@/components/tools/data-collector/SelectOptions";
+import { selectors } from "@/Contexts/selectors";
 
 export default function CreateProduct() {
   const { setisSubmited, tags, images, specifications, selectedCat } =
-    useContext(forms);
+    useContext(selectors);
 
   const {
     register,

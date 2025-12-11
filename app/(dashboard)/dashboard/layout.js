@@ -1,11 +1,11 @@
 import { Roboto } from "next/font/google";
 import SideNav from "@/components/dashboard/SideNav";
-import { MainProvider } from "@/Contexts/mainContext";
-import { DashBoardProvider } from "@/Contexts/dashboard";
-import "@/styles/globals.css";
+import "@/styles/client/globals.css";
 import "@/styles/dashboard/globals.css";
-import Navigations from "@/components/Navigations";
 import Head from "@/components/dashboard/Head";
+import { SettingsProvider } from "@/Contexts/settings";
+import { FiltersProvider } from "@/Contexts/filters";
+import { SelectorsProvider } from "@/Contexts/selectors";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -15,20 +15,20 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "Masr360 DashBoard",
+  title: "dawarly DashBoard",
   description: "",
 
   openGraph: {
-    title: "Masr360 DashBoard",
+    title: "dawarly DashBoard",
     description: "",
-    url: "https://masr360.vercel.app/dashboard",
-    siteName: "Masr360 DashBoard",
+    url: "https://dawarly.vercel.app/dashboard",
+    siteName: "dawarly DashBoard",
     images: [
       {
         url: "/full-logo.jpg",
         width: 1000,
         height: 1000,
-        alt: "Masr360-logo",
+        alt: "dawarly-logo",
       },
     ],
     locale: "en_US",
@@ -45,18 +45,20 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={roboto.className}>
       <body>
-        <MainProvider>
-          <DashBoardProvider>
-            <div className="dashboard">
-              <SideNav />
+        <SettingsProvider>
+          <FiltersProvider>
+            <SelectorsProvider>
+              <div className="dashboard">
+                <SideNav />
 
-              <div className="dash-holder">
-                <Head />
-                {children}
+                <div className="dash-holder">
+                  <Head />
+                  {children}
+                </div>
               </div>
-            </div>
-          </DashBoardProvider>
-        </MainProvider>
+            </SelectorsProvider>
+          </FiltersProvider>
+        </SettingsProvider>
       </body>
     </html>
   );
