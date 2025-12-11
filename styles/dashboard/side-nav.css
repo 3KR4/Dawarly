@@ -1,0 +1,121 @@
+.side-nav {
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.side-nav h4 {
+  font-size: 15px;
+  transition: 0.3s;
+  color: var(--paragraph);
+  width: 0;
+  overflow: hidden;
+}
+.side-nav .a {
+  cursor: pointer;
+}
+.side-nav.active h4 {
+  width: 145px;
+}
+.side-nav svg {
+  color: var(--paragraph);
+}
+.side-nav .actions-btns {
+  padding: 6px 15px !important;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-top: 0px !important;
+  height: 56px !important;
+}
+.side-nav div + div .actions-btns {
+  border-top: 1px solid #e0e0e0 !important;
+  border-bottom: 0 I !important;
+}
+.side-nav.active .actions-btns {
+  padding: 6px 18px !important;
+}
+.side-nav .actions-btns:hover {
+  background: var(--section-color);
+}
+.side-nav .a.danger:hover .hold {
+  background: #ce3636;
+}
+
+.side-nav h4 {
+  white-space: nowrap;
+}
+.side-nav .menu-ico {
+  font-size: 26px !important;
+}
+.side-nav.active .actions-btns svg {
+  font-size: 20px !important;
+}
+.side-nav .a,
+.side-nav .actions-btns {
+  gap: 0px;
+  height: 50px;
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 6px;
+  justify-content: center;
+
+  transition: 0.3s;
+}
+.side-nav.active .side-nav .a,
+.side-nav.active .side-nav .actions-btns {
+  justify-content: space-between;
+}
+.side-nav.active .a,
+.side-nav.active .actions-btns {
+  gap: 10px;
+}
+.side-nav .a .hold {
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  display: flex;
+  padding: 12px;
+  transition: 0.3s;
+}
+.side-nav .a:hover .hold,
+.side-nav .a.active .hold {
+  background: var(--main-color);
+  border-radius: 7px;
+}
+.side-nav svg {
+  font-size: 20px;
+}
+.side-nav.active svg {
+  font-size: 19px;
+}
+.side-nav .a:hover *, 
+.side-nav .a.active *{
+  color: white;
+}
+
+.side-nav .a-user {
+  border-top: 1px solid #e0e0e0 !important;
+  cursor: auto;
+}
+.side-nav .a-user .hold {
+  border-radius: 0px;
+  background: transparent !important;
+}
+.side-nav .a-user .hold svg {
+  cursor: auto;
+  color: var(--paragraph) !important;
+}
+.side-nav.active .a-user .hold {
+  border-radius: 7px;
+  background: var(--second-color) !important;
+}
+.side-nav.active .a-user:hover .hold {
+  background: var(--second-color);
+}
+.side-nav.active .a-user:hover .hold * {
+  color: var(--paragraph);
+}

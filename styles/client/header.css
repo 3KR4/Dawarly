@@ -1,0 +1,783 @@
+/*! HEADER */
+header {
+  z-index: 10;
+  position: sticky;
+  top: 0;
+  background: var(--body-color);
+  border-bottom: 1.5px solid var(--border-color);
+  border-bottom: 1px solid #e0e0e0;
+}
+header .container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+header .logo {
+  display: flex;
+}
+header .logo img {
+  cursor: pointer;
+  width: 102px !important;
+  position: relative !important;
+}
+header .container > .holder {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header nav {
+  display: flex;
+  align-items: center;
+}
+header nav ul {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 11px;
+}
+
+header nav ul::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+header nav ul::-moz-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+header nav > ul > li {
+  color: var(--paragraph);
+  cursor: pointer;
+  align-items: center;
+  gap: 3px;
+  padding: 28px 19px;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  font-weight: 700;
+  display: flex;
+  position: relative;
+}
+
+header nav > ul > li::before {
+  content: "";
+  background: var(--main-color);
+  width: 0%;
+  height: 3px;
+  transition: all 0.3s;
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+header nav > ul > li .page-route {
+  color: var(--paragraph);
+  min-width: max-content;
+}
+header nav > ul > li:hover .page-route {
+  color: var(--main-color);
+}
+header nav ul li:hover,
+header nav ul li.active {
+  color: var(--main-color);
+}
+
+header nav ul li:hover svg,
+header nav ul li.active svg {
+  transform: rotate(180deg);
+  color: var(--main-color);
+}
+header nav ul li:hover::before,
+header nav ul li.active::before {
+  width: 100%;
+}
+
+header .routs-menu {
+  background: var(--section-color);
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  padding: 18px 0;
+  display: flex;
+  position: absolute;
+  top: 74px;
+  left: 50%;
+
+  background: var(--body-color);
+  width: 80%;
+  transform: translateX(-50%);
+  border-radius: 0 0 22px 22px;
+  border: 1px solid #e0e0e0;
+  border-top: 0;
+  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+}
+header:has(nav li:hover) .routs-menu,
+.routs-menu:hover {
+  visibility: visible;
+  z-index: 1;
+  opacity: 1;
+}
+
+header .routs-menu:not(:has(.main-button)) {
+  padding: 30px 0;
+}
+header .routs-menu .container {
+  align-items: center;
+  gap: 50px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+header .routs-menu .container > div h4 {
+  color: var(--main-color);
+  text-transform: uppercase;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  transition: all;
+  display: flex;
+}
+header .routs-menu .container > div h4 svg {
+  color: var(--main-color);
+  font-size: 23px;
+}
+header .routs-menu .container > div h4 .arrow-right {
+  font-size: 15px;
+  color: var(--paragraph);
+  margin-left: -3px;
+}
+header .routs-menu .container > div ul {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+header .routs-menu .container > div h4 a {
+  font-weight: 500;
+}
+header .routs-menu .container .main-button {
+  font-size: 13px;
+  height: 37px;
+}
+header .routs-menu .container > div a {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.3s;
+  color: var(--paragraph);
+}
+header .routs-menu .container > div a:hover {
+  color: var(--main-color);
+}
+header .routs-menu .container > div .main-button,
+header .routs-menu .container > div .main-button:hover {
+  color: white;
+  font-weight: 700;
+}
+
+header .routs-menu .container .row-h4s {
+  display: flex;
+  gap: 50px;
+  border-bottom: 1px solid var(--border-color2);
+  padding-bottom: 30px;
+}
+
+header .routs-menu .holder {
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  margin-top: 33px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border-color2);
+}
+header .routs-menu .holder > * {
+  width: 50%;
+}
+header .routs-menu .holder .left .top {
+  margin-bottom: 16px;
+  padding: 0 6px;
+  display: flex;
+  justify-content: space-between;
+}
+header .routs-menu .holder .left .top h4 {
+  all: unset;
+  font-size: 15px;
+  color: var(--title-color);
+}
+header .routs-menu .holder .left .top a {
+  text-decoration: underline;
+}
+header .routs-menu .holder .left .top a:hover {
+  color: var(--main-color);
+  font-weight: 500;
+}
+header .routs-menu .holder .left .row {
+  display: flex;
+  gap: 12px;
+}
+header .routs-menu .holder .left .row .card {
+  position: relative;
+  background: var(--main-color);
+  height: 175px;
+  border-radius: 19px;
+  overflow: hidden;
+  cursor: pointer;
+}
+header .routs-menu .holder .left .row .card:hover svg {
+  transform: translateY(-6px) translateX(2px) rotate(45deg);
+}
+header .routs-menu .holder .left .row .card img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+header .routs-menu .holder .left .row .card h5 {
+  position: absolute;
+  color: white;
+  font-weight: 500;
+  left: 18px;
+  font-size: 15px;
+  bottom: 20px;
+}
+header .routs-menu .holder .left .row .card svg {
+  position: absolute;
+  right: 15px;
+  top: 19px;
+  color: white;
+  font-size: 18px;
+  transform: rotate(45deg);
+}
+header .routs-menu .holder .right .hold {
+  display: flex;
+  justify-content: space-between;
+}
+header .routs-menu .holder .right .hold .colomn h4 {
+  all: unset;
+  font-size: 18px;
+  margin-bottom: 5px;
+  display: flex;
+}
+header .routs-menu .holder .right .hold .colomn h5 {
+  font-size: 16px;
+  font-family: sans-serif;
+  color: #868686;
+}
+header .routs-menu .holder .right .hold button {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--title-color);
+  border: 1px solid var(--title-color);
+  border-radius: 9px;
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+header .routs-menu .holder .right .hold button:hover {
+  background: #e7e8e9;
+}
+header .actions-btns {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+header .actions-btns .main-button {
+  height: 36px;
+  font-weight: 700;
+  border-radius: 6px !important;
+  padding: 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+header .actions-btns .search-holder {
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  border: 2px solid var(--main-color);
+  transition: 0.3s;
+}
+header .actions-btns .search-holder:hover {
+  border-color: var(--hover-color);
+}
+header .actions-btns .search-holder .input {
+  display: flex;
+  align-items: center;
+}
+header .actions-btns .search-holder .input.active input {
+  width: 200px;
+  padding: 0 12px;
+  height: 100%;
+}
+header .actions-btns .search-holder input {
+  transition: 0.3s;
+
+  width: 0px;
+  padding: 0px;
+}
+header .actions-btns .search-holder input::placeholder {
+  color: var(--main-color);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  font-size: 13px;
+}
+header .actions-btns .search-holder svg {
+  height: 100%;
+  background: var(--main-color);
+  color: white;
+  width: 42px;
+  padding: 7px;
+  border-radius: 0;
+}
+
+header .actions-btns .search-holder svg.close {
+  padding: 0;
+}
+header .actions-btns .search-holder .results {
+  position: absolute;
+  width: 100%;
+  background: white;
+  padding: 15px;
+  z-index: -1;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s;
+  top: 50px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 7px 5px #00000014;
+  border-top: 3px solid var(--main-color);
+  border-radius: 6px 6px 12px 12px !important;
+}
+header .actions-btns .search-holder:has(.input.active) .results {
+  z-index: 2;
+  visibility: visible;
+  opacity: 1;
+}
+
+header .actions-btns .search-holder .results .main-button {
+  height: 0;
+  width: 100%;
+  margin-top: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-size: 14px;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+header .actions-btns .btn,
+header .actions-btns a {
+  font-size: 15px;
+  font-weight: 400;
+  display: flex;
+  cursor: auto;
+}
+header .actions-btns .search-holder .results a:not(.main-button) {
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--paragraph);
+  font-weight: 500;
+  cursor: pointer;
+}
+header .actions-btns .search-holder .results a:not(.main-button):hover {
+  background: var(--main-color);
+  color: white;
+}
+header .actions-btns svg {
+  background-color: var(--main-color);
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 35px;
+  display: flex;
+  padding: 8px;
+  color: white;
+}
+header .actions-btns svg:hover,
+header .actions-btns .search-holder svg:hover {
+  background: var(--hover-color);
+}
+header .actions-btns .menuHandler svg {
+  padding: 5px;
+}
+header .actions-btns .menu {
+  position: absolute;
+  right: -20px;
+  top: 48px;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding-bottom: 15px;
+  z-index: -1;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s;
+  width: 280px;
+  box-shadow: 0 2px 10px #0000001a;
+}
+header .actions-btns .btn:hover .menu {
+  z-index: 2;
+  visibility: visible;
+  opacity: 1;
+}
+header .actions-btns .menu::before {
+  content: "";
+  width: 100%;
+  height: 13px;
+  position: absolute;
+  top: -13px;
+  left: 0;
+}
+header .actions-btns .cartMenu::before {
+  top: -16px;
+}
+header .actions-btns .userMenu .top {
+  background: var(--main-color);
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-align: left;
+  margin-bottom: 9px;
+  padding: 13px 17px;
+
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+
+header .actions-btns .userMenu li {
+  padding: 11px;
+  padding: 0 11px;
+  cursor: pointer;
+}
+
+header .actions-btns .userMenu a,
+.userMenu .danger {
+  color: var(--paragraph);
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+header .actions-btns .userMenu a:hover {
+  background: #eeeeee;
+}
+
+header .actions-btns .userMenu .danger {
+  margin: 0 11px;
+  padding: 11px 12px;
+  display: flex;
+}
+header .actions-btns .userMenu .danger:hover {
+  color: #fff;
+  background: #ce3636;
+}
+
+header .actions-btns .userMenu svg {
+  transform: translateY(1px);
+  font-size: 20px;
+  color: white;
+  width: unset;
+  height: unset;
+  padding: unset;
+  border-radius: unset;
+  background: transparent;
+  width: 0 !important;
+  margin-right: 0;
+  transition: 0.3s;
+}
+header .actions-btns .userMenu .danger:hover svg {
+  width: 19px !important;
+  margin-right: 5px;
+}
+
+/*! MINI-CART  */
+
+header .cartMenu {
+  width: 339px !important;
+  border-top: 3px solid var(--main-color);
+  padding-bottom: 0 !important;
+  border-radius: 6px 6px 12px 12px !important;
+}
+header .cartMenu > * {
+  padding: 12px;
+}
+
+header .cartMenu .top.forEmpety {
+  font-size: 15px;
+  padding-bottom: 10px;
+}
+header .cartMenu .info a {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--paragraph);
+}
+header .cartMenu .info a:hover {
+  color: var(--main-color);
+}
+header .cartMenu .top {
+  color: var(--title-color);
+  font-size: 14px;
+  border-bottom: 2px solid #e9ecef;
+}
+header .cartMenu .holder {
+  max-height: 243px;
+  padding: 0 0 0 12px;
+  overflow: auto;
+}
+header .cartMenu .holder::-webkit-scrollbar {
+  width: 5px;
+}
+header .cartMenu .holder::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+}
+header .cartMenu .item {
+  padding: 10px 0;
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+  padding-right: 5px;
+}
+header .cartMenu .item img {
+  border-radius: 5px;
+  min-width: 64px !important;
+  max-width: 64px !important;
+  height: 60px !important;
+  object-fit: cover;
+}
+header .cartMenu .item .info {
+  flex-direction: column;
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+header .cartMenu .item .info > p {
+  color: var(--paragraph);
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+}
+header .cartMenu .item .remove {
+  color: #d94452;
+  font-size: 8px;
+  width: 23px;
+  height: 23px;
+  padding: 0;
+  background: transparent !important;
+  transform: translateY(-2px);
+}
+header .cartMenu .item .remove:hover {
+  color: #c82333;
+}
+header .cartMenu .item .info > span {
+  font-size: 12px;
+  text-align: left;
+  color: var(--paragraph);
+  font-weight: 500;
+}
+header .cartMenu .total {
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  font-weight: 500;
+  color: var(--paragraph);
+  font-size: 15px;
+  padding-bottom: 0;
+}
+header .cartMenu .btns {
+  flex-direction: column;
+  gap: 5px;
+  display: flex;
+}
+header .cartMenu .btns a.forcart {
+  background: #313131;
+}
+header .cartMenu .btns a.forcart:hover {
+  background: var(--main-color);
+}
+header .cartMenu .btns a {
+  border-radius: 6px !important;
+  width: 100%;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+@media (max-width: 1300px) {
+  header .routs-menu .container {
+    gap: 35px;
+  }
+  header .actions-btns .menu {
+    right: 0;
+  }
+}
+@media (max-width: 1200px) {
+  header nav > ul > li {
+    padding: 28px 14px;
+  }
+  header .routs-menu .container {
+    gap: 25px;
+  }
+}
+@media (max-width: 1100px) {
+  header .routs-menu {
+    width: 95%;
+  }
+  header .routs-menu .container {
+    gap: 25px;
+  }
+  header .routs-menu .container > div a {
+    font-size: 13px;
+  }
+  header .routs-menu .container > div h4 svg {
+    font-size: 21px;
+  }
+  header .routs-menu .container .main-button {
+    font-size: 12px;
+    padding: 17px 18px;
+  }
+  header .routs-menu {
+    height: unset;
+  }
+  header .actions-btns .search-holder .input.active input {
+    width: 130px;
+    padding: 0 8px;
+  }
+}
+@media (max-width: 992px) {
+  header > .container {
+    padding: 8px 12px;
+  }
+  header .logo img {
+    width: 90px !important;
+    transform: unset;
+  }
+  header nav {
+    position: absolute;
+    background: white;
+    border-radius: 0 0 14px 14px;
+    left: 50%;
+    transform: translate(-50%, 1px);
+    width: 94%;
+    justify-content: center;
+    z-index: -1;
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+    position: absolute;
+    min-height: 63px;
+    border: 1px solid #e0e0e0;
+    border-top: 0;
+  }
+  header nav.active {
+    visibility: visible;
+    z-index: 1;
+    opacity: 1;
+  }
+  header nav > ul > li {
+    padding: 23px 14px;
+    font-weight: 500;
+  }
+  header .routs-menu {
+    top: 63px;
+    border: 1px solid #e0e0e0;
+    width: 94% !important;
+    padding: 16px 0;
+  }
+  header .routs-menu .container {
+    gap: 10px 25px;
+  }
+  header .routs-menu .container .main-button {
+    height: unset;
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 900px) {
+  header .routs-menu .container {
+    gap: 10px 14px;
+  }
+}
+@media (max-width: 786px) {
+  header nav > ul > li {
+    padding: 23px 8px;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  header .routs-menu .container {
+    gap: 10px 10px;
+  }
+  header .routs-menu .container > div h4 {
+    gap: 3px;
+  }
+  header .routs-menu .container > div a {
+    font-size: 12px;
+  }
+}
+@media (max-width: 480px) {
+  header .logo img {
+    width: 80px !important;
+  }
+  header nav {
+    width: 96%;
+  }
+  header nav > ul > li {
+    padding: 23px 6px;
+  }
+  header .actions-btns svg {
+    width: 36px;
+    height: 30px;
+  }
+  header .actions-btns .search-holder {
+    height: 30px;
+  }
+  header .actions-btns .search-holder svg {
+    width: 32px;
+    padding: 6px;
+  }
+  header .actions-btns .menu,
+  header .actions-btns .search-holder .results {
+    top: 43px;
+  }
+  header .actions-btns .search-holder .input.active input {
+    width: 100px;
+  }
+  header .actions-btns .search-holder .results {
+    padding: 11px;
+  }
+  header .actions-btns .search-holder .results .main-button {
+    font-size: 13px;
+  }
+  header .actions-btns .search-holder .results a:not(.main-button) {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  header .cartMenu .top {
+    font-size: 13px;
+  }
+  header .actions-btns .userMenu a,
+  .userMenu .danger {
+    padding: 9px 12px;
+    font-size: 15px;
+  }
+}
+@media (max-width: 390px) {
+  header .logo img {
+    width: 75px !important;
+  }
+  header nav {
+    width: 100%;
+  }
+  header nav ul::-webkit-scrollbar {
+    height: 3px;
+  }
+  header nav > ul > li .page-route {
+    width: max-content;
+  }
+}
