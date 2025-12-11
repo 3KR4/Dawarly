@@ -13,16 +13,19 @@ import { MdLogout } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { FaCartShopping, FaUser } from "react-icons/fa6";
 import AdsCard from "@/components/home/AdsCard";
-import { navLinks } from "@/data";
 
+import { navLinks } from "@/data";
+import useTranslate from "@/Contexts/useTranslation";
 function Header() {
+  const t = useTranslate();
   const pathname = usePathname();
 
   useEffect(() => {
     setActiveNav(null);
   }, [pathname]);
 
-  const { screenSize } = useContext(settings);
+  const { screenSize, theme, toggleTheme, locale, toggleLocale } =
+    useContext(settings);
   const [isLogin, setIsLogin] = useState(true);
   const [activeNav, setActiveNav] = useState(null);
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -206,6 +209,12 @@ function Header() {
             </div>
           )}
         </div>
+        <button onClick={toggleTheme}>
+          {theme === "light" ? "Dark Mode" : "Light Mode"}
+        </button>
+        <button onClick={toggleLocale}>
+          {locale === "en" ? "العربية" : "English"}
+        </button>
       </div>
       {screenSize !== "large" && nav()}
     </header>

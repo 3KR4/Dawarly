@@ -27,14 +27,56 @@ export const SettingsProvider = ({ children }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
   // 🔥 الحل: منع أي Render لحد ما الشاشة تتحدد
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+
+  const [locale, setLocale] = useState("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("locale");
+    if (saved) setLocale(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("lang", locale);
+    document.documentElement.setAttribute(
+      "dir",
+      locale === "ar" ? "rtl" : "ltr"
+    );
+    localStorage.setItem("locale", locale);
+  }, [locale]);
+
+  const toggleLocale = () => setLocale((prev) => (prev === "en" ? "ar" : "en"));
   if (!isReady) {
     return null; // أو Loader صغير حسب رغبتك
   }
 
   return (
-    <settings.Provider value={{ pathname, screenSize }}>
+    <settings.Provider
+      value={{
+        pathname,
+        screenSize,
+        theme,
+        setTheme,
+        toggleTheme,
+        locale,
+        setLocale,
+        toggleLocale,
+      }}
+    >
       {children}
     </settings.Provider>
   );

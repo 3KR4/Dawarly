@@ -17,6 +17,12 @@
   --title-color: #333;
   --paragraph: #575757;
 }
+[data-theme="dark"] {
+  --body-color: #000000;
+  --section-color: #f2f2f2;
+  --main-color: #1cee00;
+}
+
 body {
   background-color: var(--body-color);
   display: flex;
