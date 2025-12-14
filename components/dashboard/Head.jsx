@@ -3,12 +3,11 @@ import React, { useState, useRef, useContext } from "react";
 import "@/styles/client/tables.css";
 import "@/styles/dashboard/globals.css";
 import { FaSearch } from "react-icons/fa";
-import { govs, filterss, categories } from "@/data";
+import { filterss } from "@/data";
 import Link from "next/link";
-import Navigations from "@/components/tools/Navigations";
+import Navigations from "@/components/Tools/Navigations";
 import { IoIosClose } from "react-icons/io";
-import { IoIosArrowDown } from "react-icons/io";
-import { IoMdClose } from "react-icons/io";
+
 import { filters } from "@/Contexts/filters";
 import { settings } from "@/Contexts/settings";
 import { getBreadcrumbItems } from "@/utlies/getBreadcrumbItems ";
