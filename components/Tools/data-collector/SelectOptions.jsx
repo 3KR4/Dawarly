@@ -1,4 +1,4 @@
-import { productCategories } from "@/data";
+import { categories } from "@/data";
 import React from "react";
 import { useState, useContext } from "react";
 
@@ -11,7 +11,7 @@ function SelectOptions() {
     useContext(selectors);
   const [activeCat, setActiveCat] = useState(false);
 
-  const filteredCategories = productCategories.filter((x) =>
+  const filteredCategories = categories.filter((x) =>
     x.name.toLowerCase().includes(compsInput.cats.toLowerCase())
   );
   return (

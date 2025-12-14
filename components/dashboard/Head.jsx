@@ -3,7 +3,7 @@ import React, { useState, useRef, useContext } from "react";
 import "@/styles/client/tables.css";
 import "@/styles/dashboard/globals.css";
 import { FaSearch } from "react-icons/fa";
-import { govs, filterss, productCategories } from "@/data";
+import { govs, filterss, categories } from "@/data";
 import Link from "next/link";
 import Navigations from "@/components/tools/Navigations";
 import { IoIosClose } from "react-icons/io";
@@ -61,26 +61,25 @@ function Head() {
     const cleanPath = pathname.split("?")[0];
     return cleanPath + "/form";
   }
-  console.log(navigationitems[0]?.name);
 
-  const citys = govs;
-  const cats = productCategories;
+  // const citys = govs;
+  // const cats = categories;
 
-  const subCats = productCategories?.find(
-    (x) => x?.name == selectedCats?.cat
-  )?.subcategories;
+  // const subCats = categories?.find(
+  //   (x) => x?.name == selectedCats?.cat
+  // )?.subcategories;
 
-  const filteredGovs = citys?.filter((x) =>
-    x.toLowerCase().includes(catsSearch.toLowerCase())
-  );
+  // const filteredGovs = citys?.filter((x) =>
+  //   x.toLowerCase().includes(catsSearch.toLowerCase())
+  // );
 
-  const filteredCats = cats?.filter((x) =>
-    x?.name.toLowerCase().includes(catsSearch.toLowerCase())
-  );
+  // const filteredCats = cats?.filter((x) =>
+  //   x?.name.toLowerCase().includes(catsSearch.toLowerCase())
+  // );
 
-  const filteredSubCats = subCats?.filter((x) =>
-    x?.name.toLowerCase().includes(catsSearch.toLowerCase())
-  );
+  // const filteredSubCats = subCats?.filter((x) =>
+  //   x?.name.toLowerCase().includes(catsSearch.toLowerCase())
+  // );
 
   return (
     <div className="head">
@@ -109,7 +108,7 @@ function Head() {
               )}
             </div>
           )}
-          {citys && (
+          {/* {citys && (
             <div className="filters for-cats gov">
               <div className="btn">
                 <h4
@@ -343,7 +342,7 @@ function Head() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
           {canCreate(navigationitems[0]?.name) && (
             <Link href={getCreateLink(pathname)} className="main-button">
               Create {getBaseName(navigationitems[0]?.name)}

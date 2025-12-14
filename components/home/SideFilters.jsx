@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Slider from "@mui/material/Slider";
-import { tourismCategories, productCategories, nightsCategories } from "@/data";
+import { tourismCategories, categories, nightsCategories } from "@/data";
 import "@/styles/components/filters.css";
 import { IoIosClose } from "react-icons/io";
 
@@ -44,7 +44,7 @@ const Filters = ({
 
   const cats =
     catsType == "product"
-      ? productCategories
+      ? categories
       : catsType == "night"
       ? nightsCategories
       : tourismCategories;

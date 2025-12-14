@@ -7,7 +7,7 @@ import Image from "next/image";
 import "@/styles/client/tables.css";
 import { FaTrashAlt, FaEye } from "react-icons/fa";
 import { settings } from "@/Contexts/settings";
-import { products } from "@/data";
+import { ads } from "@/data";
 import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
@@ -37,7 +37,7 @@ export default function Products() {
           </div>
 
           <div className="table-items">
-            {products.slice(0, 10).map((item) => {
+            {ads.slice(0, 10).map((item) => {
               return (
                 <div key={item.id} className="table-item">
                   <div className="holder">
