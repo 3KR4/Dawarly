@@ -11,7 +11,7 @@ import { FaTiktok, FaFacebookF, FaLinkedinIn } from "react-icons/fa6";
 const Footer = () => {
   return (
     <footer>
-      <Image
+      {/* <Image
         src="/footer-bg.png"
         alt="Footer Background"
         fill
@@ -21,7 +21,6 @@ const Footer = () => {
         Discover the beauty, history, and culture of Egypt — all in one place.
       </p>
       <div className="container">
-        {/* Logo Section */}
         <Image
           className="logo"
           src="/logo-transparent.png"
@@ -30,7 +29,6 @@ const Footer = () => {
         />
 
         <div className="hold">
-          {/* About Section */}
           <div className="about">
             <h4>Contact Us</h4>
             <p>
@@ -75,7 +73,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Navigation Links */}
         <div className="navlinks">
           <h4>Quick Links</h4>
           <ul>
@@ -98,14 +95,13 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Privacy & Rights */}
       <p className="privacy">
         © {new Date().getFullYear()} dawarly. All rights reserved. |
         <Link href="/privacy" className="privacy-link">
           {""}
           Privacy Policy
         </Link>
-      </p>
+      </p> */}
     </footer>
   );
 };

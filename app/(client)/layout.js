@@ -1,4 +1,4 @@
-import { Roboto } from "next/font/google";
+import { Cairo } from "next/font/google";
 import Header from "@/components/home/Sections/Header";
 import Footer from "@/components/home/Sections/Footer";
 import { SettingsProvider } from "@/Contexts/settings";
@@ -7,27 +7,25 @@ import { SelectorsProvider } from "@/Contexts/selectors";
 
 import "@/styles/client/globals.css";
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
 export const metadata = {
-  title: "dawarly",
+  title: "Dawarly",
   description:
     "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
-
   openGraph: {
-    title: "dawarly",
+    title: "Dawarly",
     description:
       "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
     url: "https://dawarly.vercel.app/",
-    siteName: "dawarly",
+    siteName: "Dawarly",
     images: [
       {
-        url: "/full-logo.jpg",
+        url: "/logo.png",
         width: 1000,
         height: 1000,
         alt: "dawarly-logo",
@@ -45,7 +43,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={roboto.className}>
+    <html lang="en" className={cairo.className}>
       <body>
         <SettingsProvider>
           <FiltersProvider>

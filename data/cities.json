@@ -1,0 +1,96 @@
+[
+  { "id": 101, "governorate_id": 1, "name_ar": "مدينة نصر", "name_en": "Nasr City", "districts_count": 3 },
+  { "id": 102, "governorate_id": 1, "name_ar": "مصر الجديدة", "name_en": "Heliopolis", "districts_count": 2 },
+  { "id": 103, "governorate_id": 1, "name_ar": "التجمع الخامس", "name_en": "Fifth Settlement", "districts_count": 3 },
+  { "id": 104, "governorate_id": 1, "name_ar": "المعادي", "name_en": "Maadi", "districts_count": 2 },
+  { "id": 105, "governorate_id": 1, "name_ar": "المقطم", "name_en": "Mokattam", "districts_count": 1 },
+  { "id": 106, "governorate_id": 1, "name_ar": "شبرا الخيمة", "name_en": "Shubra El Kheima", "districts_count": 2 },
+
+  { "id": 201, "governorate_id": 2, "name_ar": "الهرم", "name_en": "Al Haram", "districts_count": 2 },
+  { "id": 202, "governorate_id": 2, "name_ar": "الدقي", "name_en": "Dokki", "districts_count": 1 },
+  { "id": 203, "governorate_id": 2, "name_ar": "المهندسين", "name_en": "Mohandessin", "districts_count": 1 },
+  { "id": 204, "governorate_id": 2, "name_ar": "6 اكتوبر", "name_en": "6th of October", "districts_count": 3 },
+  { "id": 205, "governorate_id": 2, "name_ar": "الشيخ زايد", "name_en": "Sheikh Zayed", "districts_count": 1 },
+
+  { "id": 301, "governorate_id": 3, "name_ar": "سموحة", "name_en": "Smouha", "districts_count": 2 },
+  { "id": 302, "governorate_id": 3, "name_ar": "محرم بك", "name_en": "Moharram Bek", "districts_count": 1 },
+  { "id": 303, "governorate_id": 3, "name_ar": "العجمي", "name_en": "El Agamy", "districts_count": 1 },
+  { "id": 304, "governorate_id": 3, "name_ar": "المنتزه", "name_en": "El Montaza", "districts_count": 1 },
+
+  { "id": 401, "governorate_id": 4, "name_ar": "المنصورة", "name_en": "Mansoura", "districts_count": 2 },
+  { "id": 402, "governorate_id": 4, "name_ar": "طلخا", "name_en": "Talkha", "districts_count": 1 },
+  { "id": 403, "governorate_id": 4, "name_ar": "دكرنس", "name_en": "Dekernes", "districts_count": 1 },
+
+  { "id": 501, "governorate_id": 5, "name_ar": "الزقازيق", "name_en": "Zagazig", "districts_count": 2 },
+  { "id": 502, "governorate_id": 5, "name_ar": "العاشر من رمضان", "name_en": "10th of Ramadan", "districts_count": 1 },
+  { "id": 503, "governorate_id": 5, "name_ar": "الاقصر", "name_en": "el-misr ???", "districts_count": 0 },
+
+  { "id": 601, "governorate_id": 6, "name_ar": "الغردقة", "name_en": "Hurghada", "districts_count": 2 },
+  { "id": 602, "governorate_id": 6, "name_ar": "مرسى علم", "name_en": "Marsa Alam", "districts_count": 1 },
+  { "id": 603, "governorate_id": 6, "name_ar": "سفاجا", "name_en": "Safaga", "districts_count": 1 },
+
+  { "id": 701, "governorate_id": 7, "name_ar": "شرم الشيخ", "name_en": "Sharm El Sheikh", "districts_count": 3 },
+  { "id": 702, "governorate_id": 7, "name_ar": "دهب", "name_en": "Dahab", "districts_count": 1 },
+  { "id": 703, "governorate_id": 7, "name_ar": "نويبع", "name_en": "Nuweiba", "districts_count": 1 },
+
+  { "id": 801, "governorate_id": 8, "name_ar": "طنطا", "name_en": "Tanta", "districts_count": 1 },
+  { "id": 802, "governorate_id": 8, "name_ar": "المحلة الكبرى", "name_en": "El Mahalla El Kubra", "districts_count": 1 },
+  { "id": 803, "governorate_id": 8, "name_ar": "كفر الزيات", "name_en": "Kafr El Zayat", "districts_count": 1 },
+
+  { "id": 901, "governorate_id": 9, "name_ar": "دسوق", "name_en": "Desouk", "districts_count": 1 },
+  { "id": 902, "governorate_id": 9, "name_ar": "برج البرلس", "name_en": "Borg El Burullus", "districts_count": 1 },
+
+  { "id": 1001, "governorate_id": 10, "name_ar": "شبين الكوم", "name_en": "Shebin El Kom", "districts_count": 1 },
+  { "id": 1002, "governorate_id": 10, "name_ar": "منوف", "name_en": "Menouf", "districts_count": 1 },
+  { "id": 1003, "governorate_id": 10, "name_ar": "قويسنا", "name_en": "Quesna", "districts_count": 1 },
+
+  { "id": 1101, "governorate_id": 11, "name_ar": "دمياط", "name_en": "Damietta", "districts_count": 1 },
+  { "id": 1102, "governorate_id": 11, "name_ar": "رأس البر", "name_en": "Ras El Bar", "districts_count": 1 },
+
+  { "id": 1201, "governorate_id": 12, "name_ar": "بورسعيد", "name_en": "Port Said", "districts_count": 1 },
+
+  { "id": 1301, "governorate_id": 13, "name_ar": "السويس", "name_en": "Ismailia City", "districts_count": 1 },
+  { "id": 1302, "governorate_id": 13, "name_ar": "فايد", "name_en": "Fayed", "districts_count": 1 },
+
+  { "id": 1401, "governorate_id": 14, "name_ar": "السويس", "name_en": "Suez", "districts_count": 1 },
+
+  { "id": 1501, "governorate_id": 15, "name_ar": "الفيوم", "name_en": "Fayoum", "districts_count": 1 },
+  { "id": 1502, "governorate_id": 15, "name_ar": "طامية", "name_en": "Tamiya", "districts_count": 1 },
+
+  { "id": 1601, "governorate_id": 16, "name_ar": "بني سويف", "name_en": "Beni Suef", "districts_count": 1 },
+  { "id": 1602, "governorate_id": 16, "name_ar": "ناصر", "name_en": "Nasser", "districts_count": 1 },
+
+  { "id": 1701, "governorate_id": 17, "name_ar": "المنيا", "name_en": "Minya", "districts_count": 2 },
+  { "id": 1702, "governorate_id": 17, "name_ar": "مغاغة", "name_en": "Maghagha", "districts_count": 1 },
+  { "id": 1703, "governorate_id": 17, "name_ar": "العدوة", "name_en": "El Adwa", "districts_count": 1 },
+
+  { "id": 1801, "governorate_id": 18, "name_ar": "أسيوط", "name_en": "Assiut", "districts_count": 1 },
+  { "id": 1802, "governorate_id": 18, "name_ar": "ديروط", "name_en": "Deirout", "districts_count": 1 },
+
+  { "id": 1901, "governorate_id": 19, "name_ar": "سوهاج", "name_en": "Sohag", "districts_count": 1 },
+  { "id": 1902, "governorate_id": 19, "name_ar": "أخميم", "name_en": "Akhmim", "districts_count": 1 },
+
+  { "id": 2001, "governorate_id": 20, "name_ar": "قنا", "name_en": "Qena", "districts_count": 1 },
+  { "id": 2002, "governorate_id": 20, "name_ar": "نقادة", "name_en": "Naqada", "districts_count": 1 },
+
+  { "id": 2101, "governorate_id": 21, "name_ar": "الأقصر", "name_en": "Luxor", "districts_count": 1 },
+
+  { "id": 2201, "governorate_id": 22, "name_ar": "أسوان", "name_en": "Aswan", "districts_count": 1 },
+  { "id": 2202, "governorate_id": 22, "name_ar": "نصر", "name_en": "Nasr (Aswan area)", "districts_count": 1 },
+
+  { "id": 2301, "governorate_id": 23, "name_ar": "الخارجة", "name_en": "Al Kharga", "districts_count": 1 },
+
+  { "id": 2401, "governorate_id": 24, "name_ar": "مطروح", "name_en": "Mersa Matruh", "districts_count": 1 },
+  { "id": 2402, "governorate_id": 24, "name_ar": "الحمام", "name_en": "El Hamam", "districts_count": 1 },
+
+  { "id": 2501, "governorate_id": 25, "name_ar": "العريش", "name_en": "Al Arish", "districts_count": 1 },
+  { "id": 2502, "governorate_id": 25, "name_ar": "رفح", "name_en": "Rafah", "districts_count": 1 },
+
+  { "id": 2601, "governorate_id": 26, "name_ar": "بنها", "name_en": "Banha", "districts_count": 1 },
+  { "id": 2602, "governorate_id": 26, "name_ar": "القناطر الخيرية", "name_en": "El Qanater", "districts_count": 1 },
+  { "id": 2603, "governorate_id": 26, "name_ar": "شبرا الخيمة", "name_en": "Shubra El Kheima", "districts_count": 1 },
+
+  { "id": 2701, "governorate_id": 27, "name_ar": "دمنهور", "name_en": "Damanhour", "districts_count": 1 },
+  { "id": 2702, "governorate_id": 27, "name_ar": "كفر الدوار", "name_en": "Kafr El Dawar", "districts_count": 1 },
+  { "id": 2703, "governorate_id": 27, "name_ar": "رشيد", "name_en": "Rashid (Rosetta)", "districts_count": 1 }
+]

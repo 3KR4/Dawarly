@@ -52,7 +52,7 @@ body:has(.register) footer {
   margin-top: 10px;
   border-radius: 10px !important;
   font-size: 16px;
-  font-family: "Roboto";
+  font-family: "Cairo";
   font-weight: 700;
 }
 .register form .otherWay {

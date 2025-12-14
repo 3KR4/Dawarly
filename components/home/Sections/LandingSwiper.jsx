@@ -13,7 +13,7 @@ import "swiper/css/effect-fade";
 function LandingSwiper() {
   return (
     <div className="landing">
-      <Swiper
+      {/* <Swiper
         modules={[Autoplay, Pagination, EffectFade]}
         slidesPerView={1}
         loop={true}
@@ -35,7 +35,7 @@ function LandingSwiper() {
             </div>
           </SwiperSlide>
         ))}
-      </Swiper>
+      </Swiper> */}
     </div>
   );
 }

@@ -1,3 +1,8 @@
+import { BiSolidStoreAlt } from "react-icons/bi";
+import { FaHome, FaCar } from "react-icons/fa";
+import { FaMobileScreenButton } from "react-icons/fa6";
+import { SiApplearcade } from "react-icons/si";
+
 export const navLinks = [
   {
     title: "governorates",
@@ -118,7 +123,7 @@ export const slides = [
     link: "/marketplace",
   },
 ];
-export const products = [
+export const ads = [
   {
     id: 1,
     name: "Papyrus Painting of Nefertiti",
@@ -432,217 +437,9 @@ export const products = [
     tags: ["candle", "clay", "decor"],
   },
 ];
-export const orders = [
-  {
-    id: 1,
-    cart: [
-      products[0],
-      products[1],
-      products[2],
-      products[3],
-      products[4],
-      products[5],
-    ],
-    totalItems: 12,
-    cartTotalPrice: 387, // بعد خصم العروض تقريبًا
-    customer: {
-      id: 101,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: "+20 111 234 5678",
-      nationality: "Egyptian",
-      address: "15 Tahrir St, Downtown, Cairo",
-    },
-    payment: "Card",
-    shipping: "Standard",
-    orderStatus: "Processing",
-    orderDate: "2024-06-01T10:00:00Z",
-    notes: "Please leave the package at the front door if no one is home.",
-  },
-  {
-    id: 2,
-    cart: [products[6], products[2], products[3], products[4]],
-    totalItems: 6,
-    cartTotalPrice: 465, // خصم 25% من 620 + شحن
-    customer: {
-      id: 102,
-      name: "Sarah Ahmed",
-      email: "sarah.ahmed@example.com",
-      phone: "+20 122 678 9012",
-      nationality: "Egyptian",
-      address: "25 Nile Corniche, Luxor",
-    },
-    payment: "Cash on Delivery",
-    shipping: "Express",
-
-    orderStatus: "Shipped",
-    orderDate: "2024-07-12T14:30:00Z",
-    notes: "Handle with care — fragile item.",
-  },
-  {
-    id: 3,
-    cart: [products[10], products[12], products[3]],
-    totalItems: 3,
-    cartTotalPrice: 518,
-    customer: {
-      id: 103,
-      name: "Mohamed Elsayed",
-      email: "mohamed.elsayed@example.com",
-      phone: "+20 100 555 2134",
-      nationality: "Egyptian",
-      address: "45 El Haram St, Giza",
-    },
-    payment: "Card",
-    shipping: "Standard",
-    orderStatus: "Delivered",
-    orderDate: "2024-08-20T09:45:00Z",
-    notes: "Delivered successfully to the customer.",
-  },
-  {
-    id: 4,
-    cart: [products[2], products[8], products[4], products[14]],
-    totalItems: 5,
-    cartTotalPrice: 573,
-    customer: {
-      id: 104,
-      name: "Emily Brown",
-      email: "emily.brown@example.com",
-      phone: "+44 755 678 2221",
-      nationality: "British",
-      address: "Flat 3, 12 Garden Road, Alexandria",
-    },
-    payment: "Card",
-    shipping: "Express",
-
-    orderStatus: "Processing",
-    orderDate: "2024-09-03T12:00:00Z",
-    notes: "Gift wrap the items, please.",
-  },
-  {
-    id: 5,
-    cart: [products[8]],
-    totalItems: 1,
-    cartTotalPrice: 476,
-    customer: {
-      id: 105,
-      name: "Omar Hassan",
-      email: "omar.hassan@example.com",
-      phone: "+20 114 333 9855",
-      nationality: "Egyptian",
-      address: "Villa 8, Rehab City, New Cairo",
-    },
-    payment: "Cash on Delivery",
-    shipping: "Standard",
-    orderStatus: "Cancelled",
-    orderDate: "2024-09-28T17:10:00Z",
-    notes: "Order cancelled before shipping.",
-  },
-  {
-    id: 6,
-    cart: [products[9], products[11]],
-    totalItems: 2,
-    cartTotalPrice: 873,
-    customer: {
-      id: 106,
-      name: "Lina Khaled",
-      email: "lina.khaled@example.com",
-      phone: "+20 127 456 7893",
-      nationality: "Egyptian",
-      address: "12 King Farouk St, Ismailia",
-    },
-    payment: "Card",
-    shipping: "Express",
-    orderStatus: "Delivered",
-    orderDate: "2024-10-10T16:20:00Z",
-    notes: "Customer requested to be notified before delivery.",
-  },
-];
-export const productCategories = [
-  {
-    id: 1,
-    name: "Ancient Egypt",
-    icon: "🏺",
-  },
-  {
-    id: 2,
-    name: "Beaches",
-    icon: "🏖️",
-    subcategories: [
-      { id: 21, name: "Red Sea" },
-      { id: 22, name: "Mediterranean" },
-      { id: 23, name: "Diving Spots" },
-      { id: 24, name: "Resorts" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Cruises",
-    icon: "🚢",
-    subcategories: [
-      { id: 31, name: "Nile Cruises" },
-      { id: 32, name: "Felucca Rides" },
-      { id: 33, name: "Sea Cruises" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Oases & Deserts",
-    icon: "🏜️",
-    subcategories: [
-      { id: 41, name: "Siwa Oasis" },
-      { id: 42, name: "Western Desert" },
-      { id: 43, name: "White Desert" },
-      { id: 44, name: "Safari Tours" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Religious",
-    icon: "🕌",
-    subcategories: [
-      { id: 51, name: "Islamic" },
-      { id: 52, name: "Coptic" },
-      { id: 53, name: "Jewish" },
-      { id: 54, name: "Sacred Sites" },
-    ],
-  },
-  {
-    id: 6,
-    name: "Museums",
-    icon: "🏛️",
-    subcategories: [
-      { id: 61, name: "History Museums" },
-      { id: 62, name: "Art Museums" },
-      { id: 63, name: "Cultural Museums" },
-      { id: 64, name: "Science Museums" },
-    ],
-  },
-  {
-    id: 7,
-    name: "Outdoor Sports",
-    icon: "🎯",
-    subcategories: [
-      { id: 71, name: "Hiking" },
-      { id: 72, name: "Climbing" },
-      { id: 73, name: "Water Sports" },
-      { id: 74, name: "Sandboarding" },
-    ],
-  },
-  {
-    id: 8,
-    name: "Shopping",
-    icon: "🛍️",
-    subcategories: [
-      { id: 81, name: "Bazaars" },
-      { id: 82, name: "Handicrafts" },
-      { id: 83, name: "Malls" },
-      { id: 84, name: "Souvenirs" },
-    ],
-  },
-];
 export const filterss = [
   {
-    id: "products list",
+    id: "properties",
     sorting: [
       {
         id: "name",
@@ -672,19 +469,23 @@ export const filterss = [
       },
 
       {
-        id: "status",
+        id: "date",
         filters: [
           {
-            name: "Most Viewed",
-            value: "most_viewed",
+            name: "Newest",
+            value: "newest",
           },
           {
-            name: "Top Sales",
-            value: "top_sales",
+            name: "Oldest",
+            value: "oldest",
           },
         ],
       },
-
+    ],
+  },
+  {
+    id: "main",
+    sorting: [
       {
         id: "date",
         filters: [
@@ -699,43 +500,15 @@ export const filterss = [
         ],
       },
       {
-        id: "availability",
+        id: "price",
         filters: [
           {
-            name: "In Stock",
-            value: "1",
+            name: "Price: Low to High",
+            value: "low_to_high",
           },
           {
-            name: "Out of Stock",
-            value: "0",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "main",
-    sorting: [
-      {
-        id: "name",
-        filters: [
-          {
-            name: "Name: A to Z",
-            value: "a_to_z",
-          },
-          {
-            name: "Name: Z to A",
-            value: "z_to_a",
-          },
-        ],
-      },
-
-      {
-        id: "status",
-        filters: [
-          {
-            name: "Most Viewed",
-            value: "most_viewed",
+            name: "Price: High to Low",
+            value: "high_to_low",
           },
         ],
       },
@@ -770,4 +543,232 @@ export const govs = [
   "Qena",
   "North Sinai",
   "Sohag",
+];
+
+export const categories = [
+  {
+    id: 1,
+    key: "properties",
+    name: {
+      en: "Properties",
+      ar: "عقارات",
+    },
+    icon: BiSolidStoreAlt,
+  },
+  {
+    id: 2,
+    key: "vehicles",
+    name: {
+      en: "Vehicles",
+      ar: "مركبات",
+    },
+    icon: FaCar,
+  },
+  {
+    id: 3,
+    key: "mobiles-tablets",
+    name: {
+      en: "Mobiles & Tablets",
+      ar: "موبايلات وتابلت",
+    },
+    icon: FaMobileScreenButton,
+  },
+  {
+    id: 4,
+    key: "furniture-decor",
+    name: {
+      en: "Home & Office Furniture - Decor",
+      ar: "أثاث وديكور",
+    },
+    icon: FaHome,
+  },
+  {
+    id: 5,
+    key: "electronics-appliances",
+    name: {
+      en: "Electronics & Appliances",
+      ar: "إلكترونيات وأجهزة",
+    },
+    icon: SiApplearcade,
+  },
+];
+
+export const subcategories = [
+  {
+    id: 101,
+    categoryId: 1,
+    name: { en: "Apartments for Sale", ar: "شقق للبيع" },
+  },
+  {
+    id: 102,
+    categoryId: 1,
+    name: { en: "Apartments for Rent", ar: "شقق للإيجار" },
+  },
+  {
+    id: 103,
+    categoryId: 1,
+    name: { en: "Villas for Sale", ar: "فيلات للبيع" },
+  },
+  {
+    id: 104,
+    categoryId: 1,
+    name: { en: "Villas for Rent", ar: "فيلات للإيجار" },
+  },
+  {
+    id: 105,
+    categoryId: 1,
+    name: { en: "Vacation Homes for Sale", ar: "بيوت مصيفية للبيع" },
+  },
+  {
+    id: 106,
+    categoryId: 1,
+    name: { en: "Vacation Homes for Rent", ar: "بيوت مصيفية للإيجار" },
+  },
+  {
+    id: 107,
+    categoryId: 1,
+    name: { en: "Commercial for Sale", ar: "تجاري للبيع" },
+  },
+  {
+    id: 108,
+    categoryId: 1,
+    name: { en: "Commercial for Rent", ar: "تجاري للإيجار" },
+  },
+  {
+    id: 109,
+    categoryId: 1,
+    name: { en: "Buildings & Lands", ar: "مباني وأراضي" },
+  },
+
+  // ========= Vehicles =========
+  { id: 201, categoryId: 2, name: { en: "Cars for Sale", ar: "سيارات للبيع" } },
+  {
+    id: 202,
+    categoryId: 2,
+    name: { en: "Cars for Rent", ar: "سيارات للإيجار" },
+  },
+  {
+    id: 203,
+    categoryId: 2,
+    name: {
+      en: "Tyres, Batteries, Oils & Accessories",
+      ar: "إطارات وبطاريات وإكسسوارات",
+    },
+  },
+  {
+    id: 204,
+    categoryId: 2,
+    name: { en: "Car Spare Parts", ar: "قطع غيار سيارات" },
+  },
+  {
+    id: 205,
+    categoryId: 2,
+    name: { en: "Motorcycles & Accessories", ar: "دراجات نارية وإكسسوارات" },
+  },
+  {
+    id: 206,
+    categoryId: 2,
+    name: { en: "Boats - Watercraft", ar: "قوارب ومراكب" },
+  },
+  {
+    id: 207,
+    categoryId: 2,
+    name: {
+      en: "Heavy Trucks, Buses & Other Vehicles",
+      ar: "شاحنات وحافلات ومركبات ثقيلة",
+    },
+  },
+
+  // ========= Mobiles & Tablets =========
+  { id: 301, categoryId: 3, name: { en: "Mobile Phones", ar: "موبايلات" } },
+  { id: 302, categoryId: 3, name: { en: "Tablets", ar: "تابلت" } },
+  {
+    id: 303,
+    categoryId: 3,
+    name: { en: "Mobile & Tablet Accessories", ar: "إكسسوارات موبايل وتابلت" },
+  },
+  {
+    id: 304,
+    categoryId: 3,
+    name: { en: "Mobile Numbers", ar: "أرقام موبايل" },
+  },
+
+  // ========= Furniture & Decor =========
+  { id: 401, categoryId: 4, name: { en: "Furniture", ar: "أثاث" } },
+  {
+    id: 402,
+    categoryId: 4,
+    name: { en: "Office Furniture", ar: "أثاث مكتبي" },
+  },
+  {
+    id: 403,
+    categoryId: 4,
+    name: {
+      en: "Home Decoration & Accessories",
+      ar: "ديكور المنزل وإكسسوارات",
+    },
+  },
+  {
+    id: 404,
+    categoryId: 4,
+    name: { en: "Bathroom & Kitchen Tools", ar: "أدوات حمام ومطبخ" },
+  },
+  {
+    id: 405,
+    categoryId: 4,
+    name: { en: "Fabric & Bedding", ar: "مفروشات وأقمشة" },
+  },
+  {
+    id: 406,
+    categoryId: 4,
+    name: { en: "Garden & Outdoor", ar: "حدائق وخارجي" },
+  },
+  { id: 407, categoryId: 4, name: { en: "Lighting", ar: "إضاءة" } },
+  {
+    id: 408,
+    categoryId: 4,
+    name: { en: "Multiple / Other Furniture", ar: "أثاث متنوع" },
+  },
+
+  // ========= Electronics =========
+  {
+    id: 501,
+    categoryId: 5,
+    name: { en: "TV - Audio - Video", ar: "تلفزيونات وصوتيات" },
+  },
+  {
+    id: 502,
+    categoryId: 5,
+    name: { en: "Computers & Accessories", ar: "كمبيوتر وإكسسوارات" },
+  },
+  {
+    id: 503,
+    categoryId: 5,
+    name: { en: "Video Games & Consoles", ar: "ألعاب فيديو وبلايستيشن" },
+  },
+  {
+    id: 504,
+    categoryId: 5,
+    name: { en: "Cameras & Imaging", ar: "كاميرات وتصوير" },
+  },
+  {
+    id: 505,
+    categoryId: 5,
+    name: { en: "Security Cameras", ar: "كاميرات مراقبة" },
+  },
+  {
+    id: 506,
+    categoryId: 5,
+    name: { en: "Camera Accessories", ar: "إكسسوارات كاميرات" },
+  },
+  {
+    id: 507,
+    categoryId: 5,
+    name: { en: "Binoculars & Telescopes", ar: "مناظير وتلسكوبات" },
+  },
+  {
+    id: 508,
+    categoryId: 5,
+    name: { en: "Home Appliances", ar: "أجهزة منزلية" },
+  },
 ];
