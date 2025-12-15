@@ -36,7 +36,7 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 

@@ -1,11 +1,16 @@
 .side-nav {
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: sticky;
   top: 0;
   height: 100vh;
+}
+[lang="ar"] .side-nav {
+  border-right: 0;
+
+  border-left: 1px solid var(--border-color);
 }
 .side-nav h4 {
   font-size: 15px;
@@ -32,17 +37,17 @@
   height: 56px !important;
 }
 .side-nav div + div .actions-btns {
-  border-top: 1px solid #e0e0e0 !important;
+  border-top: 1px solid var(--border-color) !important;
   border-bottom: 0 I !important;
 }
 .side-nav.active .actions-btns {
-  padding: 6px 18px !important;
+  padding: 6px 15px !important;
 }
 .side-nav .actions-btns:hover {
   background: var(--section-color);
 }
 .side-nav .a.danger:hover .hold {
-  background: #ce3636;
+  background: var(--red-color);
 }
 
 .side-nav h4 {
@@ -59,7 +64,7 @@
   gap: 0px;
   height: 50px;
   display: flex;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color);
   padding: 6px;
   justify-content: center;
 
@@ -92,13 +97,13 @@
 .side-nav.active svg {
   font-size: 19px;
 }
-.side-nav .a:hover *, 
-.side-nav .a.active *{
+.side-nav .a:hover *,
+.side-nav .a.active * {
   color: white;
 }
 
 .side-nav .a-user {
-  border-top: 1px solid #e0e0e0 !important;
+  border-top: 1px solid var(--border-color) !important;
   cursor: auto;
 }
 .side-nav .a-user .hold {

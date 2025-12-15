@@ -19,8 +19,9 @@
   --paragraph: #575757;
   --paragraph-2: #737373;
   --border-color: #e0e0e0;
+  --red-color: #e74949;
 }
-[data-theme="dark"] {
+[theme="dark"] {
   --body-color: #171918;
   --section-color: #2c2e2d;
   --main-color: #985cff;
@@ -420,7 +421,7 @@ a {
   color: white !important;
 }
 .card .time-holder {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   padding: 11px 0;
   border-radius: 9px;
 }
@@ -441,7 +442,7 @@ a {
 }
 .card .time-holder hr {
   margin: 9px 0;
-  background: #e0e0e0;
+  background: var(--border-color);
 }
 .css-stars {
   display: inline-flex;
@@ -516,7 +517,7 @@ a {
 .navigations .separator {
   color: var(--paragraph);
   font-size: 19px;
-  font-weight: 900;
+  font-weight: 700;
 }
 .navigations .separator.last {
   color: var(--main-color);
@@ -761,7 +762,7 @@ a {
   opacity: 0;
   z-index: -1;
   background: var(--body-color);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 7px;
   gap: 12px;
   width: 100%;

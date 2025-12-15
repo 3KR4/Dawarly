@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import governorates from "@/data/governorates.json";
 import cities from "@/data/cities.json";
 import districts from "@/data/districts.json";
@@ -13,14 +13,24 @@ import {
 } from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
+import { FiSun } from "react-icons/fi";
+import useClickOutside from "@/Contexts/useClickOutside";
 
 function SelectLocation({ locale = "en", onSelect }) {
   const t = useTranslate();
-  const [isLocationsActive, setIsLocationsActive] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // 1=Gov, 2=City, 3=District
+  const [activeMenu, setActiveMenu] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedGovernorate, setSelectedGovernorate] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+
+  const menuRef = useRef(null);
+
+  useClickOutside(menuRef, () => {
+    setActiveMenu(false);
+    setCurrentPage(1);
+    setSearchValue("");
+  });
 
   const handleSelectGovernorate = (gov) => {
     setSelectedGovernorate(gov);
@@ -36,7 +46,7 @@ function SelectLocation({ locale = "en", onSelect }) {
 
   const handleSelectDistrict = (district) => {
     if (onSelect) onSelect(district);
-    setIsLocationsActive(false);
+    setActiveMenu(false);
     setCurrentPage(1);
     setSelectedGovernorate(null);
     setSelectedCity(null);
@@ -44,12 +54,12 @@ function SelectLocation({ locale = "en", onSelect }) {
   };
 
   return (
-    <div className="places-select">
-      <h4 onClick={() => setIsLocationsActive((prev) => !prev)}>
+    <div className="places-select" ref={menuRef}>
+      <h4 onClick={() => setActiveMenu((prev) => !prev)}>
         {t.actions.filterByLocation} <FaAngleDown />
       </h4>
 
-      {isLocationsActive && (
+      {activeMenu && (
         <div className="menu active">
           <div className="locations-holder">
             {/* Top bar */}

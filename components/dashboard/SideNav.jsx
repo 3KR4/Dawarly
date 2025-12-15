@@ -4,18 +4,21 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { RiGovernmentFill } from "react-icons/ri";
+import { settings } from "@/Contexts/settings";
+import { FiSun } from "react-icons/fi";
 
 import { PiCardsFill } from "react-icons/pi";
 import { FaHeadset } from "react-icons/fa6";
 import { FaUsers } from "react-icons/fa";
-
+import useTranslate from "@/Contexts/useTranslation";
+import { FaAngleRight, FaAngleLeft } from "react-icons/fa";
 import {
   FaPlaceOfWorship,
   FaShoppingCart,
   FaHome,
   FaMoon,
 } from "react-icons/fa";
-import { FaAngleLeft, FaChartPie, FaUser } from "react-icons/fa6";
+import { FaChartPie, FaUser } from "react-icons/fa6";
 import { IoMenu, IoLanguage } from "react-icons/io5";
 import { MdEventNote, MdLogout, MdSunny } from "react-icons/md";
 import { HiChartBar } from "react-icons/hi2";
@@ -23,6 +26,10 @@ import "@/styles/dashboard/side-nav.css";
 import { usePathname } from "next/navigation";
 
 function SideNav() {
+  const { screenSize, theme, toggleTheme, locale, toggleLocale } =
+    useContext(settings);
+  const t = useTranslate();
+
   const pathname = usePathname();
   const isActive = (path) => pathname == path;
 
@@ -60,7 +67,11 @@ function SideNav() {
         >
           <h4>menu routes</h4>
           {isNavOpen ? (
-            <FaAngleLeft className="menu-ico-close" />
+            locale === "en" ? (
+              <FaAngleLeft className="menu-ico-close" />
+            ) : (
+              <FaAngleRight className="menu-ico-close" />
+            )
           ) : (
             <IoMenu style={{ fontSize: "21px" }} className="menu-ico" />
           )}
@@ -128,15 +139,24 @@ function SideNav() {
             <FaUser />
           </div>
         </div>
-        <div href="/dashboard/orders" className={`a`}>
+        <di className={`a`} onClick={toggleTheme}>
           <div className="hold">
-            <h4>dark theme</h4>
-            <MdSunny />
+            {theme === "light" ? (
+              <>
+                <h4>{t.actions.darkMode}</h4>
+                <FaMoon />
+              </>
+            ) : (
+              <>
+                <h4>{t.actions.lightMode}</h4>
+                <FiSun />
+              </>
+            )}
           </div>
-        </div>
-        <div href="/dashboard/orders" className={`a`}>
+        </di>
+        <div className={`a`} onClick={toggleLocale}>
           <div className="hold">
-            <h4>arabic language</h4>
+            <h4>{t.actions.lang}</h4>
             <IoLanguage />
           </div>
         </div>

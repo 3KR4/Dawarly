@@ -1,6 +1,15 @@
 import { BiSolidStoreAlt } from "react-icons/bi";
-import { FaHome, FaCar } from "react-icons/fa";
-import { FaMobileScreenButton } from "react-icons/fa6";
+import {
+  FaHome,
+  FaCar,
+  FaTshirt,
+  FaBriefcase,
+  FaFootballBall,
+  FaTools,
+  FaIndustry,
+  FaBabyCarriage,
+} from "react-icons/fa";
+import { FaMobileScreenButton, FaDog } from "react-icons/fa6";
 import { SiApplearcade } from "react-icons/si";
 
 export const navLinks = [
@@ -549,226 +558,139 @@ export const categories = [
   {
     id: 1,
     key: "properties",
-    name: {
-      en: "Properties",
-      ar: "عقارات",
-    },
+    name: { en: "Properties", ar: "عقارات" },
     icon: BiSolidStoreAlt,
   },
   {
     id: 2,
     key: "vehicles",
-    name: {
-      en: "Vehicles",
-      ar: "مركبات",
-    },
+    name: { en: "Vehicles", ar: "مركبات" },
     icon: FaCar,
   },
   {
     id: 3,
     key: "mobiles-tablets",
-    name: {
-      en: "Mobiles & Tablets",
-      ar: "موبايلات وتابلت",
-    },
+    name: { en: "Mobiles & Tablets", ar: "موبايلات وتابلت" },
     icon: FaMobileScreenButton,
   },
   {
     id: 4,
-    key: "furniture-decor",
-    name: {
-      en: "Home & Office Furniture - Decor",
-      ar: "أثاث وديكور",
-    },
-    icon: FaHome,
+    key: "electronics",
+    name: { en: "Electronics", ar: "إلكترونيات" },
+    icon: SiApplearcade,
   },
   {
     id: 5,
-    key: "electronics-appliances",
-    name: {
-      en: "Electronics & Appliances",
-      ar: "إلكترونيات وأجهزة",
-    },
-    icon: SiApplearcade,
+    key: "home-office",
+    name: { en: "Home & Office", ar: "المنزل والمكتب" },
+    icon: FaHome,
+  },
+  {
+    id: 6,
+    key: "fashion",
+    name: { en: "Fashion", ar: "أزياء" },
+    icon: FaTshirt,
+  },
+  {
+    id: 7,
+    key: "jobs",
+    name: { en: "Jobs", ar: "وظائف" },
+    icon: FaBriefcase,
+  },
+  {
+    id: 8,
+    key: "services",
+    name: { en: "Services", ar: "خدمات" },
+    icon: FaTools,
+  },
+  {
+    id: 9,
+    key: "pets",
+    name: { en: "Pets", ar: "حيوانات أليفة" },
+    icon: FaDog,
+  },
+  {
+    id: 10,
+    key: "kids-babies",
+    name: { en: "Kids & Babies", ar: "أطفال ورضع" },
+    icon: FaBabyCarriage,
+  },
+  {
+    id: 11,
+    key: "sports-hobbies",
+    name: { en: "Sports & Hobbies", ar: "رياضة وهوايات" },
+    icon: FaFootballBall,
+  },
+  {
+    id: 12,
+    key: "business-industrial",
+    name: { en: "Business & Industrial", ar: "أعمال وصناعة" },
+    icon: FaIndustry,
   },
 ];
 
 export const subcategories = [
-  {
-    id: 101,
-    categoryId: 1,
-    name: { en: "Apartments for Sale", ar: "شقق للبيع" },
-  },
-  {
-    id: 102,
-    categoryId: 1,
-    name: { en: "Apartments for Rent", ar: "شقق للإيجار" },
-  },
-  {
-    id: 103,
-    categoryId: 1,
-    name: { en: "Villas for Sale", ar: "فيلات للبيع" },
-  },
-  {
-    id: 104,
-    categoryId: 1,
-    name: { en: "Villas for Rent", ar: "فيلات للإيجار" },
-  },
-  {
-    id: 105,
-    categoryId: 1,
-    name: { en: "Vacation Homes for Sale", ar: "بيوت مصيفية للبيع" },
-  },
-  {
-    id: 106,
-    categoryId: 1,
-    name: { en: "Vacation Homes for Rent", ar: "بيوت مصيفية للإيجار" },
-  },
-  {
-    id: 107,
-    categoryId: 1,
-    name: { en: "Commercial for Sale", ar: "تجاري للبيع" },
-  },
-  {
-    id: 108,
-    categoryId: 1,
-    name: { en: "Commercial for Rent", ar: "تجاري للإيجار" },
-  },
-  {
-    id: 109,
-    categoryId: 1,
-    name: { en: "Buildings & Lands", ar: "مباني وأراضي" },
-  },
+  // ========= Properties =========
+  { id: 101, categoryId: 1, name: { en: "Apartments for Sale", ar: "شقق للبيع" } },
+  { id: 102, categoryId: 1, name: { en: "Apartments for Rent", ar: "شقق للإيجار" } },
+  { id: 103, categoryId: 1, name: { en: "Villas", ar: "فيلات" } },
+  { id: 104, categoryId: 1, name: { en: "Commercial", ar: "عقارات تجارية" } },
+  { id: 105, categoryId: 1, name: { en: "Lands", ar: "أراضي" } },
 
   // ========= Vehicles =========
-  { id: 201, categoryId: 2, name: { en: "Cars for Sale", ar: "سيارات للبيع" } },
-  {
-    id: 202,
-    categoryId: 2,
-    name: { en: "Cars for Rent", ar: "سيارات للإيجار" },
-  },
-  {
-    id: 203,
-    categoryId: 2,
-    name: {
-      en: "Tyres, Batteries, Oils & Accessories",
-      ar: "إطارات وبطاريات وإكسسوارات",
-    },
-  },
-  {
-    id: 204,
-    categoryId: 2,
-    name: { en: "Car Spare Parts", ar: "قطع غيار سيارات" },
-  },
-  {
-    id: 205,
-    categoryId: 2,
-    name: { en: "Motorcycles & Accessories", ar: "دراجات نارية وإكسسوارات" },
-  },
-  {
-    id: 206,
-    categoryId: 2,
-    name: { en: "Boats - Watercraft", ar: "قوارب ومراكب" },
-  },
-  {
-    id: 207,
-    categoryId: 2,
-    name: {
-      en: "Heavy Trucks, Buses & Other Vehicles",
-      ar: "شاحنات وحافلات ومركبات ثقيلة",
-    },
-  },
+  { id: 201, categoryId: 2, name: { en: "Cars", ar: "سيارات" } },
+  { id: 202, categoryId: 2, name: { en: "Motorcycles", ar: "دراجات نارية" } },
+  { id: 203, categoryId: 2, name: { en: "Spare Parts", ar: "قطع غيار" } },
+  { id: 204, categoryId: 2, name: { en: "Heavy Vehicles", ar: "مركبات ثقيلة" } },
 
   // ========= Mobiles & Tablets =========
   { id: 301, categoryId: 3, name: { en: "Mobile Phones", ar: "موبايلات" } },
   { id: 302, categoryId: 3, name: { en: "Tablets", ar: "تابلت" } },
-  {
-    id: 303,
-    categoryId: 3,
-    name: { en: "Mobile & Tablet Accessories", ar: "إكسسوارات موبايل وتابلت" },
-  },
-  {
-    id: 304,
-    categoryId: 3,
-    name: { en: "Mobile Numbers", ar: "أرقام موبايل" },
-  },
-
-  // ========= Furniture & Decor =========
-  { id: 401, categoryId: 4, name: { en: "Furniture", ar: "أثاث" } },
-  {
-    id: 402,
-    categoryId: 4,
-    name: { en: "Office Furniture", ar: "أثاث مكتبي" },
-  },
-  {
-    id: 403,
-    categoryId: 4,
-    name: {
-      en: "Home Decoration & Accessories",
-      ar: "ديكور المنزل وإكسسوارات",
-    },
-  },
-  {
-    id: 404,
-    categoryId: 4,
-    name: { en: "Bathroom & Kitchen Tools", ar: "أدوات حمام ومطبخ" },
-  },
-  {
-    id: 405,
-    categoryId: 4,
-    name: { en: "Fabric & Bedding", ar: "مفروشات وأقمشة" },
-  },
-  {
-    id: 406,
-    categoryId: 4,
-    name: { en: "Garden & Outdoor", ar: "حدائق وخارجي" },
-  },
-  { id: 407, categoryId: 4, name: { en: "Lighting", ar: "إضاءة" } },
-  {
-    id: 408,
-    categoryId: 4,
-    name: { en: "Multiple / Other Furniture", ar: "أثاث متنوع" },
-  },
+  { id: 303, categoryId: 3, name: { en: "Accessories", ar: "إكسسوارات" } },
 
   // ========= Electronics =========
-  {
-    id: 501,
-    categoryId: 5,
-    name: { en: "TV - Audio - Video", ar: "تلفزيونات وصوتيات" },
-  },
-  {
-    id: 502,
-    categoryId: 5,
-    name: { en: "Computers & Accessories", ar: "كمبيوتر وإكسسوارات" },
-  },
-  {
-    id: 503,
-    categoryId: 5,
-    name: { en: "Video Games & Consoles", ar: "ألعاب فيديو وبلايستيشن" },
-  },
-  {
-    id: 504,
-    categoryId: 5,
-    name: { en: "Cameras & Imaging", ar: "كاميرات وتصوير" },
-  },
-  {
-    id: 505,
-    categoryId: 5,
-    name: { en: "Security Cameras", ar: "كاميرات مراقبة" },
-  },
-  {
-    id: 506,
-    categoryId: 5,
-    name: { en: "Camera Accessories", ar: "إكسسوارات كاميرات" },
-  },
-  {
-    id: 507,
-    categoryId: 5,
-    name: { en: "Binoculars & Telescopes", ar: "مناظير وتلسكوبات" },
-  },
-  {
-    id: 508,
-    categoryId: 5,
-    name: { en: "Home Appliances", ar: "أجهزة منزلية" },
-  },
+  { id: 401, categoryId: 4, name: { en: "TV & Audio", ar: "تلفزيونات وصوتيات" } },
+  { id: 402, categoryId: 4, name: { en: "Computers", ar: "كمبيوتر" } },
+  { id: 403, categoryId: 4, name: { en: "Video Games", ar: "ألعاب فيديو" } },
+  { id: 404, categoryId: 4, name: { en: "Cameras", ar: "كاميرات" } },
+
+  // ========= Home & Office =========
+  { id: 501, categoryId: 5, name: { en: "Furniture", ar: "أثاث" } },
+  { id: 502, categoryId: 5, name: { en: "Office Furniture", ar: "أثاث مكتبي" } },
+  { id: 503, categoryId: 5, name: { en: "Home Decor", ar: "ديكور" } },
+
+  // ========= Fashion =========
+  { id: 601, categoryId: 6, name: { en: "Men Clothing", ar: "ملابس رجالي" } },
+  { id: 602, categoryId: 6, name: { en: "Women Clothing", ar: "ملابس حريمي" } },
+  { id: 603, categoryId: 6, name: { en: "Shoes & Bags", ar: "أحذية وشنط" } },
+
+  // ========= Jobs =========
+  { id: 701, categoryId: 7, name: { en: "Full Time Jobs", ar: "وظائف دوام كامل" } },
+  { id: 702, categoryId: 7, name: { en: "Part Time Jobs", ar: "وظائف دوام جزئي" } },
+  { id: 703, categoryId: 7, name: { en: "Freelance", ar: "عمل حر" } },
+
+  // ========= Services =========
+  { id: 801, categoryId: 8, name: { en: "Home Services", ar: "خدمات منزلية" } },
+  { id: 802, categoryId: 8, name: { en: "Education", ar: "تعليم" } },
+  { id: 803, categoryId: 8, name: { en: "Repair Services", ar: "صيانة" } },
+
+  // ========= Pets =========
+  { id: 901, categoryId: 9, name: { en: "Dogs", ar: "كلاب" } },
+  { id: 902, categoryId: 9, name: { en: "Cats", ar: "قطط" } },
+  { id: 903, categoryId: 9, name: { en: "Pet Accessories", ar: "مستلزمات حيوانات" } },
+
+  // ========= Kids & Babies =========
+  { id: 1001, categoryId: 10, name: { en: "Toys", ar: "ألعاب" } },
+  { id: 1002, categoryId: 10, name: { en: "Clothes", ar: "ملابس أطفال" } },
+  { id: 1003, categoryId: 10, name: { en: "Baby Gear", ar: "مستلزمات رضع" } },
+
+  // ========= Sports & Hobbies =========
+  { id: 1101, categoryId: 11, name: { en: "Sports Equipment", ar: "معدات رياضية" } },
+  { id: 1102, categoryId: 11, name: { en: "Bicycles", ar: "دراجات" } },
+  { id: 1103, categoryId: 11, name: { en: "Musical Instruments", ar: "آلات موسيقية" } },
+
+  // ========= Business & Industrial =========
+  { id: 1201, categoryId: 12, name: { en: "Industrial Equipment", ar: "معدات صناعية" } },
+  { id: 1202, categoryId: 12, name: { en: "Office Equipment", ar: "معدات مكتبية" } },
+  { id: 1203, categoryId: 12, name: { en: "Wholesale", ar: "جملة" } },
 ];
