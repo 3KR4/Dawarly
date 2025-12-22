@@ -7,23 +7,68 @@
 .ads-section .top,
 .ads-section .bottom {
   display: flex;
-  align-items: center;
+  padding: 0 10px;
   justify-content: space-between;
+  align-items: flex-end;
+}
+.ads-section .top .link {
+  color: #595959;
+  background: #dfcfff;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.ads-section .top .link:hover {
+  background: var(--main-color);
+  color: white;
 }
 .ads-section .top h3 {
 }
 .ads-section .top a {
 }
 .ads-section .bottom {
+  align-items: center;
 }
 .ads-section .bottom .lists-count {
 }
 .ads-section .bottom .navigation {
+  display: flex;
+  align-items: center;
+}
+.ads-section .bottom .navigation hr {
+  background: #b39edb;
+  width: 2px;
+  height: 29px;
+  margin: 0;
+  transition: 0.3s;
+}
+.ads-section .bottom .navigation:has(button:hover) hr {
+  background: var(--main-color);
 }
 .ads-section .bottom .navigation button {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  background: #dfcfff;
+  padding: 7px 12px 7px 15px;
+  border-radius: 20px 0 0 20px;
+}
+.ads-section .bottom .navigation button:last-child {
+  padding: 7px 15px 7px 12px;
+
+  border-radius: 0 20px 20px 0;
 }
 .ads-section .bottom .navigation button svg {
+  font-size: 15px;
 }
 .ads-section .swiper {
   width: 100%;
+}
+.ads-section .bottom .navigation button:hover {
+  background: var(--main-color);
+}
+.ads-section .bottom .navigation button:hover svg {
+  color: white;
 }

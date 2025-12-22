@@ -82,7 +82,7 @@ export default function AdsSwiper({ title, type }) {
           >
             <FaArrowLeft />
           </button>
-
+          <hr />
           <button
             className="nav-btn"
             onClick={() => swiperRef.current?.slideNext()}

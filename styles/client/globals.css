@@ -34,7 +34,11 @@
   --paragraph-2: #959595;
   --border-color: #313131;
 }
-
+.rtl {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: plaintext;
+}
 body {
   background-color: var(--body-color);
   display: flex;
