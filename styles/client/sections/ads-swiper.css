@@ -1,0 +1,29 @@
+.ads-section {
+  padding: 35px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ads-section .top,
+.ads-section .bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ads-section .top h3 {
+}
+.ads-section .top a {
+}
+.ads-section .bottom {
+}
+.ads-section .bottom .lists-count {
+}
+.ads-section .bottom .navigation {
+}
+.ads-section .bottom .navigation button {
+}
+.ads-section .bottom .navigation button svg {
+}
+.ads-section .swiper {
+  width: 100%;
+}

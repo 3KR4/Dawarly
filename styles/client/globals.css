@@ -87,11 +87,14 @@ h5,
 h6,
 li,
 a,
+span,
+p,
 button {
   margin: 0;
   padding: 0;
   color: var(--paragraph);
   text-transform: capitalize;
+  line-height: 1;
 }
 svg {
   transition: 0.3s;
@@ -102,6 +105,7 @@ pre {
   color: var(--paragraph);
   font-size: 15px;
   font-family: "Cairo";
+  line-height: 1;
 }
 ul {
   list-style: none;

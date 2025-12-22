@@ -10,7 +10,7 @@ import { IoIosClose } from "react-icons/io";
 
 import { filters } from "@/Contexts/filters";
 import { settings } from "@/Contexts/settings";
-import { getBreadcrumbItems } from "@/utlies/getBreadcrumbItems ";
+import { getBreadcrumbItems } from "@/utils/getBreadcrumbItems ";
 
 function Head() {
   const {

@@ -1,11 +1,11 @@
 import Image from "next/image";
 import "@/styles/client/pages/home.css";
-import LandingSwiper from "@/components/home/Sections/LandingSwiper";
+import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 
 export default function Home() {
   return (
     <>
-      <LandingSwiper />
+      <AdsSwiper title={`most popular`} type={`popular`} />
     </>
   );
 }
