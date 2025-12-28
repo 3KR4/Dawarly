@@ -176,7 +176,7 @@ header .actions-btns .userMenu .top {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: var(--second-color);
+  background: var(--hover-color);
   font-size: 14px;
   padding: 4px 11px;
   border-radius: 7px;

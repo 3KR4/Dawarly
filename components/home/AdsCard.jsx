@@ -43,7 +43,7 @@ export default function CardItem({ data, type }) {
       </div>
       <div className="date-area">
         <p className="area">
-          {t.governorate[data?.area.governorate]}, {t.cities[data?.area.city]}
+          {t.governorates[data?.area.governorate]}, {t.cities[data?.area.city]}
         </p>
         <p className="date">
           {formatRelativeDate(data?.creation_date, locale)}

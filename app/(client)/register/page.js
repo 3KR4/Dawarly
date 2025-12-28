@@ -1,13 +1,15 @@
 "use client";
 import "@/styles/client/forms.css";
 import Image from "next/image";
-import countryList from "react-select-country-list";
-import Select from "react-select";
-import React, { useState, useMemo } from "react";
-import Link from "next/link";
-import { useForm, Controller } from "react-hook-form";
-import { IoIosArrowDown } from "react-icons/io";
-import { IoMdClose } from "react-icons/io";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import useTranslate from "@/Contexts/useTranslation";
+
+import governorates from "@/data/governorates.json";
+import cities from "@/data/cities.json";
+import { categories } from "@/data";
+
+import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 
 import {
   LockKeyhole,
@@ -18,81 +20,166 @@ import {
   EyeOff,
   CircleAlert,
 } from "lucide-react";
-import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 
 export default function Register() {
+  const t = useTranslate();
+
   const [isLoginPage, setIsLoginPage] = useState(false);
-  const [passEye, setPassEye] = useState({ password: false, confirm: false });
-  const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [step, setStep] = useState(1);
+
+  const [userAddress, setUserAddress] = useState({
+    gov: null,
+    city: null,
+  });
+
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const {
     register,
     handleSubmit,
     watch,
-    control,
     formState: { errors },
     reset,
   } = useForm();
 
   const password = watch("password", "");
+  const [passEye, setPassEye] = useState({ password: false, confirm: false });
 
-  function iconChanging(input) {
-    setPassEye((prevState) => ({ ...prevState, [input]: !prevState[input] }));
-  }
+  /* ================= HELPERS ================= */
+  const handleAddress = (type, value) => {
+    setUserAddress((prev) => ({ ...prev, [type]: value }));
+  };
 
+  const filteredCities = cities.filter(
+    (c) => c.governorate_id === userAddress.gov?.id
+  );
+
+  const toggleCategory = (id) => {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  };
+
+  /* ================= SUBMIT ================= */
   const onSubmit = (data) => {
-    if (!value) {
-      setError("country", {
-        type: "manual",
-        message: "Please select your country",
-      });
+    if (isLoginPage) {
+      console.log("LOGIN DATA", data);
       return;
     }
 
-    console.log("Form Data Submitted:", { ...data, country: value.label });
+    if (step === 1) {
+      setStep(2);
+      return;
+    }
+
+    if (step === 2) {
+      setStep(3);
+      return;
+    }
+
+    console.log("FINAL REQUEST", {
+      userData: data,
+      address: userAddress,
+      categories: selectedCategories,
+    });
   };
 
-
-    const [userAddress, setUserAddress] = useState({
-    gov: "",
-    city: "",
-    district: "",
-  });
-  const handleAddress = (type, value) => {
-    setUserAddress((prev) => ({
-      ...prev,
-      [type]: value,
-    }));
-  };
   return (
-    <>
-      <div className="register">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <h1>
-            {isLoginPage ? "Login into your account" : "Create your account"}
-          </h1>
+    <div className="register">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <h1>
+          {isLoginPage ? "Login into your account" : "Create your account"}
+        </h1>
 
-          {/* Full name */}
-          {!isLoginPage && (
-            <div
-              className="box forInput"
-              onClick={() => document.getElementById("fullname").focus()}
-            >
-              <label htmlFor="fullname">Full Name</label>
+        {/* ================= LOGIN ================= */}
+        {isLoginPage && (
+          <>
+            <div className="box forInput">
+              <label>Email Address</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <Mail />
+                  <input
+                    type="email"
+                    {...register("email", {
+                      required: "Email address is required",
+                    })}
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.email.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="box forInput">
+              <label>Password</label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+                  <input
+                    type={passEye.password ? "text" : "password"}
+                    {...register("password", {
+                      required: "Password is required",
+                    })}
+                    placeholder="Enter your password"
+                  />
+                  {passEye.password ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: true }))
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ================= REGISTER STEP 1 ================= */}
+        {!isLoginPage && step === 1 && (
+          <>
+            <div className="box forInput">
+              <label>Full Name</label>
               <div className="inputHolder">
                 <div className="holder">
                   <UserRound />
                   <input
                     type="text"
-                    id="fullname"
                     {...register("fullname", {
-                      required: "Your Full Name is required",
+                      required: "Your full name is required",
                       validate: (value) => {
                         const words = value.trim().split(/\s+/);
-                        if (words.length < 2)
-                          return "Please enter at least two words";
-                        if (words.some((word) => word.length < 2))
-                          return "Each word must have at least 2 letters";
+
+                        if (words.length < 2) {
+                          return "Full name must contain at least two words";
+                        }
+
+                        for (let i = 0; i < words.length; i++) {
+                          if (words[i].length < 3) {
+                            if (i === 0)
+                              return "First name must be at least 3 characters";
+                            if (i === 1)
+                              return "Last name must be at least 3 characters";
+                            return `Word ${
+                              i + 1
+                            } must be at least 3 characters`;
+                          }
+                        }
+
                         return true;
                       },
                     })}
@@ -107,31 +194,31 @@ export default function Register() {
                 )}
               </div>
             </div>
-          )}
 
-          {/* Phone */}
-          {!isLoginPage && (
-            <div
-              className="box forInput"
-              onClick={() => document.getElementById("phone").focus()}
-            >
-              <label htmlFor="phone">Phone Number</label>
+            <div className="box forInput">
+              <label>Phone Number</label>
               <div className="inputHolder">
                 <div className="holder">
                   <Phone />
                   <input
                     type="tel"
-                    id="phone"
                     {...register("phone", {
                       required: "Phone number is required",
                       pattern: {
-                        // ✅ يقبل + و أي رقم (صيغ دولية مثل +20, +1, +44)
-                        value: /^\+?[0-9\s-()]{7,20}$/,
-                        message:
-                          "Enter a valid phone number (e.g. +20 100 123 4567)",
+                        value:
+                          /^\+?[0-9]{1,3}?[-.\s]?(\(?\d{1,4}\)?[-.\s]?){1,4}\d{1,4}$/,
+                        message: "Enter a valid phone number",
+                      },
+                      minLength: {
+                        value: 7,
+                        message: "Phone number is too short",
+                      },
+                      maxLength: {
+                        value: 15,
+                        message: "Phone number is too long",
                       },
                     })}
-                    placeholder="Enter your phone number"
+                    placeholder="Enter your phone"
                   />
                 </div>
                 {errors.phone && (
@@ -142,145 +229,105 @@ export default function Register() {
                 )}
               </div>
             </div>
-          )}
-          {!isLoginPage && (
-            <>
-              <SelectOptions
-                label=""
-                placeholder=""
-                options={}
-                value={}
-                onChange={() => {
 
-                }}
-              />
-              <SelectOptions
-                label=""
-                placeholder=""
-                options={}
-                value={}
-                onChange={() => {
-
-                }}
-              />
-              <SelectOptions
-                label=""
-                placeholder=""
-                options={}
-                value={}
-                onChange={() => {
-
-                }}
-              />
-            </>
-          )}
-
-          {/* Email */}
-          <div
-            className="box forInput"
-            onClick={() => document.getElementById("email").focus()}
-          >
-            <label htmlFor="email">Email Address</label>
-            <div className="inputHolder">
-              <div className="holder">
-                <Mail />
-                <input
-                  type="email"
-                  id="email"
-                  {...register("email", {
-                    required: "Email address is required",
-                    pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: "Enter a valid email address",
-                    },
-                  })}
-                  placeholder="Enter your email address"
-                />
-              </div>
-              {errors.email && (
-                <span className="error">
-                  <CircleAlert />
-                  {errors.email.message}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Password */}
-          <div
-            className="box forInput"
-            onClick={() => document.getElementById("password").focus()}
-          >
-            <label htmlFor="password">Password</label>
-            <div className="inputHolder password">
-              <div className="holder">
-                <LockKeyhole />
-
-                <input
-                  type={passEye.password ? "text" : "password"}
-                  id="password"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters long",
-                    },
-                  })}
-                  placeholder="Enter your password"
-                />
-                {passEye.password ? (
-                  <Eye
-                    className="eye"
-                    onClick={() => iconChanging("password")}
+            <div className="box forInput">
+              <label>Email Address</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <Mail />
+                  <input
+                    type="email"
+                    {...register("email", {
+                      required: "Email address is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message:
+                          "Enter a valid email address (e.g. user@example.com)",
+                      },
+                    })}
+                    placeholder="Enter your email"
                   />
-                ) : (
-                  <EyeOff
-                    className="eye"
-                    onClick={() => iconChanging("password")}
-                  />
+                </div>
+                {errors.email && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.email.message}
+                  </span>
                 )}
               </div>
-              {errors.password && (
-                <span className="error">
-                  <CircleAlert />
-                  {errors.password.message}
-                </span>
-              )}
             </div>
-          </div>
 
-          {/* Confirm Password */}
-          {!isLoginPage && (
-            <div
-              className="box forInput"
-              onClick={() =>
-                document.getElementById("passwordConfirmation").focus()
-              }
-            >
-              <label htmlFor="confirm">Confirm Password</label>
+            <div className="box forInput">
+              <label>Password</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
+                  <input
+                    type={passEye.password ? "text" : "password"}
+                    {...register("password", {
+                      required: "Password is required",
+                      pattern: {
+                        value:
+                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
+                        message:
+                          "Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character",
+                      },
+                    })}
+                    placeholder="Enter your password"
+                  />
+                  {passEye.password ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: true }))
+                      }
+                    />
+                  )}
+                </div>
+                {errors.password && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.password.message}
+                  </span>
+                )}
+              </div>
+            </div>
 
+            <div className="box forInput">
+              <label>Confirm Password</label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
                   <input
                     type={passEye.confirm ? "text" : "password"}
-                    id="passwordConfirmation"
                     {...register("passwordConfirmation", {
                       required: "Please confirm your password",
                       validate: (value) =>
                         value === password || "Passwords do not match",
                     })}
-                    placeholder="Confirm your password"
+                    placeholder="Confirm password"
                   />
                   {passEye.confirm ? (
                     <Eye
                       className="eye"
-                      onClick={() => iconChanging("confirm")}
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: false }))
+                      }
                     />
                   ) : (
                     <EyeOff
                       className="eye"
-                      onClick={() => iconChanging("confirm")}
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: true }))
+                      }
                     />
                   )}
                 </div>
@@ -292,64 +339,86 @@ export default function Register() {
                 )}
               </div>
             </div>
-          )}
+          </>
+        )}
 
-          {/* Forgot Password */}
-          {isLoginPage && (
-            <p className="didntHasAccount">
-              Forgot your password?
-              <button className="mineLink">reset password</button>
-            </p>
-          )}
-
-          {/* Buttons */}
-
-          <button
-            className={`main-button ${loadingSpinner ? "loading" : ""}`}
-            type="submit"
-          >
-            <span>{isLoginPage ? "Login" : "Create account"}</span>
-          </button>
-
-          <div className="otherWay">
-            <hr />
-            <span>Or continue with</span>
-            <hr />
-          </div>
-          <div className="social-btns">
-            <div className="btn">
-              <Image
-                src={`/google-icon.png`}
-                width={24}
-                height={24}
-                alt="google icon"
-              />
-              Google
-            </div>
-            <div className="btn">
-              <Image
-                src={`/facebook-icon.png`}
-                width={24}
-                height={24}
-                alt="facebook icon"
-              />
-              Facebook
-            </div>
-          </div>
-          <div className="didntHasAccount">
-            {isLoginPage ? "Didnt" : "Already"} have an account?{" "}
-            <div
-              className="mineLink"
-              onClick={() => {
-                setIsLoginPage((prev) => !prev);
-                reset();
+        {/* ================= REGISTER STEP 2 ================= */}
+        {!isLoginPage && step === 2 && (
+          <>
+            <SelectOptions
+              label={t.location.yourGovernorate}
+              placeholder={t.location.selectGovernorate}
+              options={governorates}
+              value={
+                userAddress.gov ? t.governorates[userAddress.gov.name] : ""
+              }
+              tPath="governorates"
+              onChange={(item) => {
+                handleAddress("gov", item);
+                handleAddress("city", null);
               }}
-            >
-              {isLoginPage ? "Create account" : "Log in"}
-            </div>
+            />
+
+            <SelectOptions
+              label={t.location.yourCity}
+              placeholder={t.location.selectCity}
+              options={filteredCities}
+              value={userAddress.city ? t.cities[userAddress.city.name] : ""}
+              tPath="cities"
+              disabled={!userAddress.gov}
+              onChange={(item) => handleAddress("city", item)}
+            />
+          </>
+        )}
+
+        {/* ================= REGISTER STEP 3 ================= */}
+        {!isLoginPage && step === 3 && (
+          <div className="categories-grid">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
+              const active = selectedCategories.includes(cat.id);
+
+              return (
+                <div
+                  key={cat.id}
+                  className={`cat-box ${active ? "active" : ""}`}
+                  onClick={() => toggleCategory(cat.id)}
+                >
+                  <Icon className="cat-icon" />
+                  <span>{t.categories[cat.name]}</span>
+                </div>
+              );
+            })}
           </div>
-        </form>
-      </div>
-    </>
+        )}
+
+        {/* ================= BUTTON ================= */}
+        <button type="submit" className="main-button">
+          {isLoginPage
+            ? "Login"
+            : step === 1
+            ? "Create account"
+            : step === 2
+            ? userAddress.gov || userAddress.city
+              ? "Next"
+              : "Skip"
+            : "Finish account"}
+        </button>
+
+        <div className="didntHasAccount">
+          {isLoginPage ? "Didnt" : "Already"} have an account?{" "}
+          <span
+            className="mineLink"
+            onClick={() => {
+              setIsLoginPage((p) => !p);
+              setStep(1);
+              reset();
+            }}
+          >
+            {isLoginPage ? "Create account" : "Log in"}
+          </span>
+        </div>
+      </form>
+    </div>
   );
 }

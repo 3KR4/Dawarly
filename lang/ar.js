@@ -32,6 +32,10 @@ const ar = {
     searchGovernorate: "ابحث في المحافظات...",
     searchCity: "ابحث في",
     inside: "داخل",
+    yourGovernorate: "محافظتك",
+    selectGovernorate: "اختر محافظتك",
+    yourCity: "مدينتك",
+    selectCity: "اختر مدينتك",
   },
   dashboard: {
     dashboard: "لوحة التحكم",
@@ -39,7 +43,7 @@ const ar = {
   auth: {
     login: "تسجيل الدخول",
   },
-  governorate: {
+  governorates: {
     cairo: "القاهرة",
     giza: "الجيزة",
     alexandria: "الإسكندرية",

@@ -119,7 +119,7 @@
   background: var(--second-color) !important;
 }
 .side-nav.active .a-user:hover .hold {
-  background: var(--second-color);
+  background: var(--hover-color);
 }
 .side-nav.active .a-user:hover .hold * {
   color: var(--paragraph);

@@ -83,7 +83,7 @@ function SelectLocation({ locale = "en", onSelect }) {
               <h5>
                 {currentPage === 1 && t.location.egyptGovernorates}
                 {currentPage === 2 && selectedGovernorate && (
-                  <>{t.governorate[selectedGovernorate.name]}</>
+                  <>{t.governorates[selectedGovernorate.name]}</>
                 )}
                 {currentPage === 3 && selectedCity && (
                   <>{t.cities[selectedCity.name]}</>
@@ -100,7 +100,7 @@ function SelectLocation({ locale = "en", onSelect }) {
                   : currentPage === 2
                   ? `${t.location.searchCity} ${
                       selectedGovernorate
-                        ? t.governorate[selectedGovernorate.name]
+                        ? t.governorates[selectedGovernorate.name]
                         : ""
                     }...`
                   : `${t.location.searchCity} ${
@@ -130,14 +130,16 @@ function SelectLocation({ locale = "en", onSelect }) {
               {currentPage === 1 &&
                 governorates
                   .filter((gov) => {
-                    const govName = t.governorate[gov.name];
+                    const govName = t.governorates[gov.name];
                     return govName
                       .toLowerCase()
                       .includes(searchValue.toLowerCase());
                   })
                   .map((gov) => (
                     <button key={gov.id}>
-                      <Link href={`/${gov.id}`}>{t.governorate[gov.name]}</Link>
+                      <Link href={`/${gov.id}`}>
+                        {t.governorates[gov.name]}
+                      </Link>
                       {gov.cities_count > 0 && (
                         <span onClick={() => handleSelectGovernorate(gov)}>
                           {gov.cities_count}

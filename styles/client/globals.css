@@ -145,6 +145,10 @@ body.ar input {
   direction: rtl;
   font-size: 14px !important;
 }
+input::placeholder,
+textarea::placeholder {
+  text-transform: capitalize;
+}
 button {
   background: transparent;
   border: none;
@@ -216,6 +220,9 @@ a {
 }
 .main-button:hover {
   background: var(--hover-color2);
+}
+.main-button span {
+  color: white;
 }
 .title-holder {
   display: flex;
@@ -591,6 +598,7 @@ a {
   color: var(--paragraph);
   font-size: 13px;
   font-weight: 700;
+  text-transform: capitalize;
 }
 
 .box.forInput .inputHolder .holder {
@@ -834,10 +842,10 @@ a {
   transition: 0.3s;
 }
 .filters .menu .hold ul li:hover {
-  background: var(--second-color);
+  background: var(--hover-color);
 }
 .filters .menu .hold ul li.active {
-  background: var(--second-color);
+  background: var(--hover-color);
   border: 1px solid var(--main-color);
 }
 .filters.for-cats {
@@ -852,7 +860,7 @@ a {
 }
 .filters.for-cats button:hover,
 .filters.for-cats button.active {
-  background: var(--second-color);
+  background: var(--hover-color);
 }
 .filters.for-cats input {
   flex: 1;

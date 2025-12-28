@@ -79,7 +79,7 @@
 }
 .filters .holder .sub-cats {
   padding: 5px;
-  background: var(--second-color);
+  background: var(--hover-color);
   display: flex;
   flex-direction: column;
   gap: 2px;
