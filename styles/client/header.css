@@ -31,7 +31,7 @@ header .menu.active {
 header .menu::before {
   content: "";
   left: 0;
-  top: -9px;
+  top: -11px;
   height: 10px;
   width: 100%;
   background: transparent;
@@ -209,9 +209,12 @@ header .top .account .user .menu {
 header .top .account .user .user-menu {
   width: 215px;
 }
+header .top .account .user .menu:has(.user-menu) {
+  padding: 0;
+}
 header .top .account .user .user-menu li {
   border-bottom: 1px solid var(--border-color);
-  padding: 4px 0;
+  padding: 5px 6px;
 }
 header .top .account .user .user-menu li:last-child {
   border: 0;
@@ -225,7 +228,7 @@ header .top .account .user .user-menu .btn {
   font-weight: 600;
   display: flex;
   border-radius: 6px;
-  padding: 2px 8px;
+  padding: 7px 8px;
 }
 header .top .account .user .user-menu .btn:hover {
   background: var(--hover-color);
@@ -365,6 +368,7 @@ header .bottom .nav .places-select .locations-holder .top {
   padding: 3px 10px 3px 6px;
   color: var(--paragraph);
   font-size: 15px;
+  margin-bottom: 3px;
 }
 [lang="ar"] header .bottom .nav .places-select .locations-holder .top {
   padding: 3px 6px 3px 10px;
@@ -388,7 +392,7 @@ header .bottom .nav .places-select .items-list {
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
-  max-height: 328px;
+  max-height: 314px;
   overflow: auto;
 }
 header .bottom .nav .places-select .items-list.has-padding {

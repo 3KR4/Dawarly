@@ -14,10 +14,12 @@
   --hover-color: #e9deff;
   --hover-color2: #f68d0f;
   --lighter-main-color: #f7eafc;
+  --lighter-main-color-2: #dfcfff;
   --title-color: #333;
   --title-color2: #d2d2d2;
   --paragraph: #575757;
   --paragraph-2: #737373;
+  --paragraph-3: #525252;
   --border-color: #e0e0e0;
   --red-color: #e74949;
 }
@@ -28,11 +30,13 @@
   --hover-color: #af97de;
   --hover-color2: #f68d0f;
   --lighter-main-color: #f7eafc;
+  --lighter-main-color-2: #d0b8ff;
   --title-color: #d2d2d2;
   --title-color2: #333;
   --paragraph: #959595;
   --paragraph-2: #959595;
-  --border-color: #313131;
+  --paragraph-3: #474747;
+  --border-color: #404040;
 }
 .rtl {
   direction: rtl;
@@ -159,13 +163,7 @@ a {
   padding-right: 0px;
   margin-left: auto;
   margin-right: auto;
-}
-
-@media (min-width: 768px) {
-  .container,
-  .fluid-container {
-    width: 95%;
-  }
+  width: 95%;
 }
 
 @media (min-width: 1600px) {

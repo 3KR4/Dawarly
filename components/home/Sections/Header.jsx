@@ -39,7 +39,7 @@ function Header() {
   const [isLogin, setIsLogin] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSmallMenu, setActiveSmallMenu] = useState(false);
-  const [activeSubCat, setActiveSubCat] = useState();
+  const [activeSubCat, setActiveSubCat] = useState(0);
   const menuRef = useRef(null);
   const menuRef2 = useRef(null);
   useClickOutside(menuRef, () => setActiveMenu(false));
@@ -79,8 +79,6 @@ function Header() {
       openMenu(id);
     }
   };
-  console.log(activeMenu);
-  console.log(activeSubCat);
 
   return (
     <header>
@@ -206,7 +204,10 @@ function Header() {
                           </>
                         )}
                         <li>
-                          <button className="btn logout" onClick={() => setIsLogin(false)}>
+                          <button
+                            className="btn logout"
+                            onClick={() => setIsLogin(false)}
+                          >
                             <MdLogout />
                             {t.actions.logout}
                           </button>
@@ -218,7 +219,11 @@ function Header() {
               </>
             ) : (
               <>
-                <Link className="main-button login-in" href={`/`} onClick={() => setIsLogin(true)}>
+                <Link
+                  className="main-button login-in"
+                  href={`/`}
+                  onClick={() => setIsLogin(true)}
+                >
                   {t.auth.login}
                 </Link>
               </>
@@ -265,7 +270,7 @@ function Header() {
                       }}
                     >
                       <Icon />
-                      {locale === "en" ? cat.name.en : cat.name.ar}
+                      {t.categories[cat.name]}
                       <FaAngleDown />
                     </Link>
 
@@ -286,7 +291,7 @@ function Header() {
                             .filter((x) => x.categoryId === cat.id)
                             .map((sub) => (
                               <Link key={sub.id} href={`/${sub.id}`}>
-                                {locale === "en" ? sub.name.en : sub.name.ar}
+                                {t.subcategories[sub.name]}
                               </Link>
                             ))}
                         </div>
@@ -339,9 +344,7 @@ function Header() {
                               if (screenSize !== "large") closeMenu();
                             }}
                           >
-                            {locale === "en"
-                              ? otherCat.name.en
-                              : otherCat.name.ar}
+                            {t.categories[otherCat.name]}
                           </Link>
                         ))}
                       </div>

@@ -27,6 +27,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: 0.3s;
 }
 .ad-card .image-holder .top svg {
   color: var(--main-color);
@@ -35,7 +36,12 @@
 .ad-card .image-holder .top .fav-ico.active svg {
   color: var(--main-color);
 }
-
+.ad-card .image-holder .top .fav-ico:not(.active):hover {
+  background: var(--main-color);
+}
+.ad-card .image-holder .top .fav-ico:not(.active):hover svg {
+  color: white;
+}
 .ad-card .image-holder .top .info {
   display: flex;
   flex-direction: column;
@@ -78,7 +84,7 @@
   display: none;
 }
 .ad-card .body span.category {
-  background: #dfcfff;
+  background: var(--lighter-main-color-2);
   padding: 5px 9px;
   font-size: 13px;
   color: #474747;

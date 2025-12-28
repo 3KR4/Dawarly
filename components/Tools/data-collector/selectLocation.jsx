@@ -1,19 +1,18 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import governorates from "@/data/governorates.json";
 import cities from "@/data/cities.json";
 import districts from "@/data/districts.json";
 import {
   FaAngleDown,
-  FaAngleRight,
   FaAngleLeft,
+  FaAngleRight,
   FaArrowLeft,
   FaArrowRight,
 } from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
-import { FiSun } from "react-icons/fi";
 import useClickOutside from "@/Contexts/useClickOutside";
 
 function SelectLocation({ locale = "en", onSelect }) {
@@ -68,16 +67,14 @@ function SelectLocation({ locale = "en", onSelect }) {
                 (locale === "en" ? (
                   <FaArrowLeft
                     onClick={() => {
-                      if (currentPage === 3) setCurrentPage(2);
-                      else if (currentPage === 2) setCurrentPage(1);
+                      setCurrentPage((prev) => (prev === 3 ? 2 : 1));
                       setSelectedCity(null);
                     }}
                   />
                 ) : (
                   <FaArrowRight
                     onClick={() => {
-                      if (currentPage === 3) setCurrentPage(2);
-                      else if (currentPage === 2) setCurrentPage(1);
+                      setCurrentPage((prev) => (prev === 3 ? 2 : 1));
                       setSelectedCity(null);
                     }}
                   />
@@ -86,21 +83,12 @@ function SelectLocation({ locale = "en", onSelect }) {
               <h5>
                 {currentPage === 1 && t.location.egyptGovernorates}
                 {currentPage === 2 && selectedGovernorate && (
-                  <>
-                    {locale === "en"
-                      ? `${t.location.inside} ${selectedGovernorate.name_en}`
-                      : `${t.location.inside} ${selectedGovernorate.name_ar}`}
-                  </>
+                  <>{t.governorate[selectedGovernorate.name]}</>
                 )}
                 {currentPage === 3 && selectedCity && (
-                  <>
-                    {locale === "en"
-                      ? `${t.location.inside} ${selectedCity.name_en}`
-                      : `${t.location.inside} ${selectedCity.name_ar}`}
-                  </>
+                  <>{t.cities[selectedCity.name]}</>
                 )}
               </h5>
-              <h5></h5>
             </div>
 
             {/* Search Input */}
@@ -112,17 +100,11 @@ function SelectLocation({ locale = "en", onSelect }) {
                   : currentPage === 2
                   ? `${t.location.searchCity} ${
                       selectedGovernorate
-                        ? locale === "en"
-                          ? selectedGovernorate.name_en
-                          : selectedGovernorate.name_ar
+                        ? t.governorate[selectedGovernorate.name]
                         : ""
                     }...`
                   : `${t.location.searchCity} ${
-                      selectedCity
-                        ? locale === "en"
-                          ? selectedCity.name_en
-                          : selectedCity.name_ar
-                        : ""
+                      selectedCity ? t.cities[selectedCity.name] : ""
                     }...`
               }
               value={searchValue}
@@ -147,22 +129,19 @@ function SelectLocation({ locale = "en", onSelect }) {
               {/* Governorates */}
               {currentPage === 1 &&
                 governorates
-                  .filter((gov) =>
-                    locale === "en"
-                      ? gov.name_en
-                          .toLowerCase()
-                          .includes(searchValue.toLowerCase())
-                      : gov.name_ar.includes(searchValue)
-                  )
+                  .filter((gov) => {
+                    const govName = t.governorate[gov.name];
+                    return govName
+                      .toLowerCase()
+                      .includes(searchValue.toLowerCase());
+                  })
                   .map((gov) => (
                     <button key={gov.id}>
-                      <Link href={`/${gov.id}`}>
-                        {locale === "en" ? gov.name_en : gov.name_ar}
-                      </Link>
+                      <Link href={`/${gov.id}`}>{t.governorate[gov.name]}</Link>
                       {gov.cities_count > 0 && (
                         <span onClick={() => handleSelectGovernorate(gov)}>
                           {gov.cities_count}
-                          {locale == "en" ? <FaAngleRight /> : <FaAngleLeft />}
+                          {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
                         </span>
                       )}
                     </button>
@@ -175,22 +154,19 @@ function SelectLocation({ locale = "en", onSelect }) {
                   .filter(
                     (city) => city.governorate_id === selectedGovernorate.id
                   )
-                  .filter((city) =>
-                    locale === "en"
-                      ? city.name_en
-                          .toLowerCase()
-                          .includes(searchValue.toLowerCase())
-                      : city.name_ar.includes(searchValue)
-                  )
+                  .filter((city) => {
+                    const cityName = t.cities[city.name];
+                    return cityName
+                      .toLowerCase()
+                      .includes(searchValue.toLowerCase());
+                  })
                   .map((city) => (
                     <button key={city.id}>
-                      <Link href={`/${city.id}`}>
-                        {locale === "en" ? city.name_en : city.name_ar}
-                      </Link>
+                      <Link href={`/${city.id}`}>{t.cities[city.name]}</Link>
                       {city.districts_count > 0 && (
                         <span onClick={() => handleSelectCity(city)}>
                           {city.districts_count}
-                          {locale == "en" ? <FaAngleRight /> : <FaAngleLeft />}
+                          {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
                         </span>
                       )}
                     </button>
@@ -201,17 +177,16 @@ function SelectLocation({ locale = "en", onSelect }) {
                 selectedCity &&
                 districts
                   .filter((district) => district.city_id === selectedCity.id)
-                  .filter((district) =>
-                    locale === "en"
-                      ? district.name_en
-                          .toLowerCase()
-                          .includes(searchValue.toLowerCase())
-                      : district.name_ar.includes(searchValue)
-                  )
+                  .filter((district) => {
+                    const districtName = t.districts[district.name];
+                    return districtName
+                      .toLowerCase()
+                      .includes(searchValue.toLowerCase());
+                  })
                   .map((district) => (
                     <button key={district.id}>
                       <Link href={`/${district.id}`}>
-                        {locale === "en" ? district.name_en : district.name_ar}
+                        {t.districts[district.name]}
                       </Link>
                     </button>
                   ))}

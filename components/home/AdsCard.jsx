@@ -8,9 +8,12 @@ import { settings } from "@/Contexts/settings";
 import "@/styles/client/ad-card.css";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { isArabic } from "@/utils/detectDirection";
+import useTranslate from "@/Contexts/useTranslation";
 
 export default function CardItem({ data, type }) {
   const { locale } = useContext(settings);
+  const t = useTranslate();
+
   const arabic = isArabic(data?.title);
   return (
     <div key={data?.id} className={`ad-card ${type}`}>
@@ -18,7 +21,7 @@ export default function CardItem({ data, type }) {
         <Image fill src={data?.images[0]} alt={data?.title} />
         <div className="top">
           <div className={`fav-ico ${data?.id == 102 ? "active" : ""}`}>
-            {data?.id == 102 ? <FaHeart className="active" /> : <FaRegHeart />}
+            {data?.id == 102 ? <FaHeart /> : <FaRegHeart />}
           </div>
         </div>
       </div>
@@ -40,7 +43,7 @@ export default function CardItem({ data, type }) {
       </div>
       <div className="date-area">
         <p className="area">
-          {data?.area.governorate}, {data?.area.city}
+          {t.governorate[data?.area.governorate]}, {t.cities[data?.area.city]}
         </p>
         <p className="date">
           {formatRelativeDate(data?.creation_date, locale)}

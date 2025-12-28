@@ -18,6 +18,7 @@ import {
   EyeOff,
   CircleAlert,
 } from "lucide-react";
+import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 
 export default function Register() {
   const [isLoginPage, setIsLoginPage] = useState(false);
@@ -51,15 +52,18 @@ export default function Register() {
     console.log("Form Data Submitted:", { ...data, country: value.label });
   };
 
-  const options = useMemo(() => countryList().getData(), []);
 
-  const [activeNational, setActiveNational] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [countrySearch, setCountrySearch] = useState("");
-
-  const filteredCountries = options.filter((x) =>
-    x.label.toLowerCase().includes(countrySearch.toLowerCase())
-  );
+    const [userAddress, setUserAddress] = useState({
+    gov: "",
+    city: "",
+    district: "",
+  });
+  const handleAddress = (type, value) => {
+    setUserAddress((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+  };
   return (
     <>
       <div className="register">
@@ -140,72 +144,35 @@ export default function Register() {
             </div>
           )}
           {!isLoginPage && (
-            <div
-              className="box forInput"
-              onClick={() => document.getElementById("phone").focus()}
-            >
-              <label htmlFor="phone">nationality</label>
-              <div className="filters for-cats">
-                <div className="btn">
-                  <h4
-                    onClick={() => setActiveNational(true)}
-                    className="ellipsis"
-                  >
-                    {activeNational ? (
-                      <input
-                        autoFocus
-                        value={countrySearch}
-                        onChange={(e) => setCountrySearch(e.target.value)}
-                        placeholder="Select your country"
-                        className="search-input"
-                      />
-                    ) : !selectedCountry ? (
-                      "Select your country"
-                    ) : (
-                      `Country: ${selectedCountry}`
-                    )}
-                  </h4>
+            <>
+              <SelectOptions
+                label=""
+                placeholder=""
+                options={}
+                value={}
+                onChange={() => {
 
-                  {activeNational ? (
-                    <IoMdClose
-                      className="main-ico"
-                      onClick={() => setActiveNational(false)}
-                    />
-                  ) : (
-                    <IoIosArrowDown
-                      className="main-ico"
-                      onClick={() => setActiveNational(true)}
-                    />
-                  )}
-                </div>
+                }}
+              />
+              <SelectOptions
+                label=""
+                placeholder=""
+                options={}
+                value={}
+                onChange={() => {
 
-                <div className={`menu ${activeNational ? "active" : ""}`}>
-                  {filteredCountries?.length > 0 ? (
-                    filteredCountries.map((country, index) => (
-                      <button
-                        key={index}
-                        className={`${
-                          selectedCountry === country.label ? "active" : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedCountry(
-                            selectedCountry === country.label
-                              ? ""
-                              : country.label
-                          );
-                          setActiveNational(false);
-                          setCountrySearch("");
-                        }}
-                      >
-                        {country.label}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="no-results">No results</div>
-                  )}
-                </div>
-              </div>
-            </div>
+                }}
+              />
+              <SelectOptions
+                label=""
+                placeholder=""
+                options={}
+                value={}
+                onChange={() => {
+
+                }}
+              />
+            </>
           )}
 
           {/* Email */}

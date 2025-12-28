@@ -9,11 +9,16 @@ import "@/styles/client/sections/ads-swiper.css";
 
 import AdsCard from "@/components/home/AdsCard";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
+import useTranslate from "@/Contexts/useTranslation";
 
 import { ads } from "@/data";
 
 export default function AdsSwiper({ title, type }) {
-  const { screenSize } = useContext(settings);
+  const { locale } = useContext(settings);
+  const t = useTranslate();
+
+  console.log(t);
+
   const swiperRef = useRef(null);
 
   const TOTAL_ADS = ads.length;
@@ -50,17 +55,19 @@ export default function AdsSwiper({ title, type }) {
       <div className="top">
         <h3 className="title">{title}</h3>
         <Link href="#" className="link">
-          See more
+          {t.home.seeMore}
         </Link>
       </div>
 
       {/* ===== Swiper ===== */}
       <Swiper
+        key={locale}
         slidesPerView={4}
         speed={800}
         spaceBetween={12}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         onSlideChange={handleSlideChange}
+        dir={locale === "ar" ? "rtl" : "ltr"} // ← هذا يحل مشكلة المارجين والاتجاه
       >
         {ads.slice(0, visibleCount).map((data, index) => (
           <SwiperSlide key={data.id || index}>
@@ -72,7 +79,7 @@ export default function AdsSwiper({ title, type }) {
       {/* ===== Bottom ===== */}
       <div className="bottom">
         <div className="lists-count">
-          {activeIndex} / {visibleCount} من أصل {TOTAL_ADS}
+          {activeIndex} / {visibleCount}
         </div>
 
         <div className="navigation">
@@ -80,15 +87,15 @@ export default function AdsSwiper({ title, type }) {
             className="nav-btn"
             onClick={() => swiperRef.current?.slidePrev()}
           >
-            <FaArrowLeft />
+            {locale === "en" ? <FaArrowLeft /> : <FaArrowRight />}
           </button>
-          <hr />
           <button
             className="nav-btn"
             onClick={() => swiperRef.current?.slideNext()}
           >
-            <FaArrowRight />
+            {locale === "en" ? <FaArrowRight /> : <FaArrowLeft />}
           </button>
+          
         </div>
       </div>
     </div>
