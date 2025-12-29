@@ -205,8 +205,6 @@ a {
 /*! Main Button */
 
 .main-button {
-  color: #fff;
-  background: var(--main-color);
   letter-spacing: 0.5px;
   border-radius: 50px;
   justify-content: center;
@@ -217,9 +215,13 @@ a {
   font-size: 14px;
   font-weight: 700;
   display: flex;
+  background: var(--lighter-main-color-2);
+  color: var(--main-color);
+  border: 1px solid var(--main-color);
 }
 .main-button:hover {
-  background: var(--hover-color2);
+  background: var(--main-color);
+  color: white;
 }
 .main-button span {
   color: white;
@@ -591,7 +593,7 @@ a {
 .box.forInput {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
   width: 100%;
 }
 .box.forInput label {
@@ -599,6 +601,7 @@ a {
   font-size: 13px;
   font-weight: 700;
   text-transform: capitalize;
+  line-height: 1;
 }
 
 .box.forInput .inputHolder .holder {
@@ -607,6 +610,9 @@ a {
   align-items: center;
   border: 1px solid #a6a6a6;
   border-radius: 10px;
+}
+.box.forInput .inputHolder:has(input:focus) .holder {
+  border-color: var(--main-color);
 }
 .box.forInput .inputHolder .holder.nationality {
   cursor: pointer;
@@ -626,20 +632,26 @@ a {
   height: 44px;
   padding-right: 10px;
 }
+[lang="ar"] .box.forInput .inputHolder .holder input {
+  padding-right: unset;
+  padding-left: 10px;
+  direction: rtl;
+}
 .box.forInput .inputHolder.password .holder input {
   padding-right: 0;
 }
 .error {
-  color: red;
+  color: var(--red-color);
   align-items: center;
   gap: 2px;
-  font-size: 13px;
-  font-weight: 400;
-  display: flex;
   margin: 2px 4px -6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
 }
 .error svg {
-  color: red;
+  color: var(--red-color);
+
   width: 15px;
 }
 

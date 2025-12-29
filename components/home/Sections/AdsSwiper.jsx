@@ -17,7 +17,6 @@ export default function AdsSwiper({ title, type }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
 
-  console.log(t);
 
   const swiperRef = useRef(null);
 

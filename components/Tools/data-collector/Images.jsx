@@ -5,6 +5,7 @@ import { CircleAlert } from "lucide-react";
 import { FaCloudUploadAlt, FaHashtag, FaLink } from "react-icons/fa";
 import Image from "next/image";
 import { selectors } from "@/Contexts/selectors";
+import { FaCircleInfo } from "react-icons/fa6";
 
 function Images() {
   const { images, setImages, isSubmited } = useContext(selectors);

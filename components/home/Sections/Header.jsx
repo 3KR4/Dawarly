@@ -13,11 +13,11 @@ import {
   FaRegMoon,
   FaRegUser,
   FaListUl,
+  FaUser,
 } from "react-icons/fa";
 import { FiSun } from "react-icons/fi";
 import { GrLanguage } from "react-icons/gr";
 import { usePathname } from "next/navigation";
-import {} from "react-icons/fa";
 import { categories, subcategories } from "@/data";
 import { LuMessageSquare } from "react-icons/lu";
 import { MdPostAdd } from "react-icons/md";
@@ -221,10 +221,10 @@ function Header() {
               <>
                 <Link
                   className="main-button login-in"
-                  href={`/`}
+                  href={`/register`}
                   onClick={() => setIsLogin(true)}
                 >
-                  {t.auth.login}
+                  {screenSize != "small" ? t.auth.login : <FaUser />}
                 </Link>
               </>
             )}

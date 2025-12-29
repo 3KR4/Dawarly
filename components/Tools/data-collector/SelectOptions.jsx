@@ -31,7 +31,6 @@ function SelectOptions({
     });
   }, [options, search, t, tPath]);
 
-  console.log(filteredOptions);
 
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
@@ -75,7 +74,6 @@ function SelectOptions({
           {filteredOptions.length ? (
             filteredOptions.map((item) => {
               const text = t[tPath]?.[item.name];
-              console.log(t[tPath]?.[item.name]);
 
               return (
                 <button

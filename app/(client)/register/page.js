@@ -1,7 +1,7 @@
 "use client";
 import "@/styles/client/forms.css";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 
@@ -20,18 +20,26 @@ import {
   EyeOff,
   CircleAlert,
 } from "lucide-react";
+import { FaCircleInfo } from "react-icons/fa6";
+import OtpInputs from "@/components/Tools/Otp";
 
 export default function Register() {
   const t = useTranslate();
+  const auth = t.auth; // استدعاء الترجمات
 
   const [isLoginPage, setIsLoginPage] = useState(false);
-  const [step, setStep] = useState(1);
-
+  const STEPS = {
+    ACCOUNT: 1,
+    PHONE_VERIFY: 2,
+    EMAIL_VERIFY: 3,
+    ADDRESS: 4,
+    INTERESTS: 5,
+  };
+  const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
   });
-
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   const {
@@ -60,6 +68,15 @@ export default function Register() {
     );
   };
 
+  const OTP_LENGTH = 5;
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+
+  useEffect(() => {
+    if (step === STEPS.PHONE_VERIFY || step === STEPS.EMAIL_VERIFY) {
+      setOtp(Array(OTP_LENGTH).fill(""));
+    }
+  }, [step]);
+
   /* ================= SUBMIT ================= */
   const onSubmit = (data) => {
     if (isLoginPage) {
@@ -67,13 +84,27 @@ export default function Register() {
       return;
     }
 
-    if (step === 1) {
-      setStep(2);
+    if (step === STEPS.ACCOUNT) {
+      setStep(STEPS.PHONE_VERIFY);
       return;
     }
 
-    if (step === 2) {
-      setStep(3);
+    if (step === STEPS.PHONE_VERIFY) {
+      if (data.email) {
+        setStep(STEPS.EMAIL_VERIFY);
+      } else {
+        setStep(STEPS.ADDRESS);
+      }
+      return;
+    }
+
+    if (step === STEPS.EMAIL_VERIFY) {
+      setStep(STEPS.ADDRESS);
+      return;
+    }
+
+    if (step === STEPS.ADDRESS) {
+      setStep(STEPS.INTERESTS);
       return;
     }
 
@@ -84,27 +115,51 @@ export default function Register() {
     });
   };
 
+  const titles = {
+    [STEPS.ACCOUNT]: auth.createAccount,
+    [STEPS.PHONE_VERIFY]: auth.verifyPhone,
+    [STEPS.EMAIL_VERIFY]: auth.verifyEmail,
+    [STEPS.ADDRESS]: auth.chooseAddress,
+    [STEPS.INTERESTS]: auth.chooseInterests,
+  };
+
+  const descriptions = {
+    [STEPS.ACCOUNT]: auth.accountDescription,
+    [STEPS.PHONE_VERIFY]: auth.phoneDescription,
+    [STEPS.EMAIL_VERIFY]: auth.emailDescription,
+    [STEPS.ADDRESS]: auth.addressDescription,
+    [STEPS.INTERESTS]: auth.interestsDescription,
+  };
+
+  const buttonLabels = {
+    [STEPS.ACCOUNT]: auth.createAccountBtn,
+    [STEPS.PHONE_VERIFY]: auth.verifyPhoneBtn,
+    [STEPS.EMAIL_VERIFY]: auth.verifyEmailBtn,
+    [STEPS.INTERESTS]: auth.finishAccount,
+  };
+
   return (
     <div className="register">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h1>
-          {isLoginPage ? "Login into your account" : "Create your account"}
-        </h1>
+        <div className="top">
+          <h1>{titles[step]}</h1>
+          <p>{descriptions[step]}</p>
+        </div>
 
         {/* ================= LOGIN ================= */}
         {isLoginPage && (
           <>
             <div className="box forInput">
-              <label>Email Address</label>
+              <label>{auth.email}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <Mail />
                   <input
                     type="email"
                     {...register("email", {
-                      required: "Email address is required",
+                      required: auth.errors.requiredEmail,
                     })}
-                    placeholder="Enter your email"
+                    placeholder={auth.placeholders.email}
                   />
                 </div>
                 {errors.email && (
@@ -117,16 +172,16 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>Password</label>
+              <label>{auth.password}</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
                   <input
                     type={passEye.password ? "text" : "password"}
                     {...register("password", {
-                      required: "Password is required",
+                      required: auth.errors.requiredPassword,
                     })}
-                    placeholder="Enter your password"
+                    placeholder={auth.placeholders.password}
                   />
                   {passEye.password ? (
                     <Eye
@@ -146,44 +201,55 @@ export default function Register() {
                 </div>
               </div>
             </div>
+
+            <div className="otherWay">
+              <hr />
+              <span>{auth.orContinueWith}</span>
+              <hr />
+            </div>
+            <div className="social-btns">
+              <div className="btn">
+                <Image
+                  src={`/google-icon.png`}
+                  width={24}
+                  height={24}
+                  alt="google icon"
+                />
+                {auth.google}
+              </div>
+            </div>
           </>
         )}
 
         {/* ================= REGISTER STEP 1 ================= */}
-        {!isLoginPage && step === 1 && (
+        {!isLoginPage && step === STEPS.ACCOUNT && (
           <>
             <div className="box forInput">
-              <label>Full Name</label>
+              <label>{auth.fullName}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <UserRound />
                   <input
                     type="text"
                     {...register("fullname", {
-                      required: "Your full name is required",
+                      required: auth.errors.requiredFullName,
                       validate: (value) => {
                         const words = value.trim().split(/\s+/);
-
-                        if (words.length < 2) {
-                          return "Full name must contain at least two words";
-                        }
-
+                        if (words.length < 2)
+                          return auth.errors.fullNameTwoWords;
                         for (let i = 0; i < words.length; i++) {
                           if (words[i].length < 3) {
-                            if (i === 0)
-                              return "First name must be at least 3 characters";
-                            if (i === 1)
-                              return "Last name must be at least 3 characters";
+                            if (i === 0) return auth.errors.firstNameShort;
+                            if (i === 1) return auth.errors.lastNameShort;
                             return `Word ${
                               i + 1
                             } must be at least 3 characters`;
                           }
                         }
-
                         return true;
                       },
                     })}
-                    placeholder="Enter your full name"
+                    placeholder={auth.placeholders.fullName}
                   />
                 </div>
                 {errors.fullname && (
@@ -196,29 +262,29 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>Phone Number</label>
+              <label>{auth.phone}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <Phone />
                   <input
                     type="tel"
                     {...register("phone", {
-                      required: "Phone number is required",
+                      required: auth.errors.requiredPhone,
                       pattern: {
                         value:
                           /^\+?[0-9]{1,3}?[-.\s]?(\(?\d{1,4}\)?[-.\s]?){1,4}\d{1,4}$/,
-                        message: "Enter a valid phone number",
+                        message: auth.errors.invalidPhone,
                       },
                       minLength: {
                         value: 7,
-                        message: "Phone number is too short",
+                        message: auth.errors.phoneTooShort,
                       },
                       maxLength: {
                         value: 15,
-                        message: "Phone number is too long",
+                        message: auth.errors.phoneTooLong,
                       },
                     })}
-                    placeholder="Enter your phone"
+                    placeholder={auth.placeholders.phone}
                   />
                 </div>
                 {errors.phone && (
@@ -231,22 +297,21 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>Email Address</label>
+              <label>{auth.email}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <Mail />
                   <input
                     type="email"
                     {...register("email", {
-                      required: "Email address is required",
+                      required: auth.errors.requiredEmail,
                       pattern: {
                         value:
                           /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                        message:
-                          "Enter a valid email address (e.g. user@example.com)",
+                        message: auth.errors.invalidEmail,
                       },
                     })}
-                    placeholder="Enter your email"
+                    placeholder={auth.placeholders.email}
                   />
                 </div>
                 {errors.email && (
@@ -259,22 +324,21 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>Password</label>
+              <label>{t.auth.password}</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
                   <input
                     type={passEye.password ? "text" : "password"}
                     {...register("password", {
-                      required: "Password is required",
+                      required: t.auth.errors.requiredPassword,
                       pattern: {
                         value:
                           /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
-                        message:
-                          "Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character",
+                        message: t.auth.errors.passwordWeak,
                       },
                     })}
-                    placeholder="Enter your password"
+                    placeholder={t.auth.placeholders.password}
                   />
                   {passEye.password ? (
                     <Eye
@@ -302,18 +366,20 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>Confirm Password</label>
+              <label>{t.auth.confirmPassword}</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
                   <input
                     type={passEye.confirm ? "text" : "password"}
                     {...register("passwordConfirmation", {
-                      required: "Please confirm your password",
+                      required: t.auth.errors.requiredPassword,
                       validate: (value) =>
-                        value === password || "Passwords do not match",
+                        value === password
+                          ? true
+                          : t.auth.errors.passwordMismatch,
                     })}
-                    placeholder="Confirm password"
+                    placeholder={t.auth.placeholders.confirmPassword}
                   />
                   {passEye.confirm ? (
                     <Eye
@@ -342,8 +408,15 @@ export default function Register() {
           </>
         )}
 
+        {!isLoginPage && step === STEPS.PHONE_VERIFY && (
+          <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
+        )}
+        {!isLoginPage && step === STEPS.EMAIL_VERIFY && (
+          <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
+        )}
+
         {/* ================= REGISTER STEP 2 ================= */}
-        {!isLoginPage && step === 2 && (
+        {!isLoginPage && step === STEPS.ADDRESS && (
           <>
             <SelectOptions
               label={t.location.yourGovernorate}
@@ -372,7 +445,7 @@ export default function Register() {
         )}
 
         {/* ================= REGISTER STEP 3 ================= */}
-        {!isLoginPage && step === 3 && (
+        {!isLoginPage && step === STEPS.INTERESTS && (
           <div className="categories-grid">
             {categories.map((cat) => {
               const Icon = cat.icon;
@@ -395,18 +468,37 @@ export default function Register() {
         {/* ================= BUTTON ================= */}
         <button type="submit" className="main-button">
           {isLoginPage
-            ? "Login"
-            : step === 1
-            ? "Create account"
-            : step === 2
+            ? auth.login
+            : step === STEPS.ADDRESS
             ? userAddress.gov || userAddress.city
-              ? "Next"
-              : "Skip"
-            : "Finish account"}
+              ? auth.next
+              : auth.skip
+            : buttonLabels[step]}
         </button>
 
+        {!isLoginPage && step === STEPS.ACCOUNT && (
+          <>
+            <div className="otherWay">
+              <hr />
+              <span>{auth.orContinueWith}</span>
+              <hr />
+            </div>
+            <div className="social-btns">
+              <div className="btn">
+                <Image
+                  src={`/google-icon.png`}
+                  width={24}
+                  height={24}
+                  alt="google icon"
+                />
+                {auth.google}
+              </div>
+            </div>
+          </>
+        )}
+
         <div className="didntHasAccount">
-          {isLoginPage ? "Didnt" : "Already"} have an account?{" "}
+          {isLoginPage ? auth.noAccount : auth.haveAccount}{" "}
           <span
             className="mineLink"
             onClick={() => {
@@ -415,7 +507,7 @@ export default function Register() {
               reset();
             }}
           >
-            {isLoginPage ? "Create account" : "Log in"}
+            {isLoginPage ? auth.createAccountBtn : auth.login}
           </span>
         </div>
       </form>

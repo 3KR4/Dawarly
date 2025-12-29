@@ -3,6 +3,7 @@ import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { selectors } from "@/Contexts/selectors";
 import { useContext } from "react";
+import { FaCircleInfo } from "react-icons/fa6";
 
 function Specs() {
   const { specifications, setSpecifications, compsErrors, updateCompsError } =

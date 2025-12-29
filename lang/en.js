@@ -34,14 +34,69 @@ const en = {
     selectGovernorate: "select your governorate",
     yourCity: "your City",
     selectCity: "select your City",
-
   },
   dashboard: {
     dashboard: "dashboard",
   },
-  auth: {
-    login: "log in",
+auth : {
+  login: "Log in",
+  createAccount: "Create your account",
+  verifyPhone: "Verify your phone number",
+  verifyEmail: "Verify your email address",
+  chooseAddress: "Choose your address",
+  chooseInterests: "Choose your interests",
+
+  accountDescription:
+    "Create your account to connect with sellers or sell your own items.",
+  phoneDescription: "Enter the verification code sent to your phone number.",
+  emailDescription: "Enter the verification code sent to your email address.",
+  addressDescription:
+    "Your address helps manage your store and can be changed anytime.",
+  interestsDescription:
+    "Choose your interests to see relevant content instantly.",
+
+  createAccountBtn: "Create account",
+  verifyPhoneBtn: "Verify phone",
+  verifyEmailBtn: "Verify email",
+  finishAccount: "Finish account",
+  next: "Next",
+  skip: "Skip",
+  orContinueWith: "Or continue with",
+  google: "Google",
+  haveAccount: "Already have an account?",
+  noAccount: "Don't have an account?",
+
+  fullName: "Full name",
+  phone: "Phone number",
+  email: "Email address",
+  emailOptional: "Email address (optional)",
+  password: "Password",
+  confirmPassword: "Confirm password",
+
+  placeholders: {
+    fullName: "Enter your full name",
+    phone: "Enter your phone",
+    email: "Enter your email",
+    password: "Enter your password",
+    confirmPassword: "Confirm password",
   },
+
+  errors: {
+    requiredEmail: "Email address is required",
+    requiredPassword: "Password is required",
+    requiredFullName: "Your full name is required",
+    invalidEmail: "Enter a valid email address (e.g. user@example.com)",
+    invalidPhone: "Enter a valid phone number",
+    phoneTooShort: "Phone number is too short",
+    phoneTooLong: "Phone number is too long",
+    passwordWeak:
+      "Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character",
+    passwordMismatch: "Passwords do not match",
+    fullNameTwoWords: "Full name must contain at least two words",
+    firstNameShort: "First name must be at least 3 characters",
+    lastNameShort: "Last name must be at least 3 characters",
+  },
+},
   governorates: {
     cairo: "Cairo",
     giza: "Giza",
