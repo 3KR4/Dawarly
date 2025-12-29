@@ -603,7 +603,10 @@ a {
   text-transform: capitalize;
   line-height: 1;
 }
-
+.box.forInput label span {
+  color: var(--paragraph-2);
+  font-size: 12px;
+}
 .box.forInput .inputHolder .holder {
   position: relative;
   display: flex;

@@ -4,10 +4,10 @@
   flex-direction: column;
   gap: 7px;
 }
-.ads-section .top,
-.ads-section .bottom {
+.ads-section .top {
   display: flex;
-  padding: 0 10px;
+  padding: 0 22px;
+
   justify-content: space-between;
   align-items: flex-end;
 }
@@ -24,56 +24,89 @@
   background: var(--lighter-main-color-2);
   color: var(--paragraph-3);
 }
-.ads-section .top h3 {
+.ads-section > a {
+  text-align: center;
+  border: 1px solid var(--main-color);
+  border-radius: 13px;
+  padding: 12px;
+  margin-right: 8px;
+  font-weight: 700;
+  margin-top: 4px;
+  background: var(--hover-color);
+  color: var(--main-color);
+}
+[lang="ar"] .ads-section > a {
+  margin-right: unset;
+  margin-left: 8px;
 }
 .ads-section .top a {
 }
-.ads-section .bottom {
-  align-items: center;
-  align-items: flex-start;
-}
-.ads-section .bottom .lists-count {
-  color: var(--paragraph-2);
-  line-height: 1.4;
-  font-weight: 700;
-  font-size: 17px;
-}
-.ads-section .bottom .navigation {
+
+.ads-section .navigation {
   display: flex;
   align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 100%;
+  justify-content: space-between;
+  transform: translate(-50%, -50%);
 }
 
-.ads-section .bottom .navigation button {
+.ads-section .navigation button {
+  border: 1px solid var(--border-color);
+  background: var(--body-color);
+  border-radius: 39%;
   justify-content: center;
   align-items: center;
+  padding: 11px;
   display: flex;
-  padding: 8px 14px 8px 17px;
-  border-radius: 20px 0 0 20px;
-  border: 1px solid var(--border-color);
 }
-.ads-section .bottom .navigation button:last-child {
+
+[lang="ar"] .ads-section .navigation button {
   padding: 8px 17px 8px 14px;
   border-radius: 0 20px 20px 0;
 }
-[lang="ar"] .ads-section .bottom .navigation button {
-  padding: 8px 17px 8px 14px;
-  border-radius: 0 20px 20px 0;
-}
-[lang="ar"] .ads-section .bottom .navigation button:last-child {
+[lang="ar"] .ads-section .navigation button:last-child {
   padding: 8px 14px 8px 17px;
   border-radius: 20px 0 0 20px;
 }
-.ads-section .bottom .navigation button svg {
-  font-size: 14px;
+.ads-section .navigation button svg {
+  font-size: 16px;
   color: var(--paragraph-2);
+}
+.ads-section .swiper-holder {
+  position: relative;
+  padding: 0 24px;
 }
 .ads-section .swiper {
   width: 100%;
 }
-.ads-section .bottom .navigation button:hover {
+.ads-section .navigation button:hover {
   background: var(--lighter-main-color-2);
   border-color: transparent;
 }
-.ads-section .bottom .navigation button:hover svg {
+.ads-section .navigation button:hover svg {
   color: var(--paragraph-3);
+}
+
+@media (max-width: 400px) {
+  .ads-section {
+    width: 100%;
+    padding-left: 10px;
+  }
+  [lang="ar"] .ads-section {
+    padding-right: 10px;
+    padding-left: unset;
+  }
+  .ads-section .top,
+  .ads-section .bottom {
+    padding-right: 10px;
+  }
+  [lang="ar"] .ads-section .top,
+  [lang="ar"] .ads-section .bottom {
+    padding-right: unset;
+    padding-left: 10px;
+  }
 }

@@ -104,7 +104,7 @@ body:has(.register) footer {
   font-weight: 700;
   display: flex;
 }
-.register form .didntHasAccount {
+.register form .have-problem {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,8 +113,9 @@ body:has(.register) footer {
   font-weight: 500;
   color: var(--paragraph);
   line-height: 1;
+  cursor: pointer;
 }
-p.didntHasAccount {
+p.have-problem {
   justify-content: flex-start;
   transform: translateX(8px);
 }
@@ -154,13 +155,16 @@ p.didntHasAccount {
   color: var(--paragraph);
 }
 
-.register .categories-grid {
+.register .options-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
   display: grid;
   margin: 5px 10px 2px;
 }
-.register .cat-box {
+.register .options-grid.verfiyMethod {
+  grid-template-columns: repeat(2, 1fr);
+}
+.register .option-box {
   border: 1px solid var(--border-color);
   border-radius: 10px;
   flex-direction: column;
@@ -176,23 +180,27 @@ p.didntHasAccount {
   cursor: pointer;
   position: relative;
 }
-.register .cat-box:hover {
+.register .option-box:hover {
   background: var(--hover-color);
   border: 1px solid var(--main-color);
 }
-.register .cat-box.active {
+.register .option-box.active {
   background: var(--lighter-main-color-2);
   border: 1px solid var(--main-color);
 }
-.register .cat-box svg {
+.register .option-box.disable {
+  opacity: 0.5;
+  cursor: no-drop;
+}
+.register .option-box svg {
   font-size: 22px;
   color: var(--paragraph-2);
 }
-.register .cat-box span {
+.register .option-box span {
   color: var(--paragraph-2);
   text-align: center;
 }
-.register .cat-box .check {
+.register .option-box .check {
   position: absolute;
   right: 0;
   top: 0;
@@ -242,16 +250,21 @@ p.didntHasAccount {
 
     padding: 19px 15px;
   }
-  .register .categories-grid {
+  .register .options-grid {
     margin: 0;
   }
-  .register .cat-box {
+  .register .option-box {
     height: 80px;
   }
-  .register .cat-box svg {
+  .register .option-box svg {
     font-size: 18px;
   }
-  .register .cat-box span {
+  .register .option-box span {
     font-size: 13px;
+  }
+  .register form h1 {
+    line-height: 1;
+    margin-bottom: 7px;
+    font-size: 26px;
   }
 }

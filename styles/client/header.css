@@ -629,12 +629,13 @@ header .bottom .actions button:hover svg {
     height: 38px;
   }
   header .top .account .login-in {
-    height: 36px;
-    width: 36px;
+    height: 34px;
+    width: 34px;
     padding: 0;
+    background: transparent;
   }
   header .top .account .login-in svg {
-    font-size: 15px;
+    font-size: 17px;
   }
   [theme="dark"] header .top .account .user svg.small-drop-down {
     color: var(--body-color);

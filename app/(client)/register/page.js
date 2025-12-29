@@ -20,7 +20,7 @@ import {
   EyeOff,
   CircleAlert,
 } from "lucide-react";
-import { FaCircleInfo } from "react-icons/fa6";
+import { FaRegCircleUser } from "react-icons/fa6";
 import OtpInputs from "@/components/Tools/Otp";
 
 export default function Register() {
@@ -34,6 +34,10 @@ export default function Register() {
     EMAIL_VERIFY: 3,
     ADDRESS: 4,
     INTERESTS: 5,
+    LOGIN: 6,
+    FORGET_PASS: 7,
+    FORGET_PASS_VERIFY: 8,
+    VIEW_OR_UPDATE_PASS: 9,
   };
   const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
@@ -41,6 +45,11 @@ export default function Register() {
     city: null,
   });
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [verifyMethod, setVerifyMethod] = useState("");
+  const [availableMethod, setAvailableMethod] = useState("both");
+
+  const canUseEmail = availableMethod === "email" || availableMethod === "both";
+  const canUsePhone = availableMethod === "phone" || availableMethod === "both";
 
   const {
     register,
@@ -107,6 +116,18 @@ export default function Register() {
       setStep(STEPS.INTERESTS);
       return;
     }
+    if (step === STEPS.LOGIN) {
+      setStep(STEPS.FORGET_PASS);
+      return;
+    }
+    if (step === STEPS.FORGET_PASS) {
+      setStep(STEPS.FORGET_PASS_VERIFY);
+      return;
+    }
+    if (step === STEPS.FORGET_PASS_VERIFY) {
+      setStep(STEPS.VIEW_OR_UPDATE_PASS);
+      return;
+    }
 
     console.log("FINAL REQUEST", {
       userData: data,
@@ -117,8 +138,12 @@ export default function Register() {
 
   const titles = {
     [STEPS.ACCOUNT]: auth.createAccount,
+    [STEPS.LOGIN]: auth.createAccount,
     [STEPS.PHONE_VERIFY]: auth.verifyPhone,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmail,
+    [STEPS.FORGET_PASS_VERIFY]: auth.forgetPass,
+    [STEPS.FORGET_PASS]: auth.choose_verify_method,
+    [STEPS.VIEW_OR_UPDATE_PASS]: auth.userVerified,
     [STEPS.ADDRESS]: auth.chooseAddress,
     [STEPS.INTERESTS]: auth.chooseInterests,
   };
@@ -127,6 +152,10 @@ export default function Register() {
     [STEPS.ACCOUNT]: auth.accountDescription,
     [STEPS.PHONE_VERIFY]: auth.phoneDescription,
     [STEPS.EMAIL_VERIFY]: auth.emailDescription,
+    [STEPS.FORGET_PASS_VERIFY]:
+      verifyMethod == "email" ? auth.emailDescription : auth.phoneDescription,
+    [STEPS.FORGET_PASS]: auth.choose_verify_method_description,
+    [STEPS.VIEW_OR_UPDATE_PASS]: auth.userVerifiedDescription,
     [STEPS.ADDRESS]: auth.addressDescription,
     [STEPS.INTERESTS]: auth.interestsDescription,
   };
@@ -135,6 +164,10 @@ export default function Register() {
     [STEPS.ACCOUNT]: auth.createAccountBtn,
     [STEPS.PHONE_VERIFY]: auth.verifyPhoneBtn,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmailBtn,
+    [STEPS.FORGET_PASS_VERIFY]: auth.forgetPassBtn,
+    [STEPS.FORGET_PASS]: auth.sendCode,
+    [STEPS.VIEW_OR_UPDATE_PASS]:
+      auth.skip_and_continue || auth.update_pass_and_continue,
     [STEPS.INTERESTS]: auth.finishAccount,
   };
 
@@ -145,27 +178,32 @@ export default function Register() {
           <h1>{titles[step]}</h1>
           <p>{descriptions[step]}</p>
         </div>
-
         {/* ================= LOGIN ================= */}
         {isLoginPage && (
           <>
             <div className="box forInput">
-              <label>{auth.email}</label>
+              <label>{auth.emailPhoneLogin}</label>
               <div className="inputHolder">
                 <div className="holder">
-                  <Mail />
+                  <FaRegCircleUser />
                   <input
-                    type="email"
-                    {...register("email", {
-                      required: auth.errors.requiredEmail,
+                    type="text"
+                    {...register("emailPhoneLogin", {
+                      required: auth.errors.emailPhoneLoginRequired,
+                      pattern: {
+                        value:
+                          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$|^\+?[0-9\s\-()]{7,15}$/,
+                        message: auth.errors.emailPhoneLoginInvalid,
+                      },
                     })}
-                    placeholder={auth.placeholders.email}
+                    placeholder={auth.placeholders.emailPhoneLogin}
                   />
                 </div>
-                {errors.email && (
+
+                {errors.emailPhoneLogin && (
                   <span className="error">
                     <CircleAlert />
-                    {errors.email.message}
+                    {errors.emailPhoneLogin.message}
                   </span>
                 )}
               </div>
@@ -178,7 +216,7 @@ export default function Register() {
                   <LockKeyhole />
                   <input
                     type={passEye.password ? "text" : "password"}
-                    {...register("password", {
+                    {...register("loginPassword", {
                       required: auth.errors.requiredPassword,
                     })}
                     placeholder={auth.placeholders.password}
@@ -199,28 +237,28 @@ export default function Register() {
                     />
                   )}
                 </div>
+                {errors.loginPassword && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.loginPassword.message}
+                  </span>
+                )}
               </div>
             </div>
-
-            <div className="otherWay">
-              <hr />
-              <span>{auth.orContinueWith}</span>
-              <hr />
-            </div>
-            <div className="social-btns">
-              <div className="btn">
-                <Image
-                  src={`/google-icon.png`}
-                  width={24}
-                  height={24}
-                  alt="google icon"
-                />
-                {auth.google}
-              </div>
+            <div
+              className="have-problem"
+              onClick={() => {
+                setIsLoginPage((p) => !p);
+                setStep(STEPS.FORGET_PASS);
+                setIsLoginPage(false);
+                reset();
+              }}
+            >
+              {auth.forgetPassword}{" "}
+              <span className="mineLink">{auth.password}</span>
             </div>
           </>
         )}
-
         {/* ================= REGISTER STEP 1 ================= */}
         {!isLoginPage && step === STEPS.ACCOUNT && (
           <>
@@ -268,6 +306,7 @@ export default function Register() {
                   <Phone />
                   <input
                     type="tel"
+                    id="phone"
                     {...register("phone", {
                       required: auth.errors.requiredPhone,
                       pattern: {
@@ -297,14 +336,15 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>{auth.email}</label>
+              <label>
+                {auth.email} <span>({auth.optional})</span>
+              </label>
               <div className="inputHolder">
                 <div className="holder">
                   <Mail />
                   <input
                     type="email"
                     {...register("email", {
-                      required: auth.errors.requiredEmail,
                       pattern: {
                         value:
                           /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -407,15 +447,124 @@ export default function Register() {
             </div>
           </>
         )}
+        {/* ================= REGISTER STEP 2 / 3 / 7 ================= */}
+        {step === STEPS.FORGET_PASS && (
+          <div className="options-grid verfiyMethod">
+            {/* ===== Email ===== */}
+            <div
+              className={`option-box ${
+                canUseEmail
+                  ? verifyMethod === "email"
+                    ? "active"
+                    : ""
+                  : "disable"
+              }`}
+              onClick={() => {
+                if (canUseEmail) {
+                  setVerifyMethod("email");
+                }
+              }}
+            >
+              <Mail className="cat-icon" />
+              <span>{t.auth.verify_by_email}</span>
+            </div>
 
-        {!isLoginPage && step === STEPS.PHONE_VERIFY && (
+            {/* ===== Phone ===== */}
+            <div
+              className={`option-box ${
+                canUsePhone
+                  ? verifyMethod === "phone"
+                    ? "active"
+                    : ""
+                  : "disable"
+              }`}
+              onClick={() => {
+                if (canUsePhone) {
+                  setVerifyMethod("phone");
+                }
+              }}
+            >
+              <Phone className="cat-icon" />
+              <span>{t.auth.verify_by_phone}</span>
+            </div>
+          </div>
+        )}
+        {step === STEPS.VIEW_OR_UPDATE_PASS && (
+          <>
+            <div className="box forInput">
+              <label>{auth.viewYourCurrentPassword}</label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+                  <input
+                    type={passEye.password ? "text" : "password"}
+                    value={"Aa123456@"}
+                    readOnly
+                  />
+                  {passEye.password ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: true }))
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="box forInput">
+              <label>
+                {auth.makeNewPassword} <span>({auth.optional})</span>
+              </label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+                  <input
+                    type={passEye.password ? "text" : "password"}
+                    {...register("newPass", {
+                      required: auth.errors.requiredPassword,
+                    })}
+                    placeholder={auth.placeholders.newPassword}
+                  />
+                  {passEye.password ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: true }))
+                      }
+                    />
+                  )}
+                </div>
+                {errors.newPass && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.newPass.message}
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+        {(step === STEPS.PHONE_VERIFY ||
+          step === STEPS.EMAIL_VERIFY ||
+          step === STEPS.FORGET_PASS_VERIFY) && (
           <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
         )}
-        {!isLoginPage && step === STEPS.EMAIL_VERIFY && (
-          <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
-        )}
-
-        {/* ================= REGISTER STEP 2 ================= */}
+        {/* ================= REGISTER STEP 4 ================= */}
         {!isLoginPage && step === STEPS.ADDRESS && (
           <>
             <SelectOptions
@@ -443,10 +592,9 @@ export default function Register() {
             />
           </>
         )}
-
-        {/* ================= REGISTER STEP 3 ================= */}
+        {/* ================= REGISTER STEP 5 ================= */}
         {!isLoginPage && step === STEPS.INTERESTS && (
-          <div className="categories-grid">
+          <div className="options-grid">
             {categories.map((cat) => {
               const Icon = cat.icon;
               const active = selectedCategories.includes(cat.id);
@@ -454,7 +602,7 @@ export default function Register() {
               return (
                 <div
                   key={cat.id}
-                  className={`cat-box ${active ? "active" : ""}`}
+                  className={`option-box ${active ? "active" : ""}`}
                   onClick={() => toggleCategory(cat.id)}
                 >
                   <Icon className="cat-icon" />
@@ -464,7 +612,6 @@ export default function Register() {
             })}
           </div>
         )}
-
         {/* ================= BUTTON ================= */}
         <button type="submit" className="main-button">
           {isLoginPage
@@ -475,20 +622,21 @@ export default function Register() {
               : auth.skip
             : buttonLabels[step]}
         </button>
-
-        {!isLoginPage && step === STEPS.ACCOUNT && (
+        {(isLoginPage || step === STEPS.ACCOUNT) && (
           <>
             <div className="otherWay">
               <hr />
-              <span>{auth.orContinueWith}</span>
+              <span>
+                {isLoginPage ? auth.orLoginWith : auth.orContinueWith}
+              </span>
               <hr />
             </div>
             <div className="social-btns">
               <div className="btn">
                 <Image
                   src={`/google-icon.png`}
-                  width={24}
-                  height={24}
+                  width={22}
+                  height={22}
                   alt="google icon"
                 />
                 {auth.google}
@@ -496,20 +644,21 @@ export default function Register() {
             </div>
           </>
         )}
-
-        <div className="didntHasAccount">
-          {isLoginPage ? auth.noAccount : auth.haveAccount}{" "}
-          <span
-            className="mineLink"
+        {(step === STEPS.ACCOUNT || step === STEPS.LOGIN) && (
+          <div
+            className="have-problem"
             onClick={() => {
               setIsLoginPage((p) => !p);
-              setStep(1);
+              setStep((prev) => (prev = 6 ? 1 : 6));
               reset();
             }}
           >
-            {isLoginPage ? auth.createAccountBtn : auth.login}
-          </span>
-        </div>
+            {isLoginPage ? auth.noAccount : auth.haveAccount}{" "}
+            <span className="mineLink">
+              {isLoginPage ? auth.createAccountBtn : auth.login}
+            </span>
+          </div>
+        )}
       </form>
     </div>
   );
