@@ -7,6 +7,8 @@ const en = {
   },
   home: {
     seeMore: "see more",
+    browseCategories: "browse categories",
+    browseSubCategories: "browse subcategories",
   },
   placeholders: {
     search: "search on anything ...",

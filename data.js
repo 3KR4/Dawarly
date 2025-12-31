@@ -105,30 +105,14 @@ export const navLinks = [
 export const slides = [
   {
     image: "/Slides/slide-003.jpg",
-    small: "Discover Egypt",
-    paragraph:
-      "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
-    title: "Live the Full Experience",
-    btnText: "Explore Now",
     link: "/discover",
   },
   {
     image: "/Slides/slide-005.jpg",
-    small: "Play • Explore • Win",
-    paragraph:
-      "Complete fun challenges at iconic places, earn points, and unlock real rewards — restaurants, handcrafts, and more!",
-    title: "Make Every Step a Game",
-    btnText: "See Events",
     link: "/nights",
   },
   {
     image: "/Slides/slide-001.jpg",
-
-    small: "Explore Egypt Differently",
-    paragraph:
-      "Find hidden gems, unique experiences, and special rewards across all Egyptian governorates. dawarly is your smart guide to explore, play, and enjoy every part of Egypt.",
-    title: "Discover the Real Egypt",
-    btnText: "Visit Marketplace",
     link: "/marketplace",
   },
 ];
@@ -253,7 +237,6 @@ export const categories = [
   { id: 11, name: "sportsHobbies", icon: FaFootballBall },
   { id: 12, name: "businessIndustrial", icon: FaIndustry },
 ];
-
 export const subcategories = [
   { id: 101, categoryId: 1, name: "apartmentsSale" },
   { id: 102, categoryId: 1, name: "apartmentsRent" },
@@ -307,7 +290,6 @@ export const subcategories = [
   { id: 1202, categoryId: 12, name: "officeEquipment" },
   { id: 1203, categoryId: 12, name: "wholesale" },
 ];
-
 
 // =============================
 // Users (15 Egyptian fake users)
@@ -654,7 +636,7 @@ export const ads = [
     area: { governorate: "alexandria", city: "smouha" },
     specs: { storage_gb: 128 },
     amenities: [],
-    images: ["/ads/mobile1..jpg"],
+    images: ["/ads/mobile1.jpg"],
     tags: ["samsung"],
     creation_date: "2025-01-12",
   },
@@ -732,7 +714,7 @@ export const ads = [
     area: { governorate: "cairo", city: "heliopolis" },
     specs: { salary_range: "6000-8000" },
     amenities: [],
-    images: ["/ads/job1.jpg"],
+    images: ["/ads/jop1.jpg"],
     tags: ["وظيفة"],
     creation_date: "2025-01-13",
   },

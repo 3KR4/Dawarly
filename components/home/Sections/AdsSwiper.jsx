@@ -6,6 +6,7 @@ import { settings } from "@/Contexts/settings";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "@/styles/client/sections/ads-swiper.css";
+import { FaAngleRight, FaAngleLeft } from "react-icons/fa";
 
 import AdsCard from "@/components/home/AdsCard";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
@@ -23,8 +24,10 @@ export default function AdsSwiper({ title, type }) {
 
   const [visibleCount, setVisibleCount] = useState(8);
   const [fetchCount, setFetchCount] = useState(0);
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0); // غير لـ 0 بدلاً من 1
   const [slidesPerView, setSlidesPerView] = useState(4);
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
 
   // دالة لحساب threshold بناءً على slidesPerView
   const getLoadMoreThreshold = (currentSlidesPerView) => {
@@ -56,11 +59,13 @@ export default function AdsSwiper({ title, type }) {
     // تحديث حالة slidesPerView الحالي
     setSlidesPerView(currentSlidesPerView);
 
-    // حساب activeIndex بناءً على slidesPerGroup
-    const slidesPerGroup = getSlidesPerGroup(currentSlidesPerView);
-    const currentIndex = (swiper.activeIndex + 1) * slidesPerGroup;
+    // تحديث حالة البداية والنهاية
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
 
-    setActiveIndex(Math.min(currentIndex, visibleCount));
+    // حساب activeIndex (بداية من 1 لعرض المستخدم)
+    const currentIndex = swiper.activeIndex + 1;
+    setActiveIndex(currentIndex);
 
     const remainingSlides = visibleCount - currentIndex;
 
@@ -91,6 +96,13 @@ export default function AdsSwiper({ title, type }) {
     }
   };
 
+  // تحديث حالة البداية والنهاية عند تغيير الـ Swiper
+  const handleSwiperInit = (swiper) => {
+    swiperRef.current = swiper;
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
   // دالة للجلب التلقائي عند الوصول للنهاية
   const handleReachEnd = (swiper) => {
     if (visibleCount < TOTAL_ADS) {
@@ -108,6 +120,13 @@ export default function AdsSwiper({ title, type }) {
       setVisibleCount((prevCount) =>
         Math.min(prevCount + increment, TOTAL_ADS)
       );
+
+      // إعادة تعيين isEnd بعد إضافة المزيد
+      setTimeout(() => {
+        if (swiperRef.current) {
+          setIsEnd(swiperRef.current.isEnd);
+        }
+      }, 100);
     }
   };
 
@@ -116,9 +135,9 @@ export default function AdsSwiper({ title, type }) {
     // إعادة التعيين إلى قيمة مناسبة بناءً على حجم الشاشة
     let initialCount = 8; // افتراضي
 
-    if (screenSize === "xlarge" || screenSize === "large") {
+    if (screenSize === "large") {
       initialCount = 8; // 2 صفوف من 4
-    } else if (screenSize === "medium") {
+    } else if (screenSize === "med") {
       initialCount = 6; // 2 صفوف من 3
     } else if (screenSize === "small") {
       initialCount = 4; // 2 صفوف من 2
@@ -128,61 +147,79 @@ export default function AdsSwiper({ title, type }) {
 
     setVisibleCount(Math.min(initialCount, TOTAL_ADS));
     setActiveIndex(1);
+    setIsBeginning(true);
+    setIsEnd(visibleCount <= initialCount);
 
     // إعادة تعيين السلايدر إلى البداية
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
+      setIsBeginning(true);
+      setIsEnd(visibleCount <= initialCount);
     }
   }, [screenSize, TOTAL_ADS]);
 
+  // تحديث isEnd عند تغيير visibleCount
+  useEffect(() => {
+    if (swiperRef.current) {
+      const swiper = swiperRef.current;
+      setIsEnd(swiper.isEnd);
+    }
+  }, [visibleCount]);
+
   return (
-    <div className="ads-section container">
+    <div className="swiper-section container">
       {/* ===== Top ===== */}
       <div className="top">
         <h3 className="title">{title}</h3>
-        {screenSize !== "small" && (
-          <Link href="#" className="link">
-            {t.home.seeMore}
-          </Link>
-        )}
+        <Link href="#" className="link">
+          {t.home.seeMore}
+          {locale == "en" ? <FaAngleRight /> : <FaAngleLeft />}
+        </Link>
       </div>
-
       {/* ===== Swiper ===== */}
       <div className="swiper-holder">
+        {screenSize !== "small" && (
+          <button
+            className="nav-btn prev-btn"
+            onClick={() => swiperRef.current?.slidePrev()}
+            disabled={isBeginning}
+          >
+            {locale === "en" ? <FaArrowLeft /> : <FaArrowRight />}
+          </button>
+        )}
         <Swiper
           key={locale}
           speed={800}
           spaceBetween={12}
-          onSwiper={(swiper) => (swiperRef.current = swiper)}
+          onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
           onReachEnd={handleReachEnd}
           dir={locale === "ar" ? "rtl" : "ltr"}
-          // إزالة slidesPerGroup من breakpoints واستبداله بـ watchSlidesProgress
           watchSlidesProgress={true}
           breakpoints={{
             0: {
-              slidesPerView: 1,
-              slidesPerGroup: 1,
-            },
-            400: {
-              slidesPerView: 1.2,
+              slidesPerView: 1.4,
               slidesPerGroup: 1,
             },
             500: {
               slidesPerView: 1.5,
               slidesPerGroup: 1,
             },
-            700: {
-              slidesPerView: 2,
-              slidesPerGroup: 1, // مع 2 slides، يتحرك 1 في كل مرة
+            620: {
+              slidesPerView: 2.2,
+              slidesPerGroup: 1,
             },
-            900: {
+            768: {
+              slidesPerView: 2,
+              slidesPerGroup: 1,
+            },
+            1000: {
               slidesPerView: 3,
-              slidesPerGroup: 1, // مع 3 slides، يتحرك 1 في كل مرة
+              slidesPerGroup: 2,
             },
             1200: {
               slidesPerView: 4,
-              slidesPerGroup: 2, // مع 4 slides، يتحرك 2 في كل مرة كحد أقصى
+              slidesPerGroup: 2,
             },
           }}
         >
@@ -193,30 +230,15 @@ export default function AdsSwiper({ title, type }) {
           ))}
         </Swiper>
         {screenSize !== "small" && (
-          <div className="navigation">
-            <button
-              className="nav-btn"
-              onClick={() => swiperRef.current?.slidePrev()}
-              disabled={activeIndex <= 1}
-            >
-              {locale === "en" ? <FaArrowLeft /> : <FaArrowRight />}
-            </button>
-            <button
-              className="nav-btn"
-              onClick={() => swiperRef.current?.slideNext()}
-              disabled={activeIndex >= visibleCount}
-            >
-              {locale === "en" ? <FaArrowRight /> : <FaArrowLeft />}
-            </button>
-          </div>
+          <button
+            className="nav-btn next-btn"
+            onClick={() => swiperRef.current?.slideNext()}
+            disabled={isEnd}
+          >
+            {locale === "en" ? <FaArrowRight /> : <FaArrowLeft />}
+          </button>
         )}
       </div>
-
-      {screenSize == "small" && (
-        <Link href="#" className="link">
-          {t.home.seeMore}
-        </Link>
-      )}
     </div>
   );
 }

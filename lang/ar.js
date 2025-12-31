@@ -8,6 +8,10 @@ const ar = {
 
   home: {
     seeMore: "رؤية المزيد",
+    categories: "categories",
+    subCategories: "sub categories",
+    browseCategories: "تصفح التصنيفات",
+    browseSubCategories: "اختر من التصنيفات الفرعية",
   },
   placeholders: {
     search: "ابحث عن اي شئ ...",

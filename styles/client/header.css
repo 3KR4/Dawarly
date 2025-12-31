@@ -1,7 +1,19 @@
-
 header {
   z-index: 2;
   border-bottom: 1px solid var(--border-color);
+}
+header.border {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+header:has(.top) {
+  position: sticky;
+  top: 0;
+  background: var(--body-color);
+  z-index: 3;
+  border-bottom: 0;
+}
+header .top {
+  background: var(--body-color);
 }
 header .container {
   display: flex;

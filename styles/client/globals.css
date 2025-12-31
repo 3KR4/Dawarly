@@ -108,6 +108,15 @@ svg {
   transition: 0.3s;
   cursor: pointer;
 }
+.disabled,
+:disabled {
+  opacity: 0.5;
+  cursor: no-drop;
+}
+.disabled svg,
+:disabled svg {
+  cursor: no-drop;
+}
 p,
 pre {
   color: var(--paragraph);
@@ -508,6 +517,36 @@ a {
 .out-of-stock .status {
   color: #e63946;
   font-weight: 600;
+}
+
+.cat-card {
+  border: 1px solid var(--main-color);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+  height: 85px;
+  justify-content: center;
+  background: var(--hover-color);
+  transition: 0.4s;
+  cursor: pointer;
+}
+.cat-card svg {
+  font-size: 28px;
+  transition: 0.4s;
+  color: var(--paragraph-2);
+}
+.cat-card h4 {
+  color: var(--paragraph-2);
+  transition: 0.4s;
+}
+.cat-card:hover {
+  background: var(--main-color);
+}
+.cat-card:hover > * {
+  color: white;
 }
 
 .navigations {
@@ -998,6 +1037,12 @@ svg.main-ico {
   }
   .card .time-holder div {
     font-size: 13px;
+  }
+  .cat-card h4 {
+    font-size: 15px;
+  }
+  .cat-card svg {
+    font-size: 25px;
   }
 }
 @media (max-width: 600px) {

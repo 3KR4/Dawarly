@@ -1,112 +1,109 @@
-.ads-section {
-  padding: 35px 0;
+.swiper-section {
+  padding: 25px 0;
   display: flex;
   flex-direction: column;
   gap: 7px;
 }
-.ads-section .top {
+.swiper-section .top {
   display: flex;
-  padding: 0 22px;
-
+  padding: 0 45px;
   justify-content: space-between;
   align-items: flex-end;
 }
-.ads-section .top .link {
+.swiper-section .top .link {
   color: var(--paragraph);
+  border: 1px solid var(--border-color);
   border-radius: 50px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 700;
   transition: all 0.3s;
-  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0px;
 }
-.ads-section .top .link:hover {
+.swiper-section .top .link:hover {
   background: var(--lighter-main-color-2);
   color: var(--paragraph-3);
 }
-.ads-section > a {
-  text-align: center;
-  border: 1px solid var(--main-color);
-  border-radius: 13px;
-  padding: 12px;
-  margin-right: 8px;
-  font-weight: 700;
-  margin-top: 4px;
-  background: var(--hover-color);
-  color: var(--main-color);
+.swiper-section .top .link svg {
+  font-size: 16px;
+  transform: translateY(1px);
 }
-[lang="ar"] .ads-section > a {
-  margin-right: unset;
-  margin-left: 8px;
-}
-.ads-section .top a {
-}
-
-.ads-section .navigation {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  width: 100%;
-  justify-content: space-between;
-  transform: translate(-50%, -50%);
-}
-
-.ads-section .navigation button {
+.swiper-section .nav-btn {
   border: 1px solid var(--border-color);
   background: var(--body-color);
-  border-radius: 39%;
+  border-radius: 40%;
   justify-content: center;
   align-items: center;
   padding: 11px;
   display: flex;
 }
+.swiper-section .nav-btn:disabled {
+  background: var(--body-color) !important;
+  opacity: 0.5;
+  border: 1px solid var(--border-color) !important;
+}
 
-[lang="ar"] .ads-section .navigation button {
-  padding: 8px 17px 8px 14px;
-  border-radius: 0 20px 20px 0;
-}
-[lang="ar"] .ads-section .navigation button:last-child {
-  padding: 8px 14px 8px 17px;
-  border-radius: 20px 0 0 20px;
-}
-.ads-section .navigation button svg {
+.swiper-section .nav-btn svg {
   font-size: 16px;
   color: var(--paragraph-2);
 }
-.ads-section .swiper-holder {
+.swiper-section .swiper-holder {
   position: relative;
-  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
-.ads-section .swiper {
+.swiper-section .swiper {
   width: 100%;
 }
-.ads-section .navigation button:hover {
+.swiper-section .nav-btn:hover {
   background: var(--lighter-main-color-2);
   border-color: transparent;
 }
-.ads-section .navigation button:hover svg {
+.swiper-section .nav-btn:hover svg {
   color: var(--paragraph-3);
 }
-
-@media (max-width: 400px) {
-  .ads-section {
+@media (min-width: 1600px) {
+  .swiper-section {
+    width: 1495px;
+  }
+}
+@media (max-width: 1030px) {
+  header .bottom .nav .cats-nav a {
+    padding: 6px;
+  }
+}
+@media (max-width: 768px) {
+  .swiper-section .top {
+    padding: 0 10px;
+  }
+  .swiper-section {
     width: 100%;
     padding-left: 10px;
   }
-  [lang="ar"] .ads-section {
+  [lang="ar"] .swiper-section {
     padding-right: 10px;
     padding-left: unset;
   }
-  .ads-section .top,
-  .ads-section .bottom {
+  .swiper-section .top {
     padding-right: 10px;
   }
-  [lang="ar"] .ads-section .top,
-  [lang="ar"] .ads-section .bottom {
+  [lang="ar"] .swiper-section .top {
     padding-right: unset;
     padding-left: 10px;
   }
+  .swiper-section .top h3 {
+    font-size: 17px;
+  }
+  .swiper-section .top .link {
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    color: var(--main-color);
+  }
+}
+@media (max-width: 400px) {
 }
