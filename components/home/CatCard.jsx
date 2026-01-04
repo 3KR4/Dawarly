@@ -1,9 +1,8 @@
 import Link from "next/link";
 import React from "react";
-import { FaArrowRight } from "react-icons/fa6";
 import useTranslate from "@/Contexts/useTranslation";
 
-function CatCard({ data, type, position, onSelect }) {
+function CatCard({ data, type, position, activeClass, onSelect }) {
   const t = useTranslate();
 
   const name =
@@ -18,14 +17,14 @@ function CatCard({ data, type, position, onSelect }) {
     <>
       {Icon && <Icon className="cat-icon" />}
       <h4 className="cat-name">{name}</h4>
-      {position === "when-create-ad" && (
-        <FaArrowRight className="cat-arrow-icon" />
-      )}
     </>
   );
   if (position === "when-create-ad") {
     return (
-      <div className="cat-card" onClick={() => onSelect?.(data)}>
+      <div
+        className={`cat-card ${activeClass ? "active" : ""}`}
+        onClick={() => onSelect?.(data)}
+      >
         {Content}
       </div>
     );

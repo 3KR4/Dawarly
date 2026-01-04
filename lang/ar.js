@@ -5,13 +5,48 @@ const ar = {
     other: "تصنيفات اخري",
     filterByCategories: "التصفية حسب الفئات",
   },
-
   home: {
     seeMore: "رؤية المزيد",
     categories: "categories",
     subCategories: "sub categories",
     browseCategories: "تصفح التصنيفات",
     browseSubCategories: "اختر من التصنيفات الفرعية",
+  },
+  create: {
+    ad: {
+      choose_category: "اختر القسم",
+      choose_sub_category: "اختر القسم الفرعي",
+      ad_basics: "البيانات الأساسية",
+      ad_details: "تفاصيل الإعلان",
+      contact_information: "بيانات التواصل",
+
+      choose_category_description: "حدد القسم الرئيسي المناسب لإعلانك.",
+      choose_sub_category_description: "اختر القسم الفرعي لوصف إعلانك بدقة.",
+      ad_basics_description: "أدخل المعلومات الأساسية الخاصة بالإعلان.",
+      ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
+      contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
+      create_your_ad: "انشيء اعلانك الان",
+      contact_via_email: "تواصل عبر البريد الإلكتروني",
+      contact_via_phone: "تواصل عبر الهاتف",
+      contact_via_chat: "تواصل عبر الدردشة",
+      placeholders: {
+        adTitle: "قم بكتابة عنوان اعلانك",
+      },
+      errors: {
+        adTitle: "عنوان اعلانك مطلوب",
+        adTitleValidation: "عنوان اعلانك قصير للغاية",
+      },
+    },
+    images: {
+      label: "قم برفع صور لاعلانك",
+
+      helperText: "انقر او اسحب الصور لهنا",
+      clickHere: "انقر هنا",
+      dropHere: "اترك الصور",
+      errors: {
+        required: "يجب علي اضافة علي الاقل صورة واحدة",
+      },
+    },
   },
   placeholders: {
     search: "ابحث عن اي شئ ...",
@@ -29,10 +64,10 @@ const ar = {
     logout: "تسجيل الخروج",
     adsChat: "رسائل الاعلانات",
     favorietList: "قائمة المفضلة",
+    next: "التالي",
   },
   location: {
     egyptGovernorates: "محافظات مصر",
-
     searchGovernorate: "ابحث في المحافظات...",
     searchCity: "ابحث في",
     inside: "داخل",
@@ -42,7 +77,92 @@ const ar = {
     selectCity: "اختر مدينتك",
   },
   dashboard: {
-    dashboard: "لوحة التحكم",
+    forms: {
+      title: "اسم المنتج",
+      titlePlaceholder: "أدخل اسم المنتج",
+
+      category: "القسم",
+      categoryPlaceholder: "اختر القسم",
+
+      stock: "الكمية",
+      stockPlaceholder: "أدخل الكمية المتاحة",
+
+      price: "السعر",
+      pricePlaceholder: "أدخل سعر المنتج",
+
+      sale: "الخصم (%)",
+      salePlaceholder: "أدخل نسبة الخصم",
+
+      description: "الوصف",
+      descriptionPlaceholder: "أدخل وصف المنتج",
+
+      createProduct: "إضافة منتج",
+      tags: "الوسوم",
+      tagsPlaceholder: "أدخل الوسوم",
+      add: "إضافة",
+
+      specifications: "المواصفات",
+      specKey: "الخاصية",
+      specValue: "القيمة",
+      addSpecification: "إضافة مواصفة",
+
+      images: "الصور",
+      imagesHint: "اضغط أو اسحب الصور هنا",
+      clickHere: "اضغط هنا",
+      dropHere: "اترك هنا",
+
+      governorate: "المحافظة",
+      selectGovernorate: "اختر المحافظة",
+      subCategory: "الفئة الفرعية",
+      selectSubCategory: "اختر الفئة الفرعية",
+
+      googleMapsLink: "رابط خرائط جوجل",
+      googleMapsLinkPlaceholder: "https://maps.app.goo.gl/...",
+      googleMapsIframe: "رابط تضمين خرائط جوجل",
+      googleMapsIframePlaceholder: "https://www.google.com/maps/embed?pb=...",
+
+      createPlace: "إنشاء مكان",
+      governorateName: "اسم المحافظة",
+      governorateNamePlaceholder: "ادخل اسم المحافظة",
+      governorateDescriptionPlaceholder: "ادخل وصف للمحافظة",
+      createGovernorate: "إنشاء محافظة",
+
+      tickets: "التذاكر",
+      freeEntry: "دخول مجاني",
+      paidTickets: "تذاكر مدفوعة",
+      staticPrice: "سعر ثابت",
+      staticEgFr: "سعر للمصريين والأجانب",
+      regionAge: "سعر حسب العمر",
+      regionAgeEgFr: "سعر حسب العمر والجنسيات",
+
+      students: "طلاب",
+      adults: "بالغين",
+      seniors: "كبار السن",
+      egyptian: "مصري",
+      foreigner: "أجنبي",
+
+      errors: {
+        titleRequired: "اسم المنتج مطلوب",
+        titleMin: "اسم المنتج يجب أن يكون 3 أحرف على الأقل",
+
+        stockRequired: "الكمية مطلوبة",
+        stockMin: "أقل كمية هي 1",
+
+        priceRequired: "السعر مطلوب",
+        priceMin: "السعر يجب أن يكون أكبر من صفر",
+        imagesRequired: "يجب رفع صورة واحدة على الأقل",
+
+        googleMapsLinkRequired: "رابط خرائط جوجل مطلوب",
+        googleMapsLinkInvalid: "الرجاء إدخال رابط خرائط جوجل صحيح",
+        googleMapsIframeRequired: "رابط التضمين مطلوب",
+        googleMapsIframeInvalid: "الرجاء إدخال رابط التضمين صحيح",
+
+        saleMax: "نسبة الخصم لا يمكن أن تتجاوز 90%",
+
+        governorateNameRequired: "اسم المحافظة مطلوب",
+        governorateNameMinLength: "اسم المحافظة يجب أن يكون على الأقل 3 أحرف",
+      },
+    },
   },
   auth: {
     login: "تسجيل الدخول",
@@ -124,6 +244,7 @@ const ar = {
       emailPhoneLoginInvalid: "قم بأدخال أدخل بريد إلكتروني أو رقم هاتف صحيح",
     },
   },
+
   governorates: {
     cairo: "القاهرة",
     giza: "الجيزة",
@@ -327,7 +448,6 @@ const ar = {
     sportsHobbies: "رياضة وهوايات",
     businessIndustrial: "أعمال وصناعة",
   },
-
   subcategories: {
     apartmentsSale: "شقق للبيع",
     apartmentsRent: "شقق للإيجار",

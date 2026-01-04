@@ -172,7 +172,7 @@ export default function Register() {
   };
 
   return (
-    <div className="register">
+    <div className="form-holder">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="top">
           <h1>{titles[step]}</h1>

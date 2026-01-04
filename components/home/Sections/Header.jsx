@@ -172,7 +172,7 @@ function Header() {
                             </Link>
                           </li>
                           <li>
-                            <Link href={`/post`} className="btn">
+                            <Link href={`/createAd`} className="btn">
                               <MdPostAdd style={{ fontSize: "17px" }} />
                               {t.actions.postAd}
                             </Link>

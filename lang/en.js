@@ -10,6 +10,43 @@ const en = {
     browseCategories: "browse categories",
     browseSubCategories: "browse subcategories",
   },
+  create: {
+    ad: {
+      choose_category: "Choose a category",
+      choose_sub_category: "Choose a subcategory",
+      ad_basics: "Ad basics",
+      ad_details: "Ad details",
+      contact_information: "Contact information",
+      choose_category_description:
+        "Select the main category that best fits your ad.",
+      choose_sub_category_description:
+        "Choose a subcategory to better describe your ad.",
+      ad_basics_description: "Enter the essential information about your ad.",
+      ad_details_description:
+        "Add more details to make your ad more attractive.",
+      contact_information_description: "Provide your preferred contact method.",
+      create_your_ad: "create your ad",
+      contact_via_email: "Contact via Email",
+      contact_via_phone: "Contact via Phone",
+      contact_via_chat: "Contact via Chat",
+      placeholders: {
+        adTitle: "enter your ad title",
+      },
+      errors: {
+        adTitle: "your ad title is required",
+        adTitleValidation: "your ad title is too short",
+      },
+    },
+    images: {
+      label: "uploud your ad images",
+      helperText: "Click or drop images here",
+      clickHere: "Click here",
+      dropHere: "Drop here",
+      errors: {
+        required: "You must upload at least one image",
+      },
+    },
+  },
   placeholders: {
     search: "search on anything ...",
   },
@@ -19,13 +56,13 @@ const en = {
     darkMode: "Dark Mode",
     lightMode: "Light Mode",
     filterByLocation: "Filter by Location",
-
     postAd: "Post an Ad",
     viewAdsListing: "Your ads Listings",
     accountSettings: "Account Settings",
     logout: "Log Out",
     adsChat: "ads chat",
     favorietList: "favoriet List",
+    next: "next",
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -38,7 +75,93 @@ const en = {
     selectCity: "select your City",
   },
   dashboard: {
-    dashboard: "dashboard",
+    forms: {
+      title: "Title",
+      titlePlaceholder: "Enter product title",
+
+      category: "Category",
+      categoryPlaceholder: "Select category",
+
+      stock: "Stock",
+      stockPlaceholder: "Enter stock quantity",
+
+      price: "Price",
+      pricePlaceholder: "Enter product price",
+
+      sale: "Sale (%)",
+      salePlaceholder: "Enter sale percentage",
+
+      description: "Description",
+      descriptionPlaceholder: "Enter product description",
+
+      createProduct: "Create Product",
+      tags: "Tags",
+      tagsPlaceholder: "Enter your tags",
+      add: "Add",
+
+      specifications: "Specifications",
+      specKey: "Key",
+      specValue: "Value",
+      addSpecification: "Add specification",
+
+      images: "Images",
+      imagesHint: "Click or drop images here",
+      clickHere: "Click here",
+      dropHere: "Drop here",
+
+      governorate: "Governorate",
+      selectGovernorate: "Select governorate",
+      subCategory: "Sub Category",
+      selectSubCategory: "Select sub category",
+
+      googleMapsLink: "Google Maps Link",
+      googleMapsLinkPlaceholder: "https://maps.app.goo.gl/...",
+      googleMapsIframe: "Google Maps Embed URL",
+      googleMapsIframePlaceholder: "https://www.google.com/maps/embed?pb=...",
+
+      createPlace: "Create place",
+      governorateName: "Governorate Name",
+      governorateNamePlaceholder: "Enter Governorate name",
+      governorateDescriptionPlaceholder: "Enter governorate description",
+      createGovernorate: "Create Governorate",
+
+      tickets: "Tickets",
+      freeEntry: "Free Entry",
+      paidTickets: "Paid Tickets",
+      staticPrice: "Static Price",
+      staticEgFr: "For Egyptians / Foreigners",
+      regionAge: "Different by Age",
+      regionAgeEgFr: "Different by Age and Nationality",
+
+      students: "Students",
+      adults: "Adults",
+      seniors: "Seniors",
+      egyptian: "Egyptian",
+      foreigner: "Foreigner",
+
+      errors: {
+        titleRequired: "Product title is required",
+        titleMin: "Title must be at least 3 characters",
+
+        stockRequired: "Stock is required",
+        stockMin: "Minimum stock is 1",
+
+        priceRequired: "Price is required",
+        priceMin: "Price must be more than 0",
+        imagesRequired: "You must upload at least 1 image",
+
+        googleMapsLinkRequired: "Google Maps link is required",
+        googleMapsLinkInvalid: "Please enter a valid Google Maps link",
+        googleMapsIframeRequired: "Google Maps embed link is required",
+        googleMapsIframeInvalid: "Please enter a valid Google Maps embed URL",
+
+        saleMax: "Sale cannot exceed 90%",
+
+        governorateNameRequired: "The Governorate name is required",
+        governorateNameMinLength:
+          "The Governorate name must be at least 3 letters",
+      },
+    },
   },
   auth: {
     login: "Log in",

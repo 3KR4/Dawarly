@@ -778,3 +778,339 @@ export const ads = [
     creation_date: "2025-01-13",
   },
 ];
+export const apartmentForSaleFields = [
+  {
+    key: "type",
+    uiType: "select",
+    required: true,
+    label: {
+      ar: "نوع العقار",
+      en: "Type",
+    },
+    placeholder: {
+      ar: "اختر النوع",
+      en: "Select type",
+    },
+    requiredMessage: {
+      ar: "نوع العقار مطلوب",
+      en: "Type is required",
+    },
+    noTranslate: false,
+    options: [
+      {
+        id: 1,
+        name: {
+          en: "apartment",
+          ar: "شقة",
+        },
+      },
+      {
+        id: 2,
+        name: {
+          en: "duplex",
+          ar: "دوبلكس",
+        },
+      },
+      {
+        id: 3,
+        name: {
+          en: "penthouse",
+          ar: "بنتهاوس",
+        },
+      },
+      {
+        id: 4,
+        name: {
+          en: "studio",
+          ar: "استوديو",
+        },
+      },
+    ],
+    tPath: "apartmentTypes",
+  },
+
+  {
+    key: "area",
+    uiType: "input",
+    inputType: "number",
+    required: true,
+    label: {
+      ar: "المساحة (م²)",
+      en: "Area (m²)",
+    },
+    placeholder: {
+      ar: "ادخل المساحة",
+      en: "Enter area",
+    },
+    requiredMessage: {
+      ar: "المساحة مطلوبة",
+      en: "Area is required",
+    },
+    validation: {
+      pattern: {
+        value: /^[0-9]+$/,
+        message: {
+          ar: "المساحة يجب أن تكون رقم",
+          en: "Area must be a number",
+        },
+      },
+    },
+  },
+
+  {
+    key: "bedrooms",
+    uiType: "select",
+    required: true,
+    noTranslate: true,
+    label: {
+      ar: "عدد الغرف",
+      en: "Bedrooms",
+    },
+    placeholder: {
+      ar: "اختر عدد الغرف",
+      en: "Select bedrooms",
+    },
+    requiredMessage: {
+      ar: "عدد الغرف مطلوب",
+      en: "Bedrooms is required",
+    },
+    options: [
+      ...Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        name: {
+          en: `${i + 1}`,
+          ar: `${i + 1}`,
+        },
+      })),
+      {
+        id: 11,
+        name: {
+          en: "+10",
+          ar: "+10",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "bathrooms",
+    uiType: "select",
+    required: true,
+    noTranslate: true,
+    label: {
+      ar: "عدد الحمامات",
+      en: "Bathrooms",
+    },
+    placeholder: {
+      ar: "اختر عدد الحمامات",
+      en: "Select bathrooms",
+    },
+    requiredMessage: {
+      ar: "عدد الحمامات مطلوب",
+      en: "Bathrooms is required",
+    },
+    options: [
+      ...Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        name: {
+          en: `${i + 1}`,
+          ar: `${i + 1}`,
+        },
+      })),
+      {
+        id: 11,
+        name: {
+          en: "+10",
+          ar: "+10",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "price",
+    uiType: "input",
+    inputType: "number",
+    required: true,
+    label: {
+      ar: "السعر",
+      en: "Price",
+    },
+    placeholder: {
+      ar: "ادخل السعر",
+      en: "Enter price",
+    },
+    requiredMessage: {
+      ar: "السعر مطلوب",
+      en: "Price is required",
+    },
+  },
+
+  {
+    key: "paymentOption",
+    uiType: "radio",
+    required: true,
+    label: {
+      ar: "طريقة الدفع",
+      en: "Payment Option",
+    },
+    placeholder: {
+      ar: "اختر طريقة الدفع",
+      en: "Select payment option",
+    },
+    requiredMessage: {
+      ar: "طريقة الدفع مطلوبة",
+      en: "Payment option is required",
+    },
+    options: [
+      {
+        id: 1,
+        value: "Cash",
+        label: {
+          ar: "نقداً",
+          en: "Cash",
+        },
+      },
+      {
+        id: 2,
+        value: "Installment",
+        label: {
+          ar: "تقسيط",
+          en: "Installment",
+        },
+      },
+      {
+        id: 3,
+        value: "Cash or Installment",
+        label: {
+          ar: "نقداً أو تقسيط",
+          en: "Cash or Installment",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "furnished",
+    uiType: "boolean",
+    required: false,
+    label: {
+      ar: "مفروش",
+      en: "Furnished",
+    },
+    options: [
+      {
+        value: true,
+        label: {
+          ar: "نعم",
+          en: "Yes",
+        },
+      },
+      {
+        value: false,
+        label: {
+          ar: "لا",
+          en: "No",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "negotiable",
+    uiType: "boolean",
+    required: false,
+    label: {
+      ar: "قابل للتفاوض",
+      en: "Negotiable",
+    },
+    options: [
+      {
+        value: true,
+        label: {
+          ar: "نعم",
+          en: "Yes",
+        },
+      },
+      {
+        value: false,
+        label: {
+          ar: "لا",
+          en: "No",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "amenities",
+    uiType: "multiSelect",
+    required: false,
+    label: {
+      ar: "المميزات",
+      en: "Amenities",
+    },
+    placeholder: {
+      ar: "اختر المميزات",
+      en: "Select amenities",
+    },
+    options: [
+      {
+        id: 1,
+        value: "Balcony",
+        label: {
+          ar: "بلكونة",
+          en: "Balcony",
+        },
+      },
+      {
+        id: 2,
+        value: "Private Garden",
+        label: {
+          ar: "حديقة خاصة",
+          en: "Private Garden",
+        },
+      },
+      {
+        id: 3,
+        value: "Covered Parking",
+        label: {
+          ar: "جراج مغطى",
+          en: "Covered Parking",
+        },
+      },
+      {
+        id: 4,
+        value: "Elevator",
+        label: {
+          ar: "مصعد",
+          en: "Elevator",
+        },
+      },
+      {
+        id: 5,
+        value: "Security",
+        label: {
+          ar: "أمن",
+          en: "Security",
+        },
+      },
+      {
+        id: 6,
+        value: "Pool",
+        label: {
+          ar: "حمام سباحة",
+          en: "Pool",
+        },
+      },
+      {
+        id: 7,
+        value: "Natural Gas",
+        label: {
+          ar: "غاز طبيعي",
+          en: "Natural Gas",
+        },
+      },
+    ],
+  },
+];

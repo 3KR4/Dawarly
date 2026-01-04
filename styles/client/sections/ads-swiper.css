@@ -10,6 +10,9 @@
   justify-content: space-between;
   align-items: flex-end;
 }
+.swiper-section:not(:has(.nav-btn)) .top {
+      padding: 0 5px;
+}
 .swiper-section .top .link {
   color: var(--paragraph);
   border: 1px solid var(--border-color);

@@ -9,7 +9,6 @@ import {
   FaAngleLeft,
   FaAngleRight,
   FaArrowLeft,
-  FaArrowRight,
 } from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
@@ -63,22 +62,15 @@ function SelectLocation({ locale = "en", onSelect }) {
           <div className="locations-holder">
             {/* Top bar */}
             <div className="top">
-              {currentPage > 1 &&
-                (locale === "en" ? (
-                  <FaArrowLeft
-                    onClick={() => {
-                      setCurrentPage((prev) => (prev === 3 ? 2 : 1));
-                      setSelectedCity(null);
-                    }}
-                  />
-                ) : (
-                  <FaArrowRight
-                    onClick={() => {
-                      setCurrentPage((prev) => (prev === 3 ? 2 : 1));
-                      setSelectedCity(null);
-                    }}
-                  />
-                ))}
+              {currentPage > 1 && (
+                <FaArrowLeft
+                  className="arrow"
+                  onClick={() => {
+                    setCurrentPage((prev) => (prev === 3 ? 2 : 1));
+                    setSelectedCity(null);
+                  }}
+                />
+              )}
 
               <h5>
                 {currentPage === 1 && t.location.egyptGovernorates}
@@ -143,7 +135,7 @@ function SelectLocation({ locale = "en", onSelect }) {
                       {gov.cities_count > 0 && (
                         <span onClick={() => handleSelectGovernorate(gov)}>
                           {gov.cities_count}
-                          {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
+                          <FaAngleRight className="arrow" />
                         </span>
                       )}
                     </button>
@@ -168,7 +160,7 @@ function SelectLocation({ locale = "en", onSelect }) {
                       {city.districts_count > 0 && (
                         <span onClick={() => handleSelectCity(city)}>
                           {city.districts_count}
-                          {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
+                          <FaAngleRight className="arrow" />
                         </span>
                       )}
                     </button>

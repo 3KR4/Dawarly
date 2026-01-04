@@ -47,7 +47,7 @@
 }
 
 .box.forInput .inputHolder.tags {
-  border: 1px solid #a6a6a6;
+  border: 1px solid var(--input-border-color);
   border-radius: 11px;
   flex-direction: column;
   gap: 0;
@@ -121,7 +121,7 @@
   height: 40px;
 }
 .box.forInput .spec-list {
-  border: 1px solid #a6a6a6;
+  border: 1px solid var(--input-border-color);
   border-radius: 11px;
   display: flex;
   flex-direction: column;
@@ -188,19 +188,33 @@
 }
 
 /* Images Holder */
-.productImages {
+.images-uplouder {
   background-color: var(--body-color);
   border-radius: 10px;
   width: 100%;
   height: 100%;
   padding: 12px;
   transition: all 0.5s;
-  border: 1px solid #a6a6a6;
+  border: 1px solid var(--input-border-color);
 }
-.addingDetails .productImages {
-  background: var(--border-color);
+
+/* INVALID STATE */
+.images-uplouder.invalid {
+  border-color: var(--red-color);
 }
-.uploadlabel {
+
+.images-uplouder.invalid .upload-label {
+  border-color: var(--red-color) !important;
+}
+
+.images-uplouder.invalid svg,
+.images-uplouder.invalid p,
+.images-uplouder.invalid h1 {
+  color: var(--red-color) !important;
+}
+
+/* UPLOAD LABEL */
+.images-uplouder .upload-label {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -208,72 +222,77 @@
   border-radius: 6px;
   align-items: center;
   cursor: pointer;
-  min-height: 115px;
+  min-height: 132px;
+  border: 2px dashed var(--input-border-color);
+  transition: all 0.4s;
 }
-.uploadlabel svg {
+
+.images-uplouder .upload-label svg {
   font-size: 95px;
   transition: opacity 0.5s, font-size 0.4s;
-  color: #a6a6a6;
+  color: var(--input-border-color);
+  margin-top: -9px;
+  margin-bottom: -5px;
 }
-.productImages:has(.uploaded) .uploadlabel svg {
-  font-size: 80px;
+
+.images-uplouder:has(.uploaded) .upload-label svg {
+  font-size: 75px;
 }
-.productImages:has(.uploaded) .imgHolder {
-  margin: 14px 2px 0;
-}
-.uploadlabel p {
-  font-size: 20px;
-  font-weight: 600;
+
+.images-uplouder .upload-label p {
+  color: var(--input-border-color);
   margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: 700;
   transition: opacity 0.5s, font-size 0.4s;
-  color: #a6a6a6;
 }
-.uploadlabel h1 {
+
+.images-uplouder .upload-label h1 {
   position: absolute;
   top: 50%;
   left: 50%;
   opacity: 0;
-  font-size: 30px;
-  font-weight: 700;
   font-size: 15px;
+  font-weight: 700;
   transition: opacity 0.5s, font-size 0.4s !important;
   cursor: pointer;
-  color: var(--main-color);
+  color: var(--input-border-color);
   transform: translate(-50%, -50%);
   width: max-content;
 }
-.uploadlabel:hover h1,
-.uploadlabel.active h1 {
+
+/* HOVER & DRAG */
+.images-uplouder .upload-label:hover h1,
+.images-uplouder .upload-label.active h1 {
   opacity: 1;
   font-size: 40px;
 }
-.uploadlabel:hover svg,
-.uploadlabel:hover p,
-.uploadlabel.active svg,
-.uploadlabel.active p {
+
+.images-uplouder .upload-label:hover svg,
+.images-uplouder .upload-label:hover p,
+.images-uplouder .upload-label.active svg,
+.images-uplouder .upload-label.active p {
   opacity: 0;
   font-size: 10px;
 }
-.uploaded {
+
+/* UPLOADED IMAGES */
+.images-uplouder .uploaded {
   position: relative;
   display: flex;
   height: fit-content;
 }
-.uploaded div {
-  display: flex;
-  align-items: center;
-}
-.uploaded img {
-  max-width: unset !important;
-  height: 95px !important;
-  width: 100%;
-  height: 100%;
-  border-radius: 7px;
 
+.images-uplouder .uploaded img {
+  max-width: unset !important;
+  width: 100%;
+  height: 95px !important;
+  border-radius: 7px;
   object-fit: cover;
 }
-.uploaded svg {
-  background: #ff3535f5 !important;
+
+.images-uplouder .uploaded svg {
+  background: #000000c2;
   color: white;
   border-radius: 50% !important;
   cursor: pointer;
@@ -283,21 +302,35 @@
   position: absolute !important;
   right: 7px !important;
   top: 7px !important;
-  left: unset !important;
 }
-.imgHolder {
+
+.images-uplouder .uploaded svg:hover {
+  background: var(--red-color) !important;
+}
+
+/* GRID */
+.images-uplouder .imgHolder {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 10px;
   margin: 0;
 }
-.body .uploaded p {
+
+.images-uplouder:has(.uploaded) .imgHolder {
+  margin: 14px 2px 0;
+}
+
+/* IMAGE INDEX */
+.images-uplouder .imgHolder .uploaded p {
   position: absolute;
-  background: #00000099;
+  background: #000000c2;
   padding: 1px 10px;
   border-radius: 5px;
   color: white;
   font-size: 14px;
   bottom: 7px;
   left: 7px;
+}
+.images-uplouder .error {
+  margin: -3px 4px -6px;
 }

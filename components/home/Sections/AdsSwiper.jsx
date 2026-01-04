@@ -184,7 +184,7 @@ export default function AdsSwiper({ title, type }) {
             onClick={() => swiperRef.current?.slidePrev()}
             disabled={isBeginning}
           >
-            {locale === "en" ? <FaArrowLeft /> : <FaArrowRight />}
+            <FaArrowLeft className="arrow" />
           </button>
         )}
         <Swiper
@@ -235,7 +235,7 @@ export default function AdsSwiper({ title, type }) {
             onClick={() => swiperRef.current?.slideNext()}
             disabled={isEnd}
           >
-            {locale === "en" ? <FaArrowRight /> : <FaArrowLeft />}
+            <FaArrowRight className="arrow" />
           </button>
         )}
       </div>

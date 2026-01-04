@@ -1,83 +1,65 @@
-import React from "react";
-import { useState, useContext, useRef } from "react";
+"use client";
+import React, { useState, useRef } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
-import { FaCloudUploadAlt, FaHashtag, FaLink } from "react-icons/fa";
+import { FaCloudUploadAlt } from "react-icons/fa";
 import Image from "next/image";
-import { selectors } from "@/Contexts/selectors";
-import { FaCircleInfo } from "react-icons/fa6";
+import "@/styles/dashboard/forms.css";
+import useTranslate from "@/Contexts/useTranslation";
 
-function Images() {
-  const { images, setImages, isSubmited } = useContext(selectors);
+function Images({ images, setImages, isSubmitted }) {
+  const t = useTranslate();
 
   const inputFileRef = useRef(null);
   const [isDrag, setIsDrag] = useState(false);
 
+  const isInvalid = images.length === 0 && isSubmitted;
+
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDrag(false);
+
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-    setImages((prevImages) => [...prevImages, ...imageFiles]);
+
+    setImages((prev) => [...prev, ...imageFiles]);
   };
 
   const handleInputChange = (e) => {
     const files = Array.from(e.target.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-    setImages((prevImages) => [...prevImages, ...imageFiles]);
+
+    setImages((prev) => [...prev, ...imageFiles]);
   };
 
   const handleRemoveImage = (index) => {
-    setImages((prevImages) => {
-      const updatedImages = prevImages.filter((_, i) => i !== index);
-      return updatedImages;
-    });
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
+
   return (
     <div className="box forInput">
-      <label>Images</label>
-      <div className="productImages">
+      <label>{t.create.images.label}</label>
+
+      <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
         <div
-          className={`uploadlabel ${isDrag ? "active" : null}`}
-          style={{
-            height: `${
-              images.length === 0 && isSubmited
-                ? ""
-                : images.length === 0
-                ? "100%"
-                : ""
-            }`,
-            border: `2px dashed ${
-              images.length === 0 && isSubmited ? "#f43521" : "#a6a6a6"
-            }`,
-          }}
+          className={`upload-label ${isDrag ? "active" : ""}`}
           onClick={() => inputFileRef.current.click()}
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
             setIsDrag(true);
           }}
+          onDragLeave={() => setIsDrag(false)}
         >
-          <FaCloudUploadAlt
-            style={{
-              color: images.length === 0 && isSubmited ? "red" : "#a6a6a6",
-            }}
-          />
-          <p
-            style={{
-              color: images.length === 0 && isSubmited ? "red" : "#9b9b9b",
-            }}
-          >
-            click or drop images her
-          </p>
-          <h1
-            style={{
-              color: images.length === 0 && isSubmited ? "#df3a3a" : "#9b9b9b",
-            }}
-          >
-            {isDrag ? "drop her" : "click her"}
+          <FaCloudUploadAlt />
+
+          <p>{t.create.images.helperText}</p>
+
+          <h1>
+            {isDrag ? t.create.images.dropHere : t.create.images.clickHere}
           </h1>
         </div>
+
         <input
           type="file"
           accept="image/*"
@@ -86,24 +68,15 @@ function Images() {
           ref={inputFileRef}
           onChange={handleInputChange}
         />
-        {images.length === 0 && isSubmited && (
-          <span className="error">
-            <CircleAlert />
-            you must upload at least 1 image
-          </span>
-        )}
+
         <div className="imgHolder">
           {images.map((image, index) => (
             <div className="uploaded" key={index}>
               <Image
                 src={
-                  typeof image === "string"
-                    ? image
-                    : image?.url
-                    ? image.url
-                    : URL.createObjectURL(image)
+                  typeof image === "string" ? image : URL.createObjectURL(image)
                 }
-                alt={image.originalname || image.name || `Image-${index}`}
+                alt={`Image-${index}`}
                 width={150}
                 height={150}
               />
@@ -113,6 +86,12 @@ function Images() {
           ))}
         </div>
       </div>
+      {isInvalid && (
+        <span className="error">
+          <CircleAlert />
+          {t.create.images.errors.required}
+        </span>
+      )}
     </div>
   );
 }
