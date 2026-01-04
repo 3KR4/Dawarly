@@ -2,12 +2,9 @@
   border-radius: 12px;
   width: 300px;
   height: fit-content;
-  padding: 20px 2px 13px;
-  position: sticky;
-  top: 88px;
-  transition: 0.3s;
-
-  box-shadow: 0 0 5px #d3d3d3;
+  padding: 17px 0;
+  transition: all 0.3s;
+  border: 1px solid var(--border-color);
 }
 .filters .close {
   position: absolute;
@@ -24,82 +21,27 @@
 }
 .filters .holder {
   gap: 10px !important;
-  padding: 0 8px;
 }
 .filters hr {
   background: #e7e7e7;
 }
-
+.filters .filter-field {
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
 .filters .holder h4 {
   color: var(--paragraph);
-  margin-left: 8px;
-}
-.filters .holder p {
-  margin-left: 7px;
-}
-
-.filters ul {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.filters .availability ul {
-  gap: 0;
-}
-.filters .holder ul li {
-  cursor: pointer;
-  border-radius: 7px;
-  transition: all 0.3s;
-  display: flex;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--paragraph);
-  flex-direction: column;
-  overflow: hidden;
-}
-.filters .availability ul li {
-  flex-direction: row;
-  gap: 4px;
-}
-.filters .holder ul li .main-cat,
-.filters .availability ul li {
-  padding: 7px 6px;
-  transition: 0.3s;
-}
-.filters .holder ul li:has(.sub-cats) .main-cat {
-  padding: 9px 6px;
-}
-.filters .holder ul:has(.sub-cats) li:has(.main-cat.active) {
-  border: 1px solid var(--main-color);
-}
-.filters .holder ul li .main-cat:hover,
-.filters .holder ul li .main-cat.active {
-  background: #ea8c43e8;
-  color: white;
-}
-.filters .holder .sub-cats {
-  padding: 5px;
-  background: var(--hover-color);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.filters .holder .sub-cats .sub-cat {
-  border-radius: 6px;
-  padding: 6px 8px;
   font-size: 14px;
 }
-.filters .holder .sub-cats .sub-cat.active,
-.filters .holder .sub-cats .sub-cat:hover {
-  background: #ec9654;
-  font-weight: 400;
-  color: white;
+.filters .holder p {
 }
+
 .filters .holder .price-input {
   align-items: center;
   gap: 5px;
   display: flex;
-  padding: 0 8px;
 }
 .filters .holder .price-input .field {
   display: flex;
@@ -123,13 +65,13 @@
   font-weight: 600;
 }
 .filters .separator {
+  display: flex;
+  background: #8a8a8a;
   width: 11px;
   height: 2px;
-  background: #8a8a8a;
 }
 .filters .price-slider {
-  color: #ea8c43e8;
-  width: 90%;
+  width: 94%;
   height: 3px;
   margin: auto;
   padding: 7px 0;
@@ -170,66 +112,70 @@
   color: white;
 }
 
-.filters .checkbox {
+.marketplace .filters .select-options,
+.marketplace .filters .boolean-options,
+.marketplace .filters .radio-options,
+.marketplace .filters .multiselect-options {
   display: flex;
-  margin-right: 2px;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
-.checkbox {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
+.marketplace .filters .filter-option {
+  flex: 1;
+  min-width: max-content;
+  border: 1px solid var(--border-color);
+  padding: 7px 12px;
+  border-radius: 37px;
+  font-size: 14px;
+}
+.marketplace .filters .filter-option:hover,
+.marketplace .filters .filter-option.active {
+  background: var(--hover-color);
+  border-color: var(--main-color);
+}
+.marketplace .filters .filter-option.active {
+  background: var(--main-color);
+  color: white;
+  font-weight: 700;
 }
 
-.checkbox .input {
-  appearance: none;
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
+.price-slider {
+  width: 100%;
+  margin: 10px 0;
 }
 
-.custom-checkbox {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #e7e7e7;
-  border-radius: 4px;
-  display: inline-block;
-  position: relative;
-}
-.filters li:hover .custom-checkbox {
-  border-color: #ebebeb;
-}
-.filters li.active .custom-checkbox {
-  border-color: transparent;
-}
-/* Hover effect */
-
-/* Checked state */
-.input:checked + .custom-checkbox {
-  background: #ec9654;
-  border-color: #ec9654;
+/* البار الأساسي */
+.price-slider .MuiSlider-track {
+  background-color: var(--main-color);
+  border-radius: 3px;
+  height: 3px;
+  border: none;
 }
 
-/* Checkmark */
-.input:checked + .custom-checkbox::after {
-  content: "";
-  border: 2px solid #fff;
-  border-width: 0 2px 2px 0;
-  width: 3px;
-  height: 8px;
-  position: absolute;
-  top: 1px;
-  left: 5px;
-  transform: rotate(45deg);
+.price-slider .MuiSlider-rail {
+  background-color: var(--input-border-color);
+  border-radius: 3px;
+  height: 3px;
 }
 
-/* Optional — Add spacing for labels next to checkbox */
-.checkbox span + span {
-  margin-left: 8px;
+/* الكرة */
+.price-slider .MuiSlider-thumb {
+  width: 15px; /* حجم الكرة */
+  height: 15px;
+  background-color: var(--main-color); /* لون الكرة */
+  border-color: var(--main-color); /* حدود الكرة */
+  box-shadow: none;
+}
+
+/* hover للكرة */
+.price-slider .MuiSlider-thumb:hover {
+  box-shadow: none;
+}
+
+/* focus للكرة */
+.price-slider .MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: none;
 }
 
 @media (max-width: 992px) {

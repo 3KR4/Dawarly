@@ -1,0 +1,77 @@
+.marketplace {
+}
+.marketplace .content {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  padding: 12px 0;
+}
+.marketplace .content .main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.marketplace .content .main .grid-holder {
+  gap: 15px 12px;
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(317px, 1fr));
+}
+
+.active-filters-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.active-filters-bar .filters-header,
+.active-filters-bar .filters-header span {
+  font-weight: 700;
+  color: var(--paragraph-2);
+  font-size: 15px;
+}
+.active-filters-bar .filters-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.active-filters-bar .filter-tag,
+.active-filters-bar .clear-all-btn {
+  background: var(--section-color);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  border-radius: 50px;
+  align-items: center;
+  padding: 0 4px 0 9px;
+  transition: all 0.3s;
+  display: flex;
+  height: 30px;
+  letter-spacing: 0.2px;
+}
+
+.active-filters-bar .filters-list span {
+  color: var(--paragraph-2);
+  font-size: 13px;
+  transition: 0.3s;
+  font-weight: 700;
+}
+
+.active-filters-bar .filters-list svg {
+  color: var(--paragraph);
+  font-size: 18px;
+}
+.active-filters-bar .filter-tag:hover,
+.active-filters-bar .clear-all-btn:hover {
+  background: var(--red-color);
+}
+.active-filters-bar .filter-tag:hover > *,
+.active-filters-bar .clear-all-btn:hover {
+  color: white;
+}
+.active-filters-bar .clear-all-btn {
+  color: var(--red-color);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 9px;
+}

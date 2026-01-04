@@ -23,6 +23,7 @@
   --border-color: #e0e0e0;
   --input-border-color: #a6a6a6;
   --red-color: #e74949;
+  --sections-padding: 25px 0;
 }
 [theme="dark"] {
   --body-color: #171918;
@@ -718,6 +719,11 @@ svg.main-ico {
     font-size: 18px;
   }
 }
+@media (max-width: 1200px) {
+  :root {
+    --sections-padding: 15px 0;
+  }
+}
 
 @media (max-width: 1050px) {
   .hero-image-holder .details h3 {
@@ -766,6 +772,7 @@ svg.main-ico {
 }
 
 @media (max-width: 768px) {
+  
   .title-holder {
     width: 100%;
     padding: 0 15px !important;
@@ -861,17 +868,11 @@ svg.main-ico {
   }
 }
 @media (max-width: 400px) {
-  .main-title {
-    font-size: 26px;
+  :root {
+    --sections-padding: 10px 0;
   }
-  .sub-title {
-    font-size: 14px;
-  }
-  .title-holder .main-button {
-    width: unset;
-    height: 36px;
-    padding: 18px 35px;
-    margin-top: 10px;
+  .swiper-section .top h3 {
+    font-size: 15px;
   }
   .container:has(.table-container) {
     margin-top: 26px;

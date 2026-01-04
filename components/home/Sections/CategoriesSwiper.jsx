@@ -1,23 +1,53 @@
 "use client";
-import React, { useRef, useState, useContext } from "react";
-
+import React, { useRef, useState, useContext, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "@/styles/client/sections/ads-swiper.css";
-
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import useTranslate from "@/Contexts/useTranslation";
 import { categories, subcategories } from "@/data";
 import CatCard from "@/components/home/CatCard";
 import { settings } from "@/Contexts/settings";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function CategoriesSwiper({ type, catId }) {
+export default function CategoriesSwiper({
+  type,
+  catId,
+  onSelect,
+  showControls = true,
+}) {
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const swiperRef = useRef(null);
 
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // ✅ قراءة الـ URL عند التحميل
+  useEffect(() => {
+    if (type === "cat") {
+      const catParam = searchParams.get("cat");
+      if (catParam) {
+        const selectedCat = categories.find((cat) => cat.id == catParam);
+        if (selectedCat) {
+          setSelectedItem(selectedCat.id);
+        }
+      }
+    } else if (type === "sub-cat") {
+      const subcatParam = searchParams.get("subcat");
+      if (subcatParam) {
+        const selectedSubcat = subcategories.find(
+          (sub) => sub.id == subcatParam
+        );
+        if (selectedSubcat) {
+          setSelectedItem(selectedSubcat.id);
+        }
+      }
+    }
+  }, [searchParams, type]);
 
   const data =
     type === "cat"
@@ -26,6 +56,45 @@ export default function CategoriesSwiper({ type, catId }) {
 
   const title =
     type === "cat" ? t.home.browseCategories : t.home.browseSubCategories;
+
+  // ✅ التعامل مع اختيار الفئة
+  const handleSelect = (item) => {
+    const isAlreadySelected = selectedItem === item.id;
+    const newSelectedItem = isAlreadySelected ? null : item.id;
+
+    setSelectedItem(newSelectedItem);
+
+    // ✅ تحديث URL
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (type === "cat") {
+      if (newSelectedItem) {
+        params.set("cat", newSelectedItem);
+        params.delete("subcat"); // إزالة subcat عند تغيير الفئة
+      } else {
+        params.delete("cat");
+        params.delete("subcat");
+      }
+    } else if (type === "sub-cat") {
+      if (newSelectedItem) {
+        params.set("subcat", newSelectedItem);
+      } else {
+        params.delete("subcat");
+      }
+    }
+
+    router.push(`?${params.toString()}`);
+
+    // ✅ استدعاء callback إذا كان موجود
+    if (onSelect) {
+      onSelect(isAlreadySelected ? null : item);
+    }
+  };
+
+  // ✅ التحقق إذا كانت الفئة لديها subcategories
+  const hasSubcategories = (catId) => {
+    return subcategories.some((sub) => sub.categoryId === catId);
+  };
 
   // breakpoints بالأرقام اللي انت حددتها
   const breakpoints = {
@@ -43,12 +112,25 @@ export default function CategoriesSwiper({ type, catId }) {
   );
 
   // 👇 نظهر الـ navigation بس لو عدد العناصر أكبر من maxSlides
-  const showNav = data.length > maxSlides && screenSize !== "small";
+  const showNav =
+    data.length > maxSlides && screenSize !== "small" && showControls;
 
   return (
     <div className="swiper-section container cats">
       <div className="top">
         <h3 className="title">{title}</h3>
+
+        {/* ✅ عرض الفئة المختارة الحالية */}
+        {selectedItem && (
+          <div className="selected-indicator">
+            <button
+              className="clear-selection"
+              onClick={() => handleSelect({ id: selectedItem })}
+            >
+              {locale === "ar" ? "مسح" : "Clear"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="swiper-holder">
@@ -78,11 +160,22 @@ export default function CategoriesSwiper({ type, catId }) {
           dir={locale === "ar" ? "rtl" : "ltr"}
           breakpoints={breakpoints}
         >
-          {data.map((cat) => (
-            <SwiperSlide key={cat.id} className="category-slide">
-              <CatCard data={cat} type={type} />
-            </SwiperSlide>
-          ))}
+          {data.map((item) => {
+            const isSelected = selectedItem === item.id;
+            const hasSubcats = type === "cat" && hasSubcategories(item.id);
+
+            return (
+              <SwiperSlide key={item.id} className="category-slide">
+                <CatCard
+                  data={item}
+                  type={type}
+                  activeClass={isSelected}
+                  onSelect={() => handleSelect(item)}
+                  showSubcatIndicator={hasSubcats && isSelected}
+                />
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
 
         {showNav && (

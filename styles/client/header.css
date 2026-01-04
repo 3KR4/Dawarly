@@ -5,7 +5,7 @@ header {
 header.border {
   border-bottom: 1px solid var(--border-color) !important;
 }
-header:has(.top) {
+header:has(.container > .top) {
   position: sticky;
   top: 0;
   background: var(--body-color);
@@ -581,7 +581,8 @@ header .bottom .actions button:hover svg {
     width: 100%;
     position: relative;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* grid-template-columns: 1fr 1fr; */
+    grid-template-columns: 1fr;
   }
   header .bottom .nav > * {
     flex: 1;
@@ -613,6 +614,9 @@ header .bottom .actions button:hover svg {
     background: transparent;
     font-weight: 600;
     border-color: var(--border-color);
+  }
+  header .bottom .nav > h4 {
+    display: none;
   }
   header .bottom .nav .cats-nav .cat-item {
     width: 100%;

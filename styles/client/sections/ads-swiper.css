@@ -1,5 +1,5 @@
 .swiper-section {
-  padding: 25px 0;
+  padding: var(--sections-padding);
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -9,6 +9,9 @@
   padding: 0 45px;
   justify-content: space-between;
   align-items: flex-end;
+}
+.swiper-section .top h3 {
+    font-size: 18px;
 }
 .swiper-section:not(:has(.nav-btn)) .top {
       padding: 0 5px;
