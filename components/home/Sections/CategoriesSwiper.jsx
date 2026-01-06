@@ -145,7 +145,7 @@ export default function CategoriesSwiper({
         )}
 
         <Swiper
-          key={locale}
+          key={`${type}-${catId}-${data.length}-${locale}`}
           speed={500}
           spaceBetween={8}
           onSwiper={(swiper) => {

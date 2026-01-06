@@ -10,10 +10,12 @@ export const formatRelativeDate = (dateString, locale = "ar") => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   const weeks = Math.floor(days / 7);
-  const months = Math.floor(days / 30);
-  const years = Math.floor(days / 365);
 
   const isArabic = locale === "ar";
+
+  // Calculate months and years properly
+  const years = now.getFullYear() - date.getFullYear();
+  const months = years * 12 + (now.getMonth() - date.getMonth());
 
   if (seconds < 10) {
     return isArabic ? "الآن" : "now";
@@ -22,7 +24,7 @@ export const formatRelativeDate = (dateString, locale = "ar") => {
   if (seconds < 60) {
     return isArabic
       ? `منذ ${seconds} ثانية`
-      : `${seconds} seconds ago`;
+      : `${seconds} second${seconds > 1 ? "s" : ""} ago`;
   }
 
   if (minutes < 60) {

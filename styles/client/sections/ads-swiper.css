@@ -4,6 +4,9 @@
   flex-direction: column;
   gap: 7px;
 }
+.swiper-section:not(:has(.nav-btn)) {
+  padding: 25px 47px;
+}
 .swiper-section .top {
   display: flex;
   padding: 0 45px;
@@ -11,10 +14,14 @@
   align-items: flex-end;
 }
 .swiper-section .top h3 {
-    font-size: 18px;
+  font-size: 18px;
+}
+.swiper-section.for-ads .top h3 {
+  font-size: 20px;
+  transform: translateY(-2px);
 }
 .swiper-section:not(:has(.nav-btn)) .top {
-      padding: 0 5px;
+  padding: 0 5px;
 }
 .swiper-section .top .link {
   color: var(--paragraph);
@@ -75,6 +82,10 @@
   .swiper-section {
     width: 1495px;
   }
+  /* .swiper-section.for-ads {
+    width: 1800px;
+    max-width: 95%;
+  } */
 }
 @media (max-width: 1030px) {
   header .bottom .nav .cats-nav a {

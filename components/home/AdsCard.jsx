@@ -36,7 +36,8 @@ export default function CardItem({ data }) {
   return (
     <Link href={`/ad/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
-        <Image fill src={data?.images[0]} alt={data?.title} />
+        <Image className="main" fill src={data?.images[0]} alt={data?.title} />
+        <Image className="cover" fill src={data?.images[0]} alt={`${data?.title}-cover`} />
         <div className="top">
           <button
             className={`fav-btn ${isFavorite ? "active" : ""}`}
@@ -57,7 +58,9 @@ export default function CardItem({ data }) {
           >
             {data?.title}
           </h4>
-          <span className={`category ellipsis`}>{data?.sub_category.name}</span>
+          <span className={`category ellipsis`}>
+            {t.subcategories[data?.sub_category.name]}
+          </span>
         </div>
         <div className="row-holder">
           <h3>{formatEGP(data?.price, locale)}</h3>
@@ -67,7 +70,7 @@ export default function CardItem({ data }) {
       </div>
       <div className="date-area">
         <p className="area">
-          {t.governorates[data?.area.governorate]}, {t.cities[data?.area.city]}
+          {data?.area.governorate[locale]}, {data?.area.city[locale]}
         </p>
         <p className="date">
           {formatRelativeDate(data?.creation_date, locale)}

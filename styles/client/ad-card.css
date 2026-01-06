@@ -12,19 +12,25 @@
   aspect-ratio: 1.4;
   overflow: hidden;
 }
-.ad-card .image-holder img {
+.ad-card .image-holder .main {
   display: flex;
-  object-fit: fill;
-  transition: 0.3s;
+  object-fit: contain;
+  transition: 0.4s;
+}
+.ad-card .image-holder .cover {
+  object-fit: cover;
+  filter: blur(10px);
+  z-index: -1;
+  transition: 0.4s;
 }
 .ad-card:hover .image-holder img {
-  scale: 1.1;
+  scale: 1.15;
 }
 .ad-card .image-holder .top {
   position: absolute;
   top: 0;
   width: 100%;
-  padding: 7px 16px;
+  padding: 12px 16px;
   align-items: flex-start;
 }
 .ad-card .image-holder .top .fav-btn {
@@ -36,6 +42,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transform: translateY(17px);
+  opacity: 0;
+  visibility: hidden;
   transition: 0.3s;
 }
 .ad-card .image-holder .top svg {
@@ -50,6 +59,11 @@
 }
 .ad-card .image-holder .top .fav-btn:not(.active):hover svg {
   color: white;
+}
+.ad-card:hover .image-holder .top .fav-btn {
+  transform: translateY(0px);
+  opacity: 1;
+  visibility: visible;
 }
 .ad-card .image-holder .top .info {
   display: flex;

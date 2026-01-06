@@ -210,9 +210,26 @@ const DynamicFilters = ({
         return null;
     }
   };
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 30) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className={`filters dynamic-filters ${active ? "active" : ""}`}>
+    <div
+      className={`filters dynamic-filters ${active ? "active" : ""} ${
+        scrolled ? "biger-hight" : ""
+      }`}
+    >
       {screenSize !== "large" && (
         <IoIosClose className="close" onClick={() => setActive(false)} />
       )}

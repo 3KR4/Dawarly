@@ -280,7 +280,9 @@ function Header() {
                       }
                     >
                       <Link
-                        href={`/${screenSize !== "small" ? cat.id : ""}`}
+                        href={`/market${
+                          screenSize !== "small" ? `?cat=${cat.id}` : ""
+                        }`}
                         onClick={(e) => {
                           if (screenSize !== "large") {
                             e.preventDefault();
@@ -309,7 +311,10 @@ function Header() {
                             {subcategories
                               .filter((x) => x.categoryId === cat.id)
                               .map((sub) => (
-                                <Link key={sub.id} href={`/${sub.id}`}>
+                                <Link
+                                  key={sub.id}
+                                  href={`/market?subcat=${sub.id}`}
+                                >
                                   {t.subcategories[sub.name]}
                                 </Link>
                               ))}
@@ -362,7 +367,11 @@ function Header() {
                           {secondCategories.map((otherCat) => (
                             <Link
                               key={otherCat.id}
-                              href={`/${otherCat.id}`}
+                              href={`/market${
+                                screenSize !== "small"
+                                  ? `?cat=${otherCat.id}`
+                                  : ""
+                              }`}
                               onClick={() => {
                                 if (screenSize !== "large") closeMenu();
                               }}

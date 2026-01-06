@@ -241,7 +241,7 @@ export const subcategories = [
   { id: 101, categoryId: 1, name: "apartmentsSale" },
   { id: 102, categoryId: 1, name: "apartmentsRent" },
   { id: 103, categoryId: 1, name: "villas" },
-  { id: 104, categoryId: 1, name: "commercial" },
+  { id: 104, categoryId: 1, name: "commercial" }, // 3
   { id: 105, categoryId: 1, name: "lands" },
 
   { id: 201, categoryId: 2, name: "cars" },
@@ -249,7 +249,7 @@ export const subcategories = [
   { id: 203, categoryId: 2, name: "spareParts" },
   { id: 204, categoryId: 2, name: "heavyVehicles" },
 
-  { id: 301, categoryId: 3, name: "mobilePhones" },
+  { id: 301, categoryId: 3, name: "mobilePhones" }, // 9
   { id: 302, categoryId: 3, name: "tablets" },
   { id: 303, categoryId: 3, name: "accessories" },
 
@@ -258,7 +258,7 @@ export const subcategories = [
   { id: 403, categoryId: 4, name: "videoGames" },
   { id: 404, categoryId: 4, name: "cameras" },
 
-  { id: 501, categoryId: 5, name: "furniture" },
+  { id: 501, categoryId: 5, name: "furniture" }, // 16
   { id: 502, categoryId: 5, name: "officeFurniture" },
   { id: 503, categoryId: 5, name: "homeDecor" },
 
@@ -267,20 +267,20 @@ export const subcategories = [
   { id: 603, categoryId: 6, name: "shoesBags" },
 
   { id: 701, categoryId: 7, name: "fullTime" },
-  { id: 702, categoryId: 7, name: "partTime" },
+  { id: 702, categoryId: 7, name: "partTime" }, // 23
   { id: 703, categoryId: 7, name: "freelance" },
 
   { id: 801, categoryId: 8, name: "homeServices" },
-  { id: 802, categoryId: 8, name: "education" },
+  { id: 802, categoryId: 8, name: "education" },  // 26
   { id: 803, categoryId: 8, name: "repairServices" },
 
   { id: 901, categoryId: 9, name: "dogs" },
-  { id: 902, categoryId: 9, name: "cats" },
+  { id: 902, categoryId: 9, name: "cats" }, // 29
   { id: 903, categoryId: 9, name: "petAccessories" },
 
   { id: 1001, categoryId: 10, name: "toys" },
   { id: 1002, categoryId: 10, name: "kidsClothes" },
-  { id: 1003, categoryId: 10, name: "babyGear" },
+  { id: 1003, categoryId: 10, name: "babyGear" }, // 33
 
   { id: 1101, categoryId: 11, name: "sportsEquipment" },
   { id: 1102, categoryId: 11, name: "bicycles" },
@@ -468,37 +468,45 @@ export const users = [
 // =============================
 
 export const amenities = [
-  { id: 1, key: "balcony", name: { en: "Balcony", ar: "بلكونة" } },
-  { id: 2, key: "gym", name: { en: "Gym", ar: "جيم" } },
-  { id: 3, key: "parking", name: { en: "Parking", ar: "جراج" } },
-  { id: 4, key: "elevator", name: { en: "Elevator", ar: "مصعد" } },
-  { id: 5, key: "security", name: { en: "Security", ar: "أمن" } },
+  { id: 1, name: { ar: "تكييف", en: "air conditioning" } },
+  { id: 2, name: { ar: "تدفئة مركزية", en: "central heating" } },
+  { id: 3, name: { ar: "انترنت", en: "internet" } },
+  { id: 4, name: { ar: "جراج", en: "garage" } },
+  { id: 5, name: { ar: "أمن", en: "security" } },
+  { id: 6, name: { ar: "مسبح", en: "swimming pool" } },
 ];
-
 // =============================
 // Ads / Listings (15 ads | owned by 5 users)
 // =============================
 
 export const ads = [
-  // ===== User u_001 =====
+  // ===== الإعلانات المعدلة من الأصلية (15 إعلان) =====
   {
     id: 101,
     user_id: "u_001",
     title: "شقة للبيع في مدينة نصر",
     description: "شقة 110 متر قريبة من الخدمات",
     price: 1850000,
-    negotiable: true,
-    category: { id: 1, key: "properties" },
-    sub_category: { id: 101, name: "Apartments for Sale" },
-    status: "for sale",
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "nasrCity" },
-    specs: { area_m2: 110, bedrooms: 2, bathrooms: 2, furnished: false },
-    amenities: [amenities[0], amenities[3]],
+    category: categories[0], // properties
+    sub_category: subcategories[0], // apartmentsSale
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "مدينة نصر", en: "Nasr City" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      area_m2: 110,
+      bedrooms: 2,
+      bathrooms: 2,
+      furnished: false,
+      status: "for sale",
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [amenities[4]], // أمن
+    },
     images: ["/ads/ap1.jpg"],
     tags: ["شقة", "تمليك"],
-    creation_date: "2025-12-10",
+    creation_date: "2025-12-05T14:30:00Z",
   },
   {
     id: 102,
@@ -506,19 +514,24 @@ export const ads = [
     title: "iPhone 13 Pro Max",
     description: "256GB – حالة ممتازة",
     price: 28500,
-    negotiable: false,
-    category: { id: 3, key: "mobiles-tablets" },
-    sub_category: { id: 301, name: "Mobile Phones" },
-    status: null,
-    condition: "used",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "nasrCity" },
-
-    specs: { storage_gb: 256, battery_health_percent: 92 },
-    amenities: [],
+    category: categories[2], // mobilesTablets
+    sub_category: subcategories[9], // mobilePhones
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "مدينة نصر", en: "Nasr City" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "used",
+      storage_gb: 256,
+      battery_health_percent: 92,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/iphone3.jpeg"],
     tags: ["iphone", "apple"],
-    creation_date: "2025-12-19",
+    creation_date: "2025-12-10T09:15:00Z",
   },
   {
     id: 103,
@@ -526,40 +539,50 @@ export const ads = [
     title: "كنبة مودرن 3 مقاعد",
     description: "خشب زان – حالة جيدة",
     price: 7500,
-    negotiable: true,
-    category: { id: 5, key: "home-office" },
-    sub_category: { id: 501, name: "Furniture" },
-    status: null,
-    condition: "used",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "nasrCity" },
-
-    specs: { material: "wood", seats: 3 },
-    amenities: [],
+    category: categories[4], // homeOffice
+    sub_category: subcategories[16], // furniture
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "مدينة نصر", en: "Nasr City" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      material: "wood",
+      seats: 3,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/sofa1.jpg"],
     tags: ["كنبة", "أثاث"],
-    creation_date: "2025-12-19 18:30:59.561",
+    creation_date: "2025-12-12T16:45:00Z",
   },
-
-  // ===== User u_002 =====
   {
     id: 104,
     user_id: "u_002",
     title: "Hyundai Elantra 2019",
     description: "فابريكا بالكامل",
     price: 720000,
-    negotiable: true,
-    category: { id: 2, key: "vehicles" },
-    sub_category: { id: 201, name: "Cars" },
-    status: "for sale",
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "dokki" },
-    specs: { model_year: 2019, km: 85000, transmission: "automatic" },
-    amenities: [],
+    category: categories[1], // vehicles
+    sub_category: subcategories[5], // cars
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الدقي", en: "Dokki" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      model_year: 2019,
+      km: 85000,
+      transmission: "automatic",
+      status: "for sale",
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/car1.jpg"],
     tags: ["hyundai", "car"],
-    creation_date: "2025-01-10",
+    creation_date: "2025-12-03T11:20:00Z",
   },
   {
     id: 105,
@@ -567,18 +590,23 @@ export const ads = [
     title: "موتوسيكل هوجن 200",
     description: "جاهز للاستخدام",
     price: 68000,
-    negotiable: true,
-    category: { id: 2, key: "vehicles" },
-    sub_category: { id: 202, name: "Motorcycles" },
-    status: "for sale",
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "dokki" },
-    specs: { engine_cc: 200 },
-    amenities: [],
+    category: categories[1], // vehicles
+    sub_category: subcategories[6], // motorcycles
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الدقي", en: "Dokki" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      engine_cc: 200,
+      status: "for sale",
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/bike1.jpg"],
     tags: ["motorcycle"],
-    creation_date: "2025-01-12",
+    creation_date: "2025-12-04T13:10:00Z",
   },
   {
     id: 106,
@@ -586,40 +614,51 @@ export const ads = [
     title: "لابتوب Dell Latitude",
     description: "i7 – رام 16 جيجا",
     price: 19500,
-    negotiable: false,
-    category: { id: 4, key: "electronics" },
-    sub_category: { id: 402, name: "Computers" },
-    status: null,
-    condition: "used",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "dokki" },
-
-    specs: { cpu: "i7", ram_gb: 16 },
-    amenities: [],
+    category: categories[3], // electronics
+    sub_category: subcategories[13], // computers
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الدقي", en: "Dokki" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "used",
+      cpu: "i7",
+      ram_gb: 16,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/laptop1.webp"],
     tags: ["dell", "laptop"],
-    creation_date: "2025-01-13",
+    creation_date: "2025-12-07T10:05:00Z",
   },
-
-  // ===== User u_003 =====
   {
     id: 107,
     user_id: "u_003",
     title: "شقة للإيجار في سموحة",
     description: "تشطيب سوبر لوكس",
     price: 12000,
-    negotiable: false,
-    category: { id: 1, key: "properties" },
-    sub_category: { id: 102, name: "Apartments for Rent" },
-    status: "for rent",
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "alexandria", city: "smouha" },
-    specs: { area_m2: 95, bedrooms: 2, bathrooms: 1, furnished: true },
-    amenities: [amenities[0], amenities[4]],
+    category: categories[0], // properties
+    sub_category: subcategories[1], // apartmentsRent
+    area: {
+      governorate: { ar: "الإسكندرية", en: "Alexandria" },
+      city: { ar: "سموحة", en: "Smouha" },
+    },
+    specs: {
+      negotiable: false,
+      condition: null,
+      area_m2: 95,
+      bedrooms: 2,
+      bathrooms: 1,
+      furnished: true,
+      status: "for rent",
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [amenities[0], amenities[4]], // تكييف وأمن
+    },
     images: ["/ads/ap2.webp"],
     tags: ["إيجار", "سموحة"],
-    creation_date: "2025-01-11",
+    creation_date: "2025-12-02T15:40:00Z",
   },
   {
     id: 108,
@@ -627,18 +666,23 @@ export const ads = [
     title: "Samsung Galaxy S22",
     description: "زي الجديد",
     price: 19000,
-    negotiable: false,
-    category: { id: 3, key: "mobiles-tablets" },
-    sub_category: { id: 301, name: "Mobile Phones" },
-    status: null,
-    condition: "like new",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "alexandria", city: "smouha" },
-    specs: { storage_gb: 128 },
-    amenities: [],
+    category: categories[2], // mobilesTablets
+    sub_category: subcategories[9], // mobilePhones
+    area: {
+      governorate: { ar: "الإسكندرية", en: "Alexandria" },
+      city: { ar: "سموحة", en: "Smouha" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "like new",
+      storage_gb: 128,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/mobile1.jpg"],
     tags: ["samsung"],
-    creation_date: "2025-01-12",
+    creation_date: "2025-12-06T12:25:00Z",
   },
   {
     id: 109,
@@ -646,39 +690,47 @@ export const ads = [
     title: "ترابيزة سفرة 6 كراسي",
     description: "خشب طبيعي",
     price: 9800,
-    negotiable: true,
-    category: { id: 5, key: "home-office" },
-    sub_category: { id: 501, name: "Furniture" },
-    status: null,
-    condition: "used",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "alexandria", city: "smouha" },
-    specs: { seats: 6 },
-    amenities: [],
+    category: categories[5], // homeOffice
+    sub_category: subcategories[16], // furniture
+    area: {
+      governorate: { ar: "الإسكندرية", en: "Alexandria" },
+      city: { ar: "سموحة", en: "Smouha" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      seats: 6,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/table1.jpeg"],
     tags: ["سفرة"],
-    creation_date: "2025-01-13",
+    creation_date: "2025-12-08T17:50:00Z",
   },
-
-  // ===== User u_004 =====
   {
     id: 110,
     user_id: "u_004",
     title: "فستان سواريه",
     description: "لبسة واحدة",
     price: 3500,
-    negotiable: true,
-    category: { id: 6, key: "fashion" },
-    sub_category: { id: 602, name: "Women Clothing" },
-    status: null,
-    condition: "like new",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "heliopolis" },
-    specs: { size: "M" },
-    amenities: [],
+    category: categories[6], // fashion
+    sub_category: subcategories[20], // womenClothing
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "هليوبوليس", en: "Heliopolis" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "like new",
+      size: "M",
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/dress1.jpg"],
     tags: ["فستان"],
-    creation_date: "2025-01-11",
+    creation_date: "2025-12-01T14:15:00Z",
   },
   {
     id: 111,
@@ -686,18 +738,23 @@ export const ads = [
     title: "قط شيرازي",
     description: "مطعم وجاهز",
     price: 2500,
-    negotiable: false,
-    category: { id: 9, key: "pets" },
-    sub_category: { id: 902, name: "Cats" },
-    status: null,
-    condition: "new",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "heliopolis" },
-    specs: { age_months: 3 },
-    amenities: [],
+    category: categories[9], // pets
+    sub_category: subcategories[29], // cats
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "هليوبوليس", en: "Heliopolis" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "new",
+      age_months: 3,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/cat1.webp"],
     tags: ["قطط"],
-    creation_date: "2025-01-12",
+    creation_date: "2025-12-04T09:30:00Z",
   },
   {
     id: 112,
@@ -705,39 +762,47 @@ export const ads = [
     title: "وظيفة خدمة عملاء",
     description: "دوام كامل",
     price: 0,
-    negotiable: false,
-    category: { id: 7, key: "jobs" },
-    sub_category: { id: 701, name: "Full Time Jobs" },
-    status: null,
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "cairo", city: "heliopolis" },
-    specs: { salary_range: "6000-8000" },
-    amenities: [],
+    category: categories[7], // jobs
+    sub_category: subcategories[23], // fullTime
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "هليوبوليس", en: "Heliopolis" },
+    },
+    specs: {
+      negotiable: false,
+      condition: null,
+      salary_range: "6000-8000",
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/jop1.jpg"],
     tags: ["وظيفة"],
-    creation_date: "2025-01-13",
+    creation_date: "2025-12-07T11:45:00Z",
   },
-
-  // ===== User u_005 =====
   {
     id: 113,
     user_id: "u_005",
     title: "محل للإيجار",
     description: "موقع مميز",
     price: 15000,
-    negotiable: true,
-    category: { id: 1, key: "properties" },
-    sub_category: { id: 104, name: "Commercial" },
-    status: "for rent",
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "sheikhZayed" },
-    specs: { area_m2: 60 },
-    amenities: [amenities[4]],
+    category: categories[0], // properties
+    sub_category: subcategories[3], // commercial
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الشيخ زايد", en: "Sheikh Zayed" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      area_m2: 60,
+      status: "for rent",
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [amenities[4]], // أمن
+    },
     images: ["/ads/shop1.jpg"],
     tags: ["محل"],
-    creation_date: "2025-01-11",
+    creation_date: "2025-12-03T16:20:00Z",
   },
   {
     id: 114,
@@ -745,18 +810,23 @@ export const ads = [
     title: "PlayStation 5",
     description: "بحالة ممتازة",
     price: 24000,
-    negotiable: false,
-    category: { id: 4, key: "electronics" },
-    sub_category: { id: 403, name: "Video Games" },
-    status: null,
-    condition: "used",
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "sheikhZayed" },
-    specs: { storage_gb: 825 },
-    amenities: [],
+    category: categories[3], // electronics
+    sub_category: subcategories[14], // videoGames
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الشيخ زايد", en: "Sheikh Zayed" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "used",
+      storage_gb: 825,
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/ps5.jpg"],
     tags: ["ps5"],
-    creation_date: "2025-12-12",
+    creation_date: "2025-12-09T13:55:00Z",
   },
   {
     id: 115,
@@ -764,18 +834,405 @@ export const ads = [
     title: "خدمة تنظيف منازل",
     description: "خبرة 5 سنوات",
     price: 300,
-    negotiable: true,
-    category: { id: 8, key: "services" },
-    sub_category: { id: 801, name: "Home Services" },
-    status: null,
-    condition: null,
-    location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
-    area: { governorate: "giza", city: "sheikhZayed" },
-    specs: { service_type: "cleaning" },
-    amenities: [],
+    category: categories[7], // services
+    sub_category: subcategories[27], // homeServices
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الشيخ زايد", en: "Sheikh Zayed" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      service_type: "cleaning",
+      status: null,
+      location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
+      amenities: [],
+    },
     images: ["/ads/service1.jpg"],
     tags: ["تنظيف"],
-    creation_date: "2025-01-13",
+    creation_date: "2025-12-11T08:40:00Z",
+  },
+
+  // ===== الإعلانات الجديدة من تأليفي (15 إعلان) =====
+  {
+    id: 201,
+    user_id: "u_006",
+    title: "شقة دوبلكس للبيع في التجمع",
+    description: "دوبلكس 160 متر رووف خاص",
+    price: 3200000,
+    category: categories[0], // properties
+    sub_category: subcategories[0], // apartmentsSale
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "التجمع الخامس", en: "Fifth Settlement" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      area_m2: 160,
+      bedrooms: 3,
+      bathrooms: 3,
+      furnished: false,
+      status: "for sale",
+      location: "https://maps.app.goo.gl/abc123",
+      amenities: [amenities[0], amenities[4], amenities[6]], // تكييف، أمن، مسبح
+    },
+    images: ["/ads/duplex1.jpg"],
+    tags: ["دوبلكس", "تجمع"],
+    creation_date: "2025-12-14T10:20:00Z",
+  },
+  {
+    id: 202,
+    user_id: "u_007",
+    title: "مرسيدس E200 2020",
+    description: "فل أوتوماتيك – كاملة المواصفات",
+    price: 1850000,
+    category: categories[1], // vehicles
+    sub_category: subcategories[5], // cars
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "المعادي", en: "Maadi" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      model_year: 2020,
+      km: 45000,
+      transmission: "automatic",
+      status: "for sale",
+      location: "https://maps.app.goo.gl/def456",
+      amenities: [],
+    },
+    images: ["/ads/mercedes1.jpg"],
+    tags: ["مرسيدس", "سيارة فاخرة"],
+    creation_date: "2025-12-15T14:35:00Z",
+  },
+  {
+    id: 203,
+    user_id: "u_008",
+    title: "iPad Pro 12.9 2022",
+    description: "جيل جديد – شاشة كبيرة",
+    price: 32000,
+    category: categories[2], // mobilesTablets
+    sub_category: subcategories[9], // tablets
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "6 أكتوبر", en: "6th October" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "like new",
+      storage_gb: 256,
+      screen_size: "12.9",
+      status: null,
+      location: "https://maps.app.goo.gl/ghi789",
+      amenities: [],
+    },
+    images: ["/ads/ipad1.jpg"],
+    tags: ["ipad", "apple", "تابلت"],
+    creation_date: "2025-12-16T11:10:00Z",
+  },
+  {
+    id: 204,
+    user_id: "u_009",
+    title: "كاميرا Canon EOS R6",
+    description: "كاميرا احترافية للمحترفين",
+    price: 65000,
+    category: categories[3], // electronics
+    sub_category: subcategories[15], // cameras
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "مصر الجديدة", en: "New Cairo" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      megapixels: 20,
+      lens_included: true,
+      status: null,
+      location: "https://maps.app.goo.gl/jkl012",
+      amenities: [],
+    },
+    images: ["/ads/camera1.webp"],
+    tags: ["كانون", "كاميرا", "تصوير"],
+    creation_date: "2025-12-17T15:45:00Z",
+  },
+  {
+    id: 205,
+    user_id: "u_010",
+    title: "كرسي مكتب مريح",
+    description: "كرسي مكتب إيرغونوميك",
+    price: 4500,
+    category: categories[4], // homeOffice
+    sub_category: subcategories[17], // officeFurniture
+    area: {
+      governorate: { ar: "الإسكندرية", en: "Alexandria" },
+      city: { ar: "ستانلي", en: "Stanley" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "new",
+      material: "mesh",
+      adjustable: true,
+      status: null,
+      location: "https://maps.app.goo.gl/mno345",
+      amenities: [],
+    },
+    images: ["/ads/chair1.webp"],
+    tags: ["كرسي", "مكتب", "مريح"],
+    creation_date: "2025-12-18T09:25:00Z",
+  },
+  {
+    id: 206,
+    user_id: "u_011",
+    title: "حذاء رياضي Nike",
+    description: "مقاس 43 – جديد",
+    price: 1200,
+    category: categories[5], // fashion
+    sub_category: subcategories[21], // shoesBags
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "العتبة", en: "Attaba" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "new",
+      size: "43",
+      brand: "Nike",
+      status: null,
+      location: "https://maps.app.goo.gl/pqr678",
+      amenities: [],
+    },
+    images: ["/ads/shoes1.webp"],
+    tags: ["نايكي", "حذاء رياضي"],
+    creation_date: "2025-12-19T13:15:00Z",
+  },
+  {
+    id: 207,
+    user_id: "u_012",
+    title: "مصمم جرافيك",
+    description: "وظيفة مصمم بدوام جزئي",
+    price: 0,
+    category: categories[6], // jobs
+    sub_category: subcategories[23], // partTime
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "المهندسين", en: "Mohandessin" },
+    },
+    specs: {
+      negotiable: false,
+      condition: null,
+      salary_range: "4000-6000",
+      experience: "2+ سنوات",
+      status: null,
+      location: "https://maps.app.goo.gl/stu901",
+      amenities: [],
+    },
+    images: ["/ads/designer_job.jpg"],
+    tags: ["تصميم", "جرافيك", "وظيفة"],
+    creation_date: "2025-12-20T10:50:00Z",
+  },
+  {
+    id: 208,
+    user_id: "u_013",
+    title: "خدمات تصميم مواقع",
+    description: "تصميم مواقع احترافية",
+    price: 5000,
+    category: categories[7], // services
+    sub_category: subcategories[26], // education
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "وسط البلد", en: "Downtown" },
+    },
+    specs: {
+      negotiable: true,
+      condition: null,
+      service_type: "web_design",
+      delivery_time: "7 أيام",
+      status: null,
+      location: "https://maps.app.goo.gl/vwx234",
+      amenities: [],
+    },
+    images: ["/ads/web_service.webp"],
+    tags: ["تصميم مواقع", "ويب"],
+    creation_date: "2025-12-21T16:30:00Z",
+  },
+  {
+    id: 209,
+    user_id: "u_014",
+    title: "جرو جيرمن شيبرد",
+    description: "عمر 3 شهور – مطعم",
+    price: 8000,
+    category: categories[8], // pets
+    sub_category: subcategories[28], // dogs
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "الهرم", en: "Haram" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "new",
+      age_months: 3,
+      breed: "German Shepherd",
+      status: null,
+      location: "https://maps.app.goo.gl/yza567",
+      amenities: [],
+    },
+    images: ["/ads/dog1.jpeg"],
+    tags: ["كلاب", "جيرمن شيبرد"],
+    creation_date: "2025-12-22T11:40:00Z",
+  },
+  {
+    id: 210,
+    user_id: "u_015",
+    title: "عربية أطفال جديدة",
+    description: "ماركة عالمية – لم تستخدم",
+    price: 2200,
+    category: categories[9], // kidsBabies
+    sub_category: subcategories[33], // babyGear
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "الزمالك", en: "Zamalek" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "new",
+      brand: "Chicco",
+      color: "أزرق",
+      status: null,
+      location: "https://maps.app.goo.gl/bcd890",
+      amenities: [],
+    },
+    images: ["/ads/stroller1.jpg"],
+    tags: ["عربية أطفال", "مستلزمات أطفال"],
+    creation_date: "2025-12-23T14:20:00Z",
+  },
+  {
+    id: 211,
+    user_id: "u_016",
+    title: "دراجة جبلية Trek",
+    description: "سرعة 21 – حالة ممتازة",
+    price: 7500,
+    category: categories[10], // sportsHobbies
+    sub_category: subcategories[35], // bicycles
+    area: {
+      governorate: { ar: "الإسكندرية", en: "Alexandria" },
+      city: { ar: "المنتزه", en: "Montaza" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      speeds: 21,
+      frame_size: "19 inch",
+      status: null,
+      location: "https://maps.app.goo.gl/efg123",
+      amenities: [],
+    },
+    images: ["/ads/bike2.webp"],
+    tags: ["دراجة", "رياضة"],
+    creation_date: "2025-12-24T09:55:00Z",
+  },
+  {
+    id: 212,
+    user_id: "u_017",
+    title: "معدات مطعم للبيع",
+    description: "كاملة – حالة جيدة",
+    price: 85000,
+    category: categories[11], // businessIndustrial
+    sub_category: subcategories[37], // industrialEquipment
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "المطرية", en: "Mataria" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      equipment_type: "kitchen",
+      includes: ["فرن", "ثلاجة", "معدات طبخ"],
+      status: null,
+      location: "https://maps.app.goo.gl/hij456",
+      amenities: [],
+    },
+    images: ["/ads/restaurant_equipment.jpg"],
+    tags: ["معدات مطعم", "تجاري"],
+    creation_date: "2025-12-25T12:10:00Z",
+  },
+  {
+    id: 213,
+    user_id: "u_018",
+    title: "فيلا للإيجار بالساحل الشمالي",
+    description: "4 غرف – على البحر مباشرة",
+    price: 25000,
+    category: categories[0], // properties
+    sub_category: subcategories[2], // villas
+    area: {
+      governorate: { ar: "الساحل الشمالي", en: "North Coast" },
+      city: { ar: "مارينا", en: "Marina" },
+    },
+    specs: {
+      negotiable: false,
+      condition: null,
+      area_m2: 280,
+      bedrooms: 4,
+      bathrooms: 5,
+      furnished: true,
+      status: "for rent",
+      location: "https://maps.app.goo.gl/klm789",
+      amenities: [amenities[0], amenities[4], amenities[6], amenities[3]], // تكييف، أمن، مسبح، جراج
+    },
+    images: ["/ads/villa1.jpg"],
+    tags: ["فيلا", "ساحل", "إيجار"],
+    creation_date: "2025-12-26T17:25:00Z",
+  },
+  {
+    id: 214,
+    user_id: "u_019",
+    title: "Xbox Series X",
+    description: "بحالتها – مع 2 ألعاب",
+    price: 21000,
+    category: categories[3], // electronics
+    sub_category: subcategories[14], // videoGames
+    area: {
+      governorate: { ar: "الجيزة", en: "Giza" },
+      city: { ar: "فيصل", en: "Faisal" },
+    },
+    specs: {
+      negotiable: true,
+      condition: "used",
+      storage_gb: 1024,
+      games_included: 2,
+      status: null,
+      location: "https://maps.app.goo.gl/nop012",
+      amenities: [],
+    },
+    images: ["/ads/xbox1.jpg"],
+    tags: ["اكس بوكس", "ألعاب"],
+    creation_date: "2025-12-27T14:45:00Z",
+  },
+  {
+    id: 215,
+    user_id: "u_020",
+    title: "جيتار كهربائي",
+    description: "ماركة فندر – للمحترفين",
+    price: 12000,
+    category: categories[10], // sportsHobbies
+    sub_category: subcategories[36], // musicalInstruments
+    area: {
+      governorate: { ar: "القاهرة", en: "Cairo" },
+      city: { ar: "المعادي", en: "Maadi" },
+    },
+    specs: {
+      negotiable: false,
+      condition: "like new",
+      brand: "Fender",
+      type: "electric",
+      status: null,
+      location: "https://maps.app.goo.gl/qrs345",
+      amenities: [],
+    },
+    images: ["/ads/guitar1.jpg"],
+    tags: ["جيتار", "موسيقى"],
+    creation_date: "2025-12-28T11:30:00Z",
   },
 ];
 export const apartmentForSaleFields = [

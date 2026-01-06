@@ -1,10 +1,39 @@
 .filters {
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   width: 300px;
   height: fit-content;
   padding: 17px 0;
   transition: all 0.3s;
-  border: 1px solid var(--border-color);
+  max-height: 848px;
+  overflow: auto;
+  position: sticky;
+  top: 80px;
+  overflow-x: hidden;
+}
+.filters.biger-hight {
+  max-height: 890px;
+}
+.filters::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+.filters::-moz-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+.filters::-ms-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+.filters::-webkit-scrollbar-track {
+  background: var(--section-color);
+}
+.filters::-moz-scrollbar-track {
+  background: var(--section-color);
+}
+.filters::-ms-scrollbar-track {
+  background: var(--section-color);
 }
 .filters .close {
   position: absolute;
@@ -133,11 +162,6 @@
 .marketplace .filters .filter-option.active {
   background: var(--hover-color);
   border-color: var(--main-color);
-}
-.marketplace .filters .filter-option.active {
-  background: var(--main-color);
-  color: white;
-  font-weight: 700;
 }
 
 .price-slider {
