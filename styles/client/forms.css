@@ -191,32 +191,32 @@ p.have-problem {
   font-size: 14px;
   text-decoration: underline;
 }
-.filters .btn {
-  height: 44px;
-  border: 1px solid var(--input-border-color);
-  border-radius: 10px;
+.form-holder .filters .btn {
+  height: 44px !important;
+  border: 1px solid var(--input-border-color) !important;
+  border-radius: 10px !important;
 }
-.filters.filters.for-cats {
+.form-holder .filters.filters.for-cats {
   width: 100% !important;
   border: none;
 }
-.filters.filters.for-cats,
-.filters.for-cats:has(.menu.active) {
+.form-holder .filters.filters.for-cats,
+.form-holder .filters.for-cats:has(.menu.active) {
   width: 100%;
 }
-.filters .menu {
+.form-holder .filters .menu {
   grid-template-columns: 1fr;
   top: 44px;
 }
-.filters.for-cats .menu {
+.form-holder .filters.for-cats .menu {
   max-height: 216px;
   overflow: auto;
 }
-.filters.for-cats button {
+.form-holder .filters.for-cats button {
   padding: 6px 8px;
   font-size: 14px;
 }
-.filters .btn svg {
+.form-holder .filters .btn svg {
   width: 38px;
   height: 44px;
   padding: 7px;
@@ -330,7 +330,15 @@ p.have-problem {
   font-weight: 800;
   font-family: cursive;
 }
-
+.form-holder .big-ico {
+  background: var(--hover-color);
+  width: 115px;
+  height: 70px;
+  color: var(--main-color);
+  border-radius: 14px;
+  margin: 0 auto;
+  padding: 8px;
+}
 /*! CREATE - AD */
 
 .form-holder.create-ad input {
@@ -339,7 +347,7 @@ p.have-problem {
 .form-holder.create-ad textarea {
   height: 160px;
 }
-.filters.for-cats input {
+.form-holder .filters.for-cats input {
   padding: 0 !important;
 }
 @media (max-width: 992px) {

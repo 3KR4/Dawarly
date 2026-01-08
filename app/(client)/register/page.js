@@ -8,8 +8,10 @@ import useTranslate from "@/Contexts/useTranslation";
 import governorates from "@/data/governorates.json";
 import cities from "@/data/cities.json";
 import { categories } from "@/data";
+import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import { MdMarkEmailUnread } from "react-icons/md";
 
 import {
   LockKeyhole,
@@ -20,7 +22,6 @@ import {
   EyeOff,
   CircleAlert,
 } from "lucide-react";
-import { FaRegCircleUser } from "react-icons/fa6";
 import OtpInputs from "@/components/Tools/Otp";
 
 export default function Register() {
@@ -39,7 +40,7 @@ export default function Register() {
     VIEW_OR_UPDATE_PASS: 9,
   };
 
-  const [step, setStep] = useState(STEPS.ACCOUNT);
+  const [step, setStep] = useState(STEPS.ADDRESS);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
@@ -169,12 +170,31 @@ export default function Register() {
     [STEPS.VIEW_OR_UPDATE_PASS]: newPassValue
       ? auth.update_pass_and_continue
       : auth.login,
+    [STEPS.ADDRESS]: auth.next,
+
     [STEPS.INTERESTS]: auth.finishAccount,
   };
 
   return (
     <div className="form-holder">
       <form onSubmit={handleSubmit(onSubmit)}>
+        {[
+          STEPS.PHONE_VERIFY,
+          STEPS.EMAIL_VERIFY,
+          STEPS.FORGET_PASS_VERIFY,
+        ].includes(step) ? (
+          step === STEPS.FORGET_PASS_VERIFY ? (
+            verifyMethod === "phone" ? (
+              <FaCommentSms className="big-ico" />
+            ) : (
+              <MdMarkEmailUnread className="big-ico" />
+            )
+          ) : step === STEPS.PHONE_VERIFY ? (
+            <FaCommentSms className="big-ico" />
+          ) : (
+            <MdMarkEmailUnread className="big-ico" />
+          )
+        ) : null}
         <div className="top">
           <h1>{titles[step]}</h1>
           <p>{descriptions[step]}</p>
@@ -572,7 +592,9 @@ export default function Register() {
         {(step === STEPS.PHONE_VERIFY ||
           step === STEPS.EMAIL_VERIFY ||
           step === STEPS.FORGET_PASS_VERIFY) && (
-          <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
+          <>
+            <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
+          </>
         )}
 
         {/* ================= ADDRESS SELECTION ================= */}

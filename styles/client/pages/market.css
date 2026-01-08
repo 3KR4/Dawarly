@@ -1,20 +1,24 @@
 .marketplace {
 }
-body:has(.swiper-section) .marketplace .content {
+
+.marketplace body:has(.swiper-section) .marketplace .content {
   padding: 12px 0 22px;
 }
+
 .marketplace .content {
   display: flex;
   gap: 15px;
   width: 100%;
   padding: 22px 0;
 }
+
 .marketplace .content .main {
   display: flex;
   flex-direction: column;
   gap: 12px;
   flex: 1;
 }
+
 .marketplace .content .main .grid-holder {
   gap: 10px;
   display: grid;
@@ -22,30 +26,34 @@ body:has(.swiper-section) .marketplace .content {
   grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));
 }
 
-.active-filters-bar {
+.marketplace .active-filters-bar {
   flex-wrap: wrap;
   align-items: center;
   gap: 0px 8px;
   display: flex;
 }
-.active-filters-bar .filters-header {
+
+.marketplace .active-filters-bar .filters-header {
   display: flex;
   align-items: center;
 }
-.active-filters-bar .filters-header,
-.active-filters-bar .filters-header span {
+
+.marketplace .active-filters-bar .filters-header,
+.marketplace .active-filters-bar .filters-header span {
   font-weight: 700;
   color: var(--paragraph-2);
   font-size: 15px;
 }
-.active-filters-bar .filters-list {
+
+.marketplace .active-filters-bar .filters-list {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
-.active-filters-bar .filter-tag,
-.active-filters-bar .clear-all-btn {
+
+.marketplace .active-filters-bar .filter-tag,
+.marketplace .active-filters-bar .clear-all-btn {
   background: var(--section-color);
   border: 1px solid var(--border-color);
   cursor: pointer;
@@ -57,30 +65,35 @@ body:has(.swiper-section) .marketplace .content {
   height: 28px;
   letter-spacing: 0.2px;
 }
-[lang="ar"] .active-filters-bar .filter-tag,
-[lang="ar"] .active-filters-bar .clear-all-btn {
+
+[lang="ar"] .marketplace .active-filters-bar .filter-tag,
+[lang="ar"] .marketplace .active-filters-bar .clear-all-btn {
   padding: 0 9px 0 4px;
 }
-.active-filters-bar .filters-list span {
+
+.marketplace .active-filters-bar .filters-list span {
   color: var(--paragraph-2);
   font-size: 12px;
   transition: 0.3s;
   font-weight: 700;
 }
 
-.active-filters-bar .filters-list svg {
+.marketplace .active-filters-bar .filters-list svg {
   color: var(--paragraph);
   font-size: 18px;
 }
-.active-filters-bar .filter-tag:hover,
-.active-filters-bar .clear-all-btn:hover {
+
+.marketplace .active-filters-bar .filter-tag:hover,
+.marketplace .active-filters-bar .clear-all-btn:hover {
   background: var(--red-color);
 }
-.active-filters-bar .filter-tag:hover > *,
-.active-filters-bar .clear-all-btn:hover {
+
+.marketplace .active-filters-bar .filter-tag:hover > *,
+.marketplace .active-filters-bar .clear-all-btn:hover {
   color: white;
 }
-.active-filters-bar .clear-all-btn {
+
+.marketplace .active-filters-bar .clear-all-btn {
   color: var(--red-color);
   font-weight: 700;
   font-size: 13px;
@@ -93,15 +106,18 @@ body:has(.swiper-section) .marketplace .content {
   gap: 10px;
   justify-content: flex-end;
 }
+
 .marketplace .content .main .top-nav:has(.active-filters-bar) {
   justify-content: space-between;
 }
+
 .marketplace .content .main .top-nav .row-holder,
 .marketplace .top-nav .row-holder .grid-option {
   display: flex;
   align-items: center;
   gap: 5px;
 }
+
 .marketplace .top-nav .row-holder .grid-option {
   height: 30px;
   overflow: hidden;
@@ -109,36 +125,44 @@ body:has(.swiper-section) .marketplace .content {
   border-radius: 7px;
   gap: 0;
 }
+
 .marketplace .top-nav .row-holder .grid-option svg {
   color: var(--paragraph-2);
   height: 100%;
   width: 40px;
   padding: 7px;
 }
-.marketplace .top-nav .row-holder .grid-option svg:first-child {
-  border-right: 1px solid var(--border-color);
-}
-[lang="ar"] .marketplace .top-nav .row-holder .grid-option svg:first-child {
+
+.marketplace [lang="ar"] .top-nav .row-holder .grid-option svg:first-child {
   border-left: 1px solid var(--border-color);
   border-right: none;
 }
+
+.marketplace .top-nav .row-holder .grid-option svg:first-child {
+  border-right: 1px solid var(--border-color);
+}
+
 .marketplace .top-nav .row-holder .grid-option svg:hover {
   background: var(--hover-color);
 }
+
 .marketplace .top-nav .row-holder .grid-option svg.active {
   background: var(--main-color);
   color: white;
 }
-.filters.filters.for-cats {
+
+.marketplace .filters.filters.for-cats {
   padding: 0;
   width: 200px !important;
   border-radius: 8px;
 }
-.filters .btn {
+
+.marketplace .filters .btn {
   border: none;
   height: 28px;
 }
-.filters .btn svg.main-ico {
+
+.marketplace .filters .btn svg.main-ico {
   background: transparent;
   color: var(--paragraph-2);
   border-radius: 0;
@@ -146,20 +170,23 @@ body:has(.swiper-section) .marketplace .content {
   border-left: 1px solid var(--border-color);
   height: 30px;
 }
-[lang="ar"] .filters .btn svg.main-ico {
+
+[lang="ar"] .marketplace .filters .btn svg.main-ico {
   border-left: none;
   border-right: 1px solid var(--border-color);
 }
-.filters .menu {
+
+.marketplace .filters .menu {
   grid-template-columns: 1fr;
 }
-.filters.for-cats button {
-  background: transparent;
+
+.marketplace .filters.for-cats button {
   border-radius: 5px;
   padding: 4px 8px;
   font-size: 13px;
 }
-[lang="ar"] .filters.for-cats button {
+
+[lang="ar"] .marketplace .filters.for-cats button {
   text-align: right;
 }
 
@@ -167,10 +194,10 @@ body:has(.swiper-section) .marketplace .content {
   .marketplace .content .main .top-nav:has(.active-filters-bar) {
     flex-wrap: wrap;
   }
-  .active-filters-bar {
+  .marketplace .active-filters-bar {
     gap: 4px 8px;
   }
-  .active-filters-bar .filters-header {
+  .marketplace .active-filters-bar .filters-header {
     border: 1px solid var(--border-color);
     cursor: pointer;
     letter-spacing: 0.2px;
@@ -184,7 +211,7 @@ body:has(.swiper-section) .marketplace .content {
     transition: all 0.3s;
     display: flex;
   }
-  .filters.filters.for-cats {
+  .marketplace .filters.filters.for-cats {
     position: relative;
     transform: unset;
     z-index: 1;
