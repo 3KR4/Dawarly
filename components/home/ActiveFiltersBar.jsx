@@ -4,6 +4,7 @@ import { IoIosClose } from "react-icons/io";
 import "@/styles/client/pages/market.css";
 import useTranslate from "@/Contexts/useTranslation";
 import { categories, subcategories } from "@/data";
+import { LuSettings2 } from "react-icons/lu";
 
 const ActiveFiltersBar = ({
   selectedCategory,
@@ -18,7 +19,6 @@ const ActiveFiltersBar = ({
   fieldDefinitions = [],
 }) => {
   const t = useTranslate();
-
   // دالة لعرض اسم الفلتر
   const getFilterDisplayName = (key, value) => {
     // فلتر السعر
@@ -168,21 +168,15 @@ const ActiveFiltersBar = ({
       }
     });
   }
-
-  if (activeFilters.length === 0) return null;
+  if (screenSize == "large" && activeFilters.length === 0) return null;
 
   return (
     <div className="active-filters-bar">
-      <div
-        className={
-          screenSize !== "large"
-            ? "main-button filters-header"
-            : "filters-header"
-        }
-        onClick={onOpenFilters}
-      >
+      <div className="filters-header" onClick={onOpenFilters}>
         {locale === "ar" ? "الفلترات النشطة" : "Active Filters"}
-        <span className="filters-count"> ({activeFilters.length})</span>
+        <span className="filters-count" style={{ display: "flex" }}>
+          {screenSize !== "large" ? <LuSettings2 /> : ":"}
+        </span>
       </div>
 
       <div className="filters-list">

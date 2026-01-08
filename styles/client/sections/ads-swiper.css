@@ -4,9 +4,7 @@
   flex-direction: column;
   gap: 7px;
 }
-.swiper-section:not(:has(.nav-btn)) {
-  padding: 25px 47px;
-}
+
 .swiper-section .top {
   display: flex;
   padding: 0 45px;
@@ -82,10 +80,16 @@
   .swiper-section {
     width: 1495px;
   }
-  /* .swiper-section.for-ads {
-    width: 1800px;
-    max-width: 95%;
-  } */
+}
+@media (min-width: 992px) {
+  .swiper-section:not(:has(.nav-btn)) {
+    padding: 25px 47px;
+  }
+}
+@media (min-width: 768px) {
+  .swiper-section:not(:has(.nav-btn)) {
+    padding: 25px;
+  }
 }
 @media (max-width: 1030px) {
   header .bottom .nav .cats-nav a {

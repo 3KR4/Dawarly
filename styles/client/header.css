@@ -103,7 +103,7 @@ header .top .search .search-holder svg {
   color: #a7a7a7;
 }
 [theme="dark"] header .top .search .search-holder svg {
-  color: #5a5a5a;
+  color: var(--paragraph-3);
 }
 header .top .search .search-holder input {
   flex: 1;
@@ -356,7 +356,7 @@ header .bottom .nav .places-select {
 header .bottom .nav h4 {
   background: var(--hover-color);
   cursor: pointer;
-  color: #5a5a5a;
+  color: var(--paragraph-3);
   font-weight: 700;
   border: 1px solid #c5a3ff;
   border-radius: 7px;

@@ -9,7 +9,7 @@ export default function Home() {
     <>
       <HeroSwiper />
       <CategoriesSwiper type={`cat`} />
-      <CategoriesSwiper type={`sub-cat`} catId={3} />
+      {/* <CategoriesSwiper type={`sub-cat`} catId={3} /> */}
       <AdsSwiper type={`newest`} />
       <AdsSwiper type={`cat`} id={1}/>
       <AdsSwiper type={`cat`} id={2}/>

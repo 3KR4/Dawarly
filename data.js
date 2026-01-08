@@ -1285,7 +1285,6 @@ export const apartmentForSaleFields = [
     ],
     tPath: "apartmentTypes",
   },
-
   {
     key: "area",
     uiType: "input",
@@ -1313,7 +1312,6 @@ export const apartmentForSaleFields = [
       },
     },
   },
-
   {
     key: "bedrooms",
     uiType: "select",
@@ -1348,7 +1346,6 @@ export const apartmentForSaleFields = [
       },
     ],
   },
-
   {
     key: "bathrooms",
     uiType: "select",
@@ -1383,7 +1380,6 @@ export const apartmentForSaleFields = [
       },
     ],
   },
-
   {
     key: "price",
     uiType: "input",
@@ -1402,7 +1398,6 @@ export const apartmentForSaleFields = [
       en: "Price is required",
     },
   },
-
   {
     key: "paymentOption",
     uiType: "radio",
@@ -1446,7 +1441,6 @@ export const apartmentForSaleFields = [
       },
     ],
   },
-
   {
     key: "furnished",
     uiType: "boolean",
@@ -1472,7 +1466,6 @@ export const apartmentForSaleFields = [
       },
     ],
   },
-
   {
     key: "negotiable",
     uiType: "boolean",
@@ -1498,7 +1491,6 @@ export const apartmentForSaleFields = [
       },
     ],
   },
-
   {
     key: "amenities",
     uiType: "multiSelect",

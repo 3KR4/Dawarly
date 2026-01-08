@@ -51,6 +51,11 @@
   color: var(--main-color);
   font-size: 19px;
 }
+.ad-card .image-holder .top .fav-btn.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
 .ad-card .image-holder .top .fav-btn.active svg {
   color: var(--main-color);
 }

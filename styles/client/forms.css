@@ -11,9 +11,7 @@ body:has(.form-holder) header,
 body:has(.form-holder) footer {
   display: none;
 }
-body:has(.form-holder) {
-  background: var(--lighter-main-color);
-}
+
 .form-holder {
   width: 100%;
   position: relative;
@@ -198,6 +196,10 @@ p.have-problem {
   border: 1px solid var(--input-border-color);
   border-radius: 10px;
 }
+.filters.filters.for-cats {
+  width: 100% !important;
+  border: none;
+}
 .filters.filters.for-cats,
 .filters.for-cats:has(.menu.active) {
   width: 100%;
@@ -337,7 +339,7 @@ p.have-problem {
 .form-holder.create-ad textarea {
   height: 160px;
 }
-.filters.for-cats  input {
+.filters.for-cats input {
   padding: 0 !important;
 }
 @media (max-width: 992px) {

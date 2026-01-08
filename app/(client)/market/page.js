@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import AdsCard from "@/components/home/AdsCard";
-import DynamicFilters from "@/components/home/DynamicFilters";
+import DynamicFilters from "@/components/Tools/data-collector/DynamicFilters";
 import ActiveFiltersBar from "@/components/home/ActiveFiltersBar";
 import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
 import Pagination from "@/components/Tools/Pagination";
@@ -10,13 +10,50 @@ import { ads, apartmentForSaleFields } from "@/data";
 import { settings } from "@/Contexts/settings";
 import { useSearchParams } from "next/navigation";
 import { IoFilterSharp } from "react-icons/io5";
+import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import { FaListUl } from "react-icons/fa";
+import { IoGrid } from "react-icons/io5";
+import { CiBoxList } from "react-icons/ci";
+import { IoGridOutline } from "react-icons/io5";
+import { BsGridFill } from "react-icons/bs";
 
 export default function Marketplace() {
+  const defaultOptions = [
+    {
+      id: "newest",
+      name: { en: "Publish Date: Newest", ar: "تاريخ النشر: الأحدث" },
+    },
+    {
+      id: "oldest",
+      name: { en: "Publish Date: Oldest", ar: "تاريخ النشر: الأقدم" },
+    },
+    {
+      id: "price_low",
+      name: { en: "Price: Low to High", ar: "السعر: من الأقل للأعلى" },
+    },
+    {
+      id: "price_high",
+      name: { en: "Price: High to Low", ar: "السعر: من الأعلى للأقل" },
+    },
+    {
+      id: "title_az",
+      name: { en: "Ads Titles: A to Z", ar: "عناوين الاعلانات: من أ إلى ي" },
+    },
+    {
+      id: "title_za",
+      name: { en: "Ads Titles: Z to A", ar: "عناوين الاعلانات: من ي إلى أ" },
+    },
+  ];
   const { screenSize, locale } = useContext(settings);
   const searchParams = useSearchParams();
 
   const [data] = useState(ads);
   const [openFilters, setOpenFilters] = useState(false);
+  const [listGridOption, setListGridOption] = useState("grid");
+
+  const handleListGridOption = (type) => {
+    setListGridOption((prev) => (prev == type ? "" : type));
+  };
 
   // ✅ قراءة الفئات من URL
   const catParam = searchParams.get("cat");
@@ -32,6 +69,9 @@ export default function Marketplace() {
     priceRange: [0, 10000],
     dynamicFilters: {},
   });
+
+  const [orderBy, setOrderBy] = useState(defaultOptions[0]); // الافتراضي الأحدث
+  const [orderOpen, setOrderOpen] = useState(false);
 
   // ✅ تحديث الفلترات عند تغيير URL
   useEffect(() => {
@@ -120,7 +160,6 @@ export default function Marketplace() {
     });
   };
 
-  // ✅ حساب عدد الفلترات النشطة
   const hasActivePriceFilter =
     allFilters.priceRange[0] !== 0 || allFilters.priceRange[1] !== 10000;
   const hasActiveDynamicFilters =
@@ -133,24 +172,7 @@ export default function Marketplace() {
     Object.keys(allFilters.dynamicFilters).length;
 
   return (
-    <div className="fluid-container marketplace">
-      {/* ✅ زر فتح الفلترات للشاشات الصغيرة */}
-      {screenSize !== "large" && activeFiltersCount > 0 && (
-        <div className="mobile-filters-header">
-          <button
-            className="open-filters-btn"
-            onClick={() => setOpenFilters(true)}
-          >
-            <IoFilterSharp />
-            <span>
-              {locale === "ar" ? "الفلترات" : "Filters"}
-              {activeFiltersCount > 0 && ` (${activeFiltersCount})`}
-            </span>
-          </button>
-        </div>
-      )}
-
-      {/* ✅ عرض الفئات إذا لم تكن هناك فئة مختارة */}
+    <>
       {!hasSelectedCategory && (
         <CategoriesSwiper
           type="cat"
@@ -158,8 +180,6 @@ export default function Marketplace() {
           showControls={true}
         />
       )}
-
-      {/* ✅ عرض الفئات الفرعية إذا كانت هناك فئة مختارة */}
       {selectedCategory.cat && !selectedCategory.subCat && (
         <CategoriesSwiper
           type="sub-cat"
@@ -168,10 +188,8 @@ export default function Marketplace() {
           showControls={true}
         />
       )}
-
-      <div className="content">
-        {/* ✅ الفلترات الجانبية للشاشات الكبيرة */}
-        {screenSize === "large" && (
+      <div className="fluid-container marketplace">
+        <div className="content">
           <DynamicFilters
             dynamicFilters={apartmentForSaleFields}
             selectedFilters={allFilters.dynamicFilters}
@@ -183,56 +201,87 @@ export default function Marketplace() {
             priceRange={allFilters.priceRange}
             setPriceRange={handlePriceChange}
           />
-        )}
 
-        {/* ✅ المحتوى الرئيسي */}
-        <div className="main">
-          {/* ✅ شريط الفلترات النشطة */}
-          {activeFiltersCount > 0 && (
-            <ActiveFiltersBar
-              selectedCategory={selectedCategory}
-              dynamicFilters={allFilters.dynamicFilters}
-              priceRange={allFilters.priceRange}
-              onRemoveCategory={handleRemoveCategory}
-              onRemoveFilter={handleRemoveFilter}
-              onClearAll={handleClearAllFilters}
-              onOpenFilters={() => setOpenFilters(true)}
-              locale={locale}
+          <div className="main">
+            <div className="top-nav">
+              <ActiveFiltersBar
+                selectedCategory={selectedCategory}
+                dynamicFilters={allFilters.dynamicFilters}
+                priceRange={allFilters.priceRange}
+                onRemoveCategory={handleRemoveCategory}
+                onRemoveFilter={handleRemoveFilter}
+                onClearAll={handleClearAllFilters}
+                onOpenFilters={() => setOpenFilters(true)}
+                locale={locale}
+                screenSize={screenSize}
+                fieldDefinitions={apartmentForSaleFields}
+              />
+              <div className="row-holder">
+                <div className="filters for-cats">
+                  <div className="btn">
+                    <h4
+                      className="ellipsis"
+                      onClick={() => setOrderOpen((prev) => !prev)}
+                    >
+                      {orderBy.name[locale]}
+                    </h4>
+
+                    <IoFilterSharp
+                      className="main-ico"
+                      onClick={() => setOrderOpen((prev) => !prev)}
+                    />
+                  </div>
+
+                  {orderOpen && (
+                    <div className="menu active">
+                      {defaultOptions.map((item) => {
+                        const isActive = orderBy.id === item.id;
+
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={isActive ? "active" : ""}
+                            onClick={() => {
+                              setOrderBy(item);
+                              setOrderOpen(false);
+                            }}
+                          >
+                            {item.name[locale]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="grid-option">
+                  <BsGridFill
+                    className={`${listGridOption == "grid" ? "active" : ""}`}
+                    onClick={() => handleListGridOption("grid")}
+                  />
+                  <FaListUl
+                    className={`${listGridOption == "list" ? "active" : ""}`}
+                    onClick={() => handleListGridOption("list")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid-holder">
+              {data.map((item, index) => (
+                <AdsCard key={item.id || index} data={item} />
+              ))}
+            </div>
+
+            {/* ✅ الترقيم */}
+            <Pagination
+              pageCount={50}
               screenSize={screenSize}
-              fieldDefinitions={apartmentForSaleFields} // ✅ هذا مهم جداً!
+              onPageChange={() => {}}
             />
-          )}
-
-          {/* ✅ الفلترات المنبثقة للشاشات الصغيرة */}
-          {screenSize !== "large" && (
-            <DynamicFilters
-              dynamicFilters={apartmentForSaleFields}
-              selectedFilters={allFilters.dynamicFilters}
-              setSelectedFilters={handleDynamicFilterChange}
-              screenSize={screenSize}
-              active={openFilters}
-              setActive={setOpenFilters}
-              locale={locale}
-              priceRange={allFilters.priceRange}
-              setPriceRange={handlePriceChange}
-            />
-          )}
-
-          {/* ✅ عرض الإعلانات */}
-          <div className="grid-holder">
-            {data.map((item, index) => (
-              <AdsCard key={item.id || index} data={item} />
-            ))}
           </div>
-
-          {/* ✅ الترقيم */}
-          <Pagination
-            pageCount={50}
-            screenSize={screenSize}
-            onPageChange={() => {}}
-          />
         </div>
       </div>
-    </div>
+    </>
   );
 }

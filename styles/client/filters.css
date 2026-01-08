@@ -5,47 +5,18 @@
   height: fit-content;
   padding: 17px 0;
   transition: all 0.3s;
-  max-height: 848px;
-  overflow: auto;
-  position: sticky;
-  top: 80px;
-  overflow-x: hidden;
-}
-.filters.biger-hight {
-  max-height: 890px;
-}
-.filters::-webkit-scrollbar {
-  width: 4px;
-  height: 8px;
-}
-.filters::-moz-scrollbar {
-  width: 4px;
-  height: 8px;
-}
-.filters::-ms-scrollbar {
-  width: 4px;
-  height: 8px;
-}
-.filters::-webkit-scrollbar-track {
-  background: var(--section-color);
-}
-.filters::-moz-scrollbar-track {
-  background: var(--section-color);
-}
-.filters::-ms-scrollbar-track {
-  background: var(--section-color);
 }
 .filters .close {
-  position: absolute;
-  right: 15px;
-  top: 15px;
   color: var(--paragraph);
+  border-radius: 5px;
   width: 30px;
   height: 29px;
-  border-radius: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 .filters .close:hover {
-  background: #c23737;
+  background: var(--red-color);
   color: white;
 }
 .filters .holder {
@@ -154,9 +125,9 @@
   flex: 1;
   min-width: max-content;
   border: 1px solid var(--border-color);
-  padding: 7px 12px;
+  padding: 7px 14px;
   border-radius: 37px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .marketplace .filters .filter-option:hover,
 .marketplace .filters .filter-option.active {
@@ -204,13 +175,14 @@
 
 @media (max-width: 992px) {
   .filters {
-    position: fixed;
-    background: white;
     z-index: 10;
+    background: #fff;
+    border-radius: 1px;
     height: 100%;
-    left: 0;
+    overflow: auto;
+    position: fixed;
     top: 0;
-    border-radius: 20px;
+    left: 0;
     transform: translateX(-100%);
   }
   .filters.active {

@@ -116,21 +116,13 @@ export default function CategoriesSwiper({
     data.length > maxSlides && screenSize !== "small" && showControls;
 
   return (
-    <div className="swiper-section container cats">
+    <div
+      className={`swiper-section container cats ${
+        type == "sub-cat" ? "sub-cat" : ""
+      }`}
+    >
       <div className="top">
         <h3 className="title">{title}</h3>
-
-        {/* ✅ عرض الفئة المختارة الحالية */}
-        {selectedItem && (
-          <div className="selected-indicator">
-            <button
-              className="clear-selection"
-              onClick={() => handleSelect({ id: selectedItem })}
-            >
-              {locale === "ar" ? "مسح" : "Clear"}
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="swiper-holder">
@@ -161,7 +153,7 @@ export default function CategoriesSwiper({
           breakpoints={breakpoints}
         >
           {data.map((item) => {
-            const isSelected = selectedItem === item.id;
+            const isSelected = selectedItem == item.id;
             const hasSubcats = type === "cat" && hasSubcategories(item.id);
 
             return (

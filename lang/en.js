@@ -188,7 +188,7 @@ const en = {
     createAccountBtn: "Create account",
     verifyPhoneBtn: "Verify phone",
     verifyEmailBtn: "Verify email",
-    forgetPassBtn: "تأكيد ملكية الحساب",
+    forgetPassBtn: "Verify Account Ownership",
     finishAccount: "Finish account",
     next: "Next",
     skip: "Skip",

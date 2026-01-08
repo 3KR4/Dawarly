@@ -25,9 +25,8 @@ import OtpInputs from "@/components/Tools/Otp";
 
 export default function Register() {
   const t = useTranslate();
-  const auth = t.auth; // استدعاء الترجمات
+  const auth = t.auth;
 
-  const [isLoginPage, setIsLoginPage] = useState(false);
   const STEPS = {
     ACCOUNT: 1,
     PHONE_VERIFY: 2,
@@ -39,6 +38,7 @@ export default function Register() {
     FORGET_PASS_VERIFY: 8,
     VIEW_OR_UPDATE_PASS: 9,
   };
+
   const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
     gov: null,
@@ -61,7 +61,7 @@ export default function Register() {
 
   const password = watch("password", "");
   const [passEye, setPassEye] = useState({ password: false, confirm: false });
-
+  const newPassValue = watch("newPass");
   /* ================= HELPERS ================= */
   const handleAddress = (type, value) => {
     setUserAddress((prev) => ({ ...prev, [type]: value }));
@@ -88,7 +88,7 @@ export default function Register() {
 
   /* ================= SUBMIT ================= */
   const onSubmit = (data) => {
-    if (isLoginPage) {
+    if (step === STEPS.LOGIN) {
       console.log("LOGIN DATA", data);
       return;
     }
@@ -116,14 +116,12 @@ export default function Register() {
       setStep(STEPS.INTERESTS);
       return;
     }
-    if (step === STEPS.LOGIN) {
-      setStep(STEPS.FORGET_PASS);
-      return;
-    }
+
     if (step === STEPS.FORGET_PASS) {
       setStep(STEPS.FORGET_PASS_VERIFY);
       return;
     }
+
     if (step === STEPS.FORGET_PASS_VERIFY) {
       setStep(STEPS.VIEW_OR_UPDATE_PASS);
       return;
@@ -138,7 +136,7 @@ export default function Register() {
 
   const titles = {
     [STEPS.ACCOUNT]: auth.createAccount,
-    [STEPS.LOGIN]: auth.createAccount,
+    [STEPS.LOGIN]: auth.loginToAccount,
     [STEPS.PHONE_VERIFY]: auth.verifyPhone,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmail,
     [STEPS.FORGET_PASS_VERIFY]: auth.forgetPass,
@@ -150,6 +148,7 @@ export default function Register() {
 
   const descriptions = {
     [STEPS.ACCOUNT]: auth.accountDescription,
+    [STEPS.LOGIN]: auth.loginDescription || "",
     [STEPS.PHONE_VERIFY]: auth.phoneDescription,
     [STEPS.EMAIL_VERIFY]: auth.emailDescription,
     [STEPS.FORGET_PASS_VERIFY]:
@@ -162,12 +161,14 @@ export default function Register() {
 
   const buttonLabels = {
     [STEPS.ACCOUNT]: auth.createAccountBtn,
+    [STEPS.LOGIN]: auth.login,
     [STEPS.PHONE_VERIFY]: auth.verifyPhoneBtn,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmailBtn,
     [STEPS.FORGET_PASS_VERIFY]: auth.forgetPassBtn,
     [STEPS.FORGET_PASS]: auth.sendCode,
-    [STEPS.VIEW_OR_UPDATE_PASS]:
-      auth.skip_and_continue || auth.update_pass_and_continue,
+    [STEPS.VIEW_OR_UPDATE_PASS]: newPassValue
+      ? auth.update_pass_and_continue
+      : auth.login,
     [STEPS.INTERESTS]: auth.finishAccount,
   };
 
@@ -178,8 +179,9 @@ export default function Register() {
           <h1>{titles[step]}</h1>
           <p>{descriptions[step]}</p>
         </div>
+
         {/* ================= LOGIN ================= */}
-        {isLoginPage && (
+        {step === STEPS.LOGIN && (
           <>
             <div className="box forInput">
               <label>{auth.emailPhoneLogin}</label>
@@ -248,9 +250,7 @@ export default function Register() {
             <div
               className="have-problem"
               onClick={() => {
-                setIsLoginPage((p) => !p);
                 setStep(STEPS.FORGET_PASS);
-                setIsLoginPage(false);
                 reset();
               }}
             >
@@ -259,8 +259,9 @@ export default function Register() {
             </div>
           </>
         )}
+
         {/* ================= REGISTER STEP 1 ================= */}
-        {!isLoginPage && step === STEPS.ACCOUNT && (
+        {step === STEPS.ACCOUNT && (
           <>
             <div className="box forInput">
               <label>{auth.fullName}</label>
@@ -447,7 +448,8 @@ export default function Register() {
             </div>
           </>
         )}
-        {/* ================= REGISTER STEP 2 / 3 / 7 ================= */}
+
+        {/* ================= FORGET PASSWORD METHOD SELECTION ================= */}
         {step === STEPS.FORGET_PASS && (
           <div className="options-grid verfiyMethod">
             {/* ===== Email ===== */}
@@ -489,6 +491,8 @@ export default function Register() {
             </div>
           </div>
         )}
+
+        {/* ================= VIEW/UPDATE PASSWORD ================= */}
         {step === STEPS.VIEW_OR_UPDATE_PASS && (
           <>
             <div className="box forInput">
@@ -529,7 +533,11 @@ export default function Register() {
                   <input
                     type={passEye.password ? "text" : "password"}
                     {...register("newPass", {
-                      required: auth.errors.requiredPassword,
+                      pattern: {
+                        value:
+                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
+                        message: t.auth.errors.passwordWeak,
+                      },
                     })}
                     placeholder={auth.placeholders.newPassword}
                   />
@@ -559,13 +567,16 @@ export default function Register() {
             </div>
           </>
         )}
+
+        {/* ================= OTP VERIFICATION ================= */}
         {(step === STEPS.PHONE_VERIFY ||
           step === STEPS.EMAIL_VERIFY ||
           step === STEPS.FORGET_PASS_VERIFY) && (
           <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
         )}
-        {/* ================= REGISTER STEP 4 ================= */}
-        {!isLoginPage && step === STEPS.ADDRESS && (
+
+        {/* ================= ADDRESS SELECTION ================= */}
+        {step === STEPS.ADDRESS && (
           <>
             <SelectOptions
               label={t.location.yourGovernorate}
@@ -592,8 +603,9 @@ export default function Register() {
             />
           </>
         )}
-        {/* ================= REGISTER STEP 5 ================= */}
-        {!isLoginPage && step === STEPS.INTERESTS && (
+
+        {/* ================= INTERESTS SELECTION ================= */}
+        {step === STEPS.INTERESTS && (
           <div className="options-grid">
             {categories.map((cat) => {
               const Icon = cat.icon;
@@ -612,22 +624,19 @@ export default function Register() {
             })}
           </div>
         )}
-        {/* ================= BUTTON ================= */}
+
+        {/* ================= SUBMIT BUTTON ================= */}
         <button type="submit" className="main-button">
-          {isLoginPage
-            ? auth.login
-            : step === STEPS.ADDRESS
-            ? userAddress.gov || userAddress.city
-              ? auth.next
-              : auth.skip
-            : buttonLabels[step]}
+          {buttonLabels[step]}
         </button>
-        {(isLoginPage || step === STEPS.ACCOUNT) && (
+
+        {/* ================= SOCIAL LOGIN ================= */}
+        {(step === STEPS.ACCOUNT || step === STEPS.LOGIN) && (
           <>
             <div className="otherWay">
               <hr />
               <span>
-                {isLoginPage ? auth.orLoginWith : auth.orContinueWith}
+                {step === STEPS.LOGIN ? auth.orLoginWith : auth.orContinueWith}
               </span>
               <hr />
             </div>
@@ -644,18 +653,19 @@ export default function Register() {
             </div>
           </>
         )}
+
+        {/* ================= SWITCH BETWEEN LOGIN/REGISTER ================= */}
         {(step === STEPS.ACCOUNT || step === STEPS.LOGIN) && (
           <div
             className="have-problem"
             onClick={() => {
-              setIsLoginPage((p) => !p);
-              setStep((prev) => (prev = 6 ? 1 : 6));
+              setStep(step === STEPS.ACCOUNT ? STEPS.LOGIN : STEPS.ACCOUNT);
               reset();
             }}
           >
-            {isLoginPage ? auth.noAccount : auth.haveAccount}{" "}
+            {step === STEPS.LOGIN ? auth.noAccount : auth.haveAccount}{" "}
             <span className="mineLink">
-              {isLoginPage ? auth.createAccountBtn : auth.login}
+              {step === STEPS.LOGIN ? auth.createAccountBtn : auth.login}
             </span>
           </div>
         )}
