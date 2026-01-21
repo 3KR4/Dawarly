@@ -4,10 +4,9 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
-
 import governorates from "@/data/governorates.json";
 import cities from "@/data/cities.json";
-import { categories } from "@/data";
+import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -23,10 +22,30 @@ import {
   CircleAlert,
 } from "lucide-react";
 import OtpInputs from "@/components/Tools/Otp";
+import { settings } from "@/Contexts/settings";
 
 export default function Register() {
   const t = useTranslate();
+  const { locale } = useContext(settings);
   const auth = t.auth;
+
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setCategories(locale == "en" ? categoriesEn : categoriesAr);
+    };
+    fetchCategories();
+  }, [locale]);
 
   const STEPS = {
     ACCOUNT: 1,
@@ -40,7 +59,7 @@ export default function Register() {
     VIEW_OR_UPDATE_PASS: 9,
   };
 
-  const [step, setStep] = useState(STEPS.ADDRESS);
+  const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
@@ -69,12 +88,12 @@ export default function Register() {
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id
+    (c) => c.governorate_id === userAddress.gov?.id,
   );
 
   const toggleCategory = (id) => {
     setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
   };
 

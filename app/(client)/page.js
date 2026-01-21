@@ -11,11 +11,12 @@ export default function Home() {
       <CategoriesSwiper type={`cat`} />
       {/* <CategoriesSwiper type={`sub-cat`} catId={3} /> */}
       <AdsSwiper type={`newest`} />
-      <AdsSwiper type={`cat`} id={1}/>
-      <AdsSwiper type={`cat`} id={2}/>
-      <AdsSwiper type={`cat`} id={8}/>
-      <AdsSwiper type={`sub-cat`} id={101}/>
-      <AdsSwiper type={`sub-cat`} id={102}/>
+      <AdsSwiper type={`cat`} id={1} />
+      <AdsSwiper type={`cat`} id={2} />
+      <AdsSwiper type={`cat`} id={3} />
+      <AdsSwiper type={`sub-cat`} id={11} />
+      <AdsSwiper type={`sub-cat`} id={14} />
+      <AdsSwiper type={`sub-cat`} id={21} />
     </>
   );
 }

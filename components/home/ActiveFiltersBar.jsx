@@ -1,10 +1,17 @@
 "use client";
 import React from "react";
+import { useContext,useState ,useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 import "@/styles/client/pages/market.css";
 import useTranslate from "@/Contexts/useTranslation";
-import { categories, subcategories } from "@/data";
+import {
+  categoriesEn,
+  categoriesAr,
+  subcategoriesEn,
+  subcategoriesAr,
+} from "@/data";
 import { LuSettings2 } from "react-icons/lu";
+import { settings } from "@/Contexts/settings";
 
 const ActiveFiltersBar = ({
   selectedCategory,
@@ -14,11 +21,31 @@ const ActiveFiltersBar = ({
   onRemoveFilter,
   onClearAll,
   onOpenFilters,
-  locale,
-  screenSize,
   fieldDefinitions = [],
 }) => {
   const t = useTranslate();
+  const { locale, screenSize } = useContext(settings);
+
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setCategories(locale == "en" ? categoriesEn : categoriesAr);
+      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    };
+    fetchCategories();
+  }, [locale]);
+
   // دالة لعرض اسم الفلتر
   const getFilterDisplayName = (key, value) => {
     // فلتر السعر
@@ -75,7 +102,7 @@ const ActiveFiltersBar = ({
       case "radio":
         if (!value) return "";
         const radioOption = field.options.find(
-          (opt) => opt.value === value?.value || value
+          (opt) => opt.value === value?.value || value,
         );
         if (radioOption) {
           const displayLabel =
@@ -91,8 +118,8 @@ const ActiveFiltersBar = ({
               ? "نعم"
               : "Yes"
             : locale === "ar"
-            ? "لا"
-            : "No";
+              ? "لا"
+              : "No";
         return `${field.label[locale]}: ${displayValue}`;
 
       case "multiSelect":

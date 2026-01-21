@@ -18,7 +18,12 @@ import {
 import { FiSun } from "react-icons/fi";
 import { GrLanguage } from "react-icons/gr";
 import { usePathname } from "next/navigation";
-import { categories, subcategories } from "@/data";
+import {
+  categoriesEn,
+  subcategoriesEn,
+  categoriesAr,
+  subcategoriesAr,
+} from "@/data";
 import { LuMessageSquare } from "react-icons/lu";
 import { MdPostAdd } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
@@ -35,6 +40,26 @@ function Header() {
   // useEffect(() => {
   //   setActiveMenu(null);
   // }, [pathname]);
+
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setCategories(locale == "en" ? categoriesEn : categoriesAr);
+      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    };
+    fetchCategories();
+  }, [locale]);
 
   const [isLogin, setIsLogin] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
@@ -262,17 +287,17 @@ function Header() {
                 className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
                 ref={menuRef2}
               >
-                {firstCategories.map((cat) => {
-                  const isActive = activeSubCat === cat.id;
-                  const Icon = cat.icon;
+                {firstCategories?.map((cat) => {
+                  const isActive = activeSubCat === cat?.id;
+                  const Icon = cat?.icon;
 
                   return (
                     <div
-                      key={cat.id}
+                      key={cat?.id}
                       className="cat-item"
                       onMouseEnter={
                         screenSize !== "small"
-                          ? () => openMenu(cat.id)
+                          ? () => openMenu(cat?.id)
                           : undefined
                       }
                       onMouseLeave={
@@ -281,17 +306,17 @@ function Header() {
                     >
                       <Link
                         href={`/market${
-                          screenSize !== "small" ? `?cat=${cat.id}` : ""
+                          screenSize !== "small" ? `?cat=${cat?.id}` : ""
                         }`}
                         onClick={(e) => {
                           if (screenSize !== "large") {
                             e.preventDefault();
-                            toggleMenu(cat.id);
+                            toggleMenu(cat?.id);
                           }
                         }}
                       >
-                        <Icon />
-                        {t.categories[cat.name]}
+                        {Icon ? <Icon /> : null}
+                        {cat?.name}
                         <FaAngleDown />
                       </Link>
 
@@ -300,7 +325,7 @@ function Header() {
                           className="menu active"
                           onMouseEnter={
                             screenSize !== "small"
-                              ? () => openMenu(cat.id)
+                              ? () => openMenu(cat?.id)
                               : undefined
                           }
                           onMouseLeave={
@@ -309,13 +334,13 @@ function Header() {
                         >
                           <div className="sub-cats">
                             {subcategories
-                              .filter((x) => x.categoryId === cat.id)
+                              .filter((x) => x.categoryId === cat?.id)
                               .map((sub) => (
                                 <Link
                                   key={sub.id}
                                   href={`/market?subcat=${sub.id}`}
                                 >
-                                  {t.subcategories[sub.name]}
+                                  {sub.name}
                                 </Link>
                               ))}
                           </div>
@@ -366,17 +391,17 @@ function Header() {
                         <div className="sub-cats">
                           {secondCategories.map((otherCat) => (
                             <Link
-                              key={otherCat.id}
+                              key={otherCat?.id}
                               href={`/market${
                                 screenSize !== "small"
-                                  ? `?cat=${otherCat.id}`
+                                  ? `?cat=${otherCat?.id}`
                                   : ""
                               }`}
                               onClick={() => {
                                 if (screenSize !== "large") closeMenu();
                               }}
                             >
-                              {t.categories[otherCat.name]}
+                              {otherCat?.name}
                             </Link>
                           ))}
                         </div>

@@ -60,7 +60,7 @@ const DynamicFilters = ({
     return (
       <div className="filter-field" key={field.key}>
         <div className="filter-header">
-          <h4>{field.label[locale]}</h4>
+          <h4>{field.label}</h4>
         </div>
 
         <div className="price-input">
@@ -95,13 +95,13 @@ const DynamicFilters = ({
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label[locale]}</h4>
+              <h4>{field.label}</h4>
             </div>
             <div className="select-options">
               {field.options.map((option) => {
                 const displayName =
                   typeof option.name === "object"
-                    ? option.name[locale]
+                    ? option.name
                     : option.name;
                 const isSelected = value?.id === option.id;
                 return (
@@ -124,11 +124,11 @@ const DynamicFilters = ({
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label[locale]}</h4>
+              <h4>{field.label}</h4>
             </div>
             <div className="radio-options">
               {field.options.map((option) => {
-                const displayLabel = option.label?.[locale] || option.value;
+                const displayLabel = option.label || option.value;
                 const isSelected = value?.value === option.value;
                 return (
                   <button
@@ -150,7 +150,7 @@ const DynamicFilters = ({
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label[locale]}</h4>
+              <h4>{field.label}</h4>
             </div>
             <div className="boolean-options">
               <button
@@ -178,11 +178,11 @@ const DynamicFilters = ({
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label[locale]}</h4>
+              <h4>{field.label}</h4>
             </div>
             <div className="multiselect-options">
               {field.options.map((option) => {
-                const displayLabel = option.label?.[locale] || option.value;
+                const displayLabel = option.label || option.value;
                 const isSelected = currentValues.includes(option.value);
                 return (
                   <button

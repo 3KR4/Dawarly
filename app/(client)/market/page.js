@@ -6,7 +6,7 @@ import ActiveFiltersBar from "@/components/home/ActiveFiltersBar";
 import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
 import Pagination from "@/components/Tools/Pagination";
 import "@/styles/client/pages/market.css";
-import { ads, apartmentForSaleFields } from "@/data";
+import { ads, propertiesFiltersEn, propertiesFiltersAr } from "@/data";
 import { settings } from "@/Contexts/settings";
 import { useSearchParams } from "next/navigation";
 import { IoFilterSharp } from "react-icons/io5";
@@ -50,6 +50,26 @@ export default function Marketplace() {
   const [data] = useState(ads);
   const [openFilters, setOpenFilters] = useState(false);
   const [listGridOption, setListGridOption] = useState("grid");
+
+  const [dynamicFilters, setDynamicFilters] = useState([]);
+
+  useEffect(() => {
+    const fetchdynamicFilters = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setDynamicFilters(
+        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
+      );
+    };
+    fetchdynamicFilters();
+  }, [locale]);
 
   const handleListGridOption = (type) => {
     setListGridOption((prev) => (prev == type ? "" : type));
@@ -191,7 +211,7 @@ export default function Marketplace() {
       <div className="fluid-container marketplace">
         <div className="content">
           <DynamicFilters
-            dynamicFilters={apartmentForSaleFields}
+            dynamicFilters={dynamicFilters}
             selectedFilters={allFilters.dynamicFilters}
             setSelectedFilters={handleDynamicFilterChange}
             screenSize={screenSize}
@@ -212,9 +232,8 @@ export default function Marketplace() {
                 onRemoveFilter={handleRemoveFilter}
                 onClearAll={handleClearAllFilters}
                 onOpenFilters={() => setOpenFilters(true)}
-                locale={locale}
                 screenSize={screenSize}
-                fieldDefinitions={apartmentForSaleFields}
+                fieldDefinitions={dynamicFilters}
               />
               <div className="row-holder">
                 <div className="filters for-cats">

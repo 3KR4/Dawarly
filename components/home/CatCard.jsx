@@ -5,9 +5,6 @@ import useTranslate from "@/Contexts/useTranslation";
 function CatCard({ data, type, position, activeClass, onSelect }) {
   const t = useTranslate();
 
-  const name =
-    type === "cat" ? t.categories?.[data?.name] : t.subcategories?.[data?.name];
-
   const link =
     type === "cat" ? `/market?cat=${data?.id}` : `/market?subcat=${data?.id}`;
 
@@ -16,7 +13,7 @@ function CatCard({ data, type, position, activeClass, onSelect }) {
   const Content = (
     <>
       {Icon && <Icon className="cat-icon" />}
-      <h4 className="cat-name">{name}</h4>
+      <h4 className="cat-name">{data?.name}</h4>
     </>
   );
   if (position === "when-create-ad") {

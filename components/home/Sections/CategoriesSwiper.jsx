@@ -5,7 +5,12 @@ import "swiper/css";
 import "@/styles/client/sections/ads-swiper.css";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import useTranslate from "@/Contexts/useTranslation";
-import { categories, subcategories } from "@/data";
+import {
+  categoriesEn,
+  subcategoriesEn,
+  categoriesAr,
+  subcategoriesAr,
+} from "@/data";
 import CatCard from "@/components/home/CatCard";
 import { settings } from "@/Contexts/settings";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -26,6 +31,26 @@ export default function CategoriesSwiper({
   const [isEnd, setIsEnd] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setCategories(locale == "en" ? categoriesEn : categoriesAr);
+      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    };
+    fetchCategories();
+  }, [locale]);
+
   // ✅ قراءة الـ URL عند التحميل
   useEffect(() => {
     if (type === "cat") {
@@ -40,7 +65,7 @@ export default function CategoriesSwiper({
       const subcatParam = searchParams.get("subcat");
       if (subcatParam) {
         const selectedSubcat = subcategories.find(
-          (sub) => sub.id == subcatParam
+          (sub) => sub.id == subcatParam,
         );
         if (selectedSubcat) {
           setSelectedItem(selectedSubcat.id);
@@ -108,7 +133,7 @@ export default function CategoriesSwiper({
 
   // 👇 نحسب أكبر قيمة من slidesPerView في أي breakpoint
   const maxSlides = Math.max(
-    ...Object.values(breakpoints).map((b) => b.slidesPerView)
+    ...Object.values(breakpoints).map((b) => b.slidesPerView),
   );
 
   // 👇 نظهر الـ navigation بس لو عدد العناصر أكبر من maxSlides

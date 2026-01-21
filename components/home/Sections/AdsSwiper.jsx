@@ -21,7 +21,7 @@ export default function AdsSwiper({ type, id }) {
   // ================= TITLE =================
   const computedTitle = useMemo(() => {
     if (type === "cat") {
-      const name = ads.find((ad) => ad.category?.id === id)?.category?.name;
+      const name = ads.find((ad) => ad.category == id)?.category?.name;
       return t.categories?.[name] || "";
     }
 

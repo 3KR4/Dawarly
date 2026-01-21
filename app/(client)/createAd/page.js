@@ -1,11 +1,18 @@
 "use client";
 import "@/styles/client/forms.css";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import governorates from "@/data/governorates.json";
 import cities from "@/data/cities.json";
-import { categories, subcategories, apartmentForSaleFields } from "@/data";
+import {
+  categoriesEn,
+  categoriesAr,
+  subcategoriesEn,
+  subcategoriesAr,
+  propertiesFiltersEn,
+  propertiesFiltersAr,
+} from "@/data";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import CatCard from "@/components/home/CatCard";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -16,7 +23,30 @@ import { settings } from "@/Contexts/settings";
 
 export default function CreateAd() {
   const { locale } = useContext(settings);
+
   const t = useTranslate();
+  const [dynamicFilters, setDynamicFilters] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  useEffect(() => {
+    const fetchdynamicFilters = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setDynamicFilters(
+        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
+      );
+      setCategories(locale == "en" ? categoriesEn : categoriesAr);
+      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    };
+    fetchdynamicFilters();
+  }, [locale]);
 
   const STEPS = {
     CATEGORIES: 1,
@@ -89,7 +119,7 @@ export default function CreateAd() {
       const newErrors = {};
       let hasErrors = false;
 
-      apartmentForSaleFields.forEach((field) => {
+      dynamicFilters.forEach((field) => {
         if (field.required) {
           const value = dynamicValues[field.key];
           let isEmpty = false;
@@ -108,14 +138,13 @@ export default function CreateAd() {
 
           if (isEmpty) {
             newErrors[field.key] =
-              field.requiredMessage?.[locale] ||
-              `${field.label[locale]} is required`;
+              field.requiredMessage || `${field.label} is required`;
             hasErrors = true;
           }
 
           if (field.uiType === "input" && field.validation?.pattern && value) {
             const pattern = field.validation.pattern.value;
-            const message = field.validation.pattern.message?.[locale];
+            const message = field.validation.pattern.message;
 
             if (!pattern.test(value.toString())) {
               newErrors[field.key] = message;
@@ -137,7 +166,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true
+        (v) => v === true,
       );
 
       if (!hasSelectedContact) {
@@ -174,7 +203,7 @@ export default function CreateAd() {
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id
+    (c) => c.governorate_id === userAddress.gov?.id,
   );
 
   const onSubmit = async (data) => {
@@ -211,7 +240,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true
+        (v) => v === true,
       );
       if (!hasSelectedContact) {
         setFieldErrors((prev) => ({
@@ -366,14 +395,14 @@ export default function CreateAd() {
         {/* ================= ALL_DETAILS STEP 4 ================= */}
         {step === STEPS.ALL_DETAILS && (
           <>
-            {/* ========== الحقول الديناميكية من apartmentForSaleFields ========== */}
-            {apartmentForSaleFields.map((field) => {
+            {/* ========== الحقول الديناميكية من dynamicFilters ========== */}
+            {dynamicFilters.map((field) => {
               /* ========== INPUT (المساحة، السعر، إلخ) ========== */
               if (field.uiType === "input") {
                 return (
                   <div className="box forInput" key={field.key}>
                     <label>
-                      {field.label[locale]}
+                      {field.label}
                       {field.required ? (
                         <span className="required">*</span>
                       ) : (
@@ -391,8 +420,7 @@ export default function CreateAd() {
 
                             if (field.validation?.pattern && value) {
                               const pattern = field.validation.pattern.value;
-                              const message =
-                                field.validation.pattern.message?.[locale];
+                              const message = field.validation.pattern.message;
 
                               if (!pattern.test(value)) {
                                 setFieldErrors((prev) => ({
@@ -413,11 +441,11 @@ export default function CreateAd() {
                             if (field.required && !value) {
                               setFieldErrors((prev) => ({
                                 ...prev,
-                                [field.key]: field.requiredMessage?.[locale],
+                                [field.key]: field.requiredMessage,
                               }));
                             }
                           }}
-                          placeholder={field.placeholder?.[locale]}
+                          placeholder={field.placeholder}
                         />
                       </div>
                       {fieldErrors[field.key] && (
@@ -436,10 +464,8 @@ export default function CreateAd() {
                 return (
                   <SelectOptions
                     key={field.key}
-                    label={field.label[locale]}
-                    placeholder={
-                      field.placeholder?.[locale] || field.label[locale]
-                    }
+                    label={field.label}
+                    placeholder={field.placeholder || field.label}
                     options={field.options}
                     value={dynamicValues[field.key] || ""}
                     tPath={field.tPath}
@@ -458,7 +484,7 @@ export default function CreateAd() {
                 return (
                   <div className="box forInput" key={field.key}>
                     <label>
-                      {field.label[locale]}
+                      {field.label}
                       {` `}
                       {field.required ? (
                         <span className="required">*</span>
@@ -468,8 +494,7 @@ export default function CreateAd() {
                     </label>
                     <div className="options-grid flex">
                       {field.options.map((option) => {
-                        const displayLabel =
-                          option.label?.[locale] || option.value;
+                        const displayLabel = option.label || option.value;
                         const isSelected =
                           dynamicValues[field.key]?.value === option.value;
 
@@ -503,7 +528,7 @@ export default function CreateAd() {
                 return (
                   <div className="box forInput" key={field.key}>
                     <label>
-                      {field.label[locale]}
+                      {field.label}
                       {` `}
                       {field.required ? (
                         <span className="required">*</span>
@@ -514,8 +539,7 @@ export default function CreateAd() {
                     <div className="options-grid flex">
                       {field.options?.map((option) => {
                         const displayLabel =
-                          option.label?.[locale] ||
-                          (option.value ? "Yes" : "No");
+                          option.label || (option.value ? "Yes" : "No");
                         const isSelected =
                           dynamicValues[field.key] === option.value;
 
@@ -572,7 +596,7 @@ export default function CreateAd() {
                 return (
                   <div className="box forInput" key={field.key}>
                     <label>
-                      {field.label[locale]}
+                      {field.label}
                       {` `}
                       {field.required ? (
                         <span className="required">*</span>
@@ -582,8 +606,7 @@ export default function CreateAd() {
                     </label>
                     <div className="options-grid flex">
                       {field.options.map((option) => {
-                        const displayLabel =
-                          option.label?.[locale] || option.value;
+                        const displayLabel = option.label || option.value;
                         const isActive = selectedValues.includes(option.value);
 
                         return (
@@ -597,8 +620,8 @@ export default function CreateAd() {
                                 handleDynamicChange(
                                   field.key,
                                   selectedValues.filter(
-                                    (v) => v !== option.value
-                                  )
+                                    (v) => v !== option.value,
+                                  ),
                                 );
                               } else {
                                 handleDynamicChange(field.key, [

@@ -125,7 +125,7 @@
   flex: 1;
   min-width: max-content;
   border: 1px solid var(--border-color);
-  padding: 7px 14px;
+  padding: 7px 9px;
   border-radius: 37px;
   font-size: 13px;
 }

@@ -687,6 +687,10 @@ a {
   transition: 0.3s;
   background: var(--section-color);
 }
+[lang = "ar"] .filters.for-cats button {
+  text-align: right;
+
+}
 .filters.for-cats button:hover,
 .filters.for-cats button.active {
   background: var(--hover-color);
