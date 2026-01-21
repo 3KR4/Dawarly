@@ -12,7 +12,13 @@ import AdsCard from "@/components/home/AdsCard";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import useTranslate from "@/Contexts/useTranslation";
 
-import { ads } from "@/data";
+import {
+  ads,
+  subcategoriesEn,
+  subcategoriesAr,
+  categoriesEn,
+  categoriesAr,
+} from "@/data";
 
 export default function AdsSwiper({ type, id }) {
   const { locale, screenSize } = useContext(settings);
@@ -20,32 +26,37 @@ export default function AdsSwiper({ type, id }) {
 
   // ================= TITLE =================
   const computedTitle = useMemo(() => {
+    const categories = locale == "en" ? categoriesEn : categoriesAr;
+
     if (type === "cat") {
-      const name = ads.find((ad) => ad.category == id)?.category?.name;
-      return t.categories?.[name] || "";
+      const curentCat = categories?.find((x) => x.id == id);
+
+      return curentCat || "";
     }
+
+    const subcategories = locale == "en" ? subcategoriesEn : subcategoriesAr;
 
     if (type === "sub-cat") {
-      const name = ads.find((ad) => ad.sub_category?.id === id)?.sub_category
-        ?.name;
-      return t.subcategories?.[name] || "";
+      const curentSubCat = subcategories?.find((x) => x.id == id);
+
+      return curentSubCat || "";
     }
 
-    if (type === "newest") {
-      return t.home.newestAds || locale == "en" ? "newest" : "نشر حديثا";
+    if (type === "newly_added") {
+      return t.home.newestAds;
     }
 
     return "";
-  }, [type, id, t]);
+  }, [type, id, locale]);
 
   // ================= FILTERED ADS =================
   const filteredAds = useMemo(() => {
     if (type === "cat") {
-      return ads.filter((ad) => ad.category?.id === id);
+      return ads.filter((ad) => ad.category === id);
     }
 
     if (type === "sub-cat") {
-      return ads.filter((ad) => ad.sub_category?.id === id);
+      return ads.filter((ad) => ad.sub_category === id);
     }
 
     if (type === "newest") {
@@ -103,7 +114,7 @@ export default function AdsSwiper({ type, id }) {
 
   // 👇 نحسب أكبر قيمة من slidesPerView في أي breakpoint
   const maxSlides = Math.max(
-    ...Object.values(breakpoints).map((b) => b.slidesPerView)
+    ...Object.values(breakpoints).map((b) => b.slidesPerView),
   );
 
   // 👇 نظهر الـ navigation بس لو عدد الإعلانات أكبر من maxSlides
@@ -162,7 +173,7 @@ export default function AdsSwiper({ type, id }) {
         }
 
         setVisibleCount((prevCount) =>
-          Math.min(prevCount + increment, TOTAL_ADS)
+          Math.min(prevCount + increment, TOTAL_ADS),
         );
 
         return nextFetch;
@@ -190,7 +201,7 @@ export default function AdsSwiper({ type, id }) {
       }
 
       setVisibleCount((prevCount) =>
-        Math.min(prevCount + increment, TOTAL_ADS)
+        Math.min(prevCount + increment, TOTAL_ADS),
       );
 
       setTimeout(() => {
@@ -239,7 +250,7 @@ export default function AdsSwiper({ type, id }) {
     return (
       <div className="swiper-section for-ads container">
         <div className="top">
-          <h3 className="title">{computedTitle}</h3>
+          <h3 className="title">{computedTitle?.name}</h3>
         </div>
         <div className="no-ads-message">
           <p>{t.home.noAdsFound}</p>
@@ -252,15 +263,15 @@ export default function AdsSwiper({ type, id }) {
     <div className="swiper-section for-ads container">
       {/* ===== Top ===== */}
       <div className="top">
-        <h3 className="title">{computedTitle}</h3>
+        <h3 className="title">{computedTitle?.name}</h3>
         {showNav && (
           <Link
             href={
               type === "cat"
                 ? `/category/${id}`
                 : type === "sub-cat"
-                ? `/category?subcat=${id}`
-                : "/ads"
+                  ? `/category?subcat=${id}`
+                  : "/ads"
             }
             className="link"
           >

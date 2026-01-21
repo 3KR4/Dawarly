@@ -87,12 +87,15 @@
 .ad-card .image-holder .top .info span:empty {
   display: none;
 }
-
 .ad-card .body {
   flex-direction: column;
   gap: 7px;
   padding: 13px 15px 11px;
   display: flex;
+  background: var(--body-color);
+  border-radius: 20px 20px 0 0;
+  margin-top: -20px;
+  z-index: 1;
 }
 .ad-card .body .row-holder {
   display: flex;

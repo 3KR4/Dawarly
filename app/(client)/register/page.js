@@ -1,11 +1,13 @@
 "use client";
 import "@/styles/client/forms.css";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
-import governorates from "@/data/governorates.json";
-import cities from "@/data/cities.json";
+import governoratesEn from "@/data/governoratesEn.json";
+import governoratesAr from "@/data/governoratesAr.json";
+import citiesEn from "@/data/citiesEn.json";
+import citiesAr from "@/data/citiesAr.json";
 import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 
@@ -30,6 +32,8 @@ export default function Register() {
   const auth = t.auth;
 
   const [categories, setCategories] = useState([]);
+  const [governorates, setGovernorates] = useState([]);
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -43,6 +47,8 @@ export default function Register() {
       //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
       // }
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
+      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
+      setCities(locale == "en" ? citiesEn : citiesAr);
     };
     fetchCategories();
   }, [locale]);
@@ -59,7 +65,7 @@ export default function Register() {
     VIEW_OR_UPDATE_PASS: 9,
   };
 
-  const [step, setStep] = useState(STEPS.ACCOUNT);
+  const [step, setStep] = useState(STEPS.ADDRESS);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
@@ -659,7 +665,7 @@ export default function Register() {
                   onClick={() => toggleCategory(cat.id)}
                 >
                   <Icon className="cat-icon" />
-                  <span>{t.categories[cat.name]}</span>
+                  <span>{cat.name}</span>
                 </div>
               );
             })}

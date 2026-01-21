@@ -7,10 +7,11 @@ const ar = {
   },
   home: {
     seeMore: "رؤية المزيد",
-    categories: "categories",
-    subCategories: "sub categories",
+    categories: "الفئات",
+    subCategories: "الفئات الفرعية",
     browseCategories: "تصفح التصنيفات",
     browseSubCategories: "اختر من التصنيفات الفرعية",
+    newly_added: "المضاف حديثا",
   },
   create: {
     ad: {

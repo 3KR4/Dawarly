@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState, useEffect } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { settings } from "@/Contexts/settings";

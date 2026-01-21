@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import governorates from "@/data/governorates.json";
-import cities from "@/data/cities.json";
-import districts from "@/data/districts.json";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FaAngleDown,
   FaAngleLeft,
@@ -13,6 +10,12 @@ import {
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
 import useClickOutside from "@/Contexts/useClickOutside";
+import governoratesEn from "@/data/governoratesEn.json";
+import governoratesAr from "@/data/governoratesAr.json";
+import citiesEn from "@/data/citiesEn.json";
+import citiesAr from "@/data/citiesAr.json";
+import districtsEn from "@/data/districtsEn.json";
+import districtsAr from "@/data/districtsAr.json";
 
 function SelectLocation({ locale = "en", onSelect }) {
   const t = useTranslate();
@@ -21,6 +24,28 @@ function SelectLocation({ locale = "en", onSelect }) {
   const [selectedGovernorate, setSelectedGovernorate] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+
+  const [governorates, setGovernorates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
+      setCities(locale == "en" ? citiesEn : citiesAr);
+      setDistricts(locale == "en" ? districtsEn : districtsAr);
+    };
+    fetchCategories();
+  }, [locale]);
 
   const menuRef = useRef(null);
 
@@ -72,15 +97,15 @@ function SelectLocation({ locale = "en", onSelect }) {
                 />
               )}
 
-              <h5>
+              <div>
                 {currentPage === 1 && t.location.egyptGovernorates}
                 {currentPage === 2 && selectedGovernorate && (
-                  <>{t.governorates[selectedGovernorate.name]}</>
+                  <>{selectedGovernorate.name}</>
                 )}
                 {currentPage === 3 && selectedCity && (
-                  <>{t.cities[selectedCity.name]}</>
+                  <h5>{selectedCity.name}</h5>
                 )}
-              </h5>
+              </div>
             </div>
 
             {/* Search Input */}
@@ -90,14 +115,12 @@ function SelectLocation({ locale = "en", onSelect }) {
                 currentPage === 1
                   ? t.location.searchGovernorate
                   : currentPage === 2
-                  ? `${t.location.searchCity} ${
-                      selectedGovernorate
-                        ? t.governorates[selectedGovernorate.name]
-                        : ""
-                    }...`
-                  : `${t.location.searchCity} ${
-                      selectedCity ? t.cities[selectedCity.name] : ""
-                    }...`
+                    ? `${t.location.searchCity} ${
+                        selectedGovernorate ? selectedGovernorate.name : ""
+                      }...`
+                    : `${t.location.searchCity} ${
+                        selectedCity ? selectedCity.name : ""
+                      }...`
               }
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
@@ -109,11 +132,12 @@ function SelectLocation({ locale = "en", onSelect }) {
                 (currentPage === 1
                   ? governorates.length
                   : currentPage === 2
-                  ? cities.filter(
-                      (city) => city.governorate_id === selectedGovernorate?.id
-                    ).length
-                  : districts.filter((d) => d.city_id === selectedCity?.id)
-                      .length) < 11
+                    ? cities.filter(
+                        (city) =>
+                          city.governorate_id === selectedGovernorate?.id,
+                      ).length
+                    : districts.filter((d) => d.city_id === selectedCity?.id)
+                        .length) < 11
                   ? "has-padding"
                   : ""
               }`}
@@ -122,16 +146,14 @@ function SelectLocation({ locale = "en", onSelect }) {
               {currentPage === 1 &&
                 governorates
                   .filter((gov) => {
-                    const govName = t.governorates[gov.name];
+                    const govName = gov.name;
                     return govName
                       .toLowerCase()
                       .includes(searchValue.toLowerCase());
                   })
                   .map((gov) => (
                     <button key={gov.id}>
-                      <Link href={`/${gov.id}`}>
-                        {t.governorates[gov.name]}
-                      </Link>
+                      <Link href={`/${gov.id}`}>{gov.name}</Link>
                       {gov.cities_count > 0 && (
                         <span onClick={() => handleSelectGovernorate(gov)}>
                           {gov.cities_count}
@@ -146,17 +168,17 @@ function SelectLocation({ locale = "en", onSelect }) {
                 selectedGovernorate &&
                 cities
                   .filter(
-                    (city) => city.governorate_id === selectedGovernorate.id
+                    (city) => city.governorate_id === selectedGovernorate.id,
                   )
                   .filter((city) => {
-                    const cityName = t.cities[city.name];
+                    const cityName = city.name;
                     return cityName
                       .toLowerCase()
                       .includes(searchValue.toLowerCase());
                   })
                   .map((city) => (
                     <button key={city.id}>
-                      <Link href={`/${city.id}`}>{t.cities[city.name]}</Link>
+                      <Link href={`/${city.id}`}>{city.name}</Link>
                       {city.districts_count > 0 && (
                         <span onClick={() => handleSelectCity(city)}>
                           {city.districts_count}
@@ -172,16 +194,15 @@ function SelectLocation({ locale = "en", onSelect }) {
                 districts
                   .filter((district) => district.city_id === selectedCity.id)
                   .filter((district) => {
-                    const districtName = t.districts[district.name];
+                    const districtName = district.name;
+
                     return districtName
                       .toLowerCase()
                       .includes(searchValue.toLowerCase());
                   })
                   .map((district) => (
                     <button key={district.id}>
-                      <Link href={`/${district.id}`}>
-                        {t.districts[district.name]}
-                      </Link>
+                      <Link href={`/${district.id}`}>{district.name}</Link>
                     </button>
                   ))}
             </div>

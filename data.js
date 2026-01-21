@@ -241,7 +241,7 @@ export const categoriesEn = [
 ];
 export const categoriesAr = [
   { id: 1, name: "عقارات للبيع", icon: BiSolidStoreAlt },
-  { id: 2, name: "عقارات للإيجار", icon: BiSolidStoreAlt },
+  { id: 2, name: "عقارات للإيجار", icon: FaHandshake },
   { id: 3, name: "مركبات", icon: FaCar },
   { id: 5, name: "موبايلات وأجهزة لوحية", icon: FaMobileScreenButton },
   { id: 6, name: "إلكترونيات", icon: SiApplearcade },

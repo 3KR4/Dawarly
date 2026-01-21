@@ -7,8 +7,11 @@ const en = {
   },
   home: {
     seeMore: "see more",
+    categories: "categories",
+    subCategories: "sub categories",
     browseCategories: "browse categories",
     browseSubCategories: "browse subcategories",
+    newly_added: "Newly added",
   },
   create: {
     ad: {

@@ -1,0 +1,180 @@
+[
+  { "id": 101, "governorate_id": 1, "name": "مدينة نصر", "districts_count": 3 },
+  { "id": 102, "governorate_id": 1, "name": "هليوبوليس", "districts_count": 2 },
+  {
+    "id": 103,
+    "governorate_id": 1,
+    "name": "التجمع الخامس",
+    "districts_count": 3
+  },
+  { "id": 104, "governorate_id": 1, "name": "المعادي", "districts_count": 2 },
+  { "id": 105, "governorate_id": 1, "name": "المقطم", "districts_count": 1 },
+  {
+    "id": 106,
+    "governorate_id": 1,
+    "name": "شبرا الخيمة",
+    "districts_count": 2
+  },
+
+  { "id": 201, "governorate_id": 2, "name": "الهرم", "districts_count": 2 },
+  { "id": 202, "governorate_id": 2, "name": "الدقي", "districts_count": 1 },
+  { "id": 203, "governorate_id": 2, "name": "المهندسين", "districts_count": 1 },
+  {
+    "id": 204,
+    "governorate_id": 2,
+    "name": "السادس من أكتوبر",
+    "districts_count": 3
+  },
+  {
+    "id": 205,
+    "governorate_id": 2,
+    "name": "الشيخ زايد",
+    "districts_count": 1
+  },
+
+  { "id": 301, "governorate_id": 3, "name": "سموحة", "districts_count": 2 },
+  { "id": 302, "governorate_id": 3, "name": "محرم بك", "districts_count": 1 },
+  { "id": 303, "governorate_id": 3, "name": "العجمي", "districts_count": 1 },
+  { "id": 304, "governorate_id": 3, "name": "المنتزة", "districts_count": 1 },
+
+  { "id": 401, "governorate_id": 4, "name": "المنصورة", "districts_count": 2 },
+  { "id": 402, "governorate_id": 4, "name": "طلخا", "districts_count": 1 },
+  { "id": 403, "governorate_id": 4, "name": "دكرنس", "districts_count": 1 },
+
+  { "id": 501, "governorate_id": 5, "name": "الزقازيق", "districts_count": 2 },
+  {
+    "id": 502,
+    "governorate_id": 5,
+    "name": "العاشر من رمضان",
+    "districts_count": 1
+  },
+
+  { "id": 601, "governorate_id": 6, "name": "الغردقة", "districts_count": 2 },
+  { "id": 602, "governorate_id": 6, "name": "مرسى علم", "districts_count": 1 },
+  { "id": 603, "governorate_id": 6, "name": "سفاجا", "districts_count": 1 },
+
+  { "id": 701, "governorate_id": 7, "name": "شرم الشيخ", "districts_count": 3 },
+  { "id": 702, "governorate_id": 7, "name": "دهب", "districts_count": 1 },
+  { "id": 703, "governorate_id": 7, "name": "نويبع", "districts_count": 1 },
+
+  { "id": 801, "governorate_id": 8, "name": "طنطا", "districts_count": 1 },
+  {
+    "id": 802,
+    "governorate_id": 8,
+    "name": "المحلة الكبرى",
+    "districts_count": 1
+  },
+  {
+    "id": 803,
+    "governorate_id": 8,
+    "name": "كفر الزيات",
+    "districts_count": 1
+  },
+
+  { "id": 901, "governorate_id": 9, "name": "دسوق", "districts_count": 1 },
+  {
+    "id": 902,
+    "governorate_id": 9,
+    "name": "برج البرلس",
+    "districts_count": 1
+  },
+
+  {
+    "id": 1001,
+    "governorate_id": 10,
+    "name": "شبين الكوم",
+    "districts_count": 1
+  },
+  { "id": 1002, "governorate_id": 10, "name": "منوف", "districts_count": 1 },
+  { "id": 1003, "governorate_id": 10, "name": "قويسنا", "districts_count": 1 },
+
+  { "id": 1101, "governorate_id": 11, "name": "دمياط", "districts_count": 1 },
+  {
+    "id": 1102,
+    "governorate_id": 11,
+    "name": "رأس البر",
+    "districts_count": 1
+  },
+
+  { "id": 1201, "governorate_id": 12, "name": "بورسعيد", "districts_count": 1 },
+
+  {
+    "id": 1301,
+    "governorate_id": 13,
+    "name": "الإسماعيلية",
+    "districts_count": 1
+  },
+  { "id": 1302, "governorate_id": 13, "name": "فايد", "districts_count": 1 },
+
+  { "id": 1401, "governorate_id": 14, "name": "السويس", "districts_count": 1 },
+
+  { "id": 1501, "governorate_id": 15, "name": "الفيوم", "districts_count": 1 },
+  { "id": 1502, "governorate_id": 15, "name": "طامية", "districts_count": 1 },
+
+  {
+    "id": 1601,
+    "governorate_id": 16,
+    "name": "بني سويف",
+    "districts_count": 1
+  },
+  { "id": 1602, "governorate_id": 16, "name": "ناصر", "districts_count": 1 },
+
+  { "id": 1701, "governorate_id": 17, "name": "المنيا", "districts_count": 2 },
+  { "id": 1702, "governorate_id": 17, "name": "مغاغة", "districts_count": 1 },
+  { "id": 1703, "governorate_id": 17, "name": "العدوة", "districts_count": 1 },
+
+  { "id": 1801, "governorate_id": 18, "name": "أسيوط", "districts_count": 1 },
+  { "id": 1802, "governorate_id": 18, "name": "ديروط", "districts_count": 1 },
+
+  { "id": 1901, "governorate_id": 19, "name": "سوهاج", "districts_count": 1 },
+  { "id": 1902, "governorate_id": 19, "name": "أخميم", "districts_count": 1 },
+
+  { "id": 2001, "governorate_id": 20, "name": "قنا", "districts_count": 1 },
+  { "id": 2002, "governorate_id": 20, "name": "نقادة", "districts_count": 1 },
+
+  { "id": 2101, "governorate_id": 21, "name": "الأقصر", "districts_count": 1 },
+
+  { "id": 2201, "governorate_id": 22, "name": "أسوان", "districts_count": 1 },
+  {
+    "id": 2202,
+    "governorate_id": 22,
+    "name": "نصر أسوان",
+    "districts_count": 1
+  },
+
+  { "id": 2301, "governorate_id": 23, "name": "الخارجة", "districts_count": 1 },
+
+  {
+    "id": 2401,
+    "governorate_id": 24,
+    "name": "مرسى مطروح",
+    "districts_count": 1
+  },
+  { "id": 2402, "governorate_id": 24, "name": "الحمام", "districts_count": 1 },
+
+  { "id": 2501, "governorate_id": 25, "name": "العريش", "districts_count": 1 },
+  { "id": 2502, "governorate_id": 25, "name": "رفح", "districts_count": 1 },
+
+  { "id": 2601, "governorate_id": 26, "name": "بنها", "districts_count": 1 },
+  {
+    "id": 2602,
+    "governorate_id": 26,
+    "name": "قناطر الخيرية",
+    "districts_count": 1
+  },
+  {
+    "id": 2603,
+    "governorate_id": 26,
+    "name": "شبرا الخيمة",
+    "districts_count": 1
+  },
+
+  { "id": 2701, "governorate_id": 27, "name": "دمنهور", "districts_count": 1 },
+  {
+    "id": 2702,
+    "governorate_id": 27,
+    "name": "كفر الدوار",
+    "districts_count": 1
+  },
+  { "id": 2703, "governorate_id": 27, "name": "رشيد", "districts_count": 1 }
+]
