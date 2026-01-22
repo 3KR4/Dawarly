@@ -381,7 +381,6 @@ header .bottom .nav .places-select .locations-holder .top {
   padding: 3px 10px 3px 6px;
   color: var(--paragraph);
   font-size: 15px;
-  margin-bottom: 3px;
 }
 [lang="ar"] header .bottom .nav .places-select .locations-holder .top {
   padding: 3px 6px 3px 10px;
@@ -639,7 +638,11 @@ header .bottom .actions button:hover svg {
     width: 100%;
   }
   header .menu.active {
+    left: 0;
+  }
+  [lang="ar"] header .menu.active {
     right: 0;
+    left: unset;
   }
   header .top .account .user {
     height: 38px;

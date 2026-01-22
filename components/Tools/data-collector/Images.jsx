@@ -13,7 +13,7 @@ function Images({ images, setImages, isSubmitted }) {
   const inputFileRef = useRef(null);
   const [isDrag, setIsDrag] = useState(false);
 
-  const isInvalid = images.length === 0 && isSubmitted;
+  const isInvalid = images?.length === 0 && isSubmitted;
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ function Images({ images, setImages, isSubmitted }) {
 
   return (
     <div className="box forInput">
-      <label>{t.create.images.label}</label>
+      <label>{t.create.images?.label}</label>
 
       <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
         <div
@@ -53,10 +53,10 @@ function Images({ images, setImages, isSubmitted }) {
         >
           <FaCloudUploadAlt />
 
-          <p>{t.create.images.helperText}</p>
+          <p>{t.create.images?.helperText}</p>
 
           <h1>
-            {isDrag ? t.create.images.dropHere : t.create.images.clickHere}
+            {isDrag ? t.create.images?.dropHere : t.create.images?.clickHere}
           </h1>
         </div>
 
@@ -70,7 +70,7 @@ function Images({ images, setImages, isSubmitted }) {
         />
 
         <div className="imgHolder">
-          {images.map((image, index) => (
+          {images?.map((image, index) => (
             <div className="uploaded" key={index}>
               <Image
                 src={
@@ -89,7 +89,7 @@ function Images({ images, setImages, isSubmitted }) {
       {isInvalid && (
         <span className="error">
           <CircleAlert />
-          {t.create.images.errors.required}
+          {t.create.images?.errors.required}
         </span>
       )}
     </div>

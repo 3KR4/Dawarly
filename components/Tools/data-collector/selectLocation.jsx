@@ -98,14 +98,15 @@ function SelectLocation({ locale = "en", onSelect }) {
               )}
 
               <div>
-                {currentPage === 1 && t.location.egyptGovernorates}
+                {currentPage === 1 && <h5>{t.location.egyptGovernorates}</h5>}
                 {currentPage === 2 && selectedGovernorate && (
-                  <>{selectedGovernorate.name}</>
+                  <h5>{selectedGovernorate.name}</h5>
                 )}
                 {currentPage === 3 && selectedCity && (
                   <h5>{selectedCity.name}</h5>
                 )}
               </div>
+              <div className="hidden-element">-</div>
             </div>
 
             {/* Search Input */}

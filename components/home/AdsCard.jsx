@@ -2,13 +2,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { formatEGP } from "@/utils/formatCurrency";
 import { settings } from "@/Contexts/settings";
 import "@/styles/client/ad-card.css";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { isArabic } from "@/utils/detectDirection";
 import useTranslate from "@/Contexts/useTranslation";
+import { specsConfig } from "@/Contexts/specsConfig";
+import { subcategoriesEn, subcategoriesAr } from "@/data";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
@@ -33,11 +35,36 @@ export default function CardItem({ data }) {
     // })
   };
 
+  const [subcategories, setSubcategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // try {
+      //   const { data } = await getService.getDynamicFilters(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
+      // }
+      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    };
+    fetchCategories();
+  }, [locale]);
+
+  const adSubCat = subcategories?.find((x) => x.id == data?.sub_category);
+  const allowedSpecs = specsConfig[data.category] || [];
   return (
     <Link href={`/ad/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
         <Image className="main" fill src={data?.images[0]} alt={data?.title} />
-        <Image className="cover" fill src={data?.images[0]} alt={`${data?.title}-cover`} />
+        <Image
+          className="cover"
+          fill
+          src={data?.images[0]}
+          alt={`${data?.title}-cover`}
+        />
         <div className="top">
           <button
             className={`fav-btn ${isFavorite ? "active" : ""}`}
@@ -58,9 +85,14 @@ export default function CardItem({ data }) {
           >
             {data?.title}
           </h4>
-          <span className={`category ellipsis`}>
-            {t.subcategories[data?.sub_category.name]}
-          </span>
+          <Link
+            href={`/market?subcat=${adSubCat?.id}`}
+            className={`category ellipsis`}
+          >
+            {adSubCat?.name?.endsWith("s")
+              ? adSubCat.name.slice(0, -1)
+              : adSubCat?.name}
+          </Link>
         </div>
         <div className="row-holder">
           <h3>{formatEGP(data?.price, locale)}</h3>
@@ -68,6 +100,22 @@ export default function CardItem({ data }) {
           <span className={`condition`}>{data?.condition}</span>
         </div>
       </div>
+        <div className="date-area">
+          {allowedSpecs?.map(({ key, icon: Icon, suffix }) => {
+            const value = data?.specs?.[key];
+            if (!value) return null;
+
+            return (
+              <div key={key} className="spec">
+                <Icon className={key} />
+                <span>
+                  {value} {suffix}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
       <div className="date-area">
         <p className="area">
           {data?.area.governorate[locale]}, {data?.area.city[locale]}

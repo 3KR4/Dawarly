@@ -43,7 +43,7 @@ export default function AdsSwiper({ type, id }) {
     }
 
     if (type === "newly_added") {
-      return t.home.newestAds;
+      return t.home.newly_added;
     }
 
     return "";
@@ -263,7 +263,7 @@ export default function AdsSwiper({ type, id }) {
     <div className="swiper-section for-ads container">
       {/* ===== Top ===== */}
       <div className="top">
-        <h3 className="title">{computedTitle?.name}</h3>
+        <h3 className="title">{computedTitle?.name || computedTitle}</h3>
         {showNav && (
           <Link
             href={

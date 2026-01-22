@@ -53,25 +53,19 @@ const ActiveFiltersBar = ({
       const defaultMin = 0;
       const defaultMax = 10000;
       if (value[0] === defaultMin && value[1] === defaultMax) return "";
-      return `${locale === "ar" ? "السعر" : "Price"}: ${value[0]} - ${
-        value[1]
-      }`;
+      return `${t.dashboard.forms.price}: ${value[0]} - ${value[1]}`;
     }
 
     // فلتر الفئة الرئيسية
     if (key === "cat") {
       const cat = categories.find((c) => c.id === value.id);
-      return `${locale === "ar" ? "الفئة" : "Category"}: ${
-        cat ? cat.name : ""
-      }`;
+      return `${t.dashboard.forms.category}: ${cat ? cat.name : ""}`;
     }
 
     // فلتر الفئة الفرعية
     if (key === "subCat") {
       const sub = subcategories.find((s) => s.id == value.id);
-      return `${locale === "ar" ? "الفئة الفرعية" : "Sub Category"}: ${
-        sub ? sub.name : ""
-      }`;
+      return `${t.dashboard.forms.subCategory}: ${sub ? sub.name : ""}`;
     }
 
     // فلترات ديناميكية
@@ -197,7 +191,7 @@ const ActiveFiltersBar = ({
   return (
     <div className="active-filters-bar">
       <div className="filters-header" onClick={onOpenFilters}>
-        {locale === "ar" ? "الفلترات النشطة" : "Active Filters"}
+        {t.actions.active_filters}
         <span className="filters-count" style={{ display: "flex" }}>
           {screenSize !== "large" ? <LuSettings2 /> : ":"}
         </span>
@@ -223,7 +217,7 @@ const ActiveFiltersBar = ({
 
         {activeFilters.length > 1 && (
           <button className="clear-all-btn" onClick={onClearAll}>
-            {locale === "ar" ? "مسح الكل" : "Clear All"}
+            {t.actions.clear_all}
           </button>
         )}
       </div>

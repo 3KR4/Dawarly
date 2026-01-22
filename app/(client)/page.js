@@ -14,9 +14,17 @@ export default function Home() {
       <AdsSwiper type={`cat`} id={1} />
       <AdsSwiper type={`cat`} id={2} />
       <AdsSwiper type={`cat`} id={3} />
-      <AdsSwiper type={`sub-cat`} id={11} />
+      <AdsSwiper type={`cat`} id={5} />
+      <AdsSwiper type={`cat`} id={6} />
+      <AdsSwiper type={`cat`} id={7} />
+      <AdsSwiper type={`cat`} id={8} />
+      <AdsSwiper type={`cat`} id={9} />
+      <AdsSwiper type={`cat`} id={10} />
+      <AdsSwiper type={`cat`} id={11} />
+      <AdsSwiper type={`cat`} id={12} />
+      {/* <AdsSwiper type={`sub-cat`} id={11} />
       <AdsSwiper type={`sub-cat`} id={14} />
-      <AdsSwiper type={`sub-cat`} id={21} />
+      <AdsSwiper type={`sub-cat`} id={21} /> */}
     </>
   );
 }

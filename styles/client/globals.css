@@ -221,6 +221,9 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.hidden-element {
+  visibility: hidden;
+}
 
 /*! Main Button */
 

@@ -103,7 +103,8 @@
   gap: 5px;
   justify-content: space-between;
 }
-.ad-card .body span {
+.ad-card .body span,
+.ad-card .body a {
   border-radius: 50px;
   font-size: 14px;
   letter-spacing: 0.3px;
@@ -114,15 +115,19 @@
 .ad-card .body span:empty {
   display: none;
 }
-.ad-card .body span.category {
+.ad-card .body a.category {
   background: var(--lighter-main-color-2);
   padding: 5px 9px;
   font-size: 13px;
-  color: #474747;
+  color: var(--paragraph);
   transform: translateX(5px);
 }
-[lang="ar"] .ad-card .body span.category {
+[lang="ar"] .ad-card .body a.category {
   transform: translateX(-5px);
+}
+.ad-card .body a.category:hover {
+  background: var(--main-color);
+  color: white;
 }
 .ad-card .body h4 {
   font-size: 17px;
@@ -141,28 +146,59 @@
   font-family: sans-serif;
 }
 .ad-card .date-area {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px;
-
   border-top: 1px solid var(--border-color);
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  display: flex;
+  gap: 4px;
+}
+.ad-card .date-area:empty {
+  display: none;
+}
+.ad-card .date-area:has(.spec) {
+  padding: 5px 9px;
 }
 .ad-card .date-area * {
   font-size: 13px;
   font-weight: 700;
-  color: #5e5e5e;
+  color: var(--paragraph);
 }
-.ad-card .body .area {
+.ad-card .date-area .spec {
+  background: var(--hover-color);
+  text-align: center;
+  border-radius: 7px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  height: 31px;
+  min-width: max-content;
+  padding: 0 6px;
+  display: flex;
 }
-.ad-card .body .date {
+.ad-card .date-area .spec svg {
+  font-size: 17px;
+}
+.ad-card .date-area .spec svg.area_m2 {
+  font-size: 19px;
 }
 
+.ad-card .date-area .spec svg.km,
+.ad-card .date-area .spec svg.engine_cc {
+  font-size: 18px;
+}
+.ad-card .date-area .spec svg.km {
+  transform: translateY(1px);
+}
+.ad-card .date-area .spec span {
+  font-size: 14px;
+}
 @media (max-width: 500px) {
   .ad-card .body h4 {
     font-size: 15px;
   }
-  .ad-card .body span.category {
+  .ad-card .body a.category {
     font-size: 12px;
     min-width: unset;
   }
@@ -174,5 +210,27 @@
   }
   .ad-card .image-holder .top {
     padding: 8px 12px;
+  }
+  .ad-card .date-area .spec {
+    height: 26px;
+  }
+  .ad-card .date-area .spec svg {
+    font-size: 14px;
+  }
+  .ad-card .date-area .spec svg.bedrooms {
+    font-size: 18px;
+  }
+  .ad-card .date-area .spec span {
+    font-size: 12px;
+  }
+  .ad-card .date-area .spec svg.km,
+  .ad-card .date-area .spec svg.engine_cc {
+    font-size: 16px;
+  }
+  .ad-card .date-area .spec svg.model_year {
+    font-size: 15px;
+  }
+  .ad-card .date-area {
+    padding: 10px 14px;
   }
 }

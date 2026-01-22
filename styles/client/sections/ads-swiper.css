@@ -97,13 +97,15 @@
   }
 }
 @media (max-width: 768px) {
-  .swiper-section .top {
-    padding: 0 10px;
-  }
   .swiper-section {
     width: 100%;
     padding-left: 10px;
+    gap: 5px;
   }
+  .swiper-section .top {
+    padding: 0 10px;
+  }
+
   [lang="ar"] .swiper-section {
     padding-right: 10px;
     padding-left: unset;
@@ -124,6 +126,9 @@
     border: none;
     font-size: 16px;
     color: var(--main-color);
+  }
+  .swiper-section.for-ads .top h3 {
+    font-size: 16px;
   }
 }
 @media (max-width: 400px) {

@@ -243,7 +243,7 @@ export const categoriesAr = [
   { id: 1, name: "عقارات للبيع", icon: BiSolidStoreAlt },
   { id: 2, name: "عقارات للإيجار", icon: FaHandshake },
   { id: 3, name: "مركبات", icon: FaCar },
-  { id: 5, name: "موبايلات وأجهزة لوحية", icon: FaMobileScreenButton },
+  { id: 5, name: "هواتف وأجهزة لوحية", icon: FaMobileScreenButton },
   { id: 6, name: "إلكترونيات", icon: SiApplearcade },
   { id: 7, name: "المنزل والمكتب", icon: FaHome },
   { id: 8, name: "أزياء", icon: FaTshirt },
@@ -256,79 +256,78 @@ export const categoriesAr = [
 ];
 export const subcategoriesEn = [
   // Properties (categoryId 1,2 → category 0,1 في النظام)
-  { id: 0, categoryId: 0, name: "Apartments" }, // للبيع
-  { id: 1, categoryId: 1, name: "Apartments" }, // للإيجار
+  { id: 0, categoryId: 1, name: "Apartments" }, // للبيع
+  { id: 1, categoryId: 2, name: "Apartments" }, // للإيجار
 
-  { id: 2, categoryId: 0, name: "Villas" }, // للبيع
-  { id: 3, categoryId: 1, name: "Villas" }, // للإيجار
+  { id: 2, categoryId: 1, name: "Villas" }, // للبيع
+  { id: 3, categoryId: 2, name: "Villas" }, // للإيجار
 
-  { id: 4, categoryId: 0, name: "Vacation Homes" }, // للبيع
-  { id: 5, categoryId: 1, name: "Vacation Homes" }, // للإيجار
+  { id: 4, categoryId: 1, name: "Vacation Homes" }, // للبيع
+  { id: 5, categoryId: 2, name: "Vacation Homes" }, // للإيجار
 
-  { id: 6, categoryId: 0, name: "Commercial" }, // للبيع
-  { id: 7, categoryId: 1, name: "Commercial" }, // للإيجار
+  { id: 6, categoryId: 1, name: "Commercial" }, // للبيع
+  { id: 7, categoryId: 2, name: "Commercial" }, // للإيجار
 
-  { id: 8, categoryId: 0, name: "Buildings & Lands" }, // للبيع
-  { id: 9, categoryId: 1, name: "Buildings & Lands" }, // للإيجار
+  { id: 8, categoryId: 1, name: "Buildings & Lands" }, // للبيع
+  { id: 9, categoryId: 2, name: "Buildings & Lands" }, // للإيجار
 
   // Vehicles (categoryId 3,4 → category 2 في النظام)
-  { id: 10, categoryId: 2, name: "Cars" },
-  { id: 11, categoryId: 2, name: "Motorcycles" },
-  { id: 12, categoryId: 2, name: "Spare Parts" },
-  { id: 13, categoryId: 2, name: "Heavy Vehicles" },
+  { id: 10, categoryId: 3, name: "Cars" },
+  { id: 11, categoryId: 3, name: "Motorcycles" },
+  { id: 12, categoryId: 3, name: "Spare Parts" },
+  { id: 13, categoryId: 3, name: "Heavy Vehicles" },
 
   // Mobiles & Tablets (categoryId 5 → category 3 في النظام)
-  { id: 14, categoryId: 3, name: "Mobile Phones" },
-  { id: 15, categoryId: 3, name: "Tablets" },
-  { id: 16, categoryId: 3, name: "Accessories" },
+  { id: 14, categoryId: 5, name: "Mobile Phones" },
+  { id: 15, categoryId: 5, name: "Tablets" },
+  { id: 16, categoryId: 5, name: "Accessories" },
 
   // Electronics (categoryId 6 → category 4 في النظام)
-  { id: 17, categoryId: 4, name: "TV & Audio" },
-  { id: 18, categoryId: 4, name: "Computers" },
-  { id: 19, categoryId: 4, name: "Video Games" },
-  { id: 20, categoryId: 4, name: "Cameras" },
+  { id: 17, categoryId: 6, name: "TV & Audio" },
+  { id: 18, categoryId: 6, name: "Computers" },
+  { id: 19, categoryId: 6, name: "Video Games" },
+  { id: 20, categoryId: 6, name: "Cameras" },
 
   // Home & Office (categoryId 7 → category 5 في النظام)
-  { id: 21, categoryId: 5, name: "Furniture" },
-  { id: 22, categoryId: 5, name: "Office Furniture" },
-  { id: 23, categoryId: 5, name: "Home Decor" },
+  { id: 21, categoryId: 8, name: "Furniture" },
+  { id: 22, categoryId: 8, name: "Office Furniture" },
+  { id: 23, categoryId: 8, name: "Home Decor" },
 
   // Fashion (categoryId 8 → category 6 في النظام)
-  { id: 24, categoryId: 6, name: "Men Clothing" },
-  { id: 25, categoryId: 6, name: "Women Clothing" },
-  { id: 26, categoryId: 6, name: "Shoes & Bags" },
+  { id: 24, categoryId: 8, name: "Men Clothing" },
+  { id: 25, categoryId: 8, name: "Women Clothing" },
+  { id: 26, categoryId: 8, name: "Shoes & Bags" },
 
   // Jobs (categoryId 9 → category 7 في النظام)
-  { id: 27, categoryId: 7, name: "Full Time" },
-  { id: 28, categoryId: 7, name: "Part Time" },
-  { id: 29, categoryId: 7, name: "Freelance" },
+  { id: 27, categoryId: 9, name: "Full Time" },
+  { id: 28, categoryId: 9, name: "Part Time" },
+  { id: 29, categoryId: 9, name: "Freelance" },
 
   // Services (categoryId 10 → category 8 في النظام)
-  { id: 30, categoryId: 8, name: "Home Services" },
-  { id: 31, categoryId: 8, name: "Education" },
-  { id: 32, categoryId: 8, name: "Repair Services" },
+  { id: 30, categoryId: 10, name: "Home Services" },
+  { id: 31, categoryId: 10, name: "Education" },
+  { id: 32, categoryId: 10, name: "Repair Services" },
 
   // Pets (categoryId 11 → category 9 في النظام)
-  { id: 33, categoryId: 9, name: "Dogs" },
-  { id: 34, categoryId: 9, name: "Cats" },
-  { id: 35, categoryId: 9, name: "Pet Accessories" },
+  { id: 33, categoryId: 11, name: "Dogs" },
+  { id: 34, categoryId: 11, name: "Cats" },
+  { id: 35, categoryId: 11, name: "Pet Accessories" },
 
   // Kids & Babies (categoryId 12 → category 10 في النظام)
-  { id: 36, categoryId: 10, name: "Toys" },
-  { id: 37, categoryId: 10, name: "Kids Clothes" },
-  { id: 38, categoryId: 10, name: "Baby Gear" },
+  { id: 36, categoryId: 12, name: "Toys" },
+  { id: 37, categoryId: 12, name: "Kids Clothes" },
+  { id: 38, categoryId: 12, name: "Baby Gear" },
 
   // Sports & Hobbies (categoryId 13 → category 11 في النظام)
-  { id: 39, categoryId: 11, name: "Sports Equipment" },
-  { id: 40, categoryId: 11, name: "Bicycles" },
-  { id: 41, categoryId: 11, name: "Musical Instruments" },
+  { id: 39, categoryId: 13, name: "Sports Equipment" },
+  { id: 40, categoryId: 13, name: "Bicycles" },
+  { id: 41, categoryId: 13, name: "Musical Instruments" },
 
   // Business & Industrial (categoryId 14 → category 12 في النظام)
-  { id: 42, categoryId: 12, name: "Industrial Equipment" },
-  { id: 43, categoryId: 12, name: "Office Equipment" },
-  { id: 44, categoryId: 12, name: "Wholesale" },
+  { id: 42, categoryId: 14, name: "Industrial Equipment" },
+  { id: 43, categoryId: 14, name: "Office Equipment" },
+  { id: 44, categoryId: 14, name: "Wholesale" },
 ];
-
 export const subcategoriesAr = [
   // Properties (categoryId 1,2 → category 0,1 في النظام)
   { id: 0, categoryId: 0, name: "شقق" }, // للبيع
@@ -578,7 +577,7 @@ export const ads = [
     title: "شقة للبيع في مدينة نصر",
     description: "شقة 110 متر قريبة من الخدمات",
     price: 1850000,
-    category: 0, // properties للبيع
+    category: 1, // properties للبيع
     sub_category: 0, // apartmentsSale
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -591,7 +590,6 @@ export const ads = [
       bedrooms: 2,
       bathrooms: 2,
       furnished: false,
-      status: "for sale",
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [4], // أمن
     },
@@ -605,7 +603,7 @@ export const ads = [
     title: "iPhone 13 Pro Max",
     description: "256GB – حالة ممتازة",
     price: 28500,
-    category: 3, // mobilesTablets
+    category: 5, // mobilesTablets
     sub_category: 14, // mobilePhones
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -615,8 +613,8 @@ export const ads = [
       negotiable: false,
       condition: "used",
       storage_gb: 256,
+      memory: 8,
       battery_health_percent: 92,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -630,7 +628,7 @@ export const ads = [
     title: "كنبة مودرن 3 مقاعد",
     description: "خشب زان – حالة جيدة",
     price: 7500,
-    category: 5, // homeOffice
+    category: 7, // homeOffice
     sub_category: 21, // furniture
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -641,7 +639,6 @@ export const ads = [
       condition: "used",
       material: "wood",
       seats: 3,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -655,7 +652,7 @@ export const ads = [
     title: "Hyundai Elantra 2019",
     description: "فابريكا بالكامل",
     price: 720000,
-    category: 2, // vehicles
+    category: 3, // vehicles
     sub_category: 10, // cars
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -666,8 +663,8 @@ export const ads = [
       condition: null,
       model_year: 2019,
       km: 85000,
+      engine_cc: 2000,
       transmission: "automatic",
-      status: "for sale",
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -681,7 +678,7 @@ export const ads = [
     title: "موتوسيكل هوجن 200",
     description: "جاهز للاستخدام",
     price: 68000,
-    category: 2, // vehicles
+    category: 3, // vehicles
     sub_category: 11, // motorcycles
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -690,8 +687,9 @@ export const ads = [
     specs: {
       negotiable: true,
       condition: null,
+      model_year: 2016,
       engine_cc: 200,
-      status: "for sale",
+      km: 36000,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -705,7 +703,7 @@ export const ads = [
     title: "لابتوب Dell Latitude",
     description: "i7 – رام 16 جيجا",
     price: 19500,
-    category: 4, // electronics
+    category: 6, // electronics
     sub_category: 18, // computers
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -716,7 +714,6 @@ export const ads = [
       condition: "used",
       cpu: "i7",
       ram_gb: 16,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -730,7 +727,7 @@ export const ads = [
     title: "شقة للإيجار في سموحة",
     description: "تشطيب سوبر لوكس",
     price: 12000,
-    category: 1, // properties للإيجار
+    category: 2, // properties للإيجار
     sub_category: 1, // apartmentsRent
     area: {
       governorate: { ar: "الإسكندرية", en: "Alexandria" },
@@ -743,7 +740,6 @@ export const ads = [
       bedrooms: 2,
       bathrooms: 1,
       furnished: true,
-      status: "for rent",
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [0, 4], // تكييف وأمن
     },
@@ -757,7 +753,7 @@ export const ads = [
     title: "Samsung Galaxy S22",
     description: "زي الجديد",
     price: 19000,
-    category: 3, // mobilesTablets
+    category: 5, // mobilesTablets
     sub_category: 14, // mobilePhones
     area: {
       governorate: { ar: "الإسكندرية", en: "Alexandria" },
@@ -767,7 +763,7 @@ export const ads = [
       negotiable: false,
       condition: "like new",
       storage_gb: 128,
-      status: null,
+      memory: 16,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -781,7 +777,7 @@ export const ads = [
     title: "ترابيزة سفرة 6 كراسي",
     description: "خشب طبيعي",
     price: 9800,
-    category: 5, // homeOffice
+    category: 7, // homeOffice
     sub_category: 21, // furniture
     area: {
       governorate: { ar: "الإسكندرية", en: "Alexandria" },
@@ -791,7 +787,6 @@ export const ads = [
       negotiable: true,
       condition: "used",
       seats: 6,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -805,7 +800,7 @@ export const ads = [
     title: "فستان سواريه",
     description: "لبسة واحدة",
     price: 3500,
-    category: 6, // fashion
+    category: 8, // fashion
     sub_category: 25, // womenClothing
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -815,7 +810,6 @@ export const ads = [
       negotiable: true,
       condition: "like new",
       size: "M",
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -829,7 +823,7 @@ export const ads = [
     title: "قط شيرازي",
     description: "مطعم وجاهز",
     price: 2500,
-    category: 9, // pets
+    category: 11, // pets
     sub_category: 34, // cats
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -839,7 +833,6 @@ export const ads = [
       negotiable: false,
       condition: "new",
       age_months: 3,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -853,7 +846,7 @@ export const ads = [
     title: "وظيفة خدمة عملاء",
     description: "دوام كامل",
     price: 0,
-    category: 7, // jobs
+    category: 9, // jobs
     sub_category: 27, // fullTime
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -863,7 +856,6 @@ export const ads = [
       negotiable: false,
       condition: null,
       salary_range: "6000-8000",
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -877,7 +869,7 @@ export const ads = [
     title: "محل للإيجار",
     description: "موقع مميز",
     price: 15000,
-    category: 1, // properties للإيجار
+    category: 2, // properties للإيجار
     sub_category: 7, // commercial
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -887,7 +879,7 @@ export const ads = [
       negotiable: true,
       condition: null,
       area_m2: 60,
-      status: "for rent",
+      bathrooms: 1,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [4], // أمن
     },
@@ -901,7 +893,7 @@ export const ads = [
     title: "PlayStation 5",
     description: "بحالة ممتازة",
     price: 24000,
-    category: 4, // electronics
+    category: 6, // electronics
     sub_category: 19, // videoGames
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -911,7 +903,6 @@ export const ads = [
       negotiable: false,
       condition: "used",
       storage_gb: 825,
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -925,7 +916,7 @@ export const ads = [
     title: "خدمة تنظيف منازل",
     description: "خبرة 5 سنوات",
     price: 300,
-    category: 8, // services
+    category: 10, // services
     sub_category: 30, // homeServices
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -935,7 +926,6 @@ export const ads = [
       negotiable: true,
       condition: null,
       service_type: "cleaning",
-      status: null,
       location: "https://maps.app.goo.gl/yjMxu9toMPVHXP7x6",
       amenities: [],
     },
@@ -951,7 +941,7 @@ export const ads = [
     title: "شقة دوبلكس للبيع في التجمع",
     description: "دوبلكس 160 متر رووف خاص",
     price: 3200000,
-    category: 0, // properties للبيع
+    category: 1, // properties للبيع
     sub_category: 0, // apartmentsSale
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -964,7 +954,6 @@ export const ads = [
       bedrooms: 3,
       bathrooms: 3,
       furnished: false,
-      status: "for sale",
       location: "https://maps.app.goo.gl/abc123",
       amenities: [0, 4, 6], // تكييف، أمن، مسبح
     },
@@ -978,7 +967,7 @@ export const ads = [
     title: "مرسيدس E200 2020",
     description: "فل أوتوماتيك – كاملة المواصفات",
     price: 1850000,
-    category: 2, // vehicles
+    category: 3, // vehicles
     sub_category: 10, // cars
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -989,8 +978,8 @@ export const ads = [
       condition: null,
       model_year: 2020,
       km: 45000,
+      engine_cc: 3500,
       transmission: "automatic",
-      status: "for sale",
       location: "https://maps.app.goo.gl/def456",
       amenities: [],
     },
@@ -1004,7 +993,7 @@ export const ads = [
     title: "iPad Pro 12.9 2022",
     description: "جيل جديد – شاشة كبيرة",
     price: 32000,
-    category: 3, // mobilesTablets
+    category: 5, // mobilesTablets
     sub_category: 15, // tablets
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -1015,7 +1004,6 @@ export const ads = [
       condition: "like new",
       storage_gb: 256,
       screen_size: "12.9",
-      status: null,
       location: "https://maps.app.goo.gl/ghi789",
       amenities: [],
     },
@@ -1029,7 +1017,7 @@ export const ads = [
     title: "كاميرا Canon EOS R6",
     description: "كاميرا احترافية للمحترفين",
     price: 65000,
-    category: 4, // electronics
+    category: 6, // electronics
     sub_category: 20, // cameras
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1040,7 +1028,6 @@ export const ads = [
       condition: "used",
       megapixels: 20,
       lens_included: true,
-      status: null,
       location: "https://maps.app.goo.gl/jkl012",
       amenities: [],
     },
@@ -1054,7 +1041,7 @@ export const ads = [
     title: "كرسي مكتب مريح",
     description: "كرسي مكتب إيرغونوميك",
     price: 4500,
-    category: 5, // homeOffice
+    category: 7, // homeOffice
     sub_category: 22, // officeFurniture
     area: {
       governorate: { ar: "الإسكندرية", en: "Alexandria" },
@@ -1064,8 +1051,6 @@ export const ads = [
       negotiable: true,
       condition: "new",
       material: "mesh",
-      adjustable: true,
-      status: null,
       location: "https://maps.app.goo.gl/mno345",
       amenities: [],
     },
@@ -1079,7 +1064,7 @@ export const ads = [
     title: "حذاء رياضي Nike",
     description: "مقاس 43 – جديد",
     price: 1200,
-    category: 6, // fashion
+    category: 8, // fashion
     sub_category: 26, // shoesBags
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1090,7 +1075,6 @@ export const ads = [
       condition: "new",
       size: "43",
       brand: "Nike",
-      status: null,
       location: "https://maps.app.goo.gl/pqr678",
       amenities: [],
     },
@@ -1104,7 +1088,7 @@ export const ads = [
     title: "مصمم جرافيك",
     description: "وظيفة مصمم بدوام جزئي",
     price: 0,
-    category: 7, // jobs
+    category: 9, // jobs
     sub_category: 28, // partTime
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -1115,7 +1099,6 @@ export const ads = [
       condition: null,
       salary_range: "4000-6000",
       experience: "2+ سنوات",
-      status: null,
       location: "https://maps.app.goo.gl/stu901",
       amenities: [],
     },
@@ -1129,7 +1112,7 @@ export const ads = [
     title: "خدمات تصميم مواقع",
     description: "تصميم مواقع احترافية",
     price: 5000,
-    category: 8, // services
+    category: 10, // services
     sub_category: 31, // education
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1140,7 +1123,6 @@ export const ads = [
       condition: null,
       service_type: "web_design",
       delivery_time: "7 أيام",
-      status: null,
       location: "https://maps.app.goo.gl/vwx234",
       amenities: [],
     },
@@ -1154,7 +1136,7 @@ export const ads = [
     title: "جرو جيرمن شيبرد",
     description: "عمر 3 شهور – مطعم",
     price: 8000,
-    category: 9, // pets
+    category: 11, // pets
     sub_category: 33, // dogs
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -1165,7 +1147,6 @@ export const ads = [
       condition: "new",
       age_months: 3,
       breed: "German Shepherd",
-      status: null,
       location: "https://maps.app.goo.gl/yza567",
       amenities: [],
     },
@@ -1179,7 +1160,7 @@ export const ads = [
     title: "عربية أطفال جديدة",
     description: "ماركة عالمية – لم تستخدم",
     price: 2200,
-    category: 10, // kidsBabies
+    category: 12, // kidsBabies
     sub_category: 38, // babyGear
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1190,7 +1171,6 @@ export const ads = [
       condition: "new",
       brand: "Chicco",
       color: "أزرق",
-      status: null,
       location: "https://maps.app.goo.gl/bcd890",
       amenities: [],
     },
@@ -1204,7 +1184,7 @@ export const ads = [
     title: "دراجة جبلية Trek",
     description: "سرعة 21 – حالة ممتازة",
     price: 7500,
-    category: 11, // sportsHobbies
+    category: 3, // sportsHobbies
     sub_category: 40, // bicycles
     area: {
       governorate: { ar: "الإسكندرية", en: "Alexandria" },
@@ -1215,7 +1195,6 @@ export const ads = [
       condition: "used",
       speeds: 21,
       frame_size: "19 inch",
-      status: null,
       location: "https://maps.app.goo.gl/efg123",
       amenities: [],
     },
@@ -1229,7 +1208,7 @@ export const ads = [
     title: "معدات مطعم للبيع",
     description: "كاملة – حالة جيدة",
     price: 85000,
-    category: 12, // businessIndustrial
+    category: 14, // businessIndustrial
     sub_category: 42, // industrialEquipment
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1240,7 +1219,6 @@ export const ads = [
       condition: "used",
       equipment_type: "kitchen",
       includes: ["فرن", "ثلاجة", "معدات طبخ"],
-      status: null,
       location: "https://maps.app.goo.gl/hij456",
       amenities: [],
     },
@@ -1254,7 +1232,7 @@ export const ads = [
     title: "فيلا للإيجار بالساحل الشمالي",
     description: "4 غرف – على البحر مباشرة",
     price: 25000,
-    category: 1, // properties للإيجار
+    category: 2, // properties للإيجار
     sub_category: 3, // villas
     area: {
       governorate: { ar: "الساحل الشمالي", en: "North Coast" },
@@ -1267,7 +1245,6 @@ export const ads = [
       bedrooms: 4,
       bathrooms: 5,
       furnished: true,
-      status: "for rent",
       location: "https://maps.app.goo.gl/klm789",
       amenities: [0, 4, 6, 3], // تكييف، أمن، مسبح، جراج
     },
@@ -1281,7 +1258,7 @@ export const ads = [
     title: "Xbox Series X",
     description: "بحالتها – مع 2 ألعاب",
     price: 21000,
-    category: 4, // electronics
+    category: 6, // electronics
     sub_category: 19, // videoGames
     area: {
       governorate: { ar: "الجيزة", en: "Giza" },
@@ -1292,7 +1269,6 @@ export const ads = [
       condition: "used",
       storage_gb: 1024,
       games_included: 2,
-      status: null,
       location: "https://maps.app.goo.gl/nop012",
       amenities: [],
     },
@@ -1306,7 +1282,7 @@ export const ads = [
     title: "جيتار كهربائي",
     description: "ماركة فندر – للمحترفين",
     price: 12000,
-    category: 11, // sportsHobbies
+    category: 13, // sportsHobbies
     sub_category: 41, // musicalInstruments
     area: {
       governorate: { ar: "القاهرة", en: "Cairo" },
@@ -1317,7 +1293,6 @@ export const ads = [
       condition: "like new",
       brand: "Fender",
       type: "electric",
-      status: null,
       location: "https://maps.app.goo.gl/qrs345",
       amenities: [],
     },
