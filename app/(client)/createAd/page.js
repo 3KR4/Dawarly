@@ -3,8 +3,10 @@ import "@/styles/client/forms.css";
 import React, { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
-import governorates from "@/data/governorates.json";
-import cities from "@/data/cities.json";
+import governoratesEn from "@/data/governoratesEn.json";
+import governoratesAr from "@/data/governoratesAr.json";
+import citiesEn from "@/data/citiesEn.json";
+import citiesAr from "@/data/citiesAr.json";
 import {
   categoriesEn,
   categoriesAr,
@@ -28,6 +30,9 @@ export default function CreateAd() {
   const [dynamicFilters, setDynamicFilters] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [governorates, setGovernorates] = useState([]);
+  const [cities, setCities] = useState([]);
+
   useEffect(() => {
     const fetchdynamicFilters = async () => {
       // try {
@@ -44,6 +49,8 @@ export default function CreateAd() {
       );
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
       setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
+      setCities(locale == "en" ? citiesEn : citiesAr);
     };
     fetchdynamicFilters();
   }, [locale]);
@@ -384,6 +391,27 @@ export default function CreateAd() {
                 )}
               </div>
             </div>
+            <SelectOptions
+              label={t.location.yourGovernorate}
+              placeholder={t.location.selectGovernorate}
+              options={governorates}
+              value={userAddress.gov ? userAddress.gov.name : ""}
+              tPath="governorates"
+              onChange={(item) => {
+                handleAddress("gov", item);
+                handleAddress("city", null);
+              }}
+            />
+
+            <SelectOptions
+              label={t.location.yourCity}
+              placeholder={t.location.selectCity}
+              options={filteredCities}
+              value={userAddress.city ? userAddress.city.name : ""}
+              tPath="cities"
+              disabled={!userAddress.gov}
+              onChange={(item) => handleAddress("city", item)}
+            />
             <Images
               images={images}
               setImages={setImages}

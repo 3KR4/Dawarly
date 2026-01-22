@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useContext,useState ,useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 import "@/styles/client/pages/market.css";
 import useTranslate from "@/Contexts/useTranslation";
@@ -62,7 +62,7 @@ const ActiveFiltersBar = ({
     if (key === "cat") {
       const cat = categories.find((c) => c.id === value.id);
       return `${locale === "ar" ? "الفئة" : "Category"}: ${
-        cat ? t.categories?.[cat.name] : ""
+        cat ? cat.name : ""
       }`;
     }
 
@@ -70,7 +70,7 @@ const ActiveFiltersBar = ({
     if (key === "subCat") {
       const sub = subcategories.find((s) => s.id == value.id);
       return `${locale === "ar" ? "الفئة الفرعية" : "Sub Category"}: ${
-        sub ? t.subcategories?.[sub.name] : ""
+        sub ? sub.name : ""
       }`;
     }
 
@@ -78,9 +78,7 @@ const ActiveFiltersBar = ({
     const field = fieldDefinitions.find((f) => f.key === key);
     if (!field) {
       if (typeof value === "object" && value !== null) {
-        return `${key}: ${
-          value.name?.[locale] || value.name || value.value || ""
-        }`;
+        return `${key}: ${value.name || value.name || value.value || ""}`;
       }
       return `${key}: ${value}`;
     }
@@ -93,9 +91,9 @@ const ActiveFiltersBar = ({
         if (selOption) {
           const displayName =
             typeof selOption.name === "object"
-              ? selOption.name[locale]
+              ? selOption.name
               : selOption.name;
-          return `${field.label[locale]}: ${displayName}`;
+          return `${field.label}: ${displayName}`;
         }
         break;
 
@@ -105,11 +103,10 @@ const ActiveFiltersBar = ({
           (opt) => opt.value === value?.value || value,
         );
         if (radioOption) {
-          const displayLabel =
-            radioOption.label?.[locale] || radioOption.value || value;
-          return `${field.label[locale]}: ${displayLabel}`;
+          const displayLabel = radioOption.label || radioOption.value || value;
+          return `${field.label}: ${displayLabel}`;
         }
-        return `${field.label[locale]}: ${value}`;
+        return `${field.label}: ${value}`;
 
       case "boolean":
         const displayValue =
@@ -120,17 +117,17 @@ const ActiveFiltersBar = ({
             : locale === "ar"
               ? "لا"
               : "No";
-        return `${field.label[locale]}: ${displayValue}`;
+        return `${field.label}: ${displayValue}`;
 
       case "multiSelect":
         if (!Array.isArray(value) || value.length === 0) return "";
         const displayValues = value
           .map((val) => {
             const opt = field.options.find((o) => o.value === val);
-            return opt?.label?.[locale] || opt?.value || val;
+            return opt?.label || opt?.value || val;
           })
           .filter(Boolean);
-        return `${field.label[locale]}: ${displayValues.join(", ")}`;
+        return `${field.label}: ${displayValues.join(", ")}`;
 
       case "input":
         if (field.inputType === "number" && Array.isArray(value)) {
@@ -138,17 +135,17 @@ const ActiveFiltersBar = ({
           const defaultMin = field.min || 0;
           const defaultMax = field.max || 10000;
           if (min === defaultMin && max === defaultMax) return "";
-          return `${field.label[locale]}: ${min} - ${max}`;
+          return `${field.label}: ${min} - ${max}`;
         }
         break;
 
       default:
         if (typeof value === "object" && value !== null) {
-          return `${field.label[locale]}: ${
-            value.name?.[locale] || value.name || value.value || ""
+          return `${field.label}: ${
+            value.name || value.name || value.value || ""
           }`;
         }
-        return `${field.label[locale]}: ${value}`;
+        return `${field.label}: ${value}`;
     }
 
     return "";

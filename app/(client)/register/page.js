@@ -65,7 +65,7 @@ export default function Register() {
     VIEW_OR_UPDATE_PASS: 9,
   };
 
-  const [step, setStep] = useState(STEPS.ADDRESS);
+  const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
