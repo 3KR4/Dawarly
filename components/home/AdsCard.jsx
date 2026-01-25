@@ -56,7 +56,7 @@ export default function CardItem({ data }) {
   const adSubCat = subcategories?.find((x) => x.id == data?.sub_category);
   const allowedSpecs = specsConfig[data.category] || [];
   return (
-    <Link href={`/ad/${data?.id}`} key={data?.id} className={`ad-card`}>
+    <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
         <Image className="main" fill src={data?.images[0]} alt={data?.title} />
         <Image

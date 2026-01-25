@@ -629,9 +629,7 @@ export default function Register() {
               label={t.location.yourGovernorate}
               placeholder={t.location.selectGovernorate}
               options={governorates}
-              value={
-                userAddress.gov ? t.governorates[userAddress.gov.name] : ""
-              }
+              value={userAddress.gov ? userAddress.gov.name : ""}
               tPath="governorates"
               onChange={(item) => {
                 handleAddress("gov", item);
@@ -643,7 +641,7 @@ export default function Register() {
               label={t.location.yourCity}
               placeholder={t.location.selectCity}
               options={filteredCities}
-              value={userAddress.city ? t.cities[userAddress.city.name] : ""}
+              value={userAddress.city ? userAddress.city.name : ""}
               tPath="cities"
               disabled={!userAddress.gov}
               onChange={(item) => handleAddress("city", item)}

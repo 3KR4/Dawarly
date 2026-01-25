@@ -6,12 +6,17 @@ const ar = {
     filterByCategories: "التصفية حسب الفئات",
   },
   home: {
+    home: "الصفحة الرئيسية",
+
     seeMore: "رؤية المزيد",
     categories: "الفئات",
     subCategories: "الفئات الفرعية",
     browseCategories: "تصفح التصنيفات",
     browseSubCategories: "اختر من التصنيفات الفرعية",
     newly_added: "المضاف حديثا",
+  },
+  market: {
+    all_ads: "كل الاعلانات",
   },
   create: {
     ad: {

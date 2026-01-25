@@ -6,12 +6,16 @@ const en = {
     filterByCategories: "filter By Categories",
   },
   home: {
+    home: "home",
     seeMore: "see more",
     categories: "categories",
     subCategories: "sub categories",
     browseCategories: "browse categories",
     browseSubCategories: "browse subcategories",
     newly_added: "Newly added",
+  },
+  market: {
+    all_ads: "all ads",
   },
   create: {
     ad: {
@@ -87,6 +91,7 @@ const en = {
       titlePlaceholder: "Enter product title",
 
       category: "Category",
+      subCategory: "sub Category",
       categoryPlaceholder: "Select category",
 
       stock: "Stock",

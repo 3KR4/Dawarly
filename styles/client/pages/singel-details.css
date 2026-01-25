@@ -1,70 +1,118 @@
 .single-page .navigations {
   width: unset;
-  margin: 6px 0;
+  margin: 14px;
   padding: 0;
 }
 .single-page > .holder {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  grid-template-columns: 1fr;
+  gap: 20px;
   margin: 0 auto 75px;
 }
 .single-page .title-holder {
   margin: 38px auto 35px;
 }
 .single-page .images-holder {
-  flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   display: flex;
-  height: fit-content;
-  position: sticky;
-  top: 88px;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 2;
 }
-.single-page .images-holder > img {
-  object-fit: fill;
-  position: relative !important;
-  aspect-ratio: 1;
+
+.single-page .images-holder > .img {
   border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
 }
-.single-page .images-holder .imgs {
+.single-page .images-holder > .img .main-img {
+  object-fit: contain;
+  position: relative !important;
+}
+.single-page .images-holder > .img .back-img {
+  object-fit: fill;
+  filter: blur(15px);
+  z-index: -1;
+  position: absolute !important;
+}
+/* Wrapper الأساسي */
+.single-page .images-holder .imgs-swiper-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
+  max-height: 100%;
+  padding: 3px;
+}
+
+/* Swiper نفسه */
+.single-page .images-holder .imgs-swiper {
+  height: 100%;
+  padding: 3px;
+}
+
+/* كل Slide */
+.single-page .images-holder .imgs-swiper .swiper-slide {
   display: flex;
   justify-content: center;
-  width: 80%;
-  margin: auto;
 }
-.single-page .images-holder .imgs .img {
-  object-fit: fill;
-  max-height: 77px !important;
-  width: unset !important;
-  position: relative !important;
-  border-radius: 9px;
+
+/* الصورة (thumbnail) */
+.single-page .images-holder .imgs-swiper .img {
   aspect-ratio: 1;
   cursor: pointer;
+  border-radius: 10px;
   overflow: hidden;
+  position: relative;
 }
-.single-page .images-holder .imgs .img img {
+
+/* الصورة نفسها */
+.single-page .images-holder .imgs-swiper .img img {
+  width: 100%;
+  height: 100%;
   object-fit: fill;
-  position: relative !important;
   transition: 0.3s;
 }
 
-.single-page .images-holder .imgs .img:hover img {
-  scale: 1.1;
+/* Hover effect */
+.single-page .images-holder .imgs-swiper .img:hover img {
+  transform: scale(1.1);
 }
-.single-page .images-holder .imgs .img:has(img.active) {
+
+/* Active image */
+.single-page .images-holder .imgs-swiper .img.active {
   outline: 3px solid var(--main-color);
+}
+
+/* Navigation buttons */
+.single-page .images-holder .imgs-swiper-wrapper .nav-btn {
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  padding: 1px;
+  color: var(--paragraph);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  background: var(--hover-color);
+  height: 28px;
+}
+.single-page
+  .images-holder
+  .imgs-swiper-wrapper
+  .nav-btn.swiper-button-disabled {
+  opacity: 0.65;
+  cursor: auto;
 }
 .single-page .details-holder {
   flex-direction: column;
   gap: 10px;
   height: fit-content;
   display: flex;
-  position: sticky;
-  top: 72px;
-  padding-top: 20px;
-}
+  }
 .single-page .details-holder h3 {
   font-size: 25px;
   color: #3f3f3f;
@@ -266,8 +314,6 @@
   border-radius: 10px;
 }
 .single-page.forPlace .tickets {
-  position: sticky;
-  top: 88px;
   height: fit-content;
 }
 .single-page.forPlace > .holder .top {
@@ -361,11 +407,7 @@
 .single-page.forPlace .holds.noTikets {
   grid-template-columns: 1fr !important;
 }
-.single-page .navigations {
-  width: unset;
-  margin: 0;
-  padding: 0;
-}
+
 .single-page.forPlace .holds .top {
   padding: 0;
 }

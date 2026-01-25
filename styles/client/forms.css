@@ -382,3 +382,8 @@ p.have-problem {
     font-size: 26px;
   }
 }
+@media (max-width: 470px) {
+  .form-holder .options-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
