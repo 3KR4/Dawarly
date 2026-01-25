@@ -88,6 +88,19 @@ export default function CreateAd() {
     gov: null,
     city: null,
   });
+  const [addressErrors, setAddressErrors] = useState({
+    gov: "",
+    city: "",
+  });
+  // useEffect(() => {
+  //   if (governorates.length && cities.length) {
+  //     setUserAddress({
+  //       gov: governorates[0],
+  //       city: cities[0],
+  //     });
+  //   }
+  // }, [governorates, cities]);
+
   const [images, setImages] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -228,12 +241,21 @@ export default function CreateAd() {
 
     if (step === STEPS.BASICS) {
       setIsSubmitted(true);
+
       const isFormValid = await trigger(["adTitle"]);
-      if (!isFormValid || images.length === 0) {
+
+      const errors = {
+        gov: !userAddress.gov ? t.create.ad.errors.governorate : "",
+        city: !userAddress.city ? t.create.ad.errors.city : "",
+      };
+
+      setAddressErrors(errors);
+
+      if (!isFormValid || images.length === 0 || errors.gov || errors.city) {
         return;
       }
+
       setStep(STEPS.ALL_DETAILS);
-      return;
     }
 
     if (step === STEPS.ALL_DETAILS) {
@@ -397,9 +419,16 @@ export default function CreateAd() {
               options={governorates}
               value={userAddress.gov ? userAddress.gov.name : ""}
               tPath="governorates"
+              error={addressErrors.gov}
               onChange={(item) => {
                 handleAddress("gov", item);
                 handleAddress("city", null);
+
+                setAddressErrors((prev) => ({
+                  ...prev,
+                  gov: "",
+                  city: "",
+                }));
               }}
             />
 
@@ -409,8 +438,12 @@ export default function CreateAd() {
               options={filteredCities}
               value={userAddress.city ? userAddress.city.name : ""}
               tPath="cities"
+              error={addressErrors.city}
               disabled={!userAddress.gov}
-              onChange={(item) => handleAddress("city", item)}
+              onChange={(item) => {
+                handleAddress("city", item);
+                setAddressErrors((prev) => ({ ...prev, city: "" }));
+              }}
             />
             <Images
               images={images}

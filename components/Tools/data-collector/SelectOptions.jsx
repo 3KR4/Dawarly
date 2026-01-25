@@ -34,46 +34,46 @@ function SelectOptions({
   const getText = (item) => {
     if (noTranslate) {
       // إذا كان noTranslate = true، اسم العرض بناءً على locale
-      if (typeof item.name === 'object' && item.name !== null) {
+      if (typeof item.name === "object" && item.name !== null) {
         // كائن name يحتوي على en و ar
-        return item.name[locale] || item.name.en || '';
+        return item.name[locale] || item.name.en || "";
       }
       // إذا كان string قديم
-      return item.name || '';
+      return item.name || "";
     }
-    
+
     // إذا كان هناك ترجمة من tPath
-    if (t && t[tPath] && typeof item.name === 'string') {
+    if (t && t[tPath] && typeof item.name === "string") {
       return t[tPath][item.name] || item.name;
     }
-    
+
     // fallback
-    if (typeof item.name === 'object') {
-      return item.name[locale] || item.name.en || '';
+    if (typeof item.name === "object") {
+      return item.name[locale] || item.name.en || "";
     }
-    
-    return item.name || '';
+
+    return item.name || "";
   };
 
   // 👈 دالة للحصول على القيمة المحددة للعرض
   const getDisplayValue = () => {
-    if (!value) return '';
-    
+    if (!value) return "";
+
     // إذا كانت القيمة كائن من الخيارات
-    if (typeof value === 'object' && value !== null) {
-      if (typeof value.name === 'object') {
-        return value.name[locale] || value.name.en || '';
+    if (typeof value === "object" && value !== null) {
+      if (typeof value.name === "object") {
+        return value.name[locale] || value.name.en || "";
       }
-      return value.name || '';
+      return value.name || "";
     }
-    
+
     // إذا كانت القيمة string مباشرة
     return value;
   };
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
-    
+
     return options.filter((item) => {
       const text = getText(item);
       return normalize(text).includes(normalize(search));
@@ -156,7 +156,7 @@ function SelectOptions({
               filteredOptions.map((item) => {
                 const text = getText(item);
                 const isSelected = getDisplayValue() === text;
-                
+
                 return (
                   <button
                     type="button"
@@ -177,7 +177,7 @@ function SelectOptions({
         )}
       </div>
 
-      {hasError && (
+      {hasError && !disabled && (
         <span className="error">
           <CircleAlert size={16} />
           {error}

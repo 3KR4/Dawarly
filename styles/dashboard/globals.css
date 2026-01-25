@@ -11,14 +11,20 @@
 }
 .dashboard .head {
   border-bottom: 1px solid var(--border-color);
+  justify-content: space-between;
+  align-items: center;
   height: 56px;
   padding: 0 16px;
   font-size: 14px;
-  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s,
+    z-index 0.3s;
   display: flex;
-  position: relative;
-  justify-content: space-between;
-  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--body-color);
 }
 
 .dashboard .head .right {
@@ -68,7 +74,10 @@
   justify-content: unset;
   width: unset;
   min-height: unset;
-  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s,
+    z-index 0.3s;
   position: relative;
   left: unset;
   transform: unset;

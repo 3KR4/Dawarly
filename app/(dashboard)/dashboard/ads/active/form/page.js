@@ -14,6 +14,7 @@ import {
   subcategoriesAr,
   propertiesFiltersEn,
   propertiesFiltersAr,
+  users,
 } from "@/data";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -21,6 +22,8 @@ import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { BsChatDots } from "react-icons/bs";
 import { settings } from "@/Contexts/settings";
+import { FiUsers } from "react-icons/fi";
+import { LuUserCog } from "react-icons/lu";
 
 export default function CreateAd() {
   const { locale } = useContext(settings);
@@ -40,7 +43,7 @@ export default function CreateAd() {
   const [selectedGovernorate, setSelectedGovernorate] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [images, setImages] = useState([]);
-
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
   // State للتواصل
   const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
@@ -70,6 +73,12 @@ export default function CreateAd() {
   const filteredCities = cities.filter(
     (c) => c.governorate_id === selectedGovernorate?.id,
   );
+  const adminOptions = users.map((user) => ({
+    id: user.id,
+    name: `${user.first_name} ${user.last_name}`,
+    email: user.email,
+    phone: user.phone,
+  }));
 
   // تصفية الفئات الفرعية حسب الفئة المختارة
   useEffect(() => {
@@ -89,18 +98,13 @@ export default function CreateAd() {
   const METHODS = [
     {
       key: "email",
-      label: t.create.ad.contact_via_email || "Contact via Email",
-      icon: Mail,
+      label:  "user to user"||  t.create.ad.contact_via_email,
+      icon: FiUsers,
     },
     {
       key: "phone",
-      label: t.create.ad.contact_via_phone || "Contact via Phone",
-      icon: Phone,
-    },
-    {
-      key: "chat",
-      label: t.create.ad.contact_via_chat || "Contact via Chat",
-      icon: BsChatDots,
+      label:  "user to admin"|| t.create.ad.contact_via_phone,
+      icon: LuUserCog,
     },
   ];
 
@@ -113,13 +117,13 @@ export default function CreateAd() {
   } = useForm();
 
   // معالجة تغيير الحقول الديناميكية
+
   const handleDynamicChange = (key, value) => {
     setDynamicValues((prev) => ({
       ...prev,
       [key]: value,
     }));
 
-    // مسح الخطأ عند اختيار قيمة
     if (fieldErrors[key]) {
       setFieldErrors((prev) => {
         const newErrors = { ...prev };
@@ -148,13 +152,16 @@ export default function CreateAd() {
     }
 
     if (!selectedGovernorate) {
-      newErrors.governorate =
-        t.location.errors.governorate || "Governorate is required";
+      newErrors.governorate = "Governorate is required";
       hasErrors = true;
     }
 
     if (!selectedCity) {
-      newErrors.city = t.location.errors.city || "City is required";
+      newErrors.city = "City is required";
+      hasErrors = true;
+    }
+    if (!selectedAdmin) {
+      newErrors.admin = t.create.ad.errors?.admin || "Admin user is required";
       hasErrors = true;
     }
 
@@ -177,36 +184,55 @@ export default function CreateAd() {
 
     // التحقق من الحقول الديناميكية الإلزامية
     dynamicFilters.forEach((field) => {
-      if (field.required) {
-        const value = dynamicValues[field.key];
-        let isEmpty = false;
+      if (!field.required) return;
 
-        if (field.uiType === "select") {
+      const value = dynamicValues[field.key];
+      let isEmpty = false;
+
+      switch (field.uiType) {
+        case "select":
           isEmpty = !value || !value.id;
-        } else if (field.uiType === "radio") {
-          isEmpty = !value || !value.value;
-        } else if (field.uiType === "boolean") {
-          isEmpty = value === undefined;
-        } else if (field.uiType === "multiSelect") {
-          isEmpty = !value || !Array.isArray(value) || value.length === 0;
-        } else if (field.uiType === "input") {
-          isEmpty = !value && value !== 0;
-        }
+          break;
 
-        if (isEmpty) {
-          newErrors[field.key] =
-            field.requiredMessage || `${field.label} is required`;
+        case "radio":
+          isEmpty = value === undefined || value === null;
+          break;
+
+        case "boolean":
+          isEmpty = typeof value !== "boolean";
+          break;
+
+        case "multiSelect":
+          isEmpty = !Array.isArray(value) || value.length === 0;
+          break;
+
+        case "input":
+          isEmpty = value === undefined || value === null || value === "";
+          break;
+
+        default:
+          break;
+      }
+
+      if (isEmpty) {
+        newErrors[field.key] =
+          field.requiredMessage || `${field.label} is required`;
+        hasErrors = true;
+        return;
+      }
+
+      // pattern validation (لو موجود)
+      if (
+        field.uiType === "input" &&
+        field.validation?.pattern &&
+        value !== undefined &&
+        value !== ""
+      ) {
+        const { value: pattern, message } = field.validation.pattern;
+
+        if (!pattern.test(String(value))) {
+          newErrors[field.key] = message;
           hasErrors = true;
-        }
-
-        if (field.uiType === "input" && field.validation?.pattern && value) {
-          const pattern = field.validation.pattern.value;
-          const message = field.validation.pattern.message;
-
-          if (!pattern.test(value.toString())) {
-            newErrors[field.key] = message;
-            hasErrors = true;
-          }
         }
       }
     });
@@ -224,16 +250,10 @@ export default function CreateAd() {
   // معالجة إرسال النموذج
   const onSubmit = async (data) => {
     // التحقق من صحة الحقول الأساسية
-    const isFormValid = await trigger(["adTitle", "description"]);
-    if (!isFormValid) {
-      return;
-    }
 
-    // التحقق من صحة جميع الحقول
-    const isValid = validateForm();
-    if (!isValid) {
-      return;
-    }
+    const isCustomValid = validateForm();
+
+    if (!isCustomValid) return;
 
     // تحضير البيانات للإرسال
     const finalData = {
@@ -505,14 +525,6 @@ export default function CreateAd() {
   return (
     <div className="form-holder create-ad admin-create-ad">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="top">
-          <h1>{t.create.ad.create_ad || "Create New Ad"}</h1>
-          <p>
-            {t.create.ad.admin_create_description ||
-              "Fill all the details below to create a new advertisement"}
-          </p>
-        </div>
-
         {/* === معلومات أساسية === */}
         <div className="form-section">
           <h2 className="section-title">
@@ -570,82 +582,112 @@ export default function CreateAd() {
             </div>
           </div>
         </div>
+        <div className="row-holder">
+          {/* === الفئة والتصنيف === */}
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.create.ad.category_info || "Category Information"}
+            </h2>
 
-        {/* === الفئة والتصنيف === */}
-        <div className="form-section">
-          <h2 className="section-title">
-            {t.create.ad.category_info || "Category Information"}
-          </h2>
+            {/* الفئة الرئيسية */}
+            <SelectOptions
+              label={t.create.ad.choose_category || "Category"}
+              placeholder={t.create.ad.choose_category || "Select Category"}
+              options={categories}
+              value={selectedCategory ? selectedCategory.name : ""}
+              tPath="categories"
+              required={true}
+              error={fieldErrors.category}
+              locale={locale}
+              t={t}
+              onChange={(item) => setSelectedCategory(item)}
+            />
 
-          {/* الفئة الرئيسية */}
-          <SelectOptions
-            label={t.create.ad.choose_category || "Category"}
-            placeholder={t.create.ad.choose_category || "Select Category"}
-            options={categories}
-            value={selectedCategory ? selectedCategory.name : ""}
-            tPath="categories"
-            required={true}
-            error={fieldErrors.category}
-            locale={locale}
-            t={t}
-            onChange={(item) => setSelectedCategory(item)}
-          />
+            {/* الفئة الفرعية */}
+            <SelectOptions
+              label={t.create.ad.choose_sub_category || "Subcategory"}
+              placeholder={
+                t.create.ad.choose_sub_category || "Select Subcategory"
+              }
+              options={filteredSubcategories}
+              value={selectedSubCategory ? selectedSubCategory.name : ""}
+              tPath="subcategories"
+              required={true}
+              error={fieldErrors.subCategory}
+              locale={locale}
+              t={t}
+              disabled={!selectedCategory}
+              onChange={(item) => setSelectedSubCategory(item)}
+            />
+          </div>
 
-          {/* الفئة الفرعية */}
-          <SelectOptions
-            label={t.create.ad.choose_sub_category || "Subcategory"}
-            placeholder={
-              t.create.ad.choose_sub_category || "Select Subcategory"
-            }
-            options={filteredSubcategories}
-            value={selectedSubCategory ? selectedSubCategory.name : ""}
-            tPath="subcategories"
-            required={true}
-            error={fieldErrors.subCategory}
-            locale={locale}
-            t={t}
-            disabled={!selectedCategory}
-            onChange={(item) => setSelectedSubCategory(item)}
-          />
+          {/* === الموقع === */}
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.location.location || "Location"}
+            </h2>
+
+            {/* المحافظة */}
+            <SelectOptions
+              label={t.location.yourGovernorate}
+              placeholder={t.location.selectGovernorate}
+              options={governorates}
+              value={selectedGovernorate ? selectedGovernorate.name : ""}
+              tPath="governorates"
+              required={true}
+              error={fieldErrors.governorate}
+              locale={locale}
+              t={t}
+              onChange={(item) => {
+                setSelectedGovernorate(item);
+                setSelectedCity(null);
+              }}
+            />
+
+            {/* المدينة */}
+            <SelectOptions
+              label={t.location.yourCity}
+              placeholder={t.location.selectCity}
+              options={filteredCities}
+              value={selectedCity ? selectedCity.name : ""}
+              tPath="cities"
+              required={true}
+              error={fieldErrors.city}
+              locale={locale}
+              t={t}
+              disabled={!selectedGovernorate}
+              onChange={(item) => setSelectedCity(item)}
+            />
+          </div>
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.create.ad.admin_contact || "Admin Contact"}
+            </h2>
+
+            <SelectOptions
+              label={t.create.ad.choose_admin || "Choose Admin"}
+              placeholder={t.create.ad.choose_admin || "Select Admin"}
+              options={adminOptions}
+              value={selectedAdmin ? selectedAdmin.name : ""}
+              required={true}
+              error={fieldErrors.admin}
+              locale={locale}
+              t={t}
+              onChange={(item) => {
+                setSelectedAdmin(item);
+
+                // امسح الايرور أول ما يختار Admin
+                if (fieldErrors.admin) {
+                  setFieldErrors((prev) => {
+                    const newErrors = { ...prev };
+                    delete newErrors.admin;
+                    return newErrors;
+                  });
+                }
+              }}
+            />
+          </div>
         </div>
-
-        {/* === الموقع === */}
-        <div className="form-section">
-          <h2 className="section-title">{t.location.location || "Location"}</h2>
-
-          {/* المحافظة */}
-          <SelectOptions
-            label={t.location.yourGovernorate || "Governorate"}
-            placeholder={t.location.selectGovernorate || "Select Governorate"}
-            options={governorates}
-            value={selectedGovernorate ? selectedGovernorate.name : ""}
-            tPath="governorates"
-            required={true}
-            error={fieldErrors.governorate}
-            locale={locale}
-            t={t}
-            onChange={(item) => {
-              setSelectedGovernorate(item);
-              setSelectedCity(null);
-            }}
-          />
-
-          {/* المدينة */}
-          <SelectOptions
-            label={t.location.yourCity || "City"}
-            placeholder={t.location.selectCity || "Select City"}
-            options={filteredCities}
-            value={selectedCity ? selectedCity.name : ""}
-            tPath="cities"
-            required={true}
-            error={fieldErrors.city}
-            locale={locale}
-            t={t}
-            disabled={!selectedGovernorate}
-            onChange={(item) => setSelectedCity(item)}
-          />
-        </div>
-
         {/* === الصور === */}
         <div className="form-section">
           <h2 className="section-title">
@@ -666,7 +708,9 @@ export default function CreateAd() {
             <h2 className="section-title">
               {t.create.ad.ad_details || "Ad Details"}
             </h2>
-            {dynamicFilters.map((field) => renderDynamicField(field))}
+            <div className="dynamicFilters-holder">
+              {dynamicFilters.map((field) => renderDynamicField(field))}
+            </div>
           </div>
         )}
 

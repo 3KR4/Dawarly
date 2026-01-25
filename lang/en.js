@@ -38,6 +38,8 @@ const en = {
       errors: {
         adTitle: "your ad title is required",
         adTitleValidation: "your ad title is too short",
+        governorate: "Governorate is required",
+        city: "City is required",
       },
     },
     images: {
@@ -251,5 +253,4 @@ const en = {
     },
   },
 };
-
 export default en;

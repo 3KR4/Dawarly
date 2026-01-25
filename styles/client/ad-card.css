@@ -4,6 +4,7 @@
   overflow: hidden;
   cursor: pointer;
   display: flex;
+  height: fit-content;
   flex-direction: column;
 }
 
