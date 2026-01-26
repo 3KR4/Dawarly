@@ -7,31 +7,24 @@ import { HiMiniCalendarDateRange } from "react-icons/hi2";
 import { MdOutlineSdStorage } from "react-icons/md";
 import { IoBatteryHalf } from "react-icons/io5";
 import { LuMemoryStick } from "react-icons/lu";
+import { MdOutlineChair } from "react-icons/md";
+import { TbBrandCashapp } from "react-icons/tb";
+import { IoCashOutline } from "react-icons/io5";
+import { MdOutlineHomeWork } from "react-icons/md";
 
 export const specsConfig = {
-  // Properties (Sale & Rent)
-  1: [
-    { key: "bedrooms", icon: MdOutlineKingBed },
-    { key: "bathrooms", icon: PiBathtubBold },
-    { key: "area_m2", icon: TbMeterSquare },
-  ],
-  2: [
-    { key: "bedrooms", icon: MdOutlineKingBed },
-    { key: "bathrooms", icon: PiBathtubBold },
-    { key: "area_m2", icon: TbMeterSquare },
-  ],
+  type: { icon: MdOutlineHomeWork },
+  bedrooms: { icon: MdOutlineKingBed },
+  bathrooms: { icon: PiBathtubBold },
+  area_m2: { icon: TbMeterSquare },
+  furnished: { icon: MdOutlineChair },
 
-  // Vehicles
-  3: [
-    { key: "model_year", icon: HiMiniCalendarDateRange },
-    { key: "km", icon: PiSpeedometerBold, suffix: "km" },
-    { key: "engine_cc", icon: TbEngine, suffix: "cc" },
-  ],
+  model_year: { icon: HiMiniCalendarDateRange },
+  km: { icon: PiSpeedometerBold, suffix: "km" },
+  engine_cc: { icon: TbEngine, suffix: "cc" },
+  paymentOption: { icon: IoCashOutline },
 
-  // Mobiles & Tablets
-  5: [
-    { key: "storage_gb", icon: MdOutlineSdStorage, suffix: "GB" },
-    { key: "memory", icon: LuMemoryStick, suffix: "GB" },
-    { key: "battery_health_percent", icon: IoBatteryHalf, suffix: "%" },
-  ],
+  storage_gb: { icon: MdOutlineSdStorage, suffix: "GB" },
+  memory: { icon: LuMemoryStick, suffix: "GB" },
+  battery_health_percent: { icon: IoBatteryHalf, suffix: "%" },
 };

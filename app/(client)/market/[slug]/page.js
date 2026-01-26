@@ -4,16 +4,22 @@ import { useParams } from "next/navigation";
 import "@/styles/client/pages/singel-details.css";
 import Image from "next/image";
 import Link from "next/link";
-import { IoCloseCircleSharp } from "react-icons/io5";
+import { IoLocationOutline } from "react-icons/io5";
 import { FaCircleCheck } from "react-icons/fa6";
 import Rating from "@mui/material/Rating";
 import { getService } from "@/services/api/getService";
 import Navigations from "@/components/Tools/Navigations";
+import { formatRelativeDate } from "@/utils/formatRelativeDate";
+import { TbBrandWhatsappFilled } from "react-icons/tb";
+import { FaLocationDot } from "react-icons/fa6";
+
 import {
   FaAngleUp,
   FaAngleDown,
   FaArrowRight,
   FaWhatsapp,
+  FaRegHeart,
+  FaPhone,
 } from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -31,8 +37,10 @@ import { FiShare2 } from "react-icons/fi";
 
 import { FiPhone } from "react-icons/fi";
 
-
 import { settings } from "@/Contexts/settings";
+import { formatEGP } from "@/utils/formatCurrency";
+import AdsSwiper from "@/components/home/Sections/AdsSwiper";
+import { specsConfig } from "@/Contexts/specsConfig";
 
 export default function AdDetails() {
   const t = useTranslate();
@@ -72,6 +80,8 @@ export default function AdDetails() {
     locale === "en"
       ? subcategoriesEn.find((x) => x.id === ad?.sub_category)
       : subcategoriesAr.find((x) => x.id === ad?.sub_category);
+
+  const getSpecConfig = (key) => specsConfig[key];
   return (
     <div className="single-page container for-product">
       <Navigations
@@ -123,7 +133,7 @@ export default function AdDetails() {
                     className={`img ${index === currentImg ? "active" : ""}`}
                     onClick={() => setCurrentImg(index)}
                   >
-                    <img src={x} alt={ad?.name} />
+                    <Image fill src={x} alt={ad?.name} />
                   </div>
                 </SwiperSlide>
               ))}
@@ -135,15 +145,63 @@ export default function AdDetails() {
 
         <div className="details-holder">
           <div className="left">
-            <div className="main-details">
+            <div className="main-details card">
               <div className="row">
                 <h3>{ad?.title}</h3>
                 <div className="btns">
-                  <FiShare2 /> <Svg />
+                  <FiShare2 /> <FaRegHeart />
                 </div>
               </div>
+              <h5 className="price">{formatEGP(ad?.price, locale)}</h5>
+              <div className="row">
+                <div className="area">
+                  <FaLocationDot /> {ad?.area?.governorate?.en},{` `}
+                  {ad?.area?.city?.en}
+                </div>
+                <p className="time">
+                  {formatRelativeDate(ad?.creation_date, locale)}{" "}
+                </p>
+              </div>
             </div>
-            <p className="description">{ad?.description}</p>
+            <div className="specifecs card">
+              <h4>specifecs</h4>
+              <ul>
+                {Object.entries(ad?.specifecs || {}).map(([key, value]) => {
+                  const config = getSpecConfig(key);
+                  const Icon = config?.icon;
+
+                  const displayValue =
+                    typeof value === "object"
+                      ? (value.label ?? value.value)
+                      : value;
+
+                  return (
+                    <li key={key} className="spec-item">
+                      {/* الأيقونة تظهر بس لو موجودة */}
+                      {Icon && <Icon className="spec-icon" />}
+
+                      <span className="spec-key">{key}</span>
+
+                      <span className="spec-value">
+                        : {displayValue}
+                        {config?.suffix && ` ${config.suffix}`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="amenities card">
+              <h4>amenities</h4>
+              <ul>
+                {ad?.amenities?.map((x, index) => (
+                  <li key={index}>{x.label}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="description card">
+              <h4>description</h4> <p>{ad?.description}</p>
+            </p>
 
             {ad?.specs?.length > 0 && (
               <div className="specifications">
@@ -160,23 +218,23 @@ export default function AdDetails() {
             )}
           </div>
           <div className="right">
-            <div className="user-info">
-              <h4>Listed by agency</h4>
-              <h5>mahmoud elshazly</h5>
+            <div className="user-info card">
+              <h4>Listed by mahmoud elshazly</h4>
               <p>member since jan 2025</p>
               <Link href={`/`} className="main-button">
-                <FaArrowRight className="arrow" /> see profile
+                see profile <FaArrowRight className="arrow" />
               </Link>
-              <div className="row-holder">
+              <div className="row">
                 <button className="main-button">
-                  <FiPhone /> Phone Number
+                  <FaPhone /> Phone Number
                 </button>
                 <button className="main-button">
-                  <FaWhatsapp /> WhatsApp
+                  <TbBrandWhatsappFilled style={{ fontSize: "16px" }} />{" "}
+                  WhatsApp
                 </button>
               </div>
             </div>
-            <div className="safety">
+            <div className="safety card">
               <h4>Your safety matters to us!</h4>
               <ul>
                 <li>
@@ -198,6 +256,7 @@ export default function AdDetails() {
             </div>
           </div>
         </div>
+        <AdsSwiper type={`newly_added`} />
       </div>
     </div>
   );
