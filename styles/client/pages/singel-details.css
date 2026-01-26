@@ -7,7 +7,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
-  margin: 0 auto 75px;
+  margin: 0 auto;
 }
 .single-page .title-holder {
   margin: 38px auto 35px;
@@ -44,6 +44,9 @@
   gap: 4px;
   max-height: 100%;
   padding: 3px;
+}
+.imgs-swiper-wrapper.horizontal {
+  flex-direction: row !important;
 }
 /* Swiper نفسه */
 .single-page .images-holder .imgs-swiper {
@@ -82,7 +85,7 @@
 
 /* Active image */
 .single-page .images-holder .imgs-swiper .img.active {
-  outline: 3px solid var(--main-color);
+  outline: 2px solid var(--main-color);
 }
 
 /* Navigation buttons */
@@ -92,12 +95,18 @@
   align-items: center;
   display: flex;
   width: 100%;
-  padding: 1px;
+  padding: 3px;
   color: var(--paragraph);
   border: 1px solid var(--border-color);
   border-radius: 7px;
-  background: var(--hover-color);
+  background: var(--section-color);
   height: 28px;
+}
+.single-page
+  .images-holder
+  .imgs-swiper-wrapper
+  .nav-btn:not(.swiper-button-disabled):hover {
+  background: var(--hover-color);
 }
 .single-page
   .images-holder
@@ -109,7 +118,7 @@
 .single-page .details-holder {
   gap: 10px;
   display: grid;
-  grid-template-columns: 1fr 0.35fr;
+  grid-template-columns: 1fr 0.4fr;
 }
 .single-page .details-holder .card {
   border: 1px solid var(--border-color);
@@ -118,6 +127,9 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
+}
+.single-page .details-holder .card.description {
+  gap: 6px;
 }
 .single-page .details-holder h4 {
   font-size: 17px;
@@ -155,6 +167,10 @@
   padding: 5px;
   display: flex;
 }
+.single-page .details-holder .card .btns svg:hover {
+  background: var(--main-color);
+  color: white;
+}
 .single-page .details-holder .card .area,
 .single-page .details-holder .card .time {
   color: var(--paragraph);
@@ -163,6 +179,195 @@
   font-size: 15px;
   font-weight: 600;
   display: flex;
+}
+
+/* ===============================
+   🌗 GLOBAL (Light / Dark Ready)
+================================ */
+.rdrCalendarWrapper {
+  width: 100%;
+  background-color: var(--body-color) !important;
+  font-family: inherit !important;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===============================
+   📅 HEADER (Month / Year)
+================================ */
+.rdrMonth {
+  width: 100% !important;
+}
+.rdrMonthAndYearWrapper {
+  justify-content: space-between;
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0 0 15px 15px;
+  height: 50px !important;
+  padding: 0 !important;
+}
+.rdrMonthAndYearWrapper {
+  border-radius: 0 !important;
+}
+.rdrMonthAndYearPickers {
+  gap: 3px !important;
+}
+.rdrMonthPicker,
+.rdrYearPicker {
+  margin: 0 !important;
+  flex: 1;
+}
+.rdrMonthPicker select,
+.rdrYearPicker select {
+  background: transparent !important;
+  color: var(--paragraph) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+  height: 32px;
+  width: 100% !important;
+}
+/* ===============================
+   ⬅️➡️ Header NAV BUTTONS
+================================ */
+.rdrDateDisplayWrapper {
+  background-color: var(--section-color) !important;
+}
+.rdrNextPrevButton {
+  width: 40px !important;
+  background: var(--section-color) !important;
+  border-radius: 7px !important;
+  border: 1px solid var(--border-color) !important;
+}
+.rdrNextPrevButton i {
+  margin: auto !important;
+}
+.rdrNextPrevButton:hover {
+  background: color-mix(in srgb, var(--body-color) 20%, transparent);
+}
+.rdrNextPrevButton {
+  transform: scaleX(-1);
+}
+/* ===============================
+   🗓️ WEEK DAYS
+================================ */
+.rdrWeekDays {
+  margin-top: 10px;
+}
+
+.rdrWeekDay {
+  color: var(--paragraph) !important;
+  font-size: 13px;
+  font-weight: 700 !important;
+  border-right: 1px solid var(--border-color);
+}
+.rdrWeekDay:last-child {
+  border-right: unset;
+}
+[lang="ar"] .rdrWeekDay {
+  border-left: 1px solid var(--border-color);
+  border-right: unset;
+}
+[lang="ar"] .rdrWeekDay:last-child {
+  border-left: unset;
+  border-right: 1px solid var(--border-color);
+}
+
+/* ===============================
+   📦 DAYS GRID
+================================ */
+.rdrDays {
+  margin-top: 8px;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.rdrDay {
+  height: 42px !important;
+}
+
+/* ===============================
+   🔢 DAY NUMBER
+================================ */
+.rdrDayNumber span {
+  font-size: 14px !important;
+  font-weight: 500;
+}
+
+/* ===============================
+   📍 TODAY
+================================ */
+.rdrDayToday .rdrDayNumber span {
+  position: relative;
+}
+
+/* ===============================
+   🟣 RANGE STYLES
+================================ */
+.rdrInRange {
+  background: var(--main-color) !important;
+  color: #fff !important;
+}
+
+.rdrStartEdge,
+.rdrEndEdge {
+  background: var(--main-color) !important;
+  color: #fff;
+}
+[lang="ar"] .rdrStartEdge {
+  border-top-left-radius: unset;
+  border-bottom-left-radius: unset;
+  border-top-right-radius: 1.042em;
+  border-bottom-right-radius: 1.042em;
+}
+[lang="ar"] .rdrEndEdge {
+  border-top-left-radius: 042em;
+  border-bottom-left-radius: 042em;
+  border-top-right-radius: unset;
+  border-bottom-right-radius: unset;
+}
+.rdrStartEdge.rdrEndEdge {
+  border-radius: 042em !important;
+}
+/* ===============================
+   🖱️ HOVER
+================================ */
+
+/* preview قبل الاختيار */
+.rdrDayInPreview {
+  color: var(--main-color) !important;
+}
+
+.rdrDayStartPreview,
+.rdrDayEndPreview {
+  border-color: var(--main-color) !important;
+}
+
+/* ===============================
+   🚫 DISABLED / BOOKED
+================================ */
+.rdrDayDisabled {
+  background: var(--section-color) !important;
+}
+
+.rdrDayDisabled span {
+  color: var(--paragraph) !important;
+  opacity: 0.65 !important;
+}
+
+/* ===============================
+   📴 OUTSIDE MONTH
+================================ */
+.rdrDayPassive span {
+  opacity: 0.9 !important;
+}
+.rdrDateDisplayItemActive {
+  border: 2px solid var(--main-color) !important;
+}
+.rdrDayToday .rdrDayNumber span:after {
+  display: none !important;
 }
 .single-page .details-holder h3 {
   font-size: 25px;
@@ -191,12 +396,10 @@
   flex-wrap: wrap;
   gap: 7px;
 }
-.single-page .details-holder .amenities ul li {
-  background: var(--section-color);
-  padding: 8px;
-  border-radius: 5px;
-  font-size: 15px;
-  min-width: max-content;
+.single-page .details-holder .amenitie-item {
+  background: var(--section-color) !important;
+  border: 1px solid var(--border-color) !important;
+  height: 30px !important;
 }
 .single-page .details-holder .specifecs ul {
   gap: 7px;
@@ -204,7 +407,8 @@
   align-items: center;
   flex-wrap: wrap;
 }
-.single-page .details-holder .specifecs ul li {
+.single-page .details-holder .spec-item,
+.single-page .details-holder .amenitie-item {
   background: var(--hover-color);
   border-radius: 5px;
   align-items: center;
@@ -213,6 +417,7 @@
   font-size: 15px;
   font-weight: 600;
   display: flex;
+  height: 33px;
   border: 1px solid var(--border-color);
 }
 .single-page .details-holder .specifecs ul li svg {
@@ -220,8 +425,12 @@
   font-size: 19px;
   margin-right: 6px;
 }
+[lang="ar"] .single-page .details-holder .specifecs ul li svg {
+  margin-right: unset;
+  margin-left: 6px;
+}
 .single-page .details-holder .description p {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.4;
 }
@@ -230,10 +439,7 @@
   margin: 0px 0 4px;
   font-size: 14px;
 }
-.single-page .details-holder .right .user-info .main-button {
-  width: 100%;
-  height: 35px;
-}
+
 .single-page .details-holder .main-button,
 .single-page .details-holder .main-button > * {
   color: var(--paragraph);
@@ -246,10 +452,23 @@
 .single-page .details-holder .main-button svg {
   font-size: 13px;
 }
+.single-page .details-holder .right .user-info .holder {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+[lang="ar"] .single-page .details-holder .right .user-info a.main-button {
+  direction: rtl;
+}
+.single-page .details-holder .right .user-info .main-button {
+  width: 100%;
+  height: 35px;
+  border: none;
+}
 .single-page .details-holder .right .user-info .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 7px;
+  gap: 5px;
 }
 .single-page .details-holder .right .user-info .row button {
   width: 100%;
@@ -266,6 +485,10 @@
   font-size: 14px;
   display: flex;
   padding-left: 15px;
+}
+[lang="ar"] .single-page .details-holder .right .safety ul {
+  padding-right: 15px;
+  padding-left: unset;
 }
 .single-page .details-holder .right .safety ul li {
   line-height: 1.2;
@@ -284,6 +507,12 @@
   left: unset;
   right: -12px;
 }
+.single-page .booking-range .main-button {
+  width: 100%;
+  height: 43px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
 @media (max-width: 1200px) {
   .single-page .details-holder .actions button {
     font-size: 12px;
@@ -298,14 +527,53 @@
   }
   .single-page > .holder > *,
   .review-section .overview {
-    position: relative !important;
-    top: unset !important;
+    position: relative;
+    top: unset;
   }
+  .single-page .images-holder {
+    flex-direction: column;
+    aspect-ratio: 1;
+  }
+
   .single-page .details-holder {
     padding-top: 0;
   }
   .hero-image-holder .details h3 {
     font-size: 34px;
+  }
+  .single-page .details-holder {
+    grid-template-columns: 1fr;
+  }
+  .single-page .details-holder .left,
+  .single-page .details-holder .right {
+    position: relative;
+    top: unset;
+  }
+  .single-page .details-holder .right .user-info .holder {
+    grid-template-columns: 1fr 1fr;
+    direction: rtl;
+  }
+  [lang="ar"] .single-page .details-holder .right .user-info .holder {
+    direction: ltr;
+  }
+  .single-page .details-holder .right .user-info a.main-button {
+    direction: ltr;
+  }
+  .single-page .images-holder .imgs-swiper {
+    flex: 1;
+    width: 1px;
+    height: 90px;
+  }
+  .single-page .images-holder .imgs-swiper-wrapper .nav-btn {
+    width: 34px;
+    padding: 4px;
+  }
+  .single-page .images-holder .imgs-swiper .img {
+    width: 100%;
+    aspect-ratio: unset;
+  }
+  .single-page .images-holder .imgs-swiper-wrapper {
+    margin: 0 -8px;
   }
 }
 @media (max-width: 768px) {
@@ -317,6 +585,66 @@
   }
   .single-page .details-holder .specifications ul li {
     font-size: 14px;
+  }
+  .single-page .details-holder .specifecs ul,
+  .single-page .details-holder .amenities ul {
+    gap: 5px;
+  }
+  .single-page .details-holder .spec-item,
+  .single-page .details-holder .amenitie-item {
+    height: 29px;
+    padding: 4px 6px;
+    font-size: 14px;
+    flex: 1;
+    min-width: max-content;
+  }
+  .single-page .images-holder .imgs-swiper-wrapper .nav-btn {
+    width: 28px;
+    padding: 6px;
+  }
+  .single-page .images-holder .imgs-swiper {
+    height: 70px;
+  }
+  .single-page .images-holder .imgs-swiper .img {
+    border-radius: 7px;
+  }
+  .single-page .details-holder .right .user-info .holder {
+    grid-template-columns: 1fr;
+  }
+  .single-page .details-holder .card {
+    padding: 14px;
+  }
+  .single-page .details-holder .amenitie-item {
+    justify-content: center;
+  }
+  .single-page .details-holder .card .btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .single-page .details-holder .card .btns svg {
+    width: 100%;
+    height: 30px;
+  }
+  .single-page .details-holder h3 {
+    font-size: 20px;
+  }
+  .single-page .details-holder .price {
+    font-size: 25px;
+    margin: 3px 0px 0px;
+  }
+  .single-page .details-holder .card .row:has(.area) {
+    margin: 3px 0px 0px;
+  }
+  .single-page .details-holder .card .area svg {
+    font-size: 12px;
+  }
+  .single-page .details-holder .spec-item {
+    background: var(--section-color);
+  }
+  .rdrWeekDay {
+    font-size: 12px;
   }
 }
 

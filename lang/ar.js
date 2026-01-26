@@ -18,30 +18,50 @@ const ar = {
   market: {
     all_ads: "كل الاعلانات",
   },
-  create: {
-    ad: {
-      choose_category: "اختر القسم",
-      choose_sub_category: "اختر القسم الفرعي",
-      ad_basics: "البيانات الأساسية",
-      ad_details: "تفاصيل الإعلان",
-      contact_information: "بيانات التواصل",
+  ad: {
+    ad_details: "تفاصيل الإعلان",
+    price: "السعر",
+    amenities: "المميزات",
+    description: "الوصف",
+    specifecs: "المواصفات",
+    booking: "الحجوزات",
 
-      choose_category_description: "حدد القسم الرئيسي المناسب لإعلانك.",
-      choose_sub_category_description: "اختر القسم الفرعي لوصف إعلانك بدقة.",
-      ad_basics_description: "أدخل المعلومات الأساسية الخاصة بالإعلان.",
-      ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
-      contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
-      create_your_ad: "انشيء اعلانك الان",
-      contact_via_email: "تواصل عبر البريد الإلكتروني",
-      contact_via_phone: "تواصل عبر الهاتف",
-      contact_via_chat: "تواصل عبر الدردشة",
-      placeholders: {
-        adTitle: "قم بكتابة عنوان اعلانك",
-      },
-      errors: {
-        adTitle: "عنوان اعلانك مطلوب",
-        adTitleValidation: "عنوان اعلانك قصير للغاية",
-      },
+    listed_by: "تم النشر بواسطة",
+    member_since: "عضو منذ",
+
+    see_profile: "عرض الملف الشخصي",
+    phone_number: "رقم الهاتف",
+    whatsapp: "واتساب",
+
+    safety_title: "سلامتك تهمنا!",
+    safety_rules: [
+      "قابل البائع أو المشتري في أماكن عامة أو مزدحمة مثل المترو أو المولات.",
+      "لا تذهب بمفردك لمقابلة أي شخص.",
+      "افحص المنتج جيدًا قبل الشراء.",
+      "لا تدفع أو تحوّل أموال قبل المعاينة.",
+    ],
+
+    choose_category: "اختر القسم",
+    choose_sub_category: "اختر القسم الفرعي",
+    ad_basics: "البيانات الأساسية",
+    ad_details: "تفاصيل الإعلان",
+    contact_information: "بيانات التواصل",
+
+    choose_category_description: "حدد القسم الرئيسي المناسب لإعلانك.",
+    choose_sub_category_description: "اختر القسم الفرعي لوصف إعلانك بدقة.",
+    ad_basics_description: "أدخل المعلومات الأساسية الخاصة بالإعلان.",
+    ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
+    contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
+    create_your_ad: "انشيء اعلانك الان",
+    contact_via_email: "تواصل عبر البريد الإلكتروني",
+    contact_via_phone: "تواصل عبر الهاتف",
+    contact_via_chat: "تواصل عبر الدردشة",
+    placeholders: {
+      adTitle: "قم بكتابة عنوان اعلانك",
+    },
+    errors: {
+      adTitle: "عنوان اعلانك مطلوب",
+      adTitleValidation: "عنوان اعلانك قصير للغاية",
     },
     images: {
       label: "قم برفع صور لاعلانك",
@@ -54,6 +74,7 @@ const ar = {
       },
     },
   },
+
   placeholders: {
     search: "ابحث عن اي شئ ...",
   },

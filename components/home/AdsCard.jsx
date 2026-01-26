@@ -54,7 +54,8 @@ export default function CardItem({ data }) {
   }, [locale]);
 
   const adSubCat = subcategories?.find((x) => x.id == data?.sub_category);
-  const allowedSpecs = specsConfig[data.category] || [];
+  const getSpecConfig = (key) => specsConfig[key];
+
   return (
     <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
@@ -100,21 +101,30 @@ export default function CardItem({ data }) {
           <span className={`condition`}>{data?.condition}</span>
         </div>
       </div>
-        <div className="date-area">
-          {allowedSpecs?.map(({ key, icon: Icon, suffix }) => {
-            const value = data?.specs?.[key];
-            if (!value) return null;
+      <div className="date-area">
+        {Object.entries(data?.specifecs || {})
+          .filter(([key]) => {
+            const config = getSpecConfig(key);
+            return config?.showInMini;
+          })
+          .map(([key, value]) => {
+            const config = getSpecConfig(key);
+            const Icon = config?.icon;
+
+            const displayValue =
+              typeof value === "object" ? (value.label ?? value.value) : value;
 
             return (
               <div key={key} className="spec">
-                <Icon className={key} />
+                {Icon && <Icon className="spec-icon" />}
                 <span>
-                  {value} {suffix}
+                  {displayValue}
+                  {config?.suffix && ` ${config.suffix}`}
                 </span>
               </div>
             );
           })}
-        </div>
+      </div>
 
       <div className="date-area">
         <p className="area">

@@ -98,12 +98,12 @@ export default function CreateAd() {
   const METHODS = [
     {
       key: "email",
-      label:  "user to user"||  t.create.ad.contact_via_email,
+      label: "user to user" || t.ad.contact_via_email,
       icon: FiUsers,
     },
     {
       key: "phone",
-      label:  "user to admin"|| t.create.ad.contact_via_phone,
+      label: "user to admin" || t.ad.contact_via_phone,
       icon: LuUserCog,
     },
   ];
@@ -140,14 +140,13 @@ export default function CreateAd() {
 
     // التحقق من الحقول الإلزامية الأساسية
     if (!selectedCategory) {
-      newErrors.category =
-        t.create.ad.errors.category || "Category is required";
+      newErrors.category = t.ad.errors.category || "Category is required";
       hasErrors = true;
     }
 
     if (!selectedSubCategory) {
       newErrors.subCategory =
-        t.create.ad.errors.subCategory || "Subcategory is required";
+        t.ad.errors.subCategory || "Subcategory is required";
       hasErrors = true;
     }
 
@@ -161,13 +160,12 @@ export default function CreateAd() {
       hasErrors = true;
     }
     if (!selectedAdmin) {
-      newErrors.admin = t.create.ad.errors?.admin || "Admin user is required";
+      newErrors.admin = t.ad.errors?.admin || "Admin user is required";
       hasErrors = true;
     }
 
     if (images.length === 0) {
-      newErrors.images =
-        t.create.ad.errors.images || "At least one image is required";
+      newErrors.images = t.ad.errors.images || "At least one image is required";
       hasErrors = true;
     }
 
@@ -177,7 +175,7 @@ export default function CreateAd() {
     );
     if (!hasSelectedContact) {
       newErrors.contact =
-        t.create.ad.contact_method_required ||
+        t.ad.contact_method_required ||
         "Please select at least one contact method";
       hasErrors = true;
     }
@@ -271,16 +269,16 @@ export default function CreateAd() {
     };
 
     console.log("FINAL REQUEST", finalData);
-    alert(t.create.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+    alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
 
     // هنا يمكنك إضافة استدعاء API لإرسال البيانات
     // try {
     //   const response = await postService.createAd(finalData);
     //   console.log("Ad created successfully:", response);
-    //   alert(t.create.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+    //   alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
     // } catch (error) {
     //   console.error("Error creating ad:", error);
-    //   alert(t.create.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
+    //   alert(t.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
     // }
   };
 
@@ -528,13 +526,13 @@ export default function CreateAd() {
         {/* === معلومات أساسية === */}
         <div className="form-section">
           <h2 className="section-title">
-            {t.create.ad.basic_info || "Basic Information"}
+            {t.ad.basic_info || "Basic Information"}
           </h2>
 
           {/* عنوان الإعلان */}
           <div className="box forInput">
             <label>
-              {t.create.ad.placeholders.adTitle || "Ad Title"}{" "}
+              {t.ad.placeholders.adTitle || "Ad Title"}{" "}
               <span className="required">*</span>
             </label>
             <div className="inputHolder">
@@ -542,18 +540,15 @@ export default function CreateAd() {
                 <input
                   type="text"
                   {...register("adTitle", {
-                    required:
-                      t.create.ad.errors.adTitle || "Ad title is required",
+                    required: t.ad.errors.adTitle || "Ad title is required",
                     minLength: {
                       value: 6,
                       message:
-                        t.create.ad.errors.adTitleValidation ||
+                        t.ad.errors.adTitleValidation ||
                         "Title must be at least 6 characters",
                     },
                   })}
-                  placeholder={
-                    t.create.ad.placeholders.adTitle || "Enter ad title"
-                  }
+                  placeholder={t.ad.placeholders.adTitle || "Enter ad title"}
                 />
               </div>
               {errors.adTitle && (
@@ -586,13 +581,13 @@ export default function CreateAd() {
           {/* === الفئة والتصنيف === */}
           <div className="form-section">
             <h2 className="section-title">
-              {t.create.ad.category_info || "Category Information"}
+              {t.ad.category_info || "Category Information"}
             </h2>
 
             {/* الفئة الرئيسية */}
             <SelectOptions
-              label={t.create.ad.choose_category || "Category"}
-              placeholder={t.create.ad.choose_category || "Select Category"}
+              label={t.ad.choose_category || "Category"}
+              placeholder={t.ad.choose_category || "Select Category"}
               options={categories}
               value={selectedCategory ? selectedCategory.name : ""}
               tPath="categories"
@@ -605,10 +600,8 @@ export default function CreateAd() {
 
             {/* الفئة الفرعية */}
             <SelectOptions
-              label={t.create.ad.choose_sub_category || "Subcategory"}
-              placeholder={
-                t.create.ad.choose_sub_category || "Select Subcategory"
-              }
+              label={t.ad.choose_sub_category || "Subcategory"}
+              placeholder={t.ad.choose_sub_category || "Select Subcategory"}
               options={filteredSubcategories}
               value={selectedSubCategory ? selectedSubCategory.name : ""}
               tPath="subcategories"
@@ -661,12 +654,12 @@ export default function CreateAd() {
           </div>
           <div className="form-section">
             <h2 className="section-title">
-              {t.create.ad.admin_contact || "Admin Contact"}
+              {t.ad.admin_contact || "Admin Contact"}
             </h2>
 
             <SelectOptions
-              label={t.create.ad.choose_admin || "Choose Admin"}
-              placeholder={t.create.ad.choose_admin || "Select Admin"}
+              label={t.ad.choose_admin || "Choose Admin"}
+              placeholder={t.ad.choose_admin || "Select Admin"}
               options={adminOptions}
               value={selectedAdmin ? selectedAdmin.name : ""}
               required={true}
@@ -691,7 +684,7 @@ export default function CreateAd() {
         {/* === الصور === */}
         <div className="form-section">
           <h2 className="section-title">
-            {t.create.ad.images || "Images"} <span className="required">*</span>
+            {t.dashboard.forms} <span className="required">*</span>
           </h2>
           <Images images={images} setImages={setImages} isSubmitted={false} />
           {fieldErrors.images && (
@@ -705,9 +698,7 @@ export default function CreateAd() {
         {/* === الحقول الديناميكية === */}
         {dynamicFilters.length > 0 && (
           <div className="form-section">
-            <h2 className="section-title">
-              {t.create.ad.ad_details || "Ad Details"}
-            </h2>
+            <h2 className="section-title">{t.ad.ad_details || "Ad Details"}</h2>
             <div className="dynamicFilters-holder">
               {dynamicFilters.map((field) => renderDynamicField(field))}
             </div>
@@ -717,7 +708,7 @@ export default function CreateAd() {
         {/* === طرق التواصل === */}
         <div className="form-section">
           <h2 className="section-title">
-            {t.create.ad.contact_information || "Contact Information"}
+            {t.ad.contact_information || "Contact Information"}
           </h2>
           <div className="options-grid verfiyMethod">
             {METHODS.map(({ key, label, icon: Icon }) => {
@@ -761,7 +752,7 @@ export default function CreateAd() {
         {/* === زر الإرسال === */}
         <div className="form-section submit-section">
           <button type="submit" className="main-button">
-            {t.create.ad.create_your_ad || "Create Advertisement"}
+            {t.ad.create_your_ad || "Create Advertisement"}
           </button>
         </div>
       </form>

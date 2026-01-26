@@ -200,9 +200,9 @@ a {
 @media (max-width: 768px) {
   .container,
   .fluid-container {
-   width: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
+    width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 
@@ -690,9 +690,8 @@ a {
   transition: 0.3s;
   background: var(--section-color);
 }
-[lang = "ar"] .filters.for-cats button {
+[lang="ar"] .filters.for-cats button {
   text-align: right;
-
 }
 .filters.for-cats button:hover,
 .filters.for-cats button.active {
@@ -780,7 +779,6 @@ svg.main-ico {
 }
 
 @media (max-width: 768px) {
-  
   .title-holder {
     width: 100%;
     padding: 0 15px !important;
@@ -873,6 +871,10 @@ svg.main-ico {
     font-size: 14px;
     padding: 0;
     border: 0;
+  }
+  .navigations a,
+  .navigations .active {
+    font-size: 14px;
   }
 }
 @media (max-width: 400px) {

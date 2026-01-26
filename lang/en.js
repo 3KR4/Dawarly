@@ -17,34 +17,53 @@ const en = {
   market: {
     all_ads: "all ads",
   },
-  create: {
-    ad: {
-      choose_category: "Choose a category",
-      choose_sub_category: "Choose a subcategory",
-      ad_basics: "Ad basics",
-      ad_details: "Ad details",
-      contact_information: "Contact information",
-      choose_category_description:
-        "Select the main category that best fits your ad.",
-      choose_sub_category_description:
-        "Choose a subcategory to better describe your ad.",
-      ad_basics_description: "Enter the essential information about your ad.",
-      ad_details_description:
-        "Add more details to make your ad more attractive.",
-      contact_information_description: "Provide your preferred contact method.",
-      create_your_ad: "create your ad",
-      contact_via_email: "Contact via Email",
-      contact_via_phone: "Contact via Phone",
-      contact_via_chat: "Contact via Chat",
-      placeholders: {
-        adTitle: "enter your ad title",
-      },
-      errors: {
-        adTitle: "your ad title is required",
-        adTitleValidation: "your ad title is too short",
-        governorate: "Governorate is required",
-        city: "City is required",
-      },
+  ad: {
+    ad_details: "Ad Details",
+    price: "Price",
+    amenities: "Amenities",
+    description: "Description",
+    specifecs: "Specifications",
+    booking: "booking",
+
+    listed_by: "Listed by",
+    member_since: "Member since",
+
+    see_profile: "See profile",
+    phone_number: "Phone number",
+    whatsapp: "WhatsApp",
+
+    safety_title: "Your safety matters to us!",
+    safety_rules: [
+      "Only meet in public or crowded places such as metro stations or malls.",
+      "Never go alone to meet a buyer or seller.",
+      "Inspect the product carefully before purchasing.",
+      "Never pay or transfer money in advance.",
+    ],
+
+    choose_category: "Choose a category",
+    choose_sub_category: "Choose a subcategory",
+    ad_basics: "Ad basics",
+    ad_details: "Ad details",
+    contact_information: "Contact information",
+    choose_category_description:
+      "Select the main category that best fits your ad.",
+    choose_sub_category_description:
+      "Choose a subcategory to better describe your ad.",
+    ad_basics_description: "Enter the essential information about your ad.",
+    ad_details_description: "Add more details to make your ad more attractive.",
+    contact_information_description: "Provide your preferred contact method.",
+    create_your_ad: "create your ad",
+    contact_via_email: "Contact via Email",
+    contact_via_phone: "Contact via Phone",
+    contact_via_chat: "Contact via Chat",
+    placeholders: {
+      adTitle: "enter your ad title",
+    },
+    errors: {
+      adTitle: "your ad title is required",
+      adTitleValidation: "your ad title is too short",
+      governorate: "Governorate is required",
+      city: "City is required",
     },
     images: {
       label: "uploud your ad images",

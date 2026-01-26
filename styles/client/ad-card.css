@@ -186,7 +186,8 @@
 }
 
 .ad-card .date-area .spec svg.km,
-.ad-card .date-area .spec svg.engine_cc {
+.ad-card .date-area .spec svg.engine_cc,
+.ad-card .date-area .spec svg.color {
   font-size: 18px;
 }
 .ad-card .date-area .spec svg.km {

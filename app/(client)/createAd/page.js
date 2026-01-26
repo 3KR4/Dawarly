@@ -66,17 +66,17 @@ export default function CreateAd() {
   const METHODS = [
     {
       key: "email",
-      label: t.create.ad.contact_via_email,
+      label: t.ad.contact_via_email,
       icon: Mail,
     },
     {
       key: "phone",
-      label: t.create.ad.contact_via_phone,
+      label: t.ad.contact_via_phone,
       icon: Phone,
     },
     {
       key: "chat",
-      label: t.create.ad.contact_via_chat,
+      label: t.ad.contact_via_chat,
       icon: BsChatDots,
     },
   ];
@@ -193,7 +193,7 @@ export default function CreateAd() {
         setFieldErrors((prev) => ({
           ...prev,
           contact:
-            t.create.ad.contact_method_required ||
+            t.ad.contact_method_required ||
             "Please select at least one contact method",
         }));
         return false;
@@ -245,8 +245,8 @@ export default function CreateAd() {
       const isFormValid = await trigger(["adTitle"]);
 
       const errors = {
-        gov: !userAddress.gov ? t.create.ad.errors.governorate : "",
-        city: !userAddress.city ? t.create.ad.errors.city : "",
+        gov: !userAddress.gov ? t.ad.errors.governorate : "",
+        city: !userAddress.city ? t.ad.errors.city : "",
       };
 
       setAddressErrors(errors);
@@ -275,7 +275,7 @@ export default function CreateAd() {
         setFieldErrors((prev) => ({
           ...prev,
           contact:
-            t.create.ad.contact_method_required ||
+            t.ad.contact_method_required ||
             "Please select at least one contact method",
         }));
         return;
@@ -297,24 +297,24 @@ export default function CreateAd() {
       };
 
       console.log("FINAL REQUEST", finalData);
-      alert(t.create.ad.submission_success || "تم تجميع البيانات بنجاح!");
+      alert(t.ad.submission_success || "تم تجميع البيانات بنجاح!");
     }
   };
 
   const titles = {
-    [STEPS.CATEGORIES]: t.create.ad.choose_category,
-    [STEPS.SUB_CATEGORIES]: t.create.ad.choose_sub_category,
-    [STEPS.BASICS]: t.create.ad.ad_basics,
-    [STEPS.ALL_DETAILS]: t.create.ad.ad_details,
-    [STEPS.CONTACT]: t.create.ad.contact_information,
+    [STEPS.CATEGORIES]: t.ad.choose_category,
+    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
+    [STEPS.BASICS]: t.ad.ad_basics,
+    [STEPS.ALL_DETAILS]: t.ad.ad_details,
+    [STEPS.CONTACT]: t.ad.contact_information,
   };
 
   const descriptions = {
-    [STEPS.CATEGORIES]: t.create.ad.choose_category_description,
-    [STEPS.SUB_CATEGORIES]: t.create.ad.choose_sub_category_description,
-    [STEPS.BASICS]: t.create.ad.ad_basics_description,
-    [STEPS.ALL_DETAILS]: t.create.ad.ad_details_description,
-    [STEPS.CONTACT]: t.create.ad.contact_information_description,
+    [STEPS.CATEGORIES]: t.ad.choose_category_description,
+    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category_description,
+    [STEPS.BASICS]: t.ad.ad_basics_description,
+    [STEPS.ALL_DETAILS]: t.ad.ad_details_description,
+    [STEPS.CONTACT]: t.ad.contact_information_description,
   };
 
   return (
@@ -390,19 +390,19 @@ export default function CreateAd() {
         {step === STEPS.BASICS && (
           <>
             <div className="box forInput">
-              <label>{t.create.ad.placeholders.adTitle}</label>
+              <label>{t.ad.placeholders.adTitle}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <input
                     type="text"
                     {...register("adTitle", {
-                      required: t.create.ad.errors.adTitle,
+                      required: t.ad.errors.adTitle,
                       minLength: {
                         value: 6,
-                        message: t.create.ad.errors.adTitleValidation,
+                        message: t.ad.errors.adTitleValidation,
                       },
                     })}
-                    placeholder={t.create.ad.placeholders.adTitle}
+                    placeholder={t.ad.placeholders.adTitle}
                   />
                 </div>
                 {errors.adTitle && (
@@ -783,9 +783,7 @@ export default function CreateAd() {
         {/* ================= BUTTON ================= */}
         {step !== STEPS.CATEGORIES && step !== STEPS.SUB_CATEGORIES && (
           <button type="submit" className="main-button">
-            {step === STEPS.CONTACT
-              ? t.create.ad.create_your_ad
-              : t.actions.next}
+            {step === STEPS.CONTACT ? t.ad.create_your_ad : t.actions.next}
           </button>
         )}
       </form>
