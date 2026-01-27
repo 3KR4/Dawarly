@@ -22,8 +22,31 @@
 .side-nav .a {
   cursor: pointer;
 }
+.side-nav div.a {
+  flex-direction: column;
+  gap: 0 !important;
+  height: unset;
+}
+.side-nav div.a .according {
+  height: 0;
+  transition: 0.35s;
+  overflow: hidden;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.side-nav div.a.active .according {
+  margin-top: 5px;
+}
+.a.active > .hold {
+  background: var(--main-color);
+}
 .side-nav.active h4 {
   width: 145px;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .side-nav svg {
   color: var(--paragraph);
@@ -66,7 +89,6 @@
   display: flex;
   border-bottom: 1px solid var(--border-color);
   padding: 6px;
-  justify-content: center;
 
   transition: 0.3s;
 }
@@ -83,13 +105,36 @@
   align-items: center;
   width: 100%;
   display: flex;
-  padding: 12px;
+  padding: 0 12px;
   transition: 0.3s;
+  height: 37px;
 }
 .side-nav .a:hover .hold,
 .side-nav .a.active .hold {
   background: var(--main-color);
   border-radius: 7px;
+}
+.side-nav div.a:hover .according .hold,
+.side-nav div.a.active .according .hold {
+  background: transparent;
+}
+.side-nav div.a .according a:hover .hold,
+.side-nav div.a .according .a.active .hold {
+  background: var(--hover-color);
+}
+.side-nav div.a .according a,
+.side-nav div.a .according a {
+  border: unset;
+  height: unset;
+  padding: 0;
+}
+.side-nav.active div.a .according a,
+.side-nav.active div.a .according a {
+  padding: 0 9px;
+}
+.side-nav div.a .according a h4,
+.side-nav div.a .according a h4 {
+  font-size: 14px;
 }
 .side-nav svg {
   font-size: 20px;
@@ -100,6 +145,10 @@
 .side-nav .a:hover *,
 .side-nav .a.active * {
   color: white;
+}
+.side-nav div.a:hover .according .hold *,
+.side-nav div.a.active .according .hold * {
+  color: var(--paragraph);
 }
 
 .side-nav .a-user {
@@ -123,4 +172,18 @@
 }
 .side-nav.active .a-user:hover .hold * {
   color: var(--paragraph);
+}
+
+@media (max-width: 1300px) {
+  .side-nav.active h4 {
+    width: 120px;
+  }
+}
+@media (max-width: 992px) {
+  .side-nav {
+    position: fixed;
+    z-index: 11;
+    background: var(--body-color);
+    left: -192px;
+  }
 }

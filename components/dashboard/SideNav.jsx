@@ -1,168 +1,267 @@
 "use client";
-import "@/styles/client/header.css";
+import "@/styles/dashboard/side-nav.css";
 import React, { useState, useEffect, useContext, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { RiGovernmentFill } from "react-icons/ri";
+import { usePathname } from "next/navigation";
 import { settings } from "@/Contexts/settings";
+import useTranslate from "@/Contexts/useTranslation";
+import { AiFillProduct } from "react-icons/ai";
+import { LuCalendarClock } from "react-icons/lu";
+import { LuCalendarCheck } from "react-icons/lu";
+import { LuGrid2X2Check } from "react-icons/lu";
+
+import {
+  FaUsers,
+  FaHeadset,
+  FaMoon,
+  FaUser,
+  FaAngleLeft,
+  FaAngleRight,
+} from "react-icons/fa";
+import { FaChartSimple, FaFileContract } from "react-icons/fa6";
+import { PiCardsFill } from "react-icons/pi";
+import { IoMenu, IoLanguage } from "react-icons/io5";
+import { MdLogout } from "react-icons/md";
 import { FiSun } from "react-icons/fi";
 
-import { PiCardsFill } from "react-icons/pi";
-import { FaHeadset } from "react-icons/fa6";
-import { FaUsers } from "react-icons/fa";
-import useTranslate from "@/Contexts/useTranslation";
-import { FaAngleRight, FaAngleLeft } from "react-icons/fa";
-import {
-  FaPlaceOfWorship,
-  FaShoppingCart,
-  FaHome,
-  FaMoon,
-} from "react-icons/fa";
-import { FaChartPie, FaUser } from "react-icons/fa6";
-import { IoMenu, IoLanguage } from "react-icons/io5";
-import { MdEventNote, MdLogout, MdSunny } from "react-icons/md";
-import { HiChartBar } from "react-icons/hi2";
-import "@/styles/dashboard/side-nav.css";
-import { usePathname } from "next/navigation";
-
 function SideNav() {
-  const { screenSize, theme, toggleTheme, locale, toggleLocale } =
-    useContext(settings);
+  const { theme, toggleTheme, locale, toggleLocale } = useContext(settings);
   const t = useTranslate();
 
   const pathname = usePathname();
-  const isActive = (path) => pathname == path;
+  const isActive = (path) => {
+    return (
+      pathname === path || (path !== "/dashboard" && pathname.startsWith(path))
+    );
+  };
+
+  const isAccordionActive = (accordionPath) => {
+    return pathname.startsWith(accordionPath);
+  };
 
   const [isNavOpen, setIsNavOpen] = useState(null);
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("nav-open");
+  const [openAccordion, setOpenAccordion] = useState(null);
+  const accordionRefs = useRef({});
+  const [isMounted, setIsMounted] = useState(false);
 
-      if (saved === null) {
-        setIsNavOpen(true);
-      } else {
-        setIsNavOpen(saved === "true");
-      }
-    } catch (e) {
-      console.error("LocalStorage read error", e);
-      setIsNavOpen(true);
-    }
+  const toggleAccordion = (key) => {
+    setOpenAccordion((prev) => (prev === key ? null : key));
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("nav-open");
+    setIsNavOpen(saved === null ? true : saved === "true");
+    setIsMounted(true);
   }, []);
 
-  // حفظ القيمة بعد التغيير
   useEffect(() => {
     if (isNavOpen !== null) {
       localStorage.setItem("nav-open", isNavOpen ? "true" : "false");
     }
   }, [isNavOpen]);
 
-  // لغاية ما القيمة تتحمل → منرندرش حاجة
-  if (isNavOpen === null) return null;
+  useEffect(() => {
+    if (!isMounted) return;
+
+    if (pathname.startsWith("/dashboard/ads")) {
+      setOpenAccordion("ads");
+    } else if (pathname.startsWith("/dashboard/bookings")) {
+      setOpenAccordion("bookings");
+    } else {
+      setOpenAccordion(null);
+    }
+  }, [pathname, isMounted]);
+
+  if (isNavOpen === null || !isMounted) return null;
+
   return (
     <div className={`side-nav ${isNavOpen ? "active" : ""}`}>
       <ul>
+        {/* Toggle */}
         <li
           className="actions-btns"
           onClick={() => setIsNavOpen((prev) => !prev)}
         >
-          <h4>menu routes</h4>
+          <h4>{t.sideNav.menuRoutes}</h4>
           {isNavOpen ? (
             locale === "en" ? (
-              <FaAngleLeft className="menu-ico-close" />
+              <FaAngleLeft />
             ) : (
-              <FaAngleRight className="menu-ico-close" />
+              <FaAngleRight />
             )
           ) : (
-            <IoMenu style={{ fontSize: "21px" }} className="menu-ico" />
+            <IoMenu style={{ fontSize: "25px" }} />
           )}
         </li>
+
+        {/* Overview */}
         <Link
           href="/dashboard"
           className={isActive("/dashboard") ? "active a" : "a"}
         >
           <div className="hold">
-            <h4>OverView</h4>
-            <FaHome />
+            <h4>{t.sideNav.overview}</h4>
+            <FaChartSimple />
           </div>
         </Link>
+
+        {/* Slides */}
         <Link
           href="/dashboard/slieds"
-          className={isActive("/dashboard/slieds") ? "active a" : " a"}
+          className={isActive("/dashboard/slieds") ? "active a" : "a"}
         >
           <div className="hold">
-            <h4>slieds</h4>
+            <h4>{t.sideNav.slides}</h4>
             <PiCardsFill />
           </div>
         </Link>
+
+        {/* Users */}
         <Link
           href="/dashboard/users"
-          className={isActive("/dashboard/users") ? "active a" : " a"}
+          className={isActive("/dashboard/users") ? "active a" : "a"}
         >
           <div className="hold">
-            <h4>users</h4>
+            <h4>{t.sideNav.users}</h4>
             <FaUsers />
           </div>
         </Link>
 
-        <Link
-          href="/dashboard/orders"
-          className={isActive("/dashboard/orders") ? "active a" : " a"}
+        {/* Ads */}
+        <div
+          className={`a ${isAccordionActive("/dashboard/ads") ? "active" : ""} ${
+            openAccordion === "ads" ? "active" : ""
+          }`}
+          onClick={() => toggleAccordion("ads")}
         >
           <div className="hold">
-            <h4>orders</h4>
-            <HiChartBar />
+            <h4>{t.sideNav.ads}</h4>
+            <AiFillProduct />
           </div>
-        </Link>
-        <Link
-          href="/dashboard/products"
-          className={isActive("/dashboard/products") ? "active a" : " a"}
+
+          <div
+            ref={(el) => (accordionRefs.current.ads = el)}
+            className="according"
+            style={{
+              height:
+                openAccordion === "ads"
+                  ? `${accordionRefs.current.ads?.scrollHeight || 100}px`
+                  : "0px",
+            }}
+          >
+            <Link
+              href="/dashboard/ads/active"
+              className={isActive("/dashboard/ads/active") ? "active a" : "a"}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>{t.sideNav.activeAds}</h4>
+                <LuGrid2X2Check />
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/ads/pending"
+              className={isActive("/dashboard/ads/pending") ? "active a" : "a"}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>{t.sideNav.pendingAds}</h4>
+                <LuCalendarClock />
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Bookings */}
+        <div
+          className={`a ${isAccordionActive("/dashboard/bookings") ? "active" : ""} ${
+            openAccordion === "bookings" ? "active" : ""
+          }`}
+          onClick={() => toggleAccordion("bookings")}
         >
           <div className="hold">
-            <h4>products</h4>
-            <FaShoppingCart />
+            <h4>{t.sideNav.bookings}</h4>
+            <FaFileContract />
           </div>
-        </Link>
+
+          <div
+            ref={(el) => (accordionRefs.current.bookings = el)}
+            className="according"
+            style={{
+              height:
+                openAccordion === "bookings"
+                  ? `${accordionRefs.current.bookings?.scrollHeight || 100}px`
+                  : "0px",
+            }}
+          >
+            <Link
+              href="/dashboard/bookings/active"
+              className={
+                isActive("/dashboard/bookings/active") ? "active a" : "a"
+              }
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>{t.sideNav.activeBookings}</h4>
+                <LuCalendarCheck />
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard/bookings/pending"
+              className={
+                isActive("/dashboard/bookings/pending") ? "active a" : "a"
+              }
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>{t.sideNav.pendingBookings}</h4>
+                <LuCalendarClock />
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Support */}
         <Link
           href="/dashboard/support"
-          className={isActive("/dashboard/support") ? "active a" : " a"}
+          className={isActive("/dashboard/support") ? "active a" : "a"}
         >
           <div className="hold">
-            <h4>support</h4>
+            <h4>{t.sideNav.support}</h4>
             <FaHeadset />
           </div>
         </Link>
       </ul>
+
+      {/* Bottom actions */}
       <ul>
-        <div href="/dashboard/orders" className={`a a-user`}>
+        <div className="a a-user">
           <div className="hold">
-            <h4>mahmoud elshazly</h4>
+            <h4>Mahmoud Elshazly</h4>
             <FaUser />
           </div>
         </div>
-        <di className={`a`} onClick={toggleTheme}>
+
+        <div className="a" onClick={toggleTheme}>
           <div className="hold">
-            {theme === "light" ? (
-              <>
-                <h4>{t.actions.darkMode}</h4>
-                <FaMoon />
-              </>
-            ) : (
-              <>
-                <h4>{t.actions.lightMode}</h4>
-                <FiSun />
-              </>
-            )}
+            <h4>
+              {theme === "light" ? t.actions.darkMode : t.actions.lightMode}
+            </h4>
+            {theme === "light" ? <FaMoon /> : <FiSun />}
           </div>
-        </di>
-        <div className={`a`} onClick={toggleLocale}>
+        </div>
+
+        <div className="a" onClick={toggleLocale}>
           <div className="hold">
             <h4>{t.actions.lang}</h4>
             <IoLanguage />
           </div>
         </div>
-        <div href="/dashboard/orders" className={`a danger`}>
+
+        <div className="a danger">
           <div className="hold">
-            <h4>log out</h4>
+            <h4>{t.sideNav.logout}</h4>
             <MdLogout />
           </div>
         </div>

@@ -1,8 +1,41 @@
-export const formatRelativeDate = (dateString, locale = "ar") => {
+export const formatRelativeDate = (
+  dateString,
+  locale = "ar",
+  type = "simple", // simple | detailed
+) => {
   if (!dateString) return "";
 
   const now = new Date();
   const date = new Date(dateString);
+
+  const isArabic = locale === "ar";
+  const isSameYear = now.getFullYear() === date.getFullYear();
+
+  // =========================
+  // DETAILED MODE
+  // =========================
+  if (type === "detailed") {
+    const options = {
+      day: "numeric",
+      month: "long",
+      hour: "numeric",
+      minute: "2-digit",
+    };
+
+    // لو سنة مختلفة نضيف السنة
+    if (!isSameYear) {
+      options.year = "numeric";
+    }
+
+    return new Intl.DateTimeFormat(
+      isArabic ? "ar-EG" : "en-US",
+      options,
+    ).format(date);
+  }
+
+  // =========================
+  // SIMPLE MODE (الحالي)
+  // =========================
   const diffMs = now - date;
 
   const seconds = Math.floor(diffMs / 1000);
@@ -11,9 +44,6 @@ export const formatRelativeDate = (dateString, locale = "ar") => {
   const days = Math.floor(hours / 24);
   const weeks = Math.floor(days / 7);
 
-  const isArabic = locale === "ar";
-
-  // Calculate months and years properly
   const years = now.getFullYear() - date.getFullYear();
   const months = years * 12 + (now.getMonth() - date.getMonth());
 

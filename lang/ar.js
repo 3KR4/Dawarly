@@ -192,6 +192,33 @@ const ar = {
         governorateNameMinLength: "اسم المحافظة يجب أن يكون على الأقل 3 أحرف",
       },
     },
+    tables: {
+      ad_details: "تفاصيل الاعلان",
+      status: "الاحصائيات",
+      location: "الموقع",
+      actions: "الاجرائات",
+      published_at: "تاريخ النشر",
+      created_at: "تاريخ الانشاء",
+    },
+  },
+  sideNav: {
+    menuRoutes: "روابط القائمة",
+    overview: "نظرة عامة",
+    slides: "السلايدرز",
+    users: "المستخدمين",
+
+    ads: "الإعلانات",
+    activeAds: "إعلانات نشطة",
+    pendingAds: "إعلانات معلّقة",
+
+    bookings: "الحجوزات",
+    activeBookings: "حجوزات نشطة",
+    pendingBookings: "حجوزات معلّقة",
+
+    support: "الدعم",
+
+    profile: "الملف الشخصي",
+    logout: "تسجيل الخروج",
   },
   auth: {
     login: "تسجيل الدخول",

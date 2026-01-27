@@ -193,6 +193,33 @@ const en = {
           "The Governorate name must be at least 3 letters",
       },
     },
+    tables: {
+      ad_details: "ad details",
+      status: "status",
+      location: "location",
+      actions: "actions",
+      published_at: "published at",
+      created_at: "created at",
+    },
+  },
+  sideNav: {
+    menuRoutes: "menu routes",
+    overview: "Overview",
+    slides: "Slides",
+    users: "Users",
+
+    ads: "Ads",
+    activeAds: "Active Ads",
+    pendingAds: "Pending Ads",
+
+    bookings: "Bookings",
+    activeBookings: "Active Bookings",
+    pendingBookings: "Pending Bookings",
+
+    support: "Support",
+
+    profile: "Profile",
+    logout: "Log out",
   },
   auth: {
     login: "Log in",

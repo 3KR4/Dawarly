@@ -9,7 +9,7 @@
 .table-header {
   display: grid;
   grid-template-columns: 1.5fr 1.4fr 1fr 1fr;
-
+  border-bottom: 1px solid var(--border-color);
   gap: 30px;
   padding: 18px 1.2rem;
   background-color: #f8f9fa;
@@ -22,6 +22,7 @@
   display: flex;
   letter-spacing: 0.3px;
   font-size: 15px;
+  text-transform: capitalize;
   font-weight: 800;
   color: var(--paragraph);
 }
@@ -108,6 +109,7 @@
   -webkit-box-orient: vertical;
   display: -webkit-box;
   overflow: hidden;
+  line-height: 1.4;
 }
 
 .table-container .link:hover {
@@ -270,6 +272,58 @@
   gap: 0 !important;
 }
 
+@media (max-width: 1700px) {
+  .dashboard .table-container .table-header,
+  .dashboard .table-container .table-item {
+    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.6fr;
+    gap: 10px;
+  }
+  .header-item {
+    font-size: 14px;
+  }
+  p.date {
+    font-size: 13px;
+  }
+  .dashboard .table-container .nisted > :last-child {
+    font-size: 13px;
+  }
+  .dashboard .table-container .nisted > :first-child {
+    font-size: 14px;
+  }
+  .dashboard .table-container .item-name,
+  .dashboard .table-container .item-name span {
+    font-size: 13px;
+  }
+  .table-container .table-items .holder {
+    gap: 10px;
+  }
+}
+@media (max-width: 1450px) {
+  .dashboard .table-container .table-header,
+  .dashboard .table-container .table-item {
+    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.5fr;
+  }
+  .item-price {
+    font-size: 14px;
+  }
+  p.date .dashboard .table-container .nisted > :last-child {
+    font-size: 12px;
+  }
+  .dashboard .table-container .actions svg.delete {
+    padding: 8px;
+  }
+  .dashboard .table-container .actions {
+    gap: 1px;
+  }
+  .dashboard .table-container .actions svg {
+    width: 29px;
+    height: 29px;
+    padding: 6px;
+  }
+  .dashboard .table-container .item-overview {
+    padding: 0 10px;
+  }
+}
 @media (max-width: 1400px) {
   .table-header,
   .table-item {
@@ -279,6 +333,26 @@
     width: 100px !important;
   }
 }
+@media (max-width: 1300px) {
+  .dashboard .table-container .item-overview {
+    padding: 0;
+  }
+  .dashboard .table-container .table-header,
+  .dashboard .table-container .table-item {
+    grid-template-columns: 0.9fr 0.45fr 0.6fr 0.5fr 0.35fr 0.4fr;
+    gap: 15px;
+  }
+  .dashboard .table-container .item-overview {
+    grid-template-columns: 1fr;
+  }
+  .dashboard .table-container .item-overview h4 {
+    font-size: 13px;
+  }
+  .dashboard .table-container .actions {
+    gap: 0;
+  }
+}
+
 @media (max-width: 1200px) {
   .table-header,
   .table-item {
@@ -332,11 +406,13 @@
   }
 }
 @media (max-width: 992px) {
-  .booking .table-header,
-  .booking .table-item {
-    grid-template-columns: 2.4fr 1fr 1fr 1fr 1fr 1fr;
-    gap: 5px;
+  .dashboard .table-container .table-header,
+  .dashboard .table-container .table-item {
+    padding: 0.42rem 0.7rem;
+    grid-template-columns: 0.9fr 0.1fr 0.6fr 0.5fr 0.35fr 0.4fr;
+    gap: 10px;
   }
+
   .item-image .product-image {
     width: 80px !important;
     height: 70px !important;
@@ -355,11 +431,105 @@
   .quantity-controls {
     gap: 8px;
   }
+  .dashboard .table-container .actions hr {
+    margin: 0 3px;
+  }
+  p.date,
+  .dashboard .table-container .nisted > :last-child {
+    font-size: 12px;
+  }
+  .header-item {
+    font-size: 12px;
+  }
+  .dashboard .table-container .nisted > :first-child {
+    font-size: 13px;
+  }
+  .item-price {
+    font-size: 13px;
+  }
 }
 @media (max-width: 768px) {
   .table-container {
     box-shadow: unset;
+    border: none;
     overflow: unset;
+  }
+  .dashboard .table-container {
+    border: none;
+  }
+  .dashboard .table-container .item-image .product-image {
+    width: 100% !important;
+    height: unset !important;
+    aspect-ratio: 1.4;
+    object-fit: fill;
+    border-radius: 15px;
+  }
+  .dashboard .table-container .item-details {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 9px;
+    justify-content: center;
+
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .dashboard .table-container .item-overview {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+  .dashboard .table-container .item-name,
+  .dashboard .table-container .item-name span {
+    font-size: 15px;
+  }
+  .dashboard .table-container .nisted > * {
+    font-size: 16px !important;
+  }
+  .dashboard .table-container .actions svg {
+    width: 31px;
+    height: 31px;
+    padding: 6px;
+  }
+  .dashboard .table-container .table-header,
+  .dashboard .table-container .table-item {
+    gap: 7px;
+    margin-bottom: 5px;
+  }
+  .dashboard .table-container .item-overview h4 {
+    padding: 7px 11px;
+  }
+  p.date,
+  .dashboard .table-container .nisted > :last-child,
+  .header-item {
+    font-size: 14px;
+  }
+  .item-price {
+    color: var(--main-color);
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 800;
+  }
+  .dashboard .table-container .table-item {
+    padding: 0.42rem 0.7rem 6px !important;
+    height: fit-content;
+  }
+  .dashboard .table-container .actions svg.delete {
+    padding: 8px;
+  }
+  .dashboard .table-container .actions {
+    gap: 7;
+    width: 100%;
+    justify-content: space-around;
+    border-top: 1px solid var(--border-color);
+    padding: 7px 0 0;
+  }
+  .dashboard .table-container .actions > a,
+  .dashboard .table-container .actions > svg {
+    flex: 1 !important;
+  }
+  .dashboard .table-container .actions svg {
+    width: 100%;
+    padding: 7px;
   }
   .table-container .table-item {
     overflow: hidden;
@@ -383,7 +553,7 @@
   .table-items {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 10px;
   }
   .table-container .table-items .holder {
     width: 100%;
@@ -437,6 +607,11 @@
   .booking .table-item p:last-child {
     border-bottom: none;
   }
+}
+@media (max-width: 600px) {
+.table-items {
+  grid-template-columns: 1fr;
+}
 }
 @media (max-width: 550px) {
   .table-items {

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useContext } from "react";
-import "@/styles/client/tables.css";
+import "@/styles/dashboard/tables.css";
 import "@/styles/dashboard/globals.css";
 import { FaSearch } from "react-icons/fa";
 import { filterss } from "@/data";

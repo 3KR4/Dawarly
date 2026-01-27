@@ -21,6 +21,11 @@
   flex-direction: column;
   gap: 10px;
 }
+.dashboard form .form-section h2 {
+    color: var(--title-color);
+    font-size: 20px;
+    text-decoration: underline;
+}
 .dashboard form .form-section .dynamicFilters-holder {
   display: flex;
   flex-wrap: wrap;

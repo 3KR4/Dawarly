@@ -38,7 +38,7 @@ function Images({ images, setImages, isSubmitted }) {
 
   return (
     <div className="box forInput">
-      <label>{t.create.images?.label}</label>
+      <label>{t.ad.images?.label}</label>
 
       <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
         <div
@@ -53,10 +53,10 @@ function Images({ images, setImages, isSubmitted }) {
         >
           <FaCloudUploadAlt />
 
-          <p>{t.create.images?.helperText}</p>
+          <p>{t.ad.images?.helperText}</p>
 
           <h1>
-            {isDrag ? t.create.images?.dropHere : t.create.images?.clickHere}
+            {isDrag ? t.ad.images?.dropHere : t.ad.images?.clickHere}
           </h1>
         </div>
 
@@ -89,7 +89,7 @@ function Images({ images, setImages, isSubmitted }) {
       {isInvalid && (
         <span className="error">
           <CircleAlert />
-          {t.create.images?.errors.required}
+          {t.ad.images?.errors.required}
         </span>
       )}
     </div>

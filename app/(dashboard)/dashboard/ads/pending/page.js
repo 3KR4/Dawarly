@@ -55,9 +55,9 @@ export default function ActiveAds() {
                   {t.dashboard.tables.ad_details}
                 </div>
                 <div className="header-item">{t.dashboard.forms.price}</div>
-                <div className="header-item">{t.home.categories}</div>
+                <div className="header-item">{t.home.categories}</div>{" "}
                 <div className="header-item">
-                  {t.dashboard.tables.published_at}
+                  {t.dashboard.tables.created_at}
                 </div>
                 <div className="header-item">{t.dashboard.tables.status}</div>
                 <div className="header-item">{t.dashboard.tables.actions}</div>
@@ -118,7 +118,6 @@ export default function ActiveAds() {
                   <div className="item-price">
                     {formatEGP(item?.price, locale)}
                   </div>
-
                   <div className="item-categories nisted">
                     <Link href={`/market?cat=${adCat?.id}`} className="link">
                       {adCat?.name} /
@@ -130,14 +129,13 @@ export default function ActiveAds() {
                     >
                       {adSubCat?.name}
                     </Link>
-                  </div>
-                  <p className="date">
-                    {formatRelativeDate(
-                      item?.creation_date,
-                      locale,
-                      "detailed",
-                    )}
-                  </p>
+                  </div>                  <p className="date">
+                                      {formatRelativeDate(
+                                        item?.creation_date,
+                                        locale,
+                                        "detailed",
+                                      )}
+                                    </p>
                   <div className="item-overview">
                     <h4>
                       {views} <FaEye />
@@ -147,6 +145,7 @@ export default function ActiveAds() {
                       {purchases} <BiSolidPurchaseTagAlt />
                     </h4>
                   </div>
+
                   <div className="actions">
                     <Link href={`/marketplace/${item?.id}`}>
                       <FaEye className="view" />

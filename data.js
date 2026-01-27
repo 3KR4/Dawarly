@@ -612,7 +612,7 @@ export const ads = [
       "/ads/ap1.jpg",
     ],
     tags: ["شقة", "تمليك"],
-    creation_date: "2025-12-05T14:30:00Z",
+    creation_date: "2026-01-05T14:30:00Z",
   },
   {
     id: 102,

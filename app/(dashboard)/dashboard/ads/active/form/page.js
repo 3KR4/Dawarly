@@ -684,7 +684,7 @@ export default function CreateAd() {
         {/* === الصور === */}
         <div className="form-section">
           <h2 className="section-title">
-            {t.dashboard.forms} <span className="required">*</span>
+            {t.dashboard.forms.images} <span className="required">*</span>
           </h2>
           <Images images={images} setImages={setImages} isSubmitted={false} />
           {fieldErrors.images && (
