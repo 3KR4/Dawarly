@@ -59,7 +59,6 @@ export default function ActiveAds() {
                 <div className="header-item">
                   {t.dashboard.tables.created_at}
                 </div>
-                <div className="header-item">{t.dashboard.tables.status}</div>
                 <div className="header-item">{t.dashboard.tables.actions}</div>
               </>
             ) : (
@@ -79,8 +78,7 @@ export default function ActiveAds() {
                 locale == "en"
                   ? subcategoriesEn?.find((x) => x.id == item?.sub_category)
                   : subcategoriesAr?.find((x) => x.id == item?.sub_category);
-              const views = Math.floor(Math.random() * 5000) + 500;
-              const purchases = Math.floor(views * 0.004);
+
               return (
                 <div key={item?.id} className="table-item">
                   <div className="holder">
@@ -114,7 +112,6 @@ export default function ActiveAds() {
                       </div>
                     </div>
                   </div>
-
                   <div className="item-price">
                     {formatEGP(item?.price, locale)}
                   </div>
@@ -129,23 +126,14 @@ export default function ActiveAds() {
                     >
                       {adSubCat?.name}
                     </Link>
-                  </div>                  <p className="date">
-                                      {formatRelativeDate(
-                                        item?.creation_date,
-                                        locale,
-                                        "detailed",
-                                      )}
-                                    </p>
-                  <div className="item-overview">
-                    <h4>
-                      {views} <FaEye />
-                    </h4>
-
-                    <h4 className="green">
-                      {purchases} <BiSolidPurchaseTagAlt />
-                    </h4>
-                  </div>
-
+                  </div>{" "}
+                  <p className="date">
+                    {formatRelativeDate(
+                      item?.creation_date,
+                      locale,
+                      "detailed",
+                    )}
+                  </p>
                   <div className="actions">
                     <Link href={`/marketplace/${item?.id}`}>
                       <FaEye className="view" />

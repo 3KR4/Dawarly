@@ -44,6 +44,10 @@ export default function CreateAd() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [images, setImages] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [selectedMediatorMethod, setSelectedMediatorMethod] = useState({
+    id: 1,
+    name: "user to user",
+  });
   // State للتواصل
   const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
@@ -54,6 +58,7 @@ export default function CreateAd() {
   // State للحقول الديناميكية
   const [dynamicValues, setDynamicValues] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // تحميل البيانات
   useEffect(() => {
@@ -79,6 +84,16 @@ export default function CreateAd() {
     email: user.email,
     phone: user.phone,
   }));
+  const contactMethod = [
+    {
+      id: 1,
+      name: `user to user`,
+    },
+    {
+      id: 2,
+      name: `user to admin`,
+    },
+  ];
 
   // تصفية الفئات الفرعية حسب الفئة المختارة
   useEffect(() => {
@@ -256,6 +271,7 @@ export default function CreateAd() {
     // تحضير البيانات للإرسال
     const finalData = {
       title: data.adTitle,
+      price: data.price,
       description: data.description || dynamicValues.description || "",
       categoryId: selectedCategory?.id,
       subCategoryId: selectedSubCategory?.id,
@@ -530,52 +546,100 @@ export default function CreateAd() {
           </h2>
 
           {/* عنوان الإعلان */}
-          <div className="box forInput">
-            <label>
-              {t.ad.placeholders.adTitle || "Ad Title"}{" "}
-              <span className="required">*</span>
-            </label>
-            <div className="inputHolder">
-              <div className="holder">
-                <input
-                  type="text"
-                  {...register("adTitle", {
-                    required: t.ad.errors.adTitle || "Ad title is required",
-                    minLength: {
-                      value: 6,
-                      message:
-                        t.ad.errors.adTitleValidation ||
-                        "Title must be at least 6 characters",
-                    },
-                  })}
-                  placeholder={t.ad.placeholders.adTitle || "Enter ad title"}
-                />
+          <div className="row-holder">
+            <div className="left">
+              <div className="box forInput">
+                <label>
+                  {t.ad.placeholders.adTitle || "Ad Title"}{" "}
+                  <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="text"
+                      {...register("adTitle", {
+                        required: t.ad.errors.adTitle || "Ad title is required",
+                        minLength: {
+                          value: 6,
+                          message:
+                            t.ad.errors.adTitleValidation ||
+                            "Title must be at least 6 characters",
+                        },
+                      })}
+                      placeholder={
+                        t.ad.placeholders.adTitle || "Enter ad title"
+                      }
+                    />
+                  </div>
+                  {errors.adTitle && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.adTitle.message}
+                    </span>
+                  )}
+                </div>
               </div>
-              {errors.adTitle && (
+              <div className="box forInput">
+                <label>
+                  Price <span className="required">*</span>
+                </label>
+
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("price", {
+                        required: "Price is required",
+                        min: {
+                          value: 1,
+                          message: "Price must be greater than 0",
+                        },
+                      })}
+                      placeholder="Enter price"
+                    />
+                  </div>
+
+                  {errors.price && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.price.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* الوصف */}
+              <div className="box forInput">
+                <label>{t.dashboard.forms.description || "Description"}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <textarea
+                      {...register("description")}
+                      placeholder={
+                        t.dashboard.forms.descriptionPlaceholder ||
+                        "Enter ad description"
+                      }
+                      rows={4}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="right">
+              <Images
+                images={images}
+                setImages={setImages}
+                isSubmitted={isSubmitted}
+              />
+              {fieldErrors.images && (
                 <span className="error">
                   <CircleAlert />
-                  {errors.adTitle.message}
+                  {fieldErrors.images}
                 </span>
               )}
             </div>
           </div>
 
-          {/* الوصف */}
-          <div className="box forInput">
-            <label>{t.dashboard.forms.description || "Description"}</label>
-            <div className="inputHolder">
-              <div className="holder">
-                <textarea
-                  {...register("description")}
-                  placeholder={
-                    t.dashboard.forms.descriptionPlaceholder ||
-                    "Enter ad description"
-                  }
-                  rows={4}
-                />
-              </div>
-            </div>
-          </div>
+          {/* === الصور === */}
         </div>
         <div className="row-holder">
           {/* === الفئة والتصنيف === */}
@@ -658,6 +722,18 @@ export default function CreateAd() {
             </h2>
 
             <SelectOptions
+              label={t.ad.choseTheMethod || "chose The Method"}
+              placeholder={""}
+              options={contactMethod}
+              value={selectedMediatorMethod ? selectedMediatorMethod.name : ""}
+              required={false}
+              locale={locale}
+              t={t}
+              onChange={(item) => {
+                setSelectedMediatorMethod(item);
+              }}
+            />
+            <SelectOptions
               label={t.ad.choose_admin || "Choose Admin"}
               placeholder={t.ad.choose_admin || "Select Admin"}
               options={adminOptions}
@@ -666,10 +742,9 @@ export default function CreateAd() {
               error={fieldErrors.admin}
               locale={locale}
               t={t}
+              disabled={selectedMediatorMethod?.id == 1}
               onChange={(item) => {
                 setSelectedAdmin(item);
-
-                // امسح الايرور أول ما يختار Admin
                 if (fieldErrors.admin) {
                   setFieldErrors((prev) => {
                     const newErrors = { ...prev };
@@ -681,24 +756,13 @@ export default function CreateAd() {
             />
           </div>
         </div>
-        {/* === الصور === */}
-        <div className="form-section">
-          <h2 className="section-title">
-            {t.dashboard.forms.images} <span className="required">*</span>
-          </h2>
-          <Images images={images} setImages={setImages} isSubmitted={false} />
-          {fieldErrors.images && (
-            <span className="error">
-              <CircleAlert />
-              {fieldErrors.images}
-            </span>
-          )}
-        </div>
 
         {/* === الحقول الديناميكية === */}
-        {dynamicFilters.length > 0 && (
+        {selectedSubCategory && dynamicFilters.length > 0 && (
           <div className="form-section">
-            <h2 className="section-title">{t.ad.ad_details || "Ad Details"}</h2>
+            <h2 className="section-title">
+              {t.ad.additional_details || "additional Details"}
+            </h2>
             <div className="dynamicFilters-holder">
               {dynamicFilters.map((field) => renderDynamicField(field))}
             </div>
@@ -706,7 +770,7 @@ export default function CreateAd() {
         )}
 
         {/* === طرق التواصل === */}
-        <div className="form-section">
+        {/* <div className="form-section">
           <h2 className="section-title">
             {t.ad.contact_information || "Contact Information"}
           </h2>
@@ -747,11 +811,15 @@ export default function CreateAd() {
               </span>
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* === زر الإرسال === */}
         <div className="form-section submit-section">
-          <button type="submit" className="main-button">
+          <button
+            type="submit"
+            className="main-button"
+            onClick={() => setIsSubmitted(true)}
+          >
             {t.ad.create_your_ad || "Create Advertisement"}
           </button>
         </div>

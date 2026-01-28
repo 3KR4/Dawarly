@@ -413,6 +413,12 @@ a {
   gap: 7px;
   width: 100%;
 }
+.box.forInput:has(.images-uplouder .upload-label) {
+  height: 100%;
+}
+.admin-create-ad .images-uplouder .upload-label {
+  min-height: 165px;
+}
 .box.forInput label {
   color: var(--paragraph);
   font-size: 13px;
