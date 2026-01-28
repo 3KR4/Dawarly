@@ -115,7 +115,7 @@ svg {
 }
 .disabled,
 :disabled {
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: no-drop;
 }
 .disabled svg,
@@ -412,6 +412,11 @@ a {
   flex-direction: column;
   gap: 7px;
   width: 100%;
+}
+.box.forInput:has(input:disabled),
+.box.forInput:has(textarea:disabled) {
+  opacity: 0.7;
+  cursor: no-drop;
 }
 .box.forInput:has(.images-uplouder .upload-label) {
   height: 100%;

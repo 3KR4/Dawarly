@@ -138,7 +138,7 @@ export default function CategoriesSwiper({
 
   // 👇 نظهر الـ navigation بس لو عدد العناصر أكبر من maxSlides
   const showNav =
-    data.length > maxSlides && screenSize !== "small" && showControls;
+    data.length > maxSlides && !screenSize.includes("small") && showControls;
 
   return (
     <div

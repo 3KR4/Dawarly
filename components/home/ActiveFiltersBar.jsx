@@ -103,14 +103,7 @@ const ActiveFiltersBar = ({
         return `${field.label}: ${value}`;
 
       case "boolean":
-        const displayValue =
-          value === true
-            ? locale === "ar"
-              ? "نعم"
-              : "Yes"
-            : locale === "ar"
-              ? "لا"
-              : "No";
+        const displayValue = value === true ? t.ad.yes : t.ad.no;
         return `${field.label}: ${displayValue}`;
 
       case "multiSelect":

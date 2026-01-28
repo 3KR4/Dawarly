@@ -89,7 +89,8 @@ export default function AdDetails() {
   const getSpecConfig = (key) => specsConfig[key];
 
   const swiperDirection = screenSize === "large" ? "vertical" : "horizontal";
-  const slidesView = screenSize === "large" ? 6 : screenSize === "med" ? 5 : 4;
+  const slidesView =
+    screenSize === "ultra-small" ? 4 : screenSize === "small" ? 5 : 6;
   const space = screenSize === "large" ? 7 : 6;
 
   const showThumbNav = ad?.images?.length > slidesView;
@@ -194,7 +195,7 @@ export default function AdDetails() {
               <div className="main-details card">
                 <div className="row">
                   <h3>{ad?.title}</h3>
-                  {screenSize !== "small" && (
+                  {!screenSize.includes("small") && (
                     <div className="btns">
                       <FiShare2 /> <FaRegHeart />
                     </div>
@@ -210,7 +211,7 @@ export default function AdDetails() {
                     {formatRelativeDate(ad?.creation_date, locale)}{" "}
                   </p>
                 </div>
-                {screenSize == "small" && (
+                {screenSize.includes("small") && (
                   <div className="btns">
                     <FiShare2 /> <FaRegHeart />
                   </div>

@@ -247,7 +247,7 @@
 .rdrNextPrevButton:hover {
   background: color-mix(in srgb, var(--body-color) 20%, transparent);
 }
-.rdrNextPrevButton {
+[lang="ar"] .rdrNextPrevButton {
   transform: scaleX(-1);
 }
 /* ===============================
@@ -310,7 +310,9 @@
   background: var(--main-color) !important;
   color: #fff !important;
 }
-
+.rdrDayPassive .rdrDayNumber span {
+  opacity: 0.2 !important;
+}
 .rdrStartEdge,
 .rdrEndEdge {
   background: var(--main-color) !important;
@@ -323,13 +325,13 @@
   border-bottom-right-radius: 1.042em;
 }
 [lang="ar"] .rdrEndEdge {
-  border-top-left-radius: 042em;
-  border-bottom-left-radius: 042em;
+  border-top-left-radius: 1.042em;
+  border-bottom-left-radius: 1.042em;
   border-top-right-radius: unset;
   border-bottom-right-radius: unset;
 }
 .rdrStartEdge.rdrEndEdge {
-  border-radius: 042em !important;
+  border-radius: 1.042em !important;
 }
 /* ===============================
    🖱️ HOVER
@@ -340,11 +342,24 @@
   color: var(--main-color) !important;
 }
 
+[lang="ar"] .rdrDayStartPreview {
+  border-right: 1px solid var(--main-color);
+  border-left: 0;
+  border-radius: 0 50px 50px 0 !important;
+}
+
+[lang="ar"] .rdrDayInPreview {
+  border-radius: 0 !important;
+}
 .rdrDayStartPreview,
 .rdrDayEndPreview {
   border-color: var(--main-color) !important;
 }
-
+[lang="ar"] .rdrDayEndPreview {
+  border-left: 1px solid var(--main-color);
+  border-right: 0;
+  border-radius: 50px 0 0 50px !important;
+}
 /* ===============================
    🚫 DISABLED / BOOKED
 ================================ */
@@ -355,6 +370,7 @@
 .rdrDayDisabled span {
   color: var(--paragraph) !important;
   opacity: 0.65 !important;
+  background: var(--body-color);
 }
 
 /* ===============================
@@ -451,6 +467,9 @@
 }
 .single-page .details-holder .main-button svg {
   font-size: 13px;
+}
+[lang="ar"] .single-page .details-holder .main-button:first-child svg {
+  transform: scaleX(-1);
 }
 .single-page .details-holder .right .user-info .holder {
   display: grid;
@@ -562,11 +581,14 @@
   .single-page .images-holder .imgs-swiper {
     flex: 1;
     width: 1px;
-    height: 90px;
+    height: 125px;
   }
   .single-page .images-holder .imgs-swiper-wrapper .nav-btn {
     width: 34px;
     padding: 4px;
+  }
+  [lang="ar"] .single-page .images-holder .imgs-swiper-wrapper .nav-btn {
+    transform: scaleX(-1);
   }
   .single-page .images-holder .imgs-swiper .img {
     width: 100%;
@@ -574,6 +596,11 @@
   }
   .single-page .images-holder .imgs-swiper-wrapper {
     margin: 0 -8px;
+  }
+}
+@media (max-width: 800px) {
+  .single-page .images-holder .imgs-swiper {
+    height: 102px;
   }
 }
 @media (max-width: 768px) {
@@ -603,7 +630,7 @@
     padding: 6px;
   }
   .single-page .images-holder .imgs-swiper {
-    height: 70px;
+    height: 112px;
   }
   .single-page .images-holder .imgs-swiper .img {
     border-radius: 7px;
@@ -648,6 +675,11 @@
   }
 }
 
+@media (max-width: 600px) {
+  .single-page .images-holder .imgs-swiper {
+    height: 88px;
+  }
+}
 @media (max-width: 500px) {
   .single-page .details-holder .actions .hold {
     grid-template-columns: 1fr 1fr;
@@ -661,5 +693,13 @@
   .single-page.forNight .details-holder h3 {
     font-size: 26px;
     line-height: 1;
+  }
+  .single-page .images-holder .imgs-swiper {
+    height: 75px;
+  }
+}
+@media (max-width: 450px) {
+  .single-page .images-holder .imgs-swiper {
+    height: 68px;
   }
 }

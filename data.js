@@ -1,3 +1,4 @@
+import { id } from "date-fns/locale";
 import { BiSolidStoreAlt } from "react-icons/bi";
 import {
   FaHome,
@@ -572,7 +573,10 @@ export const users = [
 export const ads = [
   {
     id: 101,
-    user_id: "u_001",
+    owner: {
+      ...users[0],
+      type: "dawaarly", // usser / agncy / dawaarly
+    },
     title: "شقة للبيع في مدينة نصر",
     description:
       "شقة 110م² بمدينة نصر، تشطيب سوبر لوكس، 2 غرفة نوم، 2 حمام، مطبخ راكب. موقع مميز قريب من الجامعات والمستشفيات والخدمات. الشقة مفروشة بالكامل وتحتوي على تكييفات سبليت في جميع الغرف.",
@@ -580,8 +584,8 @@ export const ads = [
     category: 1,
     sub_category: 0,
     area: {
-      governorate: { ar: "القاهرة", en: "Cairo" },
-      city: { ar: "مدينة نصر", en: "Nasr City" },
+      governorate: 1,
+      city: 101,
     },
     creation_date: "2025-12-05T14:30:00Z",
     images: [
@@ -600,20 +604,24 @@ export const ads = [
     tags: ["شقة", "تمليك"],
     specifecs: {
       property_type: { id: 1, value: "Apartment" },
-      area_m2: 110,
+      area: 110,
       bedrooms: 2,
       bathrooms: 2,
-      paymentOption: "Cash",
+      paymentOption: "cash",
       furnished: { value: true, label: "Yes" },
       negotiable: { value: false, label: "No" },
     },
     amenities: [
-      { id: 1, value: "garden", label: "Garden" },
-      { id: 2, value: "roof", label: "Has roof" },
+      { id: 3, value: "bicycle-lanes", label: "Bicycles lanes" },
+      { id: 4, value: "disability-support", label: "Disability support" },
+      { id: 5, value: "jogging-trail", label: "Jogging trail" },
       { id: 6, value: "outdoor-pools", label: "Outdoor pools" },
-      { id: 11, value: "medical-center", label: "Medical center" },
-      { id: 12, value: "schools", label: "Schools" },
     ],
+    contactMethods: {
+      chat: true,
+      email: false,
+      phone: true,
+    },
   },
   {
     id: 102,
@@ -1541,7 +1549,7 @@ export const ads = [
 ];
 export const propertiesFiltersEn = [
   {
-    key: "type",
+    key: "property_type",
     uiType: "select",
     required: true,
     label: "Property Type",
@@ -1606,15 +1614,7 @@ export const propertiesFiltersEn = [
       { id: 11, name: "+10" },
     ],
   },
-  {
-    key: "price",
-    uiType: "input",
-    inputType: "number",
-    required: true,
-    label: "Price",
-    placeholder: "Enter price",
-    requiredMessage: "Price is required",
-  },
+
   {
     key: "paymentOption",
     uiType: "radio",
@@ -1672,7 +1672,7 @@ export const propertiesFiltersEn = [
 ];
 export const propertiesFiltersAr = [
   {
-    key: "type",
+    key: "property_type",
     uiType: "select",
     required: true,
     label: "نوع العقار",
@@ -1737,15 +1737,7 @@ export const propertiesFiltersAr = [
       { id: 11, name: "+10" },
     ],
   },
-  {
-    key: "price",
-    uiType: "input",
-    inputType: "number",
-    required: true,
-    label: "السعر",
-    placeholder: "ادخل السعر",
-    requiredMessage: "السعر مطلوب",
-  },
+
   {
     key: "paymentOption",
     uiType: "radio",
@@ -1801,3 +1793,40 @@ export const propertiesFiltersAr = [
     ],
   },
 ];
+
+export const dashboardRoutes = {
+  ads: {
+    label: {
+      en: "Ads",
+      ar: "الإعلانات",
+    },
+    defaultPath: "active",
+    canCreate: true,
+  },
+  bookings: {
+    label: {
+      en: "Bookings",
+      ar: "الحجوزات",
+    },
+    canCreate: true,
+  },
+  users: {
+    label: {
+      en: "Users",
+      ar: "المستخدمين",
+    },
+    canCreate: true,
+  },
+  slides: {
+    label: {
+      en: "Slides",
+      ar: "السلايدر",
+    },
+  },
+  support: {
+    label: {
+      en: "Support",
+      ar: "الدعم",
+    },
+  },
+};

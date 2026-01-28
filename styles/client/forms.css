@@ -277,7 +277,7 @@ p.have-problem {
   border: 1px solid var(--main-color);
 }
 .form-holder .option-box.disable {
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: no-drop;
 }
 .form-holder .option-box.small {

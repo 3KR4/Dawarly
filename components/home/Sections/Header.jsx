@@ -132,7 +132,7 @@ function Header() {
                 className="search-holder"
                 onClick={() => searchInputRef.current?.focus()}
               >
-                {screenSize !== "small" && <FaSearch />}
+                {!screenSize.includes("small") && <FaSearch />}
 
                 <input
                   ref={searchInputRef}
@@ -140,7 +140,11 @@ function Header() {
                   placeholder={t.placeholders.search}
                 />
                 <Link href={`/`}>
-                  {screenSize !== "small" ? t.actions.search : <FaSearch />}
+                  {!screenSize.includes("small") ? (
+                    t.actions.search
+                  ) : (
+                    <FaSearch />
+                  )}
                 </Link>
               </div>
               <div className={`menu ${activeMenu == "search" ? "active" : ""}`}>
@@ -150,7 +154,7 @@ function Header() {
             <div className="account">
               {isLogin ? (
                 <>
-                  {screenSize !== "small" && (
+                  {!screenSize.includes("small") && (
                     <>
                       <div className="icon-holder fav">
                         <FaRegHeart className="main" />
@@ -209,7 +213,7 @@ function Header() {
                             </Link>
                           </li>
 
-                          {screenSize == "small" && (
+                          {screenSize.includes("small") && (
                             <>
                               <li>
                                 <Link href={`/`} className="btn">
@@ -265,7 +269,7 @@ function Header() {
                     href={`/register`}
                     onClick={() => setIsLogin(true)}
                   >
-                    {screenSize != "small" ? t.auth.login : <FaUser />}
+                    {!screenSize.includes("small") ? t.auth.login : <FaUser />}
                   </Link>
                 </>
               )}
@@ -277,7 +281,7 @@ function Header() {
         <div className="container">
           <div className="bottom">
             <div className="nav">
-              {screenSize == "small" && (
+              {screenSize.includes("small") && (
                 <h4 onClick={() => setActiveSmallMenu((prev) => !prev)}>
                   {t.header.filterByCategories} <FaAngleDown />
                 </h4>
@@ -296,17 +300,17 @@ function Header() {
                       key={cat?.id}
                       className="cat-item"
                       onMouseEnter={
-                        screenSize !== "small"
+                        !screenSize.includes("small")
                           ? () => openMenu(cat?.id)
                           : undefined
                       }
                       onMouseLeave={
-                        screenSize !== "small" ? closeMenu : undefined
+                        !screenSize.includes("small") ? closeMenu : undefined
                       }
                     >
                       <Link
                         href={`/market${
-                          screenSize !== "small" ? `?cat=${cat?.id}` : ""
+                          !screenSize.includes("small") ? `?cat=${cat?.id}` : ""
                         }`}
                         onClick={(e) => {
                           if (screenSize !== "large") {
@@ -324,12 +328,14 @@ function Header() {
                         <div
                           className="menu active"
                           onMouseEnter={
-                            screenSize !== "small"
+                            !screenSize.includes("small")
                               ? () => openMenu(cat?.id)
                               : undefined
                           }
                           onMouseLeave={
-                            screenSize !== "small" ? closeMenu : undefined
+                            !screenSize.includes("small")
+                              ? closeMenu
+                              : undefined
                           }
                         >
                           <div className="sub-cats">
@@ -350,17 +356,17 @@ function Header() {
                   );
                 })}
 
-                {screenSize !== "small" && (
+                {!screenSize.includes("small") && (
                   <div
                     key={50}
                     className="cat-item"
                     onMouseEnter={
-                      screenSize !== "small"
+                      !screenSize.includes("small")
                         ? () => openMenu("other")
                         : undefined
                     }
                     onMouseLeave={
-                      screenSize !== "small" ? closeMenu : undefined
+                      !screenSize.includes("small") ? closeMenu : undefined
                     }
                   >
                     <Link
@@ -380,12 +386,12 @@ function Header() {
                       <div
                         className="menu active"
                         onMouseEnter={
-                          screenSize !== "small"
+                          !screenSize.includes("small")
                             ? () => openMenu("other")
                             : undefined
                         }
                         onMouseLeave={
-                          screenSize !== "small" ? closeMenu : undefined
+                          !screenSize.includes("small") ? closeMenu : undefined
                         }
                       >
                         <div className="sub-cats">
@@ -393,7 +399,7 @@ function Header() {
                             <Link
                               key={otherCat?.id}
                               href={`/market${
-                                screenSize !== "small"
+                                !screenSize.includes("small")
                                   ? `?cat=${otherCat?.id}`
                                   : ""
                               }`}
@@ -411,7 +417,7 @@ function Header() {
                 )}
               </div>
             </div>
-            {screenSize !== "small" && (
+            {!screenSize.includes("small") && (
               <div className="actions">
                 <button className="theme" onClick={toggleTheme}>
                   {theme === "light" ? (

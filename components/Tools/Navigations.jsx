@@ -28,7 +28,7 @@ export default function Navigations({
         <>
           <Link href={"/"}>{t.header.dawarly}</Link>
           <span className={`separator`}>/ </span>
-          <Link href={"/dashboard"}>{t.dashboard.dashboard}</Link>
+          <Link href={"/dashboard"}>{t.dashboard.head.dashboard}</Link>
         </>
       )}
 

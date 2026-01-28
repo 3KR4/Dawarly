@@ -2,6 +2,7 @@
 import "@/styles/client/forms.css";
 import React, { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
 import governoratesEn from "@/data/governoratesEn.json";
 import governoratesAr from "@/data/governoratesAr.json";
@@ -15,6 +16,7 @@ import {
   propertiesFiltersEn,
   propertiesFiltersAr,
   users,
+  ads,
 } from "@/data";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -28,6 +30,8 @@ import { LuUserCog } from "react-icons/lu";
 export default function CreateAd() {
   const { locale } = useContext(settings);
   const t = useTranslate();
+  const searchParams = useSearchParams();
+  const adId = searchParams.get("id"); // جلب الـ id من الـ URL
 
   // State للبيانات الديناميكية
   const [dynamicFilters, setDynamicFilters] = useState([]);
@@ -36,6 +40,10 @@ export default function CreateAd() {
   const [governorates, setGovernorates] = useState([]);
   const [cities, setCities] = useState([]);
   const [filteredSubcategories, setFilteredSubcategories] = useState([]);
+
+  // State لبيانات الإعلان
+  const [adData, setAdData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // State للبيانات الأساسية
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -46,8 +54,9 @@ export default function CreateAd() {
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [selectedMediatorMethod, setSelectedMediatorMethod] = useState({
     id: 1,
-    name: "user to user",
+    name: t.ad.userToUser,
   });
+
   // State للتواصل
   const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
@@ -57,41 +66,148 @@ export default function CreateAd() {
 
   // State للحقول الديناميكية
   const [dynamicValues, setDynamicValues] = useState({});
+
   const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [localeDataLoaded, setLocaleDataLoaded] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
-  // تحميل البيانات
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    trigger,
+    setValue,
+    reset,
+  } = useForm();
+
   useEffect(() => {
-    const fetchData = async () => {
-      setDynamicFilters(
-        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
-      );
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
-      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-      setCities(locale == "en" ? citiesEn : citiesAr);
-    };
-    fetchData();
+    // تحميل البيانات حسب الـ locale
+    setDynamicFilters(
+      locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
+    );
+    setCategories(locale == "en" ? categoriesEn : categoriesAr);
+    setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+    setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
+    setCities(locale == "en" ? citiesEn : citiesAr);
+
+    setLocaleDataLoaded(true); // دلوقتي البيانات جاهزة
+
+    setIsEditable(false);
   }, [locale]);
+
+  // useEffect لتحديث الإعلان بعد تحميل البيانات
+  useEffect(() => {
+    if (adId && localeDataLoaded) {
+      fetchAdData();
+    }
+    setIsEditable(false);
+  }, [adId, localeDataLoaded]);
+
+  const fetchAdData = async () => {
+    setIsLoading(true);
+    try {
+      // استدعاء API
+      // const response = await getService.getAdById(adId);
+      // const ad = response.data;
+
+      // بيانات وهمية
+      const mockAdData = ads?.find((x) => x.id == adId);
+
+      if (!mockAdData) {
+        alert("الإعلان غير موجود");
+        return;
+      }
+
+      setAdData(mockAdData);
+
+      // ملء الفورم
+      fillFormWithAdData(mockAdData);
+    } catch (error) {
+      console.error("Error fetching ad data:", error);
+      alert(t.ad.fetch_error || "حدث خطأ أثناء جلب بيانات الإعلان");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fillFormWithAdData = (ad) => {
+    // ملء حقول العنوان والسعر والوصف
+    setValue("adTitle", ad.title);
+    setValue("price", ad.price);
+    setValue("description", ad.description || "");
+
+    // ملء الفئات
+    const category = categories.find((c) => c.id == ad.category);
+
+    const subCategory = subcategories.find((s) => s.id == ad.sub_category);
+
+    if (category) setSelectedCategory(category);
+    if (subCategory) setSelectedSubCategory(subCategory);
+
+    // ملء الموقع
+    if (ad.area) {
+      const governorate = governorates.find((g) => g.id == ad.area.governorate);
+      const city = cities.find((c) => c.id == ad.area.city);
+
+      if (governorate) setSelectedGovernorate(governorate);
+      if (city) setSelectedCity(city);
+
+      console.log("governorate", governorate);
+    }
+
+    // ملء الصور
+    if (ad.images) setImages(ad.images);
+
+    // ملء بيانات المشرف
+    if (ad.admin) {
+      const adminUser = users.find((u) => u.id === ad.admin.id);
+      if (adminUser) {
+        setSelectedAdmin({
+          id: adminUser.id,
+          name: `${adminUser.first_name} ${adminUser.last_name}`,
+          email: adminUser.email,
+          phone: adminUser.phone,
+        });
+      }
+    }
+
+    // ملء طريقة الوساطة
+    if (ad.mediatorMethod) {
+      setSelectedMediatorMethod(ad.mediatorMethod);
+    }
+
+    // ملء طرق التواصل
+    if (ad.contactMethods) {
+      setSelectedContactMethods(ad.contactMethods);
+    }
+
+    // ملء الحقول الديناميكية
+    if (ad.specifecs) {
+      setDynamicValues(ad.specifecs);
+    }
+  };
 
   // تصفية المدن حسب المحافظة المختارة
   const filteredCities = cities.filter(
     (c) => c.governorate_id === selectedGovernorate?.id,
   );
+
   const adminOptions = users.map((user) => ({
     id: user.id,
     name: `${user.first_name} ${user.last_name}`,
     email: user.email,
     phone: user.phone,
   }));
+
   const contactMethod = [
     {
       id: 1,
-      name: `user to user`,
+      name: t.ad.userToUser,
     },
     {
       id: 2,
-      name: `user to admin`,
+      name: t.ad.userToAdmin,
     },
   ];
 
@@ -102,8 +218,6 @@ export default function CreateAd() {
         (sub) => sub?.categoryId == selectedCategory?.id,
       );
       setFilteredSubcategories(filtered);
-      // إعادة تعيين الفئة الفرعية عند تغيير الفئة الرئيسية
-      setSelectedSubCategory(null);
     } else {
       setFilteredSubcategories([]);
     }
@@ -123,16 +237,7 @@ export default function CreateAd() {
     },
   ];
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    trigger,
-    setValue,
-  } = useForm();
-
   // معالجة تغيير الحقول الديناميكية
-
   const handleDynamicChange = (key, value) => {
     setDynamicValues((prev) => ({
       ...prev,
@@ -155,32 +260,32 @@ export default function CreateAd() {
 
     // التحقق من الحقول الإلزامية الأساسية
     if (!selectedCategory) {
-      newErrors.category = t.ad.errors.category || "Category is required";
+      newErrors.category = t.ad.errors.category;
       hasErrors = true;
     }
 
     if (!selectedSubCategory) {
-      newErrors.subCategory =
-        t.ad.errors.subCategory || "Subcategory is required";
+      newErrors.subCategory = t.ad.errors.subCategory;
       hasErrors = true;
     }
 
     if (!selectedGovernorate) {
-      newErrors.governorate = "Governorate is required";
+      newErrors.governorate = t.ad.errors.governorate;
       hasErrors = true;
     }
 
     if (!selectedCity) {
-      newErrors.city = "City is required";
+      newErrors.city = t.ad.errors.city;
       hasErrors = true;
     }
-    if (!selectedAdmin) {
-      newErrors.admin = t.ad.errors?.admin || "Admin user is required";
+
+    if (selectedMediatorMethod?.id == 2 && !selectedAdmin) {
+      newErrors.admin = t.ad.errors.admin;
       hasErrors = true;
     }
 
     if (images.length === 0) {
-      newErrors.images = t.ad.errors.images || "At least one image is required";
+      newErrors.images = t.ad.images.errors.required;
       hasErrors = true;
     }
 
@@ -263,7 +368,6 @@ export default function CreateAd() {
   // معالجة إرسال النموذج
   const onSubmit = async (data) => {
     // التحقق من صحة الحقول الأساسية
-
     const isCustomValid = validateForm();
 
     if (!isCustomValid) return;
@@ -272,9 +376,9 @@ export default function CreateAd() {
     const finalData = {
       title: data.adTitle,
       price: data.price,
-      description: data.description || dynamicValues.description || "",
-      categoryId: selectedCategory?.id,
-      subCategoryId: selectedSubCategory?.id,
+      description: data.description || "",
+      categoryId: selectedCategory,
+      subCategoryId: selectedSubCategory,
       images: images,
       additionalDetail: dynamicValues,
       location: {
@@ -282,20 +386,40 @@ export default function CreateAd() {
         city: selectedCity,
       },
       contactMethods: selectedContactMethods,
+      adminId: selectedAdmin?.id,
+      mediatorMethod: selectedMediatorMethod,
     };
 
-    console.log("FINAL REQUEST", finalData);
-    alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+    // إذا كان تعديلاً، أضف الـ ID
+    if (adId) {
+      finalData.id = adId;
+    }
 
-    // هنا يمكنك إضافة استدعاء API لإرسال البيانات
-    // try {
-    //   const response = await postService.createAd(finalData);
-    //   console.log("Ad created successfully:", response);
-    //   alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
-    // } catch (error) {
-    //   console.error("Error creating ad:", error);
-    //   alert(t.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
-    // }
+    console.log("FINAL REQUEST", finalData);
+
+    if (adId) {
+      // تحديث الإعلان
+      alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
+      // try {
+      //   const response = await putService.updateAd(adId, finalData);
+      //   console.log("Ad updated successfully:", response);
+      //   alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
+      // } catch (error) {
+      //   console.error("Error updating ad:", error);
+      //   alert(t.ad.update_error || "حدث خطأ أثناء تحديث الإعلان");
+      // }
+    } else {
+      // إنشاء إعلان جديد
+      alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+      // try {
+      //   const response = await postService.createAd(finalData);
+      //   console.log("Ad created successfully:", response);
+      //   alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+      // } catch (error) {
+      //   console.error("Error creating ad:", error);
+      //   alert(t.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
+      // }
+    }
   };
 
   // عرض الحقول الديناميكية
@@ -348,6 +472,7 @@ export default function CreateAd() {
                       }));
                     }
                   }}
+                  disabled={!isEditable}
                   placeholder={field.placeholder}
                 />
               </div>
@@ -374,6 +499,7 @@ export default function CreateAd() {
             required={field.required}
             error={fieldErrors[field.key]}
             locale={locale}
+            disabled={!isEditable}
             t={t}
             onChange={(item) => handleDynamicChange(field.key, item)}
           />
@@ -395,15 +521,19 @@ export default function CreateAd() {
               {field.options.map((option) => {
                 const displayLabel = option.label || option.value;
                 const isSelected =
-                  dynamicValues[field.key]?.value === option.value;
+                  dynamicValues[field.key]?.toString().toLowerCase() ===
+                  option.value?.toString().toLowerCase();
 
                 return (
                   <div
                     key={option.id || option.value}
                     className={`option-box small ${
-                      isSelected ? "active" : ""
+                      !isEditable ? "disabled" : isSelected ? "active" : ""
                     } ${fieldErrors[field.key] ? "error-border" : ""}`}
-                    onClick={() => handleDynamicChange(field.key, option)}
+                    onClick={() => {
+                      if (!isEditable) return;
+                      handleDynamicChange(field.key, option);
+                    }}
                   >
                     {displayLabel}
                   </div>
@@ -434,16 +564,20 @@ export default function CreateAd() {
             <div className="options-grid flex">
               {field.options?.map((option) => {
                 const displayLabel =
-                  option.label || (option.value ? "Yes" : "No");
-                const isSelected = dynamicValues[field.key] === option.value;
+                  option.label || (option.value ? t.ad.yes : t.ad.no);
+                const isSelected =
+                  dynamicValues[field.key].value == option.value;
 
                 return (
                   <div
                     key={option.value.toString()}
                     className={`option-box small ${
-                      isSelected ? "active" : ""
+                      !isEditable ? "disabled" : isSelected ? "active" : ""
                     } ${fieldErrors[field.key] ? "error-border" : ""}`}
-                    onClick={() => handleDynamicChange(field.key, option.value)}
+                    onClick={() => {
+                      if (!isEditable) return;
+                      handleDynamicChange(field.key, option.value);
+                    }}
                   >
                     {displayLabel}
                   </div>
@@ -456,7 +590,7 @@ export default function CreateAd() {
                     }`}
                     onClick={() => handleDynamicChange(field.key, true)}
                   >
-                    {locale === "ar" ? "نعم" : "Yes"}
+                    {locale === "ar" ? "نعم" : t.ad.yes}
                   </div>
                   <div
                     className={`option-box small ${
@@ -464,7 +598,7 @@ export default function CreateAd() {
                     }`}
                     onClick={() => handleDynamicChange(field.key, false)}
                   >
-                    {locale === "ar" ? "لا" : "No"}
+                    {t.ad.no}
                   </div>
                 </>
               )}
@@ -536,21 +670,37 @@ export default function CreateAd() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="form-holder create-ad admin-create-ad">
+        <div className="loading-state">
+          <p>{t.ad.loading || "جاري تحميل البيانات..."}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="form-holder create-ad admin-create-ad">
+      {/* <div className="page-header">
+        {adId && (
+          <p className="ad-id">
+            {t.ad.ad_id || "رقم الإعلان"}: {adId}
+          </p>
+        )}
+      </div> */}
+
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* === معلومات أساسية === */}
         <div className="form-section">
-          <h2 className="section-title">
-            {t.ad.basic_info || "Basic Information"}
-          </h2>
+          <h2 className="section-title">{t.ad.basic_info}</h2>
 
           {/* عنوان الإعلان */}
           <div className="row-holder">
             <div className="left">
               <div className="box forInput">
                 <label>
-                  {t.ad.placeholders.adTitle || "Ad Title"}{" "}
+                  {t.ad.placeholders.adTitle}{" "}
                   <span className="required">*</span>
                 </label>
                 <div className="inputHolder">
@@ -566,6 +716,7 @@ export default function CreateAd() {
                             "Title must be at least 6 characters",
                         },
                       })}
+                      disabled={!isEditable}
                       placeholder={
                         t.ad.placeholders.adTitle || "Enter ad title"
                       }
@@ -581,7 +732,7 @@ export default function CreateAd() {
               </div>
               <div className="box forInput">
                 <label>
-                  Price <span className="required">*</span>
+                  {t.dashboard.forms.price} <span className="required">*</span>
                 </label>
 
                 <div className="inputHolder">
@@ -589,13 +740,14 @@ export default function CreateAd() {
                     <input
                       type="number"
                       {...register("price", {
-                        required: "Price is required",
+                        required: t.dashboard.forms.errors.priceRequired,
                         min: {
                           value: 1,
-                          message: "Price must be greater than 0",
+                          message: t.dashboard.forms.errors.priceMin,
                         },
                       })}
-                      placeholder="Enter price"
+                      disabled={!isEditable}
+                      placeholder={t.dashboard.forms.pricePlaceholder}
                     />
                   </div>
 
@@ -609,16 +761,14 @@ export default function CreateAd() {
               </div>
               {/* الوصف */}
               <div className="box forInput">
-                <label>{t.dashboard.forms.description || "Description"}</label>
+                <label>{t.dashboard.forms.description}</label>
                 <div className="inputHolder">
                   <div className="holder">
                     <textarea
                       {...register("description")}
-                      placeholder={
-                        t.dashboard.forms.descriptionPlaceholder ||
-                        "Enter ad description"
-                      }
+                      placeholder={t.dashboard.forms.descriptionPlaceholder}
                       rows={4}
+                      disabled={!isEditable}
                     />
                   </div>
                 </div>
@@ -629,6 +779,7 @@ export default function CreateAd() {
                 images={images}
                 setImages={setImages}
                 isSubmitted={isSubmitted}
+                isEditing={!!adId} // إضافة خاصية التعديل
               />
               {fieldErrors.images && (
                 <span className="error">
@@ -644,14 +795,12 @@ export default function CreateAd() {
         <div className="row-holder">
           {/* === الفئة والتصنيف === */}
           <div className="form-section">
-            <h2 className="section-title">
-              {t.ad.category_info || "Category Information"}
-            </h2>
+            <h2 className="section-title">{t.ad.category_info}</h2>
 
             {/* الفئة الرئيسية */}
             <SelectOptions
-              label={t.ad.choose_category || "Category"}
-              placeholder={t.ad.choose_category || "Select Category"}
+              label={t.ad.choose_category}
+              placeholder={t.ad.choose_category}
               options={categories}
               value={selectedCategory ? selectedCategory.name : ""}
               tPath="categories"
@@ -659,13 +808,14 @@ export default function CreateAd() {
               error={fieldErrors.category}
               locale={locale}
               t={t}
+              disabled={!isEditable}
               onChange={(item) => setSelectedCategory(item)}
             />
 
             {/* الفئة الفرعية */}
             <SelectOptions
-              label={t.ad.choose_sub_category || "Subcategory"}
-              placeholder={t.ad.choose_sub_category || "Select Subcategory"}
+              label={t.ad.choose_sub_category}
+              placeholder={t.ad.choose_sub_category}
               options={filteredSubcategories}
               value={selectedSubCategory ? selectedSubCategory.name : ""}
               tPath="subcategories"
@@ -673,16 +823,14 @@ export default function CreateAd() {
               error={fieldErrors.subCategory}
               locale={locale}
               t={t}
-              disabled={!selectedCategory}
+              disabled={!isEditable || !selectedCategory}
               onChange={(item) => setSelectedSubCategory(item)}
             />
           </div>
 
           {/* === الموقع === */}
           <div className="form-section">
-            <h2 className="section-title">
-              {t.location.location || "Location"}
-            </h2>
+            <h2 className="section-title">{t.dashboard.tables.location}</h2>
 
             {/* المحافظة */}
             <SelectOptions
@@ -694,6 +842,7 @@ export default function CreateAd() {
               required={true}
               error={fieldErrors.governorate}
               locale={locale}
+              disabled={!isEditable}
               t={t}
               onChange={(item) => {
                 setSelectedGovernorate(item);
@@ -712,17 +861,15 @@ export default function CreateAd() {
               error={fieldErrors.city}
               locale={locale}
               t={t}
-              disabled={!selectedGovernorate}
+              disabled={!isEditable || !selectedGovernorate}
               onChange={(item) => setSelectedCity(item)}
             />
           </div>
           <div className="form-section">
-            <h2 className="section-title">
-              {t.ad.admin_contact || "Admin Contact"}
-            </h2>
+            <h2 className="section-title">{t.ad.admin_contact}</h2>
 
             <SelectOptions
-              label={t.ad.choseTheMethod || "chose The Method"}
+              label={t.ad.theContactMethod}
               placeholder={""}
               options={contactMethod}
               value={selectedMediatorMethod ? selectedMediatorMethod.name : ""}
@@ -734,8 +881,8 @@ export default function CreateAd() {
               }}
             />
             <SelectOptions
-              label={t.ad.choose_admin || "Choose Admin"}
-              placeholder={t.ad.choose_admin || "Select Admin"}
+              label={t.ad.choose_admin}
+              placeholder={t.ad.select_admin}
               options={adminOptions}
               value={selectedAdmin ? selectedAdmin.name : ""}
               required={true}
@@ -760,9 +907,7 @@ export default function CreateAd() {
         {/* === الحقول الديناميكية === */}
         {selectedSubCategory && dynamicFilters.length > 0 && (
           <div className="form-section">
-            <h2 className="section-title">
-              {t.ad.additional_details || "additional Details"}
-            </h2>
+            <h2 className="section-title">{t.ad.additional_details}</h2>
             <div className="dynamicFilters-holder">
               {dynamicFilters.map((field) => renderDynamicField(field))}
             </div>
@@ -770,10 +915,8 @@ export default function CreateAd() {
         )}
 
         {/* === طرق التواصل === */}
-        {/* <div className="form-section">
-          <h2 className="section-title">
-            {t.ad.contact_information || "Contact Information"}
-          </h2>
+        <div className="form-section">
+          <h2 className="section-title">{t.ad.theContactMethod}</h2>
           <div className="options-grid verfiyMethod">
             {METHODS.map(({ key, label, icon: Icon }) => {
               const isActive = selectedContactMethods[key];
@@ -811,16 +954,18 @@ export default function CreateAd() {
               </span>
             </div>
           )}
-        </div> */}
+        </div>
 
         {/* === زر الإرسال === */}
         <div className="form-section submit-section">
           <button
             type="submit"
-            className="main-button"
+            className={`main-button ${adId ? "update-button" : "create-button"}`}
             onClick={() => setIsSubmitted(true)}
           >
-            {t.ad.create_your_ad || "Create Advertisement"}
+            {adId
+              ? t.ad.update_ad || "تحديث الإعلان"
+              : t.ad.create_your_ad || "إنشاء الإعلان"}
           </button>
         </div>
       </form>

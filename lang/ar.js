@@ -40,7 +40,8 @@ const ar = {
       "افحص المنتج جيدًا قبل الشراء.",
       "لا تدفع أو تحوّل أموال قبل المعاينة.",
     ],
-
+    yes: "نعم",
+    no: "لا",
     choose_category: "اختر القسم",
     choose_sub_category: "اختر القسم الفرعي",
     ad_basics: "البيانات الأساسية",
@@ -56,13 +57,30 @@ const ar = {
     contact_via_email: "تواصل عبر البريد الإلكتروني",
     contact_via_phone: "تواصل عبر الهاتف",
     contact_via_chat: "تواصل عبر الدردشة",
+    contact_method_required: "طرق التواصل مطلوبة",
+
+    basic_info: "المعلومات الأساسية",
+    category_info: "معلومات القسم",
+    admin_contact: "بيانات مسؤول النظام",
+    theContactMethod: "طريقة الاتصال الحالية",
+    additional_details: "تفاصيل إضافية",
+    userToUser: "مستخدم لمستخدم",
+    userToAdmin: "مستخدم لمسؤول",
+    choose_admin: "اختيار المسؤول",
+    select_admin: "اختر الشخص المسؤول",
     placeholders: {
       adTitle: "قم بكتابة عنوان اعلانك",
     },
     errors: {
       adTitle: "عنوان اعلانك مطلوب",
       adTitleValidation: "عنوان اعلانك قصير للغاية",
+      governorate: "المحافظة مطلوبة",
+      city: "المدينة مطلوبة",
+      category: "القسم مطلوب",
+      subCategory: "القسم الفرعي مطلوب",
+      admin: "اختيار المسؤول مطلوب",
     },
+
     images: {
       label: "قم برفع صور لاعلانك",
 
@@ -70,7 +88,7 @@ const ar = {
       clickHere: "انقر هنا",
       dropHere: "اترك الصور",
       errors: {
-        required: "يجب علي اضافة علي الاقل صورة واحدة",
+        required: "يجب عليك اضافة صورة واحدة علي الاقل",
       },
     },
   },
@@ -106,6 +124,9 @@ const ar = {
     selectCity: "اختر مدينتك",
   },
   dashboard: {
+    head: {
+      dashboard: "لوحة التحكم",
+    },
     forms: {
       title: "اسم المنتج",
       titlePlaceholder: "أدخل اسم المنتج",
@@ -117,7 +138,7 @@ const ar = {
       stockPlaceholder: "أدخل الكمية المتاحة",
 
       price: "السعر",
-      pricePlaceholder: "أدخل سعر المنتج",
+      pricePlaceholder: "أدخل السعر",
 
       sale: "الخصم (%)",
       salePlaceholder: "أدخل نسبة الخصم",
@@ -142,8 +163,8 @@ const ar = {
 
       governorate: "المحافظة",
       selectGovernorate: "اختر المحافظة",
-      subCategory: "الفئة الفرعية",
-      selectSubCategory: "اختر الفئة الفرعية",
+      subCategory: "القسم الفرعي",
+      selectSubCategory: "اختر القسم الفرعي",
 
       googleMapsLink: "رابط خرائط جوجل",
       googleMapsLinkPlaceholder: "https://maps.app.goo.gl/...",

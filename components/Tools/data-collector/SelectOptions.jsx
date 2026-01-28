@@ -59,18 +59,26 @@ function SelectOptions({
   const getDisplayValue = () => {
     if (!value) return "";
 
-    // إذا كانت القيمة كائن من الخيارات
-    if (typeof value === "object" && value !== null) {
-      if (typeof value.name === "object") {
-        return value.name[locale] || value.name.en || "";
+    if (typeof value === "object") {
+      // لو فيه label (أغلب الـ selects)
+      if (value.label) return value.label;
+
+      // لو فيه value
+      if (value.value) return value.value;
+
+      // لو فيه name (احتياطي)
+      if (value.name) {
+        if (typeof value.name === "object") {
+          return value.name[locale] || value.name.en || "";
+        }
+        return value.name;
       }
-      return value.name || "";
+      return "";
     }
 
-    // إذا كانت القيمة string مباشرة
-    return value;
+    // string أو number
+    return value.toString();
   };
-
   const filteredOptions = useMemo(() => {
     if (!search) return options;
 

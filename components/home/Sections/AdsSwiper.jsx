@@ -120,7 +120,7 @@ export default function AdsSwiper({ type, id }) {
   // 👇 نظهر الـ navigation بس لو عدد الإعلانات أكبر من maxSlides
   const showNav =
     filteredAds.length > maxSlides &&
-    screenSize !== "small" &&
+    !screenSize.includes("small") &&
     screenSize !== "xs";
 
   // ================= LOAD MORE LOGIC =================
@@ -216,14 +216,12 @@ export default function AdsSwiper({ type, id }) {
   useEffect(() => {
     let initialCount = 8;
 
-    if (screenSize === "large" || screenSize === "xl") {
+    if (screenSize === "large") {
       initialCount = 8;
     } else if (screenSize === "med") {
       initialCount = 6;
-    } else if (screenSize === "small") {
-      initialCount = 4;
     } else {
-      initialCount = 2;
+      initialCount = 4;
     }
 
     setVisibleCount(Math.min(initialCount, TOTAL_ADS));

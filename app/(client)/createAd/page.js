@@ -274,9 +274,7 @@ export default function CreateAd() {
       if (!hasSelectedContact) {
         setFieldErrors((prev) => ({
           ...prev,
-          contact:
-            t.ad.contact_method_required ||
-            "Please select at least one contact method",
+          contact: t.ad.contact_method_required,
         }));
         return;
       }
@@ -600,7 +598,7 @@ export default function CreateAd() {
                     <div className="options-grid flex">
                       {field.options?.map((option) => {
                         const displayLabel =
-                          option.label || (option.value ? "Yes" : "No");
+                          option.label || (option.value ? t.ad.yes : t.ad.no);
                         const isSelected =
                           dynamicValues[field.key] === option.value;
 
@@ -625,7 +623,7 @@ export default function CreateAd() {
                             }`}
                             onClick={() => handleDynamicChange(field.key, true)}
                           >
-                            {locale === "ar" ? "نعم" : "Yes"}
+                            {t.ad.yes}
                           </div>
                           <div
                             className={`option-box small ${
@@ -635,7 +633,7 @@ export default function CreateAd() {
                               handleDynamicChange(field.key, false)
                             }
                           >
-                            {locale === "ar" ? "لا" : "No"}
+                            {t.ad.no}
                           </div>
                         </>
                       )}
@@ -713,8 +711,7 @@ export default function CreateAd() {
             {/* ========== DESCRIPTION ========== */}
             <div className="box forInput">
               <label>
-                {t.dashboard.forms.description || "Description"}{" "}
-                <span>({t.auth.optional || "Optional"})</span>
+                {t.dashboard.forms.description} <span>({t.auth.optional})</span>
               </label>
               <div className="inputHolder">
                 <div className="holder">

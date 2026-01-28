@@ -159,7 +159,7 @@ const DynamicFilters = ({
                   updateFilter(field.key, value === true ? null : true)
                 }
               >
-                {locale === "ar" ? "نعم" : "Yes"}
+                {t.ad.yes}
               </button>
               <button
                 className={`filter-option ${value === false ? "active" : ""}`}
@@ -167,7 +167,7 @@ const DynamicFilters = ({
                   updateFilter(field.key, value === false ? null : false)
                 }
               >
-                {locale === "ar" ? "لا" : "No"}
+                {theme.ad.no}
               </button>
             </div>
           </div>

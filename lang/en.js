@@ -39,6 +39,9 @@ const en = {
       "Inspect the product carefully before purchasing.",
       "Never pay or transfer money in advance.",
     ],
+    yes: "yes",
+    no: "no",
+
 
     choose_category: "Choose a category",
     choose_sub_category: "Choose a subcategory",
@@ -56,6 +59,17 @@ const en = {
     contact_via_email: "Contact via Email",
     contact_via_phone: "Contact via Phone",
     contact_via_chat: "Contact via Chat",
+    contact_method_required: "the contact method required",
+    basic_info: "Basic Information",
+    category_info: "Category Information",
+    admin_contact: "Administrator Contact",
+    theContactMethod: "Current communication method",
+    additional_details: "Additional Details",
+    userToUser: "userToUser",
+    userToAdmin: "userToAdmin",
+    choose_admin: "choosing admin",
+    select_admin: "select admin user",
+
     placeholders: {
       adTitle: "enter your ad title",
     },
@@ -64,6 +78,9 @@ const en = {
       adTitleValidation: "your ad title is too short",
       governorate: "Governorate is required",
       city: "City is required",
+      category: "Category is required",
+      subCategory: "Subcategory is required",
+      admin: "Admin user is required",
     },
     images: {
       label: "uploud your ad images",
@@ -105,6 +122,9 @@ const en = {
     selectCity: "select your City",
   },
   dashboard: {
+    head: {
+      dashboard: "dashboard",
+    },
     forms: {
       title: "Title",
       titlePlaceholder: "Enter product title",
@@ -117,7 +137,7 @@ const en = {
       stockPlaceholder: "Enter stock quantity",
 
       price: "Price",
-      pricePlaceholder: "Enter product price",
+      pricePlaceholder: "Enter price",
 
       sale: "Sale (%)",
       salePlaceholder: "Enter sale percentage",

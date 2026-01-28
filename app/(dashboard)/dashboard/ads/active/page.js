@@ -49,7 +49,7 @@ export default function ActiveAds() {
       <div className="body">
         <div className="table-container products">
           <div className="table-header">
-            {screenSize !== "small" ? (
+            {!screenSize.includes("small") ? (
               <>
                 <div className="header-item details">
                   {t.dashboard.tables.ad_details}

@@ -12,6 +12,7 @@ export const SettingsProvider = ({ children }) => {
   useEffect(() => {
     function getScreenSize() {
       const width = window.innerWidth;
+      if (width < 400) return "ultra-small";
       if (width < 768) return "small";
       if (width < 992) return "med";
       return "large";
