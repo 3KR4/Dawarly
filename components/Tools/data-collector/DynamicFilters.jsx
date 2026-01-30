@@ -4,6 +4,7 @@ import Slider from "@mui/material/Slider";
 import "@/styles/client/filters.css";
 import { IoIosClose } from "react-icons/io";
 import { settings } from "@/Contexts/settings";
+import useTranslate from "@/Contexts/useTranslation";
 
 const DynamicFilters = ({
   dynamicFilters = [],
@@ -16,6 +17,7 @@ const DynamicFilters = ({
 }) => {
   const { theme } = useContext(settings);
   const [localState, setLocalState] = useState({});
+  const t = useTranslate();
 
   useEffect(() => {
     setLocalState(selectedFilters);
@@ -167,7 +169,7 @@ const DynamicFilters = ({
                   updateFilter(field.key, value === false ? null : false)
                 }
               >
-                {theme.ad.no}
+                {t.ad.no}
               </button>
             </div>
           </div>

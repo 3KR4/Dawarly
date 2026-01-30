@@ -3,12 +3,12 @@ import "@/styles/dashboard/side-nav.css";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { settings } from "@/Contexts/settings";
 import useTranslate from "@/Contexts/useTranslation";
 import { AiFillProduct } from "react-icons/ai";
 import { LuCalendarClock } from "react-icons/lu";
 import { LuCalendarCheck } from "react-icons/lu";
 import { LuGrid2X2Check } from "react-icons/lu";
+import { settings } from "@/Contexts/settings";
 
 import {
   FaUsers,
@@ -25,7 +25,17 @@ import { MdLogout } from "react-icons/md";
 import { FiSun } from "react-icons/fi";
 
 function SideNav() {
-  const { theme, toggleTheme, locale, toggleLocale } = useContext(settings);
+  const {
+    theme,
+    toggleTheme,
+    locale,
+    screenSize,
+    toggleLocale,
+    isNavOpen,
+    setIsNavOpen,
+    isMounted,
+    setIsMounted,
+  } = useContext(settings);
   const t = useTranslate();
 
   const pathname = usePathname();
@@ -39,26 +49,12 @@ function SideNav() {
     return pathname.startsWith(accordionPath);
   };
 
-  const [isNavOpen, setIsNavOpen] = useState(null);
   const [openAccordion, setOpenAccordion] = useState(null);
   const accordionRefs = useRef({});
-  const [isMounted, setIsMounted] = useState(false);
 
   const toggleAccordion = (key) => {
     setOpenAccordion((prev) => (prev === key ? null : key));
   };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("nav-open");
-    setIsNavOpen(saved === null ? true : saved === "true");
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isNavOpen !== null) {
-      localStorage.setItem("nav-open", isNavOpen ? "true" : "false");
-    }
-  }, [isNavOpen]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -80,10 +76,18 @@ function SideNav() {
         {/* Toggle */}
         <li
           className="actions-btns"
-          onClick={() => setIsNavOpen((prev) => !prev)}
+          onClick={() => {
+            setIsNavOpen((prev) => (screenSize !== "large" ? false : !prev));
+          }}
         >
           <h4>{t.sideNav.menuRoutes}</h4>
-          {isNavOpen ? (
+          {screenSize !== "large" ? (
+            locale === "en" ? (
+              <FaAngleLeft />
+            ) : (
+              <FaAngleRight />
+            )
+          ) : isNavOpen ? (
             locale === "en" ? (
               <FaAngleLeft />
             ) : (
@@ -129,9 +133,9 @@ function SideNav() {
 
         {/* Ads */}
         <div
-          className={`a ${isAccordionActive("/dashboard/ads") ? "active" : ""} ${
-            openAccordion === "ads" ? "active" : ""
-          }`}
+          className={`a ${
+            isAccordionActive("/dashboard/ads") ? "active" : ""
+          } ${openAccordion === "ads" ? "active" : ""}`}
           onClick={() => toggleAccordion("ads")}
         >
           <div className="hold">
@@ -174,9 +178,9 @@ function SideNav() {
 
         {/* Bookings */}
         <div
-          className={`a ${isAccordionActive("/dashboard/bookings") ? "active" : ""} ${
-            openAccordion === "bookings" ? "active" : ""
-          }`}
+          className={`a ${
+            isAccordionActive("/dashboard/bookings") ? "active" : ""
+          } ${openAccordion === "bookings" ? "active" : ""}`}
           onClick={() => toggleAccordion("bookings")}
         >
           <div className="hold">

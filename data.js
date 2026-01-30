@@ -618,10 +618,10 @@ export const ads = [
       { id: 6, value: "outdoor-pools", label: "Outdoor pools" },
     ],
     contactMethods: {
-      chat: true,
       email: false,
       phone: true,
     },
+    isEditable: true,
   },
   {
     id: 102,

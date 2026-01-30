@@ -5,11 +5,11 @@
   justify-content: space-between;
   position: sticky;
   top: 0;
+  transition: 0.5s;
   height: 100vh;
 }
 [lang="ar"] .side-nav {
   border-right: 0;
-
   border-left: 1px solid var(--border-color);
 }
 .side-nav h4 {
@@ -185,5 +185,16 @@
     z-index: 11;
     background: var(--body-color);
     left: -192px;
+  }
+  .side-nav.active {
+    left: 0;
+  }
+  [lang="ar"] .side-nav {
+    left: unset;
+    right: -192px;
+  }
+  [lang="ar"] .side-nav.active {
+    right: 0;
+    left: unset;
   }
 }

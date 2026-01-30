@@ -7,7 +7,7 @@ import Image from "next/image";
 import "@/styles/dashboard/forms.css";
 import useTranslate from "@/Contexts/useTranslation";
 
-function Images({ images, setImages, isSubmitted }) {
+function Images({ images, setImages, isSubmitted, disabled = false }) {
   const t = useTranslate();
 
   const inputFileRef = useRef(null);
@@ -37,7 +37,7 @@ function Images({ images, setImages, isSubmitted }) {
   };
 
   return (
-    <div className="box forInput">
+    <div className={`box forInput ${disabled ? "disabled" : ""}`}>
       <label>{t.ad.images?.label}</label>
 
       <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
@@ -53,11 +53,15 @@ function Images({ images, setImages, isSubmitted }) {
         >
           <FaCloudUploadAlt />
 
-          <p>{t.ad.images?.helperText}</p>
+          {disabled ? (
+            <p className="disapled-images-label">{`ad images`}</p>
+          ) : (
+            <>
+              <p>{t.ad.images?.helperText}</p>
 
-          <h1>
-            {isDrag ? t.ad.images?.dropHere : t.ad.images?.clickHere}
-          </h1>
+              <h1>{isDrag ? t.ad.images?.dropHere : t.ad.images?.clickHere}</h1>
+            </>
+          )}
         </div>
 
         <input
@@ -66,6 +70,7 @@ function Images({ images, setImages, isSubmitted }) {
           multiple
           hidden
           ref={inputFileRef}
+          disabled={disabled}
           onChange={handleInputChange}
         />
 
@@ -81,7 +86,7 @@ function Images({ images, setImages, isSubmitted }) {
                 height={150}
               />
               <p>{index + 1}</p>
-              <IoClose onClick={() => handleRemoveImage(index)} />
+              {!disabled && <IoClose onClick={() => handleRemoveImage(index)} />}
             </div>
           ))}
         </div>

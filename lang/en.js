@@ -42,7 +42,6 @@ const en = {
     yes: "yes",
     no: "no",
 
-
     choose_category: "Choose a category",
     choose_sub_category: "Choose a subcategory",
     ad_basics: "Ad basics",
@@ -56,6 +55,7 @@ const en = {
     ad_details_description: "Add more details to make your ad more attractive.",
     contact_information_description: "Provide your preferred contact method.",
     create_your_ad: "create your ad",
+    create_ad: "create ad",
     contact_via_email: "Contact via Email",
     contact_via_phone: "Contact via Phone",
     contact_via_chat: "Contact via Chat",
@@ -65,8 +65,8 @@ const en = {
     admin_contact: "Administrator Contact",
     theContactMethod: "Current communication method",
     additional_details: "Additional Details",
-    userToUser: "userToUser",
-    userToAdmin: "userToAdmin",
+    userToUser: "user To User",
+    userToAdmin: "user To Admin",
     choose_admin: "choosing admin",
     select_admin: "select admin user",
 
@@ -90,6 +90,22 @@ const en = {
       errors: {
         required: "You must upload at least one image",
       },
+    },
+    tags: {
+      label: "Tags",
+      placeholder: "Enter your tags",
+      add: "Add",
+      errors: {
+        minLength: "The tag must be at least 3 characters",
+        duplicate: "This tag has already been added before",
+      },
+    },
+    status: {
+      pending: "pending",
+      active: "active",
+      sold: "sold",
+      paused: "paused",
+      label: "Filter by status",
     },
   },
   placeholders: {

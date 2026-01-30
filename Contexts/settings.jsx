@@ -29,6 +29,22 @@ export const SettingsProvider = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   // 🔥 الحل: منع أي Render لحد ما الشاشة تتحدد
+
+  const [isNavOpen, setIsNavOpen] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    if (screenSize !== "large") {
+      setIsNavOpen(false);
+    }
+  }, [screenSize]);
+  console.log(isNavOpen);
+
+  useEffect(() => {
+    setIsNavOpen(false);
+    setIsMounted(true);
+  }, [pathname]);
+
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -76,6 +92,9 @@ export const SettingsProvider = ({ children }) => {
         locale,
         setLocale,
         toggleLocale,
+        isNavOpen,
+        setIsNavOpen,
+        isMounted,
       }}
     >
       {children}

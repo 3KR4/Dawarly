@@ -54,6 +54,7 @@ const ar = {
     ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
     contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
     create_your_ad: "انشيء اعلانك الان",
+    create_ad: "انشيء اعلان ",
     contact_via_email: "تواصل عبر البريد الإلكتروني",
     contact_via_phone: "تواصل عبر الهاتف",
     contact_via_chat: "تواصل عبر الدردشة",
@@ -90,6 +91,22 @@ const ar = {
       errors: {
         required: "يجب عليك اضافة صورة واحدة علي الاقل",
       },
+    },
+    tags: {
+      label: "الكلمات المفتاحية",
+      placeholder: "اكتب الكلمات المفتاحية",
+      add: "إضافة",
+      errors: {
+        minLength: "يجب ألا تقل الكلمة عن 3 أحرف",
+        duplicate: "تمت إضافة هذه الكلمة من قبل",
+      },
+    },
+    status: {
+      pending: "قيد المراجعة",
+      active: "نشط الأن",
+      sold: "تم بيعه",
+      paused: "توقف مؤقتًا",
+      label: "تصفية حسب الحالة",
     },
   },
 
@@ -223,7 +240,7 @@ const ar = {
     },
   },
   sideNav: {
-    menuRoutes: "روابط القائمة",
+    menuRoutes: "قائمة الصفحات",
     overview: "نظرة عامة",
     slides: "السلايدرز",
     users: "المستخدمين",

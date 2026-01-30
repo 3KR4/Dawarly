@@ -3,8 +3,9 @@ import { useState, useContext } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { selectors } from "@/Contexts/selectors";
+import useTranslate from "@/Contexts/useTranslation";
 
-function Tags() {
+export default function Tags({ disabled = false }) {
   const {
     tags,
     setTags,
@@ -14,14 +15,18 @@ function Tags() {
     updateCompsInput,
   } = useContext(selectors);
 
+  const t = useTranslate();
+
   const addTag = () => {
     const trimmed = compsInput.tags.trim();
+
     if (!trimmed || trimmed.length < 3) {
-      updateCompsError("tags", "the tag must be at least 3 characters");
+      updateCompsError("tags", t.ad.tags.errors.minLength);
       return;
     }
+
     if (tags.includes(trimmed.toLowerCase())) {
-      updateCompsError("tags", "this tag has already been added before");
+      updateCompsError("tags", t.ad.tags.errors.duplicate);
       return;
     }
 
@@ -29,43 +34,56 @@ function Tags() {
     updateCompsInput("tags", "");
     updateCompsError("tags", "");
   };
+
   const removeTag = (index) => {
     setTags(tags.filter((_, i) => i !== index));
     updateCompsError("tags", "");
   };
+
   return (
-    <div className="box forInput">
-      <label>tags</label>
+    <div className={`box forInput ${disabled ? "disabled" : ""}`}>
+      <label>{t.ad.tags.label}</label>
+
       <div className="inputHolder tags">
-        <div className="holder flex">
-          <input
-            value={compsInput.tags}
-            onChange={(e) => {
-              updateCompsInput("tags", e.target.value);
-              updateCompsError("tags", "");
-            }}
-            placeholder="enter your tags"
-          />
-          <button
-            className="main-button for-tags"
-            type="button"
-            onClick={addTag}
-          >
-            Add
-          </button>
-        </div>
+        {!disabled && (
+          <div className="holder flex">
+            <input
+              value={compsInput.tags}
+              onChange={(e) => {
+                updateCompsInput("tags", e.target.value);
+                updateCompsError("tags", "");
+              }}
+              placeholder={t.ad.tags.placeholder}
+            />
+
+            <button
+              className="main-button for-tags"
+              type="button"
+              onClick={addTag}
+            >
+              {t.ad.tags.add}
+            </button>
+          </div>
+        )}
         {compsErrors.tags && (
           <span className="error">
             <CircleAlert />
             {compsErrors.tags}
           </span>
         )}
+
         {tags.length > 0 && (
           <div className="tagsList">
-            {tags.map((t, i) => (
-              <span key={i} className="tag" onClick={() => removeTag(i)}>
-                {t}
-                <IoClose />
+            {tags.map((tag, i) => (
+              <span
+                key={i}
+                className="tag"
+                onClick={() => {
+                  !disabled && removeTag(i);
+                }}
+              >
+                {tag}
+                {!disabled && <IoClose />}
               </span>
             ))}
           </div>
@@ -74,5 +92,3 @@ function Tags() {
     </div>
   );
 }
-
-export default Tags;

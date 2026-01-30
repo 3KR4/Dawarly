@@ -11,6 +11,8 @@ import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
+import { FaRegWindowClose } from "react-icons/fa";
+import { IoMdCloseCircle } from "react-icons/io";
 
 import {
   ads,
@@ -47,7 +49,7 @@ export default function ActiveAds() {
   return (
     <div className="dash-holder">
       <div className="body">
-        <div className="table-container products">
+        <div className="table-container pending-ads-tasble">
           <div className="table-header">
             {!screenSize.includes("small") ? (
               <>
@@ -131,20 +133,21 @@ export default function ActiveAds() {
                     {formatRelativeDate(
                       item?.creation_date,
                       locale,
-                      "detailed",
+                      "detailed"
                     )}
                   </p>
                   <div className="actions">
-                    <Link href={`/marketplace/${item?.id}`}>
+                    <Link href={`/market/${item?.id}`}>
                       <FaEye className="view" />
                     </Link>
                     <hr />
-                    <Link href={`/dashboard/products/form?edit=${item?.id}`}>
+                    <Link href={`/dashboard/ads/form?id=${item?.id}`}>
                       <MdEdit className="edit" />
                     </Link>
 
                     <hr />
-                    <FaTrashAlt className="delete" />
+
+                    <IoMdCloseCircle className="delete" />
                   </div>
                 </div>
               );

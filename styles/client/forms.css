@@ -43,6 +43,19 @@ body:has(.form-holder) footer {
 .form-holder form .top {
   position: relative;
 }
+.form-holder form .row-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-holder form .row-holder .left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.form-holder form .form-section .dynamicFilters-holder > * {
+  min-width: 100%;
+}
 .form-holder form h1 {
   color: var(--paragraph);
   text-align: center;
@@ -127,7 +140,7 @@ body:has(.form-holder) footer {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.form-holder form .main-button {
+.form-holder form > .main-button {
   width: 100%;
   margin-top: 5px;
   border-radius: 10px !important;
@@ -138,6 +151,11 @@ body:has(.form-holder) footer {
 }
 .form-holder.create-ad form .main-button {
   margin-top: 0;
+}
+.form-holder.create-ad.user-create-ad form .submit-section > .main-button {
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
 }
 .form-holder form .otherWay {
   display: flex;
@@ -191,39 +209,48 @@ p.have-problem {
   font-size: 14px;
   text-decoration: underline;
 }
-.form-holder .filters .btn {
+.filters .btn {
   height: 44px !important;
   border: 1px solid var(--input-border-color) !important;
   border-radius: 10px !important;
 }
-.form-holder .filters.filters.for-cats {
+
+.filters.filters.for-cats {
   width: 100% !important;
   border: none;
 }
-.form-holder .filters.filters.for-cats,
-.form-holder .filters.for-cats:has(.menu.active) {
+.filters.filters.for-cats,
+.filters.for-cats:has(.menu.active) {
   width: 100%;
 }
-.form-holder .filters .menu {
+.filters .menu {
   grid-template-columns: 1fr;
   top: 44px;
 }
-.form-holder .filters.for-cats .menu {
+.filters.for-cats .menu {
   max-height: 216px;
   overflow: auto;
 }
-.form-holder .filters.for-cats button {
+.filters.for-cats button {
   padding: 6px 8px;
   font-size: 14px;
 }
-.form-holder .filters .btn svg {
+.filters .btn svg {
   width: 38px;
   height: 44px;
   padding: 7px;
   background: transparent;
   color: var(--paragraph);
 }
-
+.body.fluid-container.for-user .filters .btn svg {
+  height: 31px;
+  position: absolute;
+  right: 0;
+}
+.body.fluid-container.for-user .table-container .table-header,
+.body.fluid-container.for-user .table-container .table-item {
+  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.75fr 0.8fr;
+}
 .form-holder .options-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
@@ -268,9 +295,12 @@ p.have-problem {
   cursor: pointer;
   position: relative;
 }
-.form-holder .option-box:hover {
+.form-holder .option-box:not(.disabled):hover {
   background: var(--hover-color);
   border: 1px solid var(--main-color);
+}
+.form-holder .option-box.disabled {
+  cursor: no-drop !important;
 }
 .form-holder .option-box.active {
   background: var(--lighter-main-color-2);
@@ -301,7 +331,7 @@ p.have-problem {
   top: 0;
   font-size: 12px;
 }
-.form-holder .filters.for-cats .menu {
+.filters.for-cats .menu {
   max-height: 256px;
 }
 .otp-wrapper {
@@ -347,10 +377,15 @@ p.have-problem {
 .form-holder.create-ad textarea {
   height: 160px;
 }
-.form-holder .filters.for-cats input {
+.filters.for-cats input {
   padding: 0 !important;
 }
 @media (max-width: 992px) {
+  .form-holder form {
+    box-shadow: unset;
+    padding: 0 !important;
+    width: 100%;
+  }
   .form-holder .form-holderBackground {
     object-fit: cover;
   }

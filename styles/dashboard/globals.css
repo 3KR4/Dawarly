@@ -16,17 +16,39 @@
   height: 56px;
   padding: 0 16px;
   font-size: 14px;
-  transition:
-    visibility 0.3s,
-    opacity 0.3s,
-    z-index 0.3s;
+  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
   display: flex;
   position: sticky;
   top: 0;
   z-index: 10;
   background: var(--body-color);
 }
-
+.dashboard .head:has(.holder svg) {
+  padding-left: 0;
+}
+[lang="ar"] .dashboard .head:has(.holder svg) {
+  padding-left: 16px;
+  padding-right: 0;
+}
+.dashboard .head .holder:has(svg) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+}
+.dashboard .head .holder svg {
+  border-right: 1px solid var(--border-color);
+  width: 48px;
+  height: 100%;
+  margin-left: 2px;
+  padding: 12px;
+}
+[lang="ar"] .dashboard .head .holder svg {
+  margin-left: unset;
+  margin-right: 2px;
+  border-left: 1px solid var(--border-color);
+  border-right: unset;
+}
 .dashboard .head .right {
   display: flex;
   align-items: center;
@@ -59,10 +81,14 @@
   font-size: 12px;
   height: 34px;
 }
-.dashboard .body {
+.body:has(> .table-container) {
   padding: 12px;
   display: flex;
   flex-direction: column;
+  gap: 7px;
+}
+body.fluid-container {
+  margin: 0 auto;
 }
 .dashboard .navigations {
   z-index: unset;
@@ -74,10 +100,7 @@
   justify-content: unset;
   width: unset;
   min-height: unset;
-  transition:
-    visibility 0.3s,
-    opacity 0.3s,
-    z-index 0.3s;
+  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
   position: relative;
   left: unset;
   transform: unset;
@@ -127,7 +150,7 @@ header .actions-btns .userMenu .top {
 .dashboard .dash-holder {
   flex: 1;
 }
-.dashboard .table-container {
+.table-container {
   margin-bottom: unset;
   overflow: auto;
   box-shadow: unset;
@@ -137,17 +160,21 @@ header .actions-btns .userMenu .top {
   gap: 0;
 }
 
-.dashboard .table-container .table-header,
-.dashboard .table-container .table-item {
-    grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1.15fr 0.8fr;
+.table-container .table-header,
+.table-container .table-item {
+  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1.15fr 0.8fr;
   gap: 15px;
-padding: .42rem 1rem;
+  padding: 0.42rem 1rem;
 }
+.table-container.pending-ads-tasble .table-header,
+.table-container.pending-ads-tasble .table-item {
+  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.8fr;
 
-.dashboard .table-container .table-item:hover {
+}
+.table-container .table-item:hover {
   background: var(--section-color);
 }
-.dashboard .table-container .item-rating {
+.table-container .item-rating {
   flex-direction: column;
   gap: 2px;
 }
@@ -156,34 +183,34 @@ padding: .42rem 1rem;
   align-items: center;
   gap: 4px;
 }
-.dashboard .table-container .item-rating h4 {
+.table-container .item-rating h4 {
   color: var(--paragraph);
 }
-.dashboard .table-container .item-rating .row-holder h4 {
+.table-container .item-rating .row-holder h4 {
   font-size: 14px;
 }
-.dashboard .table-container .item-image .product-image {
+.table-container .item-image .product-image {
   aspect-ratio: 1.1;
   border-radius: 7px;
   width: unset !important;
   height: 60px !important;
   object-fit: cover;
 }
-.dashboard .table-container .item-details {
+.table-container .item-details {
   gap: 2px;
 }
-.dashboard .table-container .item-name,
-.dashboard .table-container .item-name span {
+.table-container .item-name,
+.table-container .item-name span {
   font-size: 14px;
   line-height: 1.4;
 }
-.dashboard .table-container .item-overview {
+.table-container .item-overview {
   gap: 5px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 0 20px;
 }
-.dashboard .table-container .item-overview h4 {
+.table-container .item-overview h4 {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -194,34 +221,46 @@ padding: .42rem 1rem;
   color: var(--paragraph);
   justify-content: center;
 }
-.dashboard .table-container .item-overview h4.green {
+.table-container .item-overview h4.green {
   background: #fdecd2;
 }
-.dashboard .table-container .nisted {
+.table-container .nisted {
   display: flex;
   align-items: center;
-  gap:0 4px;
+  gap: 0 4px;
   justify-content: center;
   flex-wrap: wrap;
 }
-.dashboard .table-container .nisted > *:first-child {
+.table-container .nisted > *:first-child {
   color: var(--main-color);
   font-weight: 800;
   font-size: 15px;
 }
-.dashboard .table-container .nisted > *:last-child {
+.table-container .nisted > *:last-child {
   color: var(--paragraph);
   font-weight: 600;
   font-size: 14px;
 }
-
-.dashboard .table-container .actions {
+.table-container .item-status {
+  padding: 0 12px;
+}
+.pending {
+  background: #fff0cf;
+  border-radius: 8px;
+  height: 32px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.table-container .actions {
   align-items: center;
   display: flex;
   justify-content: center;
   gap: 3px;
 }
-.dashboard .table-container .actions svg {
+.table-container .actions svg {
   width: 33px;
   height: 33px;
   border-radius: 7px;
@@ -229,22 +268,20 @@ padding: .42rem 1rem;
   color: var(--paragraph);
 }
 
-.dashboard .table-container .actions svg.delete {
-  padding: 9px;
-}
-.dashboard .table-container .actions svg.view:hover {
+
+.table-container .actions svg.view:hover {
   background: var(--main-color);
   color: white;
 }
-.dashboard .table-container .actions svg.edit:hover {
+.table-container .actions svg.edit:hover {
   background: #ffb52a;
   color: white;
 }
-.dashboard .table-container .actions svg.delete:hover {
+.table-container .actions svg.delete:hover {
   background: #ff4f4ff5;
   color: white;
 }
-.dashboard .table-container .actions hr {
+.table-container .actions hr {
   background: #d5d5d5;
   margin: 0 6px;
   height: 16px;
@@ -258,7 +295,7 @@ padding: .42rem 1rem;
 .pagination li.break {
   height: 34px !important;
 }
-.dashboard .table-container .categories {
+.table-container .categories {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -268,16 +305,51 @@ padding: .42rem 1rem;
   flex-direction: row;
   margin: 0;
 }
-.dashboard .table-container .categories h4 {
+.table-container .categories h4 {
   color: var(--paragraph);
 }
-.dashboard .table-container .categories h4:first-child {
+.table-container .categories h4:first-child {
   color: var(--hover-color);
 }
-.dashboard .table-container .link:has(svg) {
+.table-container .link:has(svg) {
   display: flex;
   align-items: center;
   justify-content: center;
   align-items: center;
   gap: 3px;
+}
+
+@media (max-width: 768px) {
+  .dashboard .head {
+    padding: 0 10px;
+  }
+  [lang="ar"] .dashboard .head:has(.holder svg) {
+    padding-left: 10px;
+  }
+  .dashboard .head .main-button {
+    padding: 0 8px;
+  }
+  .dashboard .head .holder svg {
+    padding: 7px;
+    width: 40px;
+  }
+  .dashboard .navigations {
+    gap: 2px;
+  }
+  .dashboard .navigations a,
+  .navigations .active {
+    font-size: 15px;
+  }
+
+  [lang="ar"] .dashboard .navigations a,
+  [lang="ar"] .navigations .active {
+    font-size: 14px;
+  }
+  .dashboard .navigations a:first-child,
+  .navigations .separator.one {
+    display: none;
+  }
+  .dashboard .head .holder:has(svg) {
+    gap: 8px;
+  }
 }

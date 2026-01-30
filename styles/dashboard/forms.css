@@ -16,22 +16,22 @@
 .dashboard form .error {
   margin: -2px 4px -2px;
 }
-.dashboard form .form-section {
+form .form-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.dashboard form .form-section h2 {
+form .form-section h2 {
   color: var(--title-color);
   font-size: 19px;
 }
-.dashboard form .form-section .dynamicFilters-holder {
+form .form-section .dynamicFilters-holder {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.dashboard form .form-section .dynamicFilters-holder > * {
+form .form-section .dynamicFilters-holder > * {
   min-width: 49%;
   flex: 1;
 }
@@ -54,6 +54,8 @@
 .dashboard form .main-button[type="submit"] {
   height: 44px;
   padding: 0 20px;
+  width: 100%;
+  border-radius: 10px;
 }
 .dashboard form .main-button[type="submit"] span {
   text-transform: uppercase;
@@ -115,16 +117,19 @@
   font-weight: 500;
   transition: all 0.3s;
   display: flex;
-  background: var(--second-color) !important;
+  background: var(--lighter-main-color);
 }
 .box.forInput .inputHolder.tags .tagsList span svg {
   font-size: 17px;
 }
-.box.forInput .inputHolder.tags .tagsList span:hover {
+.box.forInput:not(.disabled) .inputHolder.tags .tagsList span:hover {
   background: #ff3535f5 !important;
   color: white;
 }
-.box.forInput .inputHolder.tags .tagsList span:hover svg {
+.box.forInput.disabled .inputHolder.tags .tagsList span {
+  cursor: auto;
+}
+.box.forInput:not(.disabled) .inputHolder.tags .tagsList span:hover svg {
   color: white;
 }
 .box.forInput .inputHolder.tags p.tags-place-holder {
@@ -138,21 +143,28 @@
   margin: -4px 4px;
 }
 .box.forInput .for-tags {
-  height: 42px;
   padding: 0 27px;
-  border-radius: 0 !important;
-  background: transparent;
   color: var(--paragraph);
-  border-left: 1px solid #a6a6a6;
   font-weight: 400;
+  height: 36px;
+  border-radius: 5px !important;
+  background: var(--lighter-main-color-2);
+  margin-right: 4px;
+  border: none;
+}
+[lang="ar"] .box.forInput .for-tags {
+  margin-right: unset;
+  margin-left: 4px;
+}
+.create-ad .box.forInput .for-tags {
+  height: 32px;
 }
 .box.forInput .for-tags:hover {
   font-weight: 600;
   color: white;
   background: var(--main-color);
 }
-.dashboard .box.forInput .inputHolder .holder input,
-.box.forInput .for-tags {
+.dashboard .box.forInput .inputHolder .holder input {
   height: 40px;
 }
 .box.forInput .spec-list {
@@ -264,9 +276,7 @@
 
 .images-uplouder .upload-label svg {
   font-size: 95px;
-  transition:
-    opacity 0.5s,
-    font-size 0.4s;
+  transition: opacity 0.5s, font-size 0.4s;
   color: var(--input-border-color);
   margin-top: -9px;
   margin-bottom: -5px;
@@ -275,15 +285,19 @@
 .images-uplouder:has(.uploaded) .upload-label svg {
   font-size: 75px;
 }
-
+.box.forInput.disabled .images-uplouder:has(.uploaded) .upload-label svg {
+  font-size: 75px !important;
+  opacity: 1 !important;
+}
+.box.forInput.disabled .admin-create-ad .images-uplouder .upload-label {
+  cursor: no-drop;
+}
 .images-uplouder .upload-label p {
   color: var(--input-border-color);
   margin-bottom: 5px;
   font-size: 16px;
   font-weight: 700;
-  transition:
-    opacity 0.5s,
-    font-size 0.4s;
+  transition: opacity 0.5s, font-size 0.4s;
 }
 
 .images-uplouder .upload-label h1 {
@@ -293,9 +307,7 @@
   opacity: 0;
   font-size: 15px;
   font-weight: 700;
-  transition:
-    opacity 0.5s,
-    font-size 0.4s !important;
+  transition: opacity 0.5s, font-size 0.4s !important;
   cursor: pointer;
   color: var(--input-border-color);
   transform: translate(-50%, -50%);
@@ -381,7 +393,7 @@
   .dashboard form .row-holder {
     grid-template-columns: repeat(1, 1fr);
   }
-  .dashboard form .form-section .dynamicFilters-holder > * {
+  form .form-section .dynamicFilters-holder > * {
     min-width: 100%;
   }
 }

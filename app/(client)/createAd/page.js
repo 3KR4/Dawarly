@@ -22,6 +22,7 @@ import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { BsChatDots } from "react-icons/bs";
 import { settings } from "@/Contexts/settings";
+import Tags from "@/components/Tools/data-collector/Tags";
 
 export default function CreateAd() {
   const { locale } = useContext(settings);
@@ -45,7 +46,7 @@ export default function CreateAd() {
       //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
       // }
       setDynamicFilters(
-        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
+        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
       );
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
       setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
@@ -73,11 +74,6 @@ export default function CreateAd() {
       key: "phone",
       label: t.ad.contact_via_phone,
       icon: Phone,
-    },
-    {
-      key: "chat",
-      label: t.ad.contact_via_chat,
-      icon: BsChatDots,
     },
   ];
 
@@ -186,7 +182,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true,
+        (v) => v === true
       );
 
       if (!hasSelectedContact) {
@@ -223,7 +219,7 @@ export default function CreateAd() {
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id,
+    (c) => c.governorate_id === userAddress.gov?.id
   );
 
   const onSubmit = async (data) => {
@@ -269,7 +265,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true,
+        (v) => v === true
       );
       if (!hasSelectedContact) {
         setFieldErrors((prev) => ({
@@ -443,6 +439,34 @@ export default function CreateAd() {
                 setAddressErrors((prev) => ({ ...prev, city: "" }));
               }}
             />
+            <div className="box forInput">
+              <label>
+                {t.dashboard.forms.price} <span className="required">*</span>
+              </label>
+
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="number"
+                    {...register("price", {
+                      required: t.dashboard.forms.errors.priceRequired,
+                      min: {
+                        value: 1,
+                        message: t.dashboard.forms.errors.priceMin,
+                      },
+                    })}
+                    placeholder={t.dashboard.forms.pricePlaceholder}
+                  />
+                </div>
+
+                {errors.price && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.price.message}
+                  </span>
+                )}
+              </div>
+            </div>
             <Images
               images={images}
               setImages={setImages}
@@ -679,8 +703,8 @@ export default function CreateAd() {
                                 handleDynamicChange(
                                   field.key,
                                   selectedValues.filter(
-                                    (v) => v !== option.value,
-                                  ),
+                                    (v) => v !== option.value
+                                  )
                                 );
                               } else {
                                 handleDynamicChange(field.key, [
@@ -707,6 +731,8 @@ export default function CreateAd() {
 
               return null;
             })}
+
+            <Tags />
 
             {/* ========== DESCRIPTION ========== */}
             <div className="box forInput">

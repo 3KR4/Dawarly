@@ -7,15 +7,17 @@ import Navigations from "@/components/Tools/Navigations";
 
 import { settings } from "@/Contexts/settings";
 import { getDashboardBreadcrumb } from "@/utils/getBreadcrumbItems";
+import { IoMenu, IoLanguage } from "react-icons/io5";
 import { dashboardRoutes } from "@/data";
 
 function Head() {
-  const { pathname, searchParams, locale } = useContext(settings);
+  const { pathname, searchParams, screenSize, locale, setIsNavOpen } =
+    useContext(settings);
 
   const breadcrumbItems = getDashboardBreadcrumb(
     pathname,
     searchParams,
-    locale,
+    locale
   );
 
   const mainKey = breadcrumbItems[0]?.key;
@@ -23,7 +25,22 @@ function Head() {
 
   return (
     <div className="head">
-      <Navigations items={breadcrumbItems} container="no" isDashBoard={true}/>
+      <div className="holder">
+        {screenSize !== "large" && (
+          <IoMenu
+            style={{ fontSize: "25px" }}
+            onClick={() => {
+              setIsNavOpen(true);
+            }}
+          />
+        )}
+
+        <Navigations
+          items={breadcrumbItems}
+          container="no"
+          isDashBoard={true}
+        />
+      </div>
 
       {!pathname.includes("/form") && canCreate && (
         <div className="right">

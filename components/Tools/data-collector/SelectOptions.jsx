@@ -126,7 +126,20 @@ function SelectOptions({
     setActive(false);
     setSearch("");
   };
+  const statusColors = {
+    active: "#deffcf", // أخضر فاتح
+    paused: "#fff3cd", // أصفر فاتح
+    sold: "#cfeaff", // أحمر فاتح
+  };
+  const getBtnBg = () => {
+    if (!value) return ""; // default
+    const val = typeof value === "object" ? value.name : value; // خدي الاسم الفعلي
 
+    console.log(val);
+    console.log(statusColors[val]);
+
+    return statusColors[val] || "";
+  };
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
       {label && (
@@ -136,7 +149,10 @@ function SelectOptions({
       )}
 
       <div className="filters for-cats" ref={selectRef}>
-        <div className={`btn ${hasError ? "error-border" : ""}`}>
+        <div
+          className={`btn ${hasError ? "error-border" : ""}`}
+          style={{ backgroundColor: getBtnBg() }}
+        >
           <h4 className="ellipsis" onClick={openSelect}>
             {active ? (
               <input
