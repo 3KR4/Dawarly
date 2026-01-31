@@ -69,7 +69,17 @@ const en = {
     userToAdmin: "user To Admin",
     choose_admin: "choosing admin",
     select_admin: "select admin user",
-
+    rental_period: "Rental Period",
+    minimumRentalDuration: "Minimum Rental Duration",
+    durationValue: "Duration",
+    durationValuePlaceholder: "e.g. 3",
+    durationUnit: "Unit",
+    select: "Select",
+    day: "Day",
+    week: "Week",
+    month: "Month",
+    from: "from",
+    to: "to",
     placeholders: {
       adTitle: "enter your ad title",
     },

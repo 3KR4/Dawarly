@@ -53,6 +53,10 @@ body:has(.form-holder) footer {
   flex-direction: column;
   gap: 10px;
 }
+.form-holder form .row-holder.for-dates {
+  flex-direction: row;
+  gap: 7px;
+}
 .form-holder form .form-section .dynamicFilters-holder > * {
   min-width: 100%;
 }
