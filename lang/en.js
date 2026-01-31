@@ -1,7 +1,7 @@
 const en = {
   header: {
-    dawarly: "Dawarly",
-    awarly: "Awarly",
+    Dawaarly: "Dawaarly",
+    awaarly: "awaarly",
     other: "other categories",
     filterByCategories: "filter By Categories",
   },

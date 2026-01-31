@@ -124,8 +124,8 @@ function Header() {
         <div className="container">
           <div className="top">
             <Link href="/" className="logo">
-              <Image src={`/logo3.png`} fill alt="Dawarly" />
-              {t.header.awarly}
+              <Image src={`/logo3.png`} fill alt="Dawaarly" />
+              {t.header.awaarly}
             </Link>
             <div className="search">
               <div

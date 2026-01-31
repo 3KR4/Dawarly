@@ -24,7 +24,7 @@ const Footer = () => {
         <Image
           className="logo"
           src="/logo-transparent.png"
-          alt="dawarly Logo"
+          alt="Dawaarly Logo"
           fill
         />
 
@@ -32,7 +32,7 @@ const Footer = () => {
           <div className="about">
             <h4>Contact Us</h4>
             <p>
-              Email: <a href="mailto:info@dawarly.com">info@dawarly.com</a>
+              Email: <a href="mailto:info@Dawaarly.com">info@Dawaarly.com</a>
             </p>
             <p>
               Phone: <a href="tel:+201000000000">+20 100 000 0000</a>
@@ -42,28 +42,28 @@ const Footer = () => {
             <h4>Social</h4>
             <div className="holder">
               <a
-                href="https://www.instagram.com/dawarly.eg/"
+                href="https://www.instagram.com/Dawaarly.eg/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <AiFillInstagram />
               </a>
               <a
-                href="https://www.linkedin.com/company/dawarly%C2%B0/"
+                href="https://www.linkedin.com/company/Dawaarly%C2%B0/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaLinkedinIn />
               </a>
               <a
-                href="https://www.facebook.com/dawarlye/"
+                href="https://www.facebook.com/Dawaarlye/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaFacebookF />
               </a>
               <a
-                href="https://www.tiktok.com/@dawarly.travel/"
+                href="https://www.tiktok.com/@Dawaarly.travel/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -96,7 +96,7 @@ const Footer = () => {
       </div>
 
       <p className="privacy">
-        © {new Date().getFullYear()} dawarly. All rights reserved. |
+        © {new Date().getFullYear()} Dawaarly. All rights reserved. |
         <Link href="/privacy" className="privacy-link">
           {""}
           Privacy Policy

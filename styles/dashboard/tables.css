@@ -6,8 +6,11 @@
   overflow: hidden;
 }
 .dash-holder.for-client {
-  overflow: visible;
   margin: 17px 0px;
+
+}
+.dash-holder.for-client .table-container {
+  overflow: visible;
 }
 .dash-holder.for-client .top {
   display: flex;

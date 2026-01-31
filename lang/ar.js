@@ -1,7 +1,7 @@
 const ar = {
   header: {
-    dawarly: "دورلي",
-    awarly: "ورلي",
+    Dawaarly: "دورلي",
+    awaarly: "ورلي",
     other: "تصنيفات اخري",
     filterByCategories: "التصفية حسب الفئات",
   },

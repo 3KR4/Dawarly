@@ -127,16 +127,13 @@ function SelectOptions({
     setSearch("");
   };
   const statusColors = {
-    active: "#deffcf", // أخضر فاتح
-    paused: "#fff3cd", // أصفر فاتح
-    sold: "#cfeaff", // أحمر فاتح
+    active: "#deffe7", // أخضر فاتح
+    paused: "#fff6db", // أصفر فاتح
+    sold: "#ddcff7", // أحمر فاتح
   };
   const getBtnBg = () => {
     if (!value) return ""; // default
     const val = typeof value === "object" ? value.name : value; // خدي الاسم الفعلي
-
-    console.log(val);
-    console.log(statusColors[val]);
 
     return statusColors[val] || "";
   };

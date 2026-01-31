@@ -7,10 +7,8 @@ export default function Navigations({
   items = [],
   container = "fluid",
   isDashBoard = false,
-}) 
-
-{
-    const t = useTranslate();
+}) {
+  const t = useTranslate();
 
   return (
     <nav
@@ -18,15 +16,15 @@ export default function Navigations({
         container == "no"
           ? ""
           : container == "main"
-          ? "container"
-          : "fluid-container"
+            ? "container"
+            : "fluid-container"
       }`}
     >
       {!isDashBoard ? (
         <Link href={"/"}>{t.home.home}</Link>
       ) : (
         <>
-          <Link href={"/"}>{t.header.dawarly}</Link>
+          <Link href={"/"}>{t.header.Dawaarly}</Link>
           <span className={`separator one`}>/ </span>
           <Link href={"/dashboard"}>{t.dashboard.head.dashboard}</Link>
         </>

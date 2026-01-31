@@ -96,14 +96,22 @@ export default function AdDetails() {
   const showThumbNav = ad?.images?.length > slidesView;
 
   const bookedRanges = [
-    { start: "2025-12-05", end: "2025-12-10" },
-    { start: "2025-12-15", end: "2025-12-18" },
+    { start: "2026-02-10", end: "2026-02-12" },
+    { start: "2026-02-18", end: "2026-02-20" },
   ];
 
   const disabledDates = bookedRanges.flatMap((range) =>
     eachDayOfInterval({
-      start: new Date(range.start),
-      end: new Date(range.end),
+      start: new Date(
+        range.start.split("-")[0],
+        range.start.split("-")[1] - 1,
+        range.start.split("-")[2],
+      ),
+      end: new Date(
+        range.end.split("-")[0],
+        range.end.split("-")[1] - 1,
+        range.end.split("-")[2],
+      ),
     }),
   );
   return (
@@ -260,7 +268,7 @@ export default function AdDetails() {
               </p>
               <div className="card">
                 <h5>{t.ad.booking}</h5>
-                <BookingRange bookedDates={disabledDates} />
+                <BookingRange disabledDates={disabledDates} />
               </div>
 
               {ad?.specs?.length > 0 && (

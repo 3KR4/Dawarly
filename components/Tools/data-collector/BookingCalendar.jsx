@@ -7,7 +7,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { settings } from "@/Contexts/settings";
 import { ar, enUS } from "date-fns/locale";
-export default function BookingRange({ bookedDates = [] }) {
+export default function BookingRange({ disabledDates = [] }) {
   const { locale } = useContext(settings);
 
   const [range, setRange] = useState([
@@ -33,18 +33,23 @@ export default function BookingRange({ bookedDates = [] }) {
   };
   const isSameDay = (d1, d2) =>
     d1 && d2 && d1.toDateString() === d2.toDateString();
+
+  const ALLOWED_RANGE = {
+    start: new Date(2026, 0, 30), // فبراير = 1
+    end: new Date(2026, 1, 26),
+  };
   return (
     <div className="booking-range">
       <DateRange
         ranges={range}
         onChange={(item) => setRange([item.selection])}
-        minDate={new Date()}
-        disabledDates={bookedDates}
-        rangeColors={["#7c5cff"]} // تقدر تربطها بـ CSS variable لو حابب
-        direction="horizontal"
+        minDate={ALLOWED_RANGE.start}
+        maxDate={ALLOWED_RANGE.end}
+        disabledDates={disabledDates}
+        rangeColors={["#7c5cff"]}
         locale={localesMap[locale]}
-        showSelectionPreview={true} // 🔥 الحل
-        showPreview={true}
+        showSelectionPreview
+        showPreview
       />
 
       <button className="main-button" disabled={!range[0].startDate}>

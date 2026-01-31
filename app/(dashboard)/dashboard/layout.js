@@ -14,22 +14,22 @@ const cairo = Cairo({
   display: "swap",
 });
 export const metadata = {
-  title: "Dawarly",
+  title: "Dawaarly",
   description:
-    "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
+    "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
 
   openGraph: {
-    title: "Dawarly",
+    title: "Dawaarly",
     description:
-      "Explore hidden gems, exciting night spots, and real Egyptian culture with dawarly. Your journey starts here — fun, local, and unforgettable.",
-    url: "https://dawarly.vercel.app/",
-    siteName: "Dawarly",
+      "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
+    url: "https://Dawaarly.vercel.app/",
+    siteName: "Dawaarly",
     images: [
       {
         url: "/logo.png",
         width: 1000,
         height: 1000,
-        alt: "dawarly-logo",
+        alt: "Dawaarly-logo",
       },
     ],
     locale: "en_US",

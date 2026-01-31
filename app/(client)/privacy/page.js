@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="legal-document container">
       <div className="document-section">
-        <h1>Privacy Policy - dawarly</h1>
+        <h1>Privacy Policy - Dawaarly</h1>
         <div className="metadata">
           <p>
             <strong>Effective Date:</strong> [Insert Date]
@@ -18,14 +18,14 @@ export default function PrivacyPolicy() {
 
         <h2>1. Introduction</h2>
         <p>
-          Welcome to <strong>dawarly</strong>, a smart tourism platform that
+          Welcome to <strong>Dawaarly</strong>, a smart tourism platform that
           blends culture, technology, and gamified exploration across Egypt.
         </p>
         <p>
           This Privacy Policy explains how we collect, use, and protect your
           personal information when you visit our website or mobile application.
         </p>
-        <p>By using dawarly, you consent to this Privacy Policy.</p>
+        <p>By using Dawaarly, you consent to this Privacy Policy.</p>
 
         <h2>2. Information We Collect</h2>
         <p>
@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
         </ul>
 
         <h2>4. Sharing of Information</h2>
-        <p>dawarly does not sell or rent your personal data.</p>
+        <p>Dawaarly does not sell or rent your personal data.</p>
         <p>We may share limited data only in the following cases:</p>
         <ul className="sharing-list">
           <li>
@@ -106,7 +106,7 @@ export default function PrivacyPolicy() {
         </ul>
         <p>
           Requests can be made via email:{" "}
-          <a href="mailto:privacy@dawarly.com">privacy@dawarly.com</a>
+          <a href="mailto:privacy@Dawaarly.com">privacy@Dawaarly.com</a>
         </p>
 
         <h2>7. Data Retention</h2>
@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
 
         <h2>8. Cookies and Tracking Technologies</h2>
         <p>
-          dawarly uses cookies to improve performance and personalize content.
+          Dawaarly uses cookies to improve performance and personalize content.
         </p>
         <p>You can manage or disable cookies in your browser settings.</p>
         <p>For details, please review our Cookie Policy.</p>
@@ -130,12 +130,12 @@ export default function PrivacyPolicy() {
           Our platform may contain links to third-party websites or vendors.
         </p>
         <p>
-          dawarly is not responsible for their privacy practices, and we
+          Dawaarly is not responsible for their privacy practices, and we
           recommend reviewing their policies separately.
         </p>
 
         <h2>10. Changes to This Policy</h2>
-        <p>dawarly may update this Privacy Policy periodically.</p>
+        <p>Dawaarly may update this Privacy Policy periodically.</p>
         <p>Updates will be posted with a new "Last Updated" date.</p>
         <p>
           Continued use of the platform after updates means you accept the
@@ -148,10 +148,10 @@ export default function PrivacyPolicy() {
           contact us at:
         </p>
         <p>
-          <a href="mailto:privacy@dawarly.com">privacy@dawarly.com</a>
+          <a href="mailto:privacy@Dawaarly.com">privacy@Dawaarly.com</a>
         </p>
         <p>
-          <a href="http://www.dawarly.com">www.dawarly.com</a>
+          <a href="http://www.Dawaarly.com">www.Dawaarly.com</a>
         </p>
       </div>
 
@@ -169,7 +169,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. Introduction</h2>
         <p>
-          Welcome to dawarly, a smart tourism platform that helps users explore
+          Welcome to Dawaarly, a smart tourism platform that helps users explore
           Egypt through interactive experiences, gamified challenges, and
           authentic local products.
         </p>
@@ -177,49 +177,50 @@ export default function PrivacyPolicy() {
           By accessing or using our website or mobile app, you agree to these
           Terms and Conditions.
         </p>
-        <p>If you do not agree, please stop using dawarly immediately.</p>
+        <p>If you do not agree, please stop using Dawaarly immediately.</p>
 
         <h2>2. Definitions</h2>
         <ul className="definitions-list">
           <li>
-            <strong>"Platform":</strong> The dawarly website and mobile
+            <strong>"Platform":</strong> The Dawaarly website and mobile
             application.
           </li>
           <li>
-            <strong>"User":</strong> Any person using dawarly services.
+            <strong>"User":</strong> Any person using Dawaarly services.
           </li>
           <li>
             <strong>"Partner" or "Vendor":</strong> Cafés, restaurants,
-            artisans, or tour agencies listed on dawarly.
+            artisans, or tour agencies listed on Dawaarly.
           </li>
           <li>
-            <strong>"We", "Us", "Our":</strong> The dawarly management team.
+            <strong>"We", "Us", "Our":</strong> The Dawaarly management team.
           </li>
         </ul>
 
         <h2>3. Use of the Platform</h2>
         <ul className="platform-use-list">
           <li>Users must be at least 13 years old.</li>
-          <li>You agree to use dawarly only for lawful purposes.</li>
+          <li>You agree to use Dawaarly only for lawful purposes.</li>
           <li>
             You are responsible for maintaining your account and password.
           </li>
           <li>
-            dawarly reserves the right to suspend or terminate any account
+            Dawaarly reserves the right to suspend or terminate any account
             violating these terms.
           </li>
         </ul>
 
         <h2>4. Services</h2>
-        <p>dawarly provides:</p>
+        <p>Dawaarly provides:</p>
         <ul className="services-list">
           <li>Access to digital tourism content and local experiences.</li>
           <li>Gamified exploration challenges.</li>
           <li>A marketplace for authentic Egyptian handmade products.</li>
         </ul>
         <p>
-          dawarly acts as a digital intermediary and is not directly responsible
-          for the services or products provided by third-party vendors.
+          Dawaarly acts as a digital intermediary and is not directly
+          responsible for the services or products provided by third-party
+          vendors.
         </p>
 
         <h2>5. Payments</h2>
@@ -227,7 +228,7 @@ export default function PrivacyPolicy() {
           <li>
             Payments are processed securely via authorized third-party gateways.
           </li>
-          <li>dawarly does not store full payment card details.</li>
+          <li>Dawaarly does not store full payment card details.</li>
           <li>Prices are displayed in USD or EGP.</li>
           <li>
             Users are responsible for ensuring accuracy before confirming a
@@ -237,14 +238,14 @@ export default function PrivacyPolicy() {
 
         <h2>6. Refunds and Cancellations</h2>
         <p>
-          Refunds follow the dawarly Refund & Cancellation Policy, available on
+          Refunds follow the Dawaarly Refund & Cancellation Policy, available on
           our website.
         </p>
 
         <h2>7. Partner Listings and Content</h2>
         <ul className="partner-listings-list">
           <li>
-            dawarly may verify, modify, or remove listings violating its
+            Dawaarly may verify, modify, or remove listings violating its
             policies.
           </li>
           <li>
@@ -257,7 +258,7 @@ export default function PrivacyPolicy() {
         </ul>
 
         <h2>8. Limitation of Liability</h2>
-        <p>dawarly is not liable for:</p>
+        <p>Dawaarly is not liable for:</p>
         <ul className="liability-list">
           <li>Loss or damage from third-party services.</li>
           <li>Inaccuracies or cancellations by vendors.</li>
@@ -270,7 +271,8 @@ export default function PrivacyPolicy() {
 
         <h2>9. Intellectual Property</h2>
         <p>
-          All content (logo, design, text, images, and code) belongs to dawarly.
+          All content (logo, design, text, images, and code) belongs to
+          Dawaarly.
         </p>
         <p>
           Reproduction or modification without written consent is prohibited.
@@ -285,7 +287,7 @@ export default function PrivacyPolicy() {
         <h2>11. Contact</h2>
         <p>For questions, contact:</p>
         <p>
-          <a href="mailto:legal@dawarly.com">legal@dawarly.com</a>
+          <a href="mailto:legal@Dawaarly.com">legal@Dawaarly.com</a>
         </p>
       </div>
 
@@ -300,7 +302,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. What Are Cookies?</h2>
         <p>
-          Cookies are small files stored on your device when visiting dawarly.
+          Cookies are small files stored on your device when visiting Dawaarly.
         </p>
         <p>They help us improve your experience and remember preferences.</p>
 
@@ -319,12 +321,12 @@ export default function PrivacyPolicy() {
         <h2>4. Third-Party Cookies</h2>
         <p>Some cookies come from third parties (e.g., analytics, ads).</p>
         <p>
-          dawarly has no control over these and recommends checking their
+          Dawaarly has no control over these and recommends checking their
           policies.
         </p>
 
         <h2>5. Policy Updates</h2>
-        <p>dawarly may update this Cookie Policy periodically.</p>
+        <p>Dawaarly may update this Cookie Policy periodically.</p>
         <p>Please review it regularly for the latest version.</p>
       </div>
 
@@ -342,7 +344,7 @@ export default function PrivacyPolicy() {
 
         <h2>1. Overview</h2>
         <p>
-          This Vendor Agreement defines the collaboration between dawarly
+          This Vendor Agreement defines the collaboration between Dawaarly
           ("Platform") and the Vendor (café, restaurant, artisan, or tour
           operator).
         </p>
@@ -357,8 +359,8 @@ export default function PrivacyPolicy() {
           <li>Avoid posting illegal or misleading content.</li>
         </ul>
 
-        <h2>3. dawarly Responsibilities</h2>
-        <ul className="dawarly-responsibilities-list">
+        <h2>3. Dawaarly Responsibilities</h2>
+        <ul className="Dawaarly-responsibilities-list">
           <li>Promote vendor listings on the platform.</li>
           <li>Manage customer communication and payment processing.</li>
           <li>Offer analytics and visibility through the platform.</li>
@@ -368,7 +370,7 @@ export default function PrivacyPolicy() {
         <ul className="fees-list">
           <li>Vendors pay annual subscription fees based on category.</li>
           <li>
-            dawarly retains a small commission per transaction or booking.
+            Dawaarly retains a small commission per transaction or booking.
           </li>
           <li>Settlements occur monthly or as agreed.</li>
         </ul>
@@ -376,14 +378,14 @@ export default function PrivacyPolicy() {
         <h2>5. Intellectual Property</h2>
         <ul className="vendor-ip-list">
           <li>
-            Vendors grant dawarly permission to use images and logos for
+            Vendors grant Dawaarly permission to use images and logos for
             marketing.
           </li>
           <li>Vendors must ensure all uploaded content respects copyrights.</li>
         </ul>
 
         <h2>6. Termination</h2>
-        <p>dawarly can suspend or terminate vendor accounts in case of:</p>
+        <p>Dawaarly can suspend or terminate vendor accounts in case of:</p>
         <ul className="termination-list">
           <li>Violations of policies</li>
           <li>Repeated customer complaints</li>
@@ -393,7 +395,7 @@ export default function PrivacyPolicy() {
 
         <h2>7. Liability</h2>
         <p>
-          dawarly is not responsible for delivery delays, damages, or
+          Dawaarly is not responsible for delivery delays, damages, or
           vendor-related disputes.
         </p>
         <p>Each vendor operates independently under Egyptian law.</p>
@@ -410,7 +412,7 @@ export default function PrivacyPolicy() {
 
         <h2>10. Contact</h2>
         <p>
-          <a href="mailto:partners@dawarly.com">partners@dawarly.com</a>
+          <a href="mailto:partners@Dawaarly.com">partners@Dawaarly.com</a>
         </p>
       </div>
     </div>
