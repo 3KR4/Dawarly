@@ -423,18 +423,18 @@ function Header() {
                   {theme === "light" ? (
                     <>
                       <FaMoon />
-                      {t.actions.darkMode}
+                      <span>{t.actions.darkMode}</span>
                     </>
                   ) : (
                     <>
                       <FiSun />
-                      {t.actions.lightMode}
+                      <span>{t.actions.lightMode}</span>
                     </>
                   )}
                 </button>
                 <button className="lang" onClick={toggleLocale}>
                   <GrLanguage />
-                  {t.actions.lang}
+                  <span>{t.actions.lang}</span>
                 </button>
               </div>
             )}

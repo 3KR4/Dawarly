@@ -24,6 +24,65 @@ import { BsChatDots } from "react-icons/bs";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
 
+const RenderRentAvailability = ({
+  t,
+  rentAvailability,
+  setRentAvailability,
+}) => {
+  return (
+    <div className="form-section">
+      <h2 className="section-title" style={{ fontSize: "17px" }}>
+        {t.ad.rental_period}
+      </h2>
+
+      <div className="row-holder for-dates">
+        {/* From */}
+        <div className="box forInput">
+          <label>
+            {t.ad.from} <span className="required">*</span>
+          </label>
+          <div className="inputHolder">
+            <div className="holder">
+              <input
+                type="date"
+                value={rentAvailability.from}
+                onChange={(e) =>
+                  setRentAvailability((prev) => ({
+                    ...prev,
+                    from: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* To */}
+        <div className="box forInput">
+          <label>
+            {t.ad.to} <span className="required">*</span>
+          </label>
+          <div className="inputHolder">
+            <div className="holder">
+              <input
+                type="date"
+                value={rentAvailability.to}
+                min={rentAvailability.from}
+                onChange={(e) =>
+                  setRentAvailability((prev) => ({
+                    ...prev,
+                    to: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function CreateAd() {
   const { locale } = useContext(settings);
 
@@ -46,7 +105,7 @@ export default function CreateAd() {
       //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
       // }
       setDynamicFilters(
-        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
       );
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
       setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
@@ -113,6 +172,21 @@ export default function CreateAd() {
 
   const [dynamicValues, setDynamicValues] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
+
+  const [rentAvailability, setRentAvailability] = useState({
+    from: "",
+    to: "",
+  });
+  const [minRentalDuration, setMinRentalDuration] = useState({
+    value: "",
+    unit: null, // هيبقى object راجع من SelectOptions
+  });
+
+  const RENT_DURATION_UNITS = [
+    { id: "day", name: "day" },
+    { id: "week", name: "week" },
+    { id: "month", name: "month" },
+  ];
 
   const handleDynamicChange = (key, value) => {
     setDynamicValues((prev) => ({
@@ -182,7 +256,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true
+        (v) => v === true,
       );
 
       if (!hasSelectedContact) {
@@ -219,7 +293,7 @@ export default function CreateAd() {
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id
+    (c) => c.governorate_id === userAddress.gov?.id,
   );
 
   const onSubmit = async (data) => {
@@ -265,7 +339,7 @@ export default function CreateAd() {
 
     if (step === STEPS.CONTACT) {
       const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true
+        (v) => v === true,
       );
       if (!hasSelectedContact) {
         setFieldErrors((prev) => ({
@@ -289,6 +363,16 @@ export default function CreateAd() {
         },
         contactMethods: selectedContact,
       };
+      if (category === 2) {
+        finalData.rentAvailability = {
+          from: rentAvailability.from,
+          to: rentAvailability.to,
+        };
+        finalData.minimumRentalDuration = {
+          value: Number(minRentalDuration.value),
+          unit: minRentalDuration?.unit?.id, // day | week | month
+        };
+      }
 
       console.log("FINAL REQUEST", finalData);
       alert(t.ad.submission_success || "تم تجميع البيانات بنجاح!");
@@ -441,7 +525,9 @@ export default function CreateAd() {
             />
             <div className="box forInput">
               <label>
-                {t.dashboard.forms.price} <span className="required">*</span>
+                {category == 2 ? t.ad.rentPrice : t.dashboard.forms.price}
+
+                <span className="required">*</span>
               </label>
 
               <div className="inputHolder">
@@ -455,7 +541,11 @@ export default function CreateAd() {
                         message: t.dashboard.forms.errors.priceMin,
                       },
                     })}
-                    placeholder={t.dashboard.forms.pricePlaceholder}
+                    placeholder={
+                      category == 2
+                        ? t.ad.rentPricePlaceholder
+                        : t.dashboard.forms.pricePlaceholder
+                    }
                   />
                 </div>
 
@@ -467,6 +557,65 @@ export default function CreateAd() {
                 )}
               </div>
             </div>
+            {category === 2 && (
+              <RenderRentAvailability
+                t={t}
+                rentAvailability={rentAvailability}
+                setRentAvailability={setRentAvailability}
+                isEditable={true} // أو أي شرط عندك
+              />
+            )}
+            {category == 2 && (
+              <div className="form-section">
+                <h2 className="section-title" style={{ fontSize: "17px" }}>
+                  {t.ad.minimumRentalDuration}
+                </h2>
+
+                <div className="row-holder for-dates">
+                  {/* الرقم */}
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.durationValue} <span className="required">*</span>
+                    </label>
+
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          min={1}
+                          value={minRentalDuration.value}
+                          onChange={(e) =>
+                            setMinRentalDuration((prev) => ({
+                              ...prev,
+                              value: e.target.value,
+                            }))
+                          }
+                          placeholder={t.ad.durationValuePlaceholder}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* الوحدة باستخدام SelectOptions */}
+                  <SelectOptions
+                    label={t.ad.durationUnit}
+                    placeholder={t.ad.select}
+                    options={RENT_DURATION_UNITS}
+                    value={minRentalDuration.unit}
+                    tPath="ad" // 👈 مهم
+                    required={true}
+                    locale={locale}
+                    t={t}
+                    onChange={(item) =>
+                      setMinRentalDuration((prev) => ({
+                        ...prev,
+                        unit: item,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            )}
             <Images
               images={images}
               setImages={setImages}
@@ -703,8 +852,8 @@ export default function CreateAd() {
                                 handleDynamicChange(
                                   field.key,
                                   selectedValues.filter(
-                                    (v) => v !== option.value
-                                  )
+                                    (v) => v !== option.value,
+                                  ),
                                 );
                               } else {
                                 handleDynamicChange(field.key, [

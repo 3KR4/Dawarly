@@ -35,7 +35,7 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
       <div className="table-container products">
         <div className="table-header">
-          {!screenSize.includes("small") ? (
+          {!screenSize.includes("small") && (
             <>
               <div className="header-item details">
                 {t.dashboard.tables.ad_details}
@@ -48,10 +48,6 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
               <div className="header-item">{t.dashboard.tables.status}</div>
               <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
-          ) : (
-            <div className="header-item" style={{ fontSize: "17px" }}>
-              ads table
-            </div>
           )}
         </div>
 
@@ -156,6 +152,7 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                       <span className="pending">{t.ad.status.pending}</span>
                     ) : (
                       <SelectOptions
+                      size="ultra-small"
                         options={statusOptions.filter(
                           (s) => s.id !== "pending" // pending غير قابل للتفاعل
                         )}

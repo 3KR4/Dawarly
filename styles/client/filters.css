@@ -1,19 +1,22 @@
 .marketplace .filters {
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  width: 300px;
+  min-width: 285px;
+  max-width: 286px;
   height: fit-content;
   padding: 17px 0;
   transition: all 0.3s;
 }
+
 .filters .close {
   color: var(--paragraph);
   border-radius: 5px;
-  width: 30px;
-  height: 29px;
+  width: 25px;
+  height: 25px;
   position: absolute;
   top: 10px;
   right: 10px;
+  padding: 0px;
 }
 .filters .close:hover {
   background: var(--red-color);
@@ -174,20 +177,6 @@
 }
 
 @media (max-width: 992px) {
-  .filters {
-    z-index: 10;
-    background: #fff;
-    border-radius: 1px;
-    height: 100%;
-    overflow: auto;
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-  }
-  .filters.active {
-    transform: translateX(0%);
-  }
   .selected-filters strong {
     margin-right: 3px;
     font-size: 15px;
@@ -197,6 +186,23 @@
     font-weight: 500;
     cursor: pointer;
     transition: 0.3s;
+  }
+  .marketplace .filters {
+    position: fixed;
+    transform: translateX(-280px);
+    overflow: auto;
+    z-index: 100;
+    border-radius: 0;
+    max-width: 280px;
+    min-width: unset;
+    width: 280px !important;
+    max-height: 100vh;
+    background: var(--body-color);
+    top: 0;
+    left: 0;
+  }
+  .filters.active {
+    transform: translateX(0);
   }
 }
 @media (max-width: 500px) {

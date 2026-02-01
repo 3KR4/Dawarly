@@ -413,6 +413,11 @@ a {
   gap: 7px;
   width: 100%;
 }
+.box.forInput:not(:has(.upload-label.one-image)):has(input:disabled),
+.box.forInput:not(:has(.upload-label.one-image)):has(textarea:disabled) {
+  opacity: 0.7;
+  cursor: no-drop;
+}
 .box.forInput:has(input:disabled),
 .box.forInput:has(textarea:disabled) {
   opacity: 0.7;
@@ -436,8 +441,8 @@ a {
   cursor: no-drop;
 }
 .user-create-ad form > .main-button {
-width: 100%;
-height: 40px;
+  width: 100%;
+  height: 40px;
 }
 .box.forInput label {
   color: var(--paragraph);
@@ -579,42 +584,61 @@ height: 40px;
   font-size: 19px;
   font-weight: 400;
 }
-
-.filters {
-  position: relative;
-  width: 205px;
-  transition: 0.3s;
+.dash-holder .filters-header {
+  height: 35px;
+  border: 1px solid var(--input-border-color);
+  border-radius: 10px;
 }
-.filters:has(.menu.active) {
-  width: 320px;
+.dash-holder .filters-header:has(input) {
+  padding-left: 0;
 }
-.filters.filters.for-cats {
-  width: 220px;
+.dash-holder .filters-header input {
+  padding-left: 10px;
+  height: 100%;
+  flex: 1;
 }
-.filters.for-cats:has(.menu.active) {
-  width: 320px;
+[lang="ar"] .dash-holder .filters-header:has(input) {
+  padding-right: 0;
+  padding-left: 10px;
 }
-.filters.filters.for-cats.gov {
-  width: 220px !important;
+[lang="ar"] .dash-holder .filters-header input {
+  padding-right: 10px;
+  padding-left: 0;
 }
-
-.filters .btn {
+.dash-holder .filters-header svg {
+  height: 100%;
+  flex: 1;
+}
+.dash-holder .filters-header svg {
+  font-size: 19px;
+}
+.filters-header {
+  border: 1px solid var(--border-color);
   cursor: pointer;
+  letter-spacing: 0.2px;
   border-radius: 7px;
   align-items: center;
-  height: 34px !important;
+  gap: 3px;
+  height: 30px;
+  padding: 0 7px 0 8px;
+  font-size: 14px;
+  transition: all 0.3s;
   display: flex;
-  padding-right: 0;
-  overflow: hidden;
-  position: relative;
-  flex: 1;
+  text-transform: capitalize;
+  color: var(--paragraph);
+}
+.filters-header {
   justify-content: space-between;
 }
-.body.fluid-container.for-user .filters .btn {
-  height: 34px !important;
-  border: 0 !important;
+.selectOptions .btn {
+  width: 100%;
+  border: 1px solid var(--input-border-color) !important;
+  border-radius: 10px !important;
+  height: 44px !important;
+  display: flex;
+  align-items: center;
 }
-.filters .btn h4 {
+.selectOptions .btn h4 {
   color: var(--paragraph);
   font-size: 13px;
   font-weight: 500;
@@ -625,7 +649,16 @@ height: 40px;
   justify-content: flex-start;
   padding: 0 9px;
 }
-.body.fluid-container.for-user .filters .btn h4 {
+.selectOptions.small .btn {
+  height: 35px !important;
+}
+.selectOptions.ultra-small .btn {
+  height: 30px !important;
+}
+.selectOptions input {
+  padding: 0 !important;
+}
+.body.fluid-container.for-user .selectOptions .btn h4 {
   font-weight: 800;
   text-align: center;
   justify-content: center;
@@ -634,58 +667,54 @@ height: 40px;
 .disabled .btn h4 {
   cursor: no-drop;
 }
-.filters .btn svg {
+.selectOptions .btn svg {
   height: 34px;
   padding: 7px;
+  width: 38px;
+  background: transparent;
+  color: var(--paragraph);
+}
+.selectOptions.ultra-small .btn svg {
+  height: 32px;
 }
 .dashboard .head .main-ico:hover {
   background: var(--hover-color);
 }
-.filters .menu {
+.selectOptions .menu {
   visibility: hidden;
   opacity: 0;
   z-index: -1;
   background: var(--body-color);
   border: 1px solid var(--border-color);
   border-radius: 7px;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 4px;
   width: 100%;
   height: fit-content;
+  max-height: 216px;
   padding: 8px 12px 10px;
   transition: all 0.3s;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   position: absolute;
-  top: 34px;
+  top: 44px;
   left: 0;
-}
-.filters.filters.for-cats .menu {
-  gap: 5px;
-}
-.filters.filters.for-cats.gov .menu {
-  max-height: 199px;
   overflow: auto;
-  padding-right: 6px;
-  grid-template-columns: 1fr;
 }
-.dashboard:has(.products) .head .filters .menu > .hold:last-child {
-  grid-column: span 2;
+/* .selectOption.small .menu {
+  top: 30px;
+} */
+.selectOptions.ultra-small .menu {
+  top: 30px;
 }
-.dashboard:has(.products) .head .filters .menu > .hold:last-child ul {
-  flex-direction: row;
-}
-.dashboard:has(.products) .head .filters .menu > .hold:last-child li {
-  flex: 1;
-}
-.filters .menu.active {
+.selectOptions .menu.active {
   visibility: visible;
   opacity: 1;
   z-index: 5;
 }
-.filters .menu .hold {
+.selectOptions .menu .hold {
   gap: 5px;
 }
-.filters .menu .hold h5 {
+.selectOptions .menu .hold h5 {
   color: var(--hover-color);
   text-transform: uppercase;
   font-size: 13px;
@@ -693,17 +722,22 @@ height: 40px;
   align-items: center;
   justify-content: space-between;
 }
-.filters .menu .hold h5 svg {
+.selectOptions .menu .hold h5 svg {
   font-size: 15px;
   color: var(--hover-color);
 }
-.filters .menu .hold ul {
+.body.fluid-container.for-user .selectOptions .btn svg {
+  height: 31px;
+  position: absolute;
+  right: 0;
+}
+.selectOptions .menu .hold ul {
   display: flex;
   flex-direction: column;
   gap: 5px;
   margin-top: 5px;
 }
-.filters .menu .hold ul li {
+.selectOptions .menu .hold ul li {
   background: var(--section-color);
   cursor: pointer;
   border-radius: 5px;
@@ -711,39 +745,50 @@ height: 40px;
   font-size: 12px;
   transition: 0.3s;
 }
-.filters .menu .hold ul li:hover {
+.selectOptions .menu .hold ul li:hover {
   background: var(--hover-color);
 }
-.filters .menu .hold ul li.active {
+.selectOptions .menu .hold ul li.active {
   background: var(--hover-color);
   border: 1px solid var(--main-color);
 }
-.filters.for-cats {
+.selectOptions {
+  cursor: pointer;
+  border-radius: 7px;
+  align-items: center;
+  display: flex;
+  padding-right: 0;
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 100%;
+  justify-content: space-between;
 }
-.filters.for-cats button {
-  border-radius: 5px;
+.selectOptions button {
   text-align: left;
-  padding: 4px 8px;
-  font-size: 12px;
-  transition: 0.3s;
   background: var(--section-color);
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s;
 }
-[lang="ar"] .filters.for-cats button {
+[lang="ar"] .selectOptions button {
   text-align: right;
 }
-.filters.for-cats button:hover,
-.filters.for-cats button.active {
+.selectOptions button:hover,
+.selectOptions button.active {
   background: var(--hover-color);
 }
-.filters.for-cats input {
+.selectOptions input {
   flex: 1;
   height: 100%;
   color: var(--paragraph);
 }
-.body.fluid-container.for-user .filters.for-cats input {
+.body.fluid-container.for-user .selectOptions input {
   padding: 12px !important;
 }
-.filters.for-cats .no-results {
+.selectOptions .no-results {
   color: var(--paragraph);
   font-weight: 500;
   font-size: 13px;

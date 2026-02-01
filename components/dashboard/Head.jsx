@@ -17,11 +17,12 @@ function Head() {
   const breadcrumbItems = getDashboardBreadcrumb(
     pathname,
     searchParams,
-    locale
+    locale,
   );
 
   const mainKey = breadcrumbItems[0]?.key;
   const canCreate = dashboardRoutes[mainKey]?.canCreate;
+  console.log(breadcrumbItems);
 
   return (
     <div className="head">

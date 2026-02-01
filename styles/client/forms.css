@@ -213,44 +213,12 @@ p.have-problem {
   font-size: 14px;
   text-decoration: underline;
 }
-.filters .btn {
-  height: 44px !important;
-  border: 1px solid var(--input-border-color) !important;
-  border-radius: 10px !important;
-}
 
-.filters.filters.for-cats {
-  width: 100% !important;
-  border: none;
-}
-.filters.filters.for-cats,
-.filters.for-cats:has(.menu.active) {
-  width: 100%;
-}
-.filters .menu {
-  grid-template-columns: 1fr;
-  top: 44px;
-}
-.filters.for-cats .menu {
-  max-height: 216px;
-  overflow: auto;
-}
-.filters.for-cats button {
-  padding: 6px 8px;
-  font-size: 14px;
-}
-.filters .btn svg {
-  width: 38px;
-  height: 44px;
-  padding: 7px;
-  background: transparent;
-  color: var(--paragraph);
-}
-.body.fluid-container.for-user .filters .btn svg {
-  height: 31px;
-  position: absolute;
-  right: 0;
-}
+
+
+
+
+
 .body.fluid-container.for-user .table-container .table-header,
 .body.fluid-container.for-user .table-container .table-item {
   grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.75fr 0.8fr;
@@ -335,9 +303,7 @@ p.have-problem {
   top: 0;
   font-size: 12px;
 }
-.filters.for-cats .menu {
-  max-height: 256px;
-}
+
 .otp-wrapper {
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
@@ -376,14 +342,12 @@ p.have-problem {
 /*! CREATE - AD */
 
 .form-holder.create-ad input {
-  padding: 10px !important;
+  padding: 10px;
 }
 .form-holder.create-ad textarea {
   height: 160px;
 }
-.filters.for-cats input {
-  padding: 0 !important;
-}
+
 @media (max-width: 992px) {
   .form-holder form {
     box-shadow: unset;

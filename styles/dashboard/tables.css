@@ -1,13 +1,11 @@
 /*! Table settings  */
 .table-container {
   width: 100%;
-  box-shadow: 0 2px 10px #0000001a;
   border-radius: 20px;
   overflow: hidden;
 }
 .dash-holder.for-client {
   margin: 17px 0px;
-
 }
 .dash-holder.for-client .table-container {
   overflow: visible;
@@ -26,6 +24,7 @@
 .dash-holder.for-client .top .main-button {
   height: 35px !important;
   border-radius: 10px;
+  border: none;
 }
 .dash-holder.for-client .fluid-container.for-user {
   padding: 10px 0;
@@ -199,9 +198,9 @@
     grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.6fr;
     gap: 10px;
   }
-  .table-container.pending-ads-tasble .table-header,
-  .table-container.pending-ads-tasble .table-item {
-    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.6fr;
+  .table-container.slieds-tasble .table-header,
+  .table-container.slieds-tasble .table-item {
+    grid-template-columns: 3.5fr 1fr 1fr 1fr;
   }
   .header-item {
     font-size: 14px;
@@ -223,15 +222,17 @@
     gap: 10px;
   }
 }
+@media (max-width: 1600px) {
+  .table-container.slieds-tasble .item-image .product-image {
+    height: 80px !important;
+  }
+}
 @media (max-width: 1450px) {
   .table-container .table-header,
   .table-container .table-item {
     grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.5fr;
   }
-  .table-container.pending-ads-tasble .table-header,
-  .table-container.pending-ads-tasble .table-item {
-    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.5fr;
-  }
+
   .item-price {
     font-size: 14px;
   }
@@ -259,6 +260,13 @@
   .item-image .product-image {
     width: 100px !important;
   }
+  .table-container.slieds-tasble .table-header,
+  .table-container.slieds-tasble .table-item {
+    grid-template-columns: 3.5fr 1.5fr 1fr 0.8fr;
+  }
+  .table-container .item-details p {
+    font-size: 13px;
+  }
 }
 @media (max-width: 1300px) {
   .table-container .item-overview {
@@ -269,10 +277,7 @@
     grid-template-columns: 0.9fr 0.45fr 0.6fr 0.5fr 0.35fr 0.4fr;
     gap: 15px;
   }
-  .table-container.pending-ads-tasble .table-header,
-  .table-container.pending-ads-tasble .table-item {
-    grid-template-columns: 0.9fr 0.45fr 1fr 0.8fr 0.6fr;
-  }
+
   .table-container .item-overview {
     grid-template-columns: 1fr;
   }
@@ -281,6 +286,16 @@
   }
   .table-container .actions {
     gap: 0;
+  }
+  .table-container.slieds-tasble .item-image .product-image {
+    height: 60px !important;
+  }
+  .table-container.slieds-tasble .item-name {
+    font-size: 14px;
+    line-height: 1.1;
+  }
+  .table-container.slieds-tasble .item-link {
+    font-size: 12px;
   }
 }
 
@@ -321,6 +336,10 @@
     width: 37px;
     height: 37px;
     font-size: 14px;
+  }
+  p.date,
+  .table-container .nisted > :last-child {
+    font-size: 12px;
   }
 }
 @media (max-width: 1100px) {
@@ -373,6 +392,9 @@
   }
   .item-price {
     font-size: 13px;
+  }
+  .table-container.slieds-tasble .item-image .product-image {
+    height: 48px !important;
   }
 }
 @media (max-width: 768px) {
@@ -508,6 +530,16 @@
   }
   .nav-btn {
     width: 125px;
+  }
+  .table-container.slieds-tasble .item-image .product-image {
+    height: unset !important;
+    aspect-ratio: 3;
+  }
+  .table-container .item-details p {
+    text-align: center !important;
+  }
+  .table-container.slieds-tasble .item-link {
+    font-size: 15px;
   }
 }
 @media (max-width: 600px) {

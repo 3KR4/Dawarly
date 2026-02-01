@@ -12,6 +12,7 @@ const normalize = (text = "") =>
     .replace(/ة/g, "ه");
 
 function SelectOptions({
+  size = "large",
   label,
   placeholder,
   options = [],
@@ -116,6 +117,8 @@ function SelectOptions({
   };
 
   const handleSelect = (item) => {
+    console.log(item);
+
     onChange(item);
     setActive(false);
     setSearch("");
@@ -145,7 +148,7 @@ function SelectOptions({
         </label>
       )}
 
-      <div className="filters for-cats" ref={selectRef}>
+      <div className={`selectOptions ${size}`} ref={selectRef}>
         <div
           className={`btn ${hasError ? "error-border" : ""}`}
           style={{ backgroundColor: getBtnBg() }}

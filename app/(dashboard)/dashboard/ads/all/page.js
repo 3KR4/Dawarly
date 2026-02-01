@@ -1,10 +1,17 @@
 "use client";
+import Rating from "@mui/material/Rating";
+import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
+import { formatEGP } from "@/utils/formatCurrency";
+
+import Image from "next/image";
 import "@/styles/dashboard/tables.css";
-import "@/styles/dashboard/globals.css";
-import "@/styles/client/forms.css";
+import { FaTrashAlt, FaEye } from "react-icons/fa";
 import Link from "next/link";
+import { BiSolidPurchaseTagAlt } from "react-icons/bi";
+import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
+import { IoSearchSharp } from "react-icons/io5";
 
 import {
   ads,
@@ -14,23 +21,18 @@ import {
   subcategoriesAr,
 } from "@/data";
 import { settings } from "@/Contexts/settings";
+import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import { LuSettings2 } from "react-icons/lu";
 
-export default function MyAdsListing() {
-  const { locale } = useContext(settings);
-  const t = useTranslate();
-
-  // كل الإعلانات
+export default function ActiveAds() {
+  const { screenSize, locale } = useContext(settings);
   const [allAds, setAllAds] = useState([]);
 
-  // الإعلانات المعروضة
+  const t = useTranslate();
   const [adsState, setAdsState] = useState([]);
 
-  // الستاتس المختار
-  const [selectedStatus, setSelectedStatus] = useState(null);
-
-  // fetch ads (مؤقت من الداتا)
   useEffect(() => {
     const fetchAds = async () => {
       setAllAds(ads);
@@ -38,8 +40,8 @@ export default function MyAdsListing() {
     };
     fetchAds();
   }, []);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
-  // options بتاعة الستاتس (pending غير قابل للاختيار)
   const statusOptions = [
     { id: "active", name: t.ad.status.active },
     { id: "sold", name: t.ad.status.sold },
@@ -61,11 +63,16 @@ export default function MyAdsListing() {
   };
 
   return (
-    <div className="dash-holder for-client">
-      {/* Top filters */}
-      <div className="top fluid-container">
+    <div className="dash-holder">
+      <div className="top">
+        <div className="filters-header">
+          {t.actions.filterations}
+          <span className="filters-count" style={{ display: "flex" }}>
+            <LuSettings2 />
+          </span>
+        </div>
         <SelectOptions
-        size="small"
+          size="small"
           placeholder={t.ad.status.label}
           options={statusOptions}
           value={selectedStatus}
@@ -73,18 +80,14 @@ export default function MyAdsListing() {
           t={t}
           onChange={handleStatusChange}
         />
-
-        <Link
-          href="/createAd"
-          className="main-button"
-          style={{ height: "35px" }}
-        >
-          {t.ad.create_ad}
-        </Link>
+        <div className="filters-header">
+          <input type="text" placeholder={t.placeholders.search} />
+          <span className="filters-count" style={{ display: "flex" }}>
+            <IoSearchSharp />
+          </span>
+        </div>
       </div>
-
-      {/* Ads table */}
-      <AdsTable ads={adsState} page="user" limit={4} />
+      <AdsTable ads={adsState} limit={10} />
     </div>
   );
 }

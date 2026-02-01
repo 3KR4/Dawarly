@@ -236,7 +236,7 @@ export default function Marketplace() {
                 fieldDefinitions={dynamicFilters}
               />
               <div className="row-holder">
-                <div className="filters for-cats">
+                <div className="selectOptions ultra-small">
                   <div className="btn">
                     <h4
                       className="ellipsis"

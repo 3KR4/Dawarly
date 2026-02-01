@@ -184,7 +184,7 @@ const ActiveFiltersBar = ({
   return (
     <div className="active-filters-bar">
       <div className="filters-header" onClick={onOpenFilters}>
-        {t.actions.active_filters}
+        {screenSize == "large" ? t.actions.active_filters : t.actions.filterations}
         <span className="filters-count" style={{ display: "flex" }}>
           {screenSize !== "large" ? <LuSettings2 /> : ":"}
         </span>

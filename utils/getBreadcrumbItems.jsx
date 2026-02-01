@@ -14,15 +14,15 @@ export function getDashboardBreadcrumb(pathname, searchParams, locale = "en") {
   const mainKey = segments[0];
   const mainConfig = dashboardRoutes[mainKey];
 
-if (mainConfig) {
-  items.push({
-    name: mainConfig.label[locale],
-    href: mainConfig.defaultPath
-      ? `/dashboard/${mainKey}/${mainConfig.defaultPath}`
-      : `/dashboard/${mainKey}`,
-    key: mainKey,
-  });
-}
+  if (mainConfig) {
+    items.push({
+      name: mainConfig.label[locale],
+      href: mainConfig.defaultPath
+        ? `/dashboard/${mainKey}/${mainConfig.defaultPath}`
+        : `/dashboard/${mainKey}`,
+      key: mainKey,
+    });
+  }
 
   // الحالة (active / pending / form)
   const sub = segments[1];
@@ -39,7 +39,11 @@ if (mainConfig) {
           ? "إضافة"
           : "Create";
     } else {
-      name = locale === "ar" ? (sub === "active" ? "نشط" : "معلق") : sub;
+      if (locale === "ar") {
+        name = sub === "active" ? "نشط" : sub === "all" ? "الكل" : "معلق";
+      } else {
+        name = sub === "active" ? "Active" : sub === "all" ? "All" : "Pending";
+      }
     }
 
     items.push({

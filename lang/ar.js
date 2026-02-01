@@ -74,12 +74,16 @@ const ar = {
     durationValue: "المدة",
     durationValuePlaceholder: "مثال: 3",
     durationUnit: "الوحدة",
+    rentUnit: "وحدة الإيجار",
+
     select: "اختر",
     from: "من",
     to: "الي",
     day: "يوم",
     week: "أسبوع",
     month: "شهر",
+    rentPrice: "سعر الايجار",
+    rentPricePlaceholder: "مثال: 500",
     placeholders: {
       adTitle: "قم بكتابة عنوان اعلانك",
     },
@@ -94,13 +98,19 @@ const ar = {
     },
 
     images: {
-      label: "قم برفع صور لاعلانك",
-
-      helperText: "انقر او اسحب الصور لهنا",
-      clickHere: "انقر هنا",
-      dropHere: "اترك الصور",
+      label: "الصور",
+      helperText: "اسحب وأفلت الصور هنا أو انقر للتحميل",
+      helperTextSingle:
+        "اسحب وأفلت الصورة هنا أو انقر للتحميل – صورة واحدة فقط",
+      clickHere: "اضغط هنا",
+      dropHere: "أسقط هنا",
+      single: "صورة واحدة",
+      max: "حد أقصى",
+      limitReached: "تم الوصول إلى الحد الأقصى من الصور",
+      disabledLabel: "صور الإعلان",
       errors: {
-        required: "يجب عليك اضافة صورة واحدة علي الاقل",
+        required: "الصورة مطلوبة",
+        maxLimit: "يمكنك رفع {limit} صور كحد أقصى",
       },
     },
     tags: {
@@ -131,6 +141,7 @@ const ar = {
     lightMode: "الوضع النهاري",
     filterByLocation: "التصفية حسب الموقع",
     active_filters: "الفلترات النشطة",
+    filters: "الفلترات",
 
     postAd: "إضافة إعلان",
     viewAdsListing: "قائمة إعلاناتك",
@@ -218,7 +229,11 @@ const ar = {
       seniors: "كبار السن",
       egyptian: "مصري",
       foreigner: "أجنبي",
+      slied_title: "عنوان الشريحة",
+      slied_title_required: "عنوان الشريحة مطلوب",
 
+      create_slide: "إنشاء شريحة",
+      update_slide: "تحديث الشريحة",
       errors: {
         titleRequired: "اسم المنتج مطلوب",
         titleMin: "اسم المنتج يجب أن يكون 3 أحرف على الأقل",
@@ -246,6 +261,10 @@ const ar = {
       status: "الاحصائيات",
       location: "الموقع",
       actions: "الاجرائات",
+      slide_details: "تفاصيل الشريحة",
+      link: "الرابط",
+      invalidLink: "الرجاء إدخال رابط صحيح",
+
       published_at: "تاريخ النشر",
       created_at: "تاريخ الانشاء",
     },

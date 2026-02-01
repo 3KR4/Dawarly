@@ -86,6 +86,8 @@ export default function AdDetails() {
       ? subcategoriesEn.find((x) => x.id === ad?.sub_category)
       : subcategoriesAr.find((x) => x.id === ad?.sub_category);
 
+  console.log(adCat);
+
   const getSpecConfig = (key) => specsConfig[key];
 
   const swiperDirection = screenSize === "large" ? "vertical" : "horizontal";
@@ -266,10 +268,12 @@ export default function AdDetails() {
               <p className="description card">
                 <h4>{t.ad.description}</h4> <p>{ad?.description}</p>
               </p>
-              <div className="card">
-                <h5>{t.ad.booking}</h5>
-                <BookingRange disabledDates={disabledDates} />
-              </div>
+              {adCat?.id == 2 && (
+                <div className="card">
+                  <h5>{t.ad.booking}</h5>
+                  <BookingRange disabledDates={disabledDates} />
+                </div>
+              )}
 
               {ad?.specs?.length > 0 && (
                 <div className="specifications">

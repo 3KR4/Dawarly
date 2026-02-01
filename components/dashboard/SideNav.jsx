@@ -154,8 +154,8 @@ function SideNav() {
             }}
           >
             <Link
-              href="/dashboard/ads/active"
-              className={isActive("/dashboard/ads/active") ? "active a" : "a"}
+              href="/dashboard/ads/all"
+              className={isActive("/dashboard/ads/all") ? "active a" : "a"}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="hold">

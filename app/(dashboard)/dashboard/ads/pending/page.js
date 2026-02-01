@@ -51,7 +51,7 @@ export default function ActiveAds() {
       <div className="body">
         <div className="table-container pending-ads-tasble">
           <div className="table-header">
-            {!screenSize.includes("small") ? (
+            {!screenSize.includes("small") && (
               <>
                 <div className="header-item details">
                   {t.dashboard.tables.ad_details}
@@ -63,10 +63,6 @@ export default function ActiveAds() {
                 </div>
                 <div className="header-item">{t.dashboard.tables.actions}</div>
               </>
-            ) : (
-              <div className="header-item" style={{ fontSize: "17px" }}>
-                ads table
-              </div>
             )}
           </div>
 
@@ -133,7 +129,7 @@ export default function ActiveAds() {
                     {formatRelativeDate(
                       item?.creation_date,
                       locale,
-                      "detailed"
+                      "detailed",
                     )}
                   </p>
                   <div className="actions">
@@ -144,10 +140,6 @@ export default function ActiveAds() {
                     <Link href={`/dashboard/ads/form?id=${item?.id}`}>
                       <MdEdit className="edit" />
                     </Link>
-
-                    <hr />
-
-                    <IoMdCloseCircle className="delete" />
                   </div>
                 </div>
               );

@@ -16,7 +16,10 @@
   height: 56px;
   padding: 0 16px;
   font-size: 14px;
-  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s,
+    z-index 0.3s;
   display: flex;
   position: sticky;
   top: 0;
@@ -82,7 +85,6 @@
   height: 34px;
 }
 .body:has(> .table-container) {
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -100,7 +102,10 @@ body.fluid-container {
   justify-content: unset;
   width: unset;
   min-height: unset;
-  transition: visibility 0.3s, opacity 0.3s, z-index 0.3s;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s,
+    z-index 0.3s;
   position: relative;
   left: unset;
   transform: unset;
@@ -147,8 +152,20 @@ header .actions-btns .userMenu .top {
 .dashboard .main-holder {
   flex: 1;
 }
+.dashboard .holder {
+  flex: 1;
+}
 .dashboard .dash-holder {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+.dash-holder .top {
+  gap: 7px;
+  display: grid;
+  grid-template-columns: 1fr 0.2fr 0.2fr;
 }
 .table-container {
   margin-bottom: unset;
@@ -169,7 +186,10 @@ header .actions-btns .userMenu .top {
 .table-container.pending-ads-tasble .table-header,
 .table-container.pending-ads-tasble .table-item {
   grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.8fr;
-
+}
+.table-container.slieds-tasble .table-header,
+.table-container.slieds-tasble .table-item {
+  grid-template-columns: 2.5fr 1fr 1fr 1fr;
 }
 .table-container .table-item:hover {
   background: var(--section-color);
@@ -196,13 +216,33 @@ header .actions-btns .userMenu .top {
   height: 60px !important;
   object-fit: cover;
 }
+.table-container.slieds-tasble .item-image .product-image {
+  aspect-ratio: 3;
+  height: 100px !important;
+}
 .table-container .item-details {
   gap: 2px;
+}
+.table-container .item-details p {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+}
+[lang="ar"] .table-container .item-details p {
+  text-align: right;
 }
 .table-container .item-name,
 .table-container .item-name span {
   font-size: 14px;
   line-height: 1.4;
+}
+.table-container.slieds-tasble .item-name {
+  font-size: 16px;
+}
+.table-container.slieds-tasble .item-link {
+  color: var(--main-color);
+  text-decoration: underline;
+  font-size: 14px;
 }
 .table-container .item-overview {
   gap: 5px;
@@ -244,6 +284,9 @@ header .actions-btns .userMenu .top {
 .table-container .item-status {
   padding: 0 12px;
 }
+.table-container .item-status .selectOptions .btn {
+  border: none !important;
+}
 .pending {
   background: #fff6db;
   border-radius: 8px;
@@ -264,11 +307,12 @@ header .actions-btns .userMenu .top {
   width: 33px;
   height: 33px;
   border-radius: 7px;
-  padding: 7px;
+  padding: 8px;
   color: var(--paragraph);
 }
-
-
+.table-container .actions svg.delete {
+  padding: 8px;
+}
 .table-container .actions svg.view:hover {
   background: var(--main-color);
   color: white;
@@ -351,5 +395,8 @@ header .actions-btns .userMenu .top {
   }
   .dashboard .head .holder:has(svg) {
     gap: 8px;
+  }
+  .dash-holder .top {
+    grid-template-columns: 1fr;
   }
 }

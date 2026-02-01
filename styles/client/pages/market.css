@@ -120,6 +120,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  width: fit-content;
 }
 
 .marketplace .top-nav .row-holder .grid-option {
@@ -155,71 +156,18 @@
   color: white;
 }
 
-.marketplace .filters.filters.for-cats {
-  padding: 0;
-  width: 200px !important;
-  border-radius: 8px;
-}
-
-.marketplace .filters .btn {
-  border: none;
-  height: 28px;
-}
-
-.marketplace .filters .btn svg.main-ico {
-  background: transparent;
-  color: var(--paragraph-2);
-  border-radius: 0;
-  padding: 6px;
-  border-left: 1px solid var(--border-color);
-  height: 30px;
-}
-
-[lang="ar"] .marketplace .filters .btn svg.main-ico {
-  border-left: none;
-  border-right: 1px solid var(--border-color);
-}
-
-.marketplace .filters .menu {
-  grid-template-columns: 1fr;
-}
-
-.marketplace .filters.for-cats button {
-  border-radius: 5px;
-  padding: 4px 8px;
-  font-size: 13px;
-}
-
-[lang="ar"] .marketplace .filters.for-cats button {
-  text-align: right;
-}
-
 @media (max-width: 992px) {
   .marketplace .content .main .top-nav:has(.active-filters-bar) {
     flex-wrap: wrap;
   }
   .marketplace .active-filters-bar {
     gap: 4px 8px;
+    width: 100%;
   }
+
+  .marketplace .content .main .top-nav .row-holder,
   .marketplace .active-filters-bar .filters-header {
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    letter-spacing: 0.2px;
-    border-radius: 7px;
-    align-items: center;
-    gap: 3px;
-    height: 30px;
-    padding: 0 7px 0 8px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s;
-    display: flex;
+    width: 100%;
   }
-  .marketplace .filters.filters.for-cats {
-    position: relative;
-    transform: unset;
-    z-index: 1;
-    overflow: unset;
-    width: 178px !important;
-  }
+
 }

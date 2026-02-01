@@ -52,7 +52,7 @@ export default function RootLayout({ children }) {
               <div className="dashboard">
                 <SideNav />
 
-                <div className="dash-holder">
+                <div className="holder">
                   <Head />
                   {children}
                 </div>

@@ -91,7 +91,7 @@ export default function AdForm({ type = "client", adId }) {
   useEffect(() => {
     // تحميل البيانات حسب الـ locale
     setDynamicFilters(
-      locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
+      locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
     );
     setCategories(locale == "en" ? categoriesEn : categoriesAr);
     setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
@@ -201,7 +201,7 @@ export default function AdForm({ type = "client", adId }) {
 
   // تصفية المدن حسب المحافظة المختارة
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === selectedGovernorate?.id
+    (c) => c.governorate_id === selectedGovernorate?.id,
   );
 
   const adminOptions = users.map((user) => ({
@@ -230,7 +230,7 @@ export default function AdForm({ type = "client", adId }) {
   useEffect(() => {
     if (selectedCategory) {
       const filtered = subcategories.filter(
-        (sub) => sub?.categoryId == selectedCategory?.id
+        (sub) => sub?.categoryId == selectedCategory?.id,
       );
       setFilteredSubcategories(filtered);
     } else {
@@ -294,20 +294,6 @@ export default function AdForm({ type = "client", adId }) {
       newErrors.city = t.ad.errors.city;
       hasErrors = true;
     }
-    if (selectedCategory?.id === 2) {
-      if (!rentAvailability.from || !rentAvailability.to) {
-        newErrors.rentAvailability =
-          t.ad.errors.rentAvailability ||
-          "Please select rent availability period";
-        hasErrors = true;
-      }
-      if (!minRentalDuration.value || !minRentalDuration.unit) {
-        newErrors.minRentalDuration =
-          t.ad.errors.minRentalDuration ||
-          "Please specify minimum rental duration";
-        hasErrors = true;
-      }
-    }
 
     if (selectedMediatorMethod?.id == 2 && !selectedAdmin) {
       newErrors.admin = t.ad.errors.admin;
@@ -321,7 +307,7 @@ export default function AdForm({ type = "client", adId }) {
 
     // التحقق من اختيار طريقة اتصال واحدة على الأقل
     const hasSelectedContact = Object.values(selectedContactMethods).some(
-      (v) => v === true
+      (v) => v === true,
     );
     if (!hasSelectedContact) {
       newErrors.contact =
@@ -426,7 +412,7 @@ export default function AdForm({ type = "client", adId }) {
       };
       finalData.minimumRentalDuration = {
         value: Number(minRentalDuration.value),
-        unit: minRentalDuration.unit.id, // day | week | month
+        unit: minRentalDuration?.unit?.id, // day | week | month
       };
     }
     // إذا كان تعديلاً، أضف الـ ID
@@ -683,7 +669,7 @@ export default function AdForm({ type = "client", adId }) {
                       if (isActive) {
                         handleDynamicChange(
                           field.key,
-                          selectedValues.filter((v) => v !== option.value)
+                          selectedValues.filter((v) => v !== option.value),
                         );
                       } else {
                         handleDynamicChange(field.key, [
@@ -759,12 +745,6 @@ export default function AdForm({ type = "client", adId }) {
                   }
                 />
               </div>
-              {fieldErrors.rentAvailability && (
-                <span className="error">
-                  <CircleAlert />
-                  {fieldErrors.rentAvailability}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -823,9 +803,7 @@ export default function AdForm({ type = "client", adId }) {
                         },
                       })}
                       disabled={!isEditable}
-                      placeholder={
-                        t.ad.placeholders.adTitle || "Enter ad title"
-                      }
+                      placeholder={t.ad.placeholders.adTitle}
                     />
                   </div>
                   {errors.adTitle && (
@@ -838,8 +816,8 @@ export default function AdForm({ type = "client", adId }) {
               </div>
               <div className="box forInput">
                 <label>
-                  {selectedCategory === 2
-                    ? t.dashboard.forms.rentPrice || "سعر الإيجار"
+                  {selectedCategory?.id == 2
+                    ? t.ad.rentPrice
                     : t.dashboard.forms.price}
 
                   <span className="required">*</span>
@@ -858,9 +836,8 @@ export default function AdForm({ type = "client", adId }) {
                       })}
                       disabled={!isEditable}
                       placeholder={
-                        selectedCategory === 2
-                          ? t.dashboard.forms.rentPricePlaceholder ||
-                            "مثال: 500"
+                        selectedCategory?.id == 2
+                          ? t.ad.rentPricePlaceholder
                           : t.dashboard.forms.pricePlaceholder
                       }
                     />
@@ -876,8 +853,8 @@ export default function AdForm({ type = "client", adId }) {
               </div>
               {selectedCategory === 2 && (
                 <SelectOptions
-                  label={t.dashboard.forms.rentUnit || "وحدة الإيجار"}
-                  placeholder={t.dashboard.forms.select || "اختر"}
+                  label={t.ad.rentUnit}
+                  placeholder={t.ad.select}
                   options={rentalUnits}
                   value={watch("rentUnit")}
                   locale={locale}
@@ -942,7 +919,6 @@ export default function AdForm({ type = "client", adId }) {
                       value={minRentalDuration.unit}
                       tPath="ad" // 👈 مهم
                       required={true}
-                      error={fieldErrors.minRentalDuration}
                       locale={locale}
                       disabled={!isEditable}
                       t={t}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { settings } from "@/Contexts/settings";
@@ -8,6 +8,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "@/styles/client/pages/home.css";
+import { slidesEn, slidesAr } from "@/data";
 
 export default function HeroSwiper() {
   const { locale } = useContext(settings);
@@ -15,57 +16,27 @@ export default function HeroSwiper() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // بيانات السلايدات
-  const slides = [
-    {
-      id: 1,
-      image: "/slides/1.jpeg",
-      link: "/",
-      title: {
-        ar: "استرخاء بلا حدود",
-        en: "Unlimited Relaxation",
-      },
-      description: {
-        ar: "استمتع بتجربة فريدة على شاطئ يجمع بين الهدوء والفخامة",
-        en: "Enjoy a unique beachfront experience where comfort meets luxury",
-      },
-    },
-    {
-      id: 2,
-      image: "/slides/2.jpeg",
-      link: "/",
-      title: {
-        ar: "إقامة بمعايير عالمية",
-        en: "World-Class Living",
-      },
-      description: {
-        ar: "فيلات مصممة لتمنحك أقصى درجات الراحة والخصوصية",
-        en: "Villas designed to offer ultimate comfort and privacy",
-      },
-    },
-    {
-      id: 3,
-      image: "/slides/3.jpeg",
-      link: "/",
-      title: {
-        ar: "كل ما تحتاجه قريب منك",
-        en: "Everything You Need",
-      },
-      description: {
-        ar: "سوق وخدمات متكاملة تلبي جميع احتياجاتك اليومية",
-        en: "A fully integrated marketplace for all your daily needs",
-      },
-    },
-  ];
 
   const handleSlideChange = (swiper) => {
     setActiveIndex(swiper.activeIndex);
   };
 
-  const handlePaginationClick = (index) => {
-    if (swiperRef.current) {
-      swiperRef.current.slideTo(index);
-    }
-  };
+  const [slieds, setSlieds] = useState([]);
+  useEffect(() => {
+    const fetchSlieds = async () => {
+      // try {
+      //   const { data } = await getService.getSlieds(6);
+      //   setDynamicFilters(
+      //     data || locale == "en" ? slidesEn : slidesAr
+      //   );
+      // } catch (err) {
+      //   console.error("Failed to fetch governorates:", err);
+      //   setDynamicFilters(locale == "en" ? slidesEn : slidesAr);
+      // }
+      setSlieds(locale == "en" ? slidesEn : slidesAr);
+    };
+    fetchSlieds();
+  }, [locale]);
 
   return (
     <div className="hero-section">
@@ -91,8 +62,8 @@ export default function HeroSwiper() {
           renderBullet: function (index, className) {
             return `
               <button class="${className}" aria-label="Go to slide ${
-              index + 1
-            }">
+                index + 1
+              }">
                 <span class="bullet-inner"></span>
               </button>
             `;
@@ -100,7 +71,7 @@ export default function HeroSwiper() {
         }}
         className="hero-swiper"
       >
-        {slides.map((slide) => (
+        {slieds.map((slide) => (
           <SwiperSlide key={slide.id} className="hero-slide">
             <Link href={slide.link} className="slide-link">
               <div className="slide-image-wrapper">
@@ -113,11 +84,9 @@ export default function HeroSwiper() {
                 />
               </div>
               <div className="slide-content">
-                <h1 className="slide-title">{slide.title?.[locale]}</h1>
+                <h1 className="slide-title">{slide.title}</h1>
 
-                <p className="slide-description">
-                  {slide.description?.[locale]}
-                </p>
+                <p className="slide-description">{slide.description}</p>
               </div>
             </Link>
           </SwiperSlide>

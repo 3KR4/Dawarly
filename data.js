@@ -104,18 +104,57 @@ export const navLinks = [
     link: "/about",
   },
 ];
-export const slides = [
+export const slidesEn = [
   {
-    image: "/Slides/slide-003.jpg",
-    link: "/discover",
+    id: 1,
+    image: "/slides/1.jpeg",
+    link: "/properties/beachfront-villas",
+    title: "Unlimited Relaxation",
+    description:
+      "Enjoy a unique beachfront experience where comfort meets luxury",
+    creation_date: "2024-11-15",
   },
   {
-    image: "/Slides/slide-005.jpg",
-    link: "/nights",
+    id: 2,
+    image: "/slides/2.jpeg",
+    link: "/living/world-class",
+    title: "World-Class Living",
+    description: "Villas designed to offer ultimate comfort and privacy",
+    creation_date: "2024-12-02",
   },
   {
-    image: "/Slides/slide-001.jpg",
+    id: 3,
+    image: "/slides/3.jpeg",
     link: "/marketplace",
+    title: "Everything You Need",
+    description: "A fully integrated marketplace for all your daily needs",
+    creation_date: "2025-01-08",
+  },
+];
+export const slidesAr = [
+  {
+    id: 1,
+    image: "/slides/1.jpeg",
+    link: "/ar/properties/beachfront-villas",
+    title: "استرخاء بلا حدود",
+    description: "استمتع بتجربة فريدة على شاطئ يجمع بين الهدوء والفخامة",
+    creation_date: "2024-11-15",
+  },
+  {
+    id: 2,
+    image: "/slides/2.jpeg",
+    link: "/ar/living/world-class",
+    title: "إقامة بمعايير عالمية",
+    description: "فيلات مصممة لتمنحك أقصى درجات الراحة والخصوصية",
+    creation_date: "2024-12-02",
+  },
+  {
+    id: 3,
+    image: "/slides/3.jpeg",
+    link: "/ar/marketplace",
+    title: "كل ما تحتاجه قريب منك",
+    description: "سوق وخدمات متكاملة تلبي جميع احتياجاتك اليومية",
+    creation_date: "2025-01-08",
   },
 ];
 export const filterss = [
@@ -621,7 +660,8 @@ export const ads = [
       email: false,
       phone: true,
     },
-    isEditable: true,
+    isEditable: false,
+
   },
   {
     id: 102,
@@ -1817,11 +1857,12 @@ export const dashboardRoutes = {
     },
     canCreate: true,
   },
-  slides: {
+  slieds: {
     label: {
       en: "Slides",
-      ar: "السلايدر",
+      ar: "الشرائح",
     },
+    canCreate: true,
   },
   support: {
     label: {
