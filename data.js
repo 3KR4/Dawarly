@@ -135,7 +135,7 @@ export const slidesAr = [
   {
     id: 1,
     image: "/slides/1.jpeg",
-    link: "/ar/properties/beachfront-villas",
+    link: "properties/beachfront-villas",
     title: "استرخاء بلا حدود",
     description: "استمتع بتجربة فريدة على شاطئ يجمع بين الهدوء والفخامة",
     creation_date: "2024-11-15",
