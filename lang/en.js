@@ -148,6 +148,9 @@ const en = {
     favorietList: "favoriet List",
     next: "next",
     clear_all: "Clear All",
+    add: "add",
+    edit: "edit",
+    delete: "delete",
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -231,6 +234,9 @@ const en = {
       slied_title_required: "the slied title is required",
       create_slide: "create slide",
       update_slide: "update slide",
+      edit_sub_category: "edit sub category",
+      enter_new_sub_category: "enter new sub category",
+
       errors: {
         titleRequired: "Product title is required",
         titleMin: "Title must be at least 3 characters",
@@ -280,6 +286,8 @@ const en = {
     activeBookings: "Active Bookings",
     pendingBookings: "Pending Bookings",
 
+    sub_categories: "sub categories",
+    filters: "filters",
     support: "Support",
 
     profile: "Profile",

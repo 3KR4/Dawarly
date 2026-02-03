@@ -9,6 +9,8 @@ import { LuCalendarClock } from "react-icons/lu";
 import { LuCalendarCheck } from "react-icons/lu";
 import { LuGrid2X2Check } from "react-icons/lu";
 import { settings } from "@/Contexts/settings";
+import { FaFilter } from "react-icons/fa6";
+import { MdCategory } from "react-icons/md";
 
 import {
   FaUsers,
@@ -226,6 +228,26 @@ function SideNav() {
           </div>
         </div>
 
+        {/* Categories */}
+        <Link
+          href="/dashboard/subcategories"
+          className={isActive("/dashboard/subcategories") ? "active a" : "a"}
+        >
+          <div className="hold">
+            <h4>{t.sideNav.sub_categories}</h4>
+            <MdCategory />
+          </div>
+        </Link>
+        {/* Filters */}
+        <Link
+          href="/dashboard/filters"
+          className={isActive("/dashboard/filters") ? "active a" : "a"}
+        >
+          <div className="hold">
+            <h4>{t.sideNav.filters}</h4>
+            <FaFilter />
+          </div>
+        </Link>
         {/* Support */}
         <Link
           href="/dashboard/support"

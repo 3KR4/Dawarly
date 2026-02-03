@@ -27,6 +27,14 @@ body:has(.form-holder) footer {
 .form-holder .form-holderBackground {
   position: relative !important;
 }
+.form-holder.register {
+  background: linear-gradient(
+    13deg,
+    var(--main-color) -60%,
+    var(--body-color) 100%
+  );
+  margin: 0;
+}
 .form-holder form {
   background: var(--body-color);
   border-radius: 28px;
@@ -151,7 +159,8 @@ body:has(.form-holder) footer {
   font-size: 16px;
   font-family: "Cairo";
   font-weight: 700;
-  height: 46px;
+  min-height: 46px;
+  max-height: 46px;
 }
 .form-holder.create-ad form .main-button {
   margin-top: 0;
@@ -213,11 +222,6 @@ p.have-problem {
   font-size: 14px;
   text-decoration: underline;
 }
-
-
-
-
-
 
 .body.fluid-container.for-user .table-container .table-header,
 .body.fluid-container.for-user .table-container .table-item {
@@ -357,15 +361,23 @@ p.have-problem {
   .form-holder .form-holderBackground {
     object-fit: cover;
   }
-  .form-holder form {
-    padding: 22px;
+  .form-holder.register form {
+    width: 600px;
+    padding: 20px 17px !important;
+    justify-content: unset;
   }
 }
 @media (max-width: 768px) {
   .form-holder form {
     border-radius: 18px;
-
     padding: 19px 15px;
+  }
+  .form-holder.register form {
+    max-width: 100% !important;
+    height: 100vh;
+    border-radius: 0;
+    padding: 20px 10px !important;
+    overflow: auto;
   }
   .form-holder .options-grid {
     margin: 0;

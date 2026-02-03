@@ -23,7 +23,9 @@ import { Mail, Phone, CircleAlert } from "lucide-react";
 import { BsChatDots } from "react-icons/bs";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
-
+import { useAuth } from "@/Contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import useRequireAuth from "@/Contexts/useRequireAuth";
 const RenderRentAvailability = ({
   t,
   rentAvailability,
@@ -84,6 +86,9 @@ const RenderRentAvailability = ({
 };
 
 export default function CreateAd() {
+const { allowed } = useRequireAuth();
+if (!allowed) return null;
+
   const { locale } = useContext(settings);
 
   const t = useTranslate();

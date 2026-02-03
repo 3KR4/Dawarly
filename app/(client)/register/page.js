@@ -10,7 +10,7 @@ import citiesEn from "@/data/citiesEn.json";
 import citiesAr from "@/data/citiesAr.json";
 import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
-
+import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { MdMarkEmailUnread } from "react-icons/md";
 
@@ -25,12 +25,19 @@ import {
 } from "lucide-react";
 import OtpInputs from "@/components/Tools/Otp";
 import { settings } from "@/Contexts/settings";
-
+import {
+  registerUser,
+  loginUser,
+  verifyUserOtp,
+  resendEmailOtp,
+} from "@/services/auth/auth.service";
+import { useAuth } from "@/Contexts/AuthContext";
 export default function Register() {
+  const { login } = useAuth();
   const t = useTranslate();
   const { locale } = useContext(settings);
   const auth = t.auth;
-
+  const redirectAfterLogin = useRedirectAfterLogin();
   const [categories, setCategories] = useState([]);
   const [governorates, setGovernorates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -64,7 +71,7 @@ export default function Register() {
     FORGET_PASS_VERIFY: 8,
     VIEW_OR_UPDATE_PASS: 9,
   };
-
+  const [userId, setUserId] = useState(null);
   const [step, setStep] = useState(STEPS.ACCOUNT);
   const [userAddress, setUserAddress] = useState({
     gov: null,
@@ -113,30 +120,74 @@ export default function Register() {
   }, [step]);
 
   /* ================= SUBMIT ================= */
-  const onSubmit = (data) => {
-    if (step === STEPS.LOGIN) {
-      console.log("LOGIN DATA", data);
-      return;
-    }
+  const onSubmit = async (data) => {
+    try {
+      if (step === STEPS.LOGIN) {
+        const payload = {
+          email: data.emailPhoneLogin,
+          pass: data.loginPassword,
+        };
 
-    if (step === STEPS.ACCOUNT) {
-      setStep(STEPS.PHONE_VERIFY);
-      return;
-    }
+        const res = await loginUser(payload);
 
-    if (step === STEPS.PHONE_VERIFY) {
-      if (data.email) {
-        setStep(STEPS.EMAIL_VERIFY);
-      } else {
-        setStep(STEPS.ADDRESS);
+        login({
+          user: res.data.data,
+          token: res.data.token,
+        });
+        redirectAfterLogin();
+        // setStep(STEPS.PHONE_VERIFY);
+        return;
       }
-      return;
+      /* ===== CREATE ACCOUNT ===== */
+      if (step === STEPS.ACCOUNT) {
+        const payload = {
+          name: data.fullname,
+          email: data.email,
+          pass: data.password,
+          confirmpassword: data.passwordConfirmation,
+          phone: data.phone,
+        };
+
+        const res = await registerUser(payload);
+
+        localStorage.setItem("token", res.data.token);
+        setUserId(res.data.data.id);
+
+        setStep(STEPS.PHONE_VERIFY);
+        return;
+      }
+
+      /* ===== VERIFY OTP ===== */
+      if (step === STEPS.PHONE_VERIFY || step === STEPS.EMAIL_VERIFY) {
+        const code = otp.join("");
+
+        await verifyUserOtp(userId, code);
+        redirectAfterLogin();
+        setStep(STEPS.ADDRESS);
+        return;
+      }
+    } catch (err) {
+      console.error(err.response?.data || err.message);
     }
 
-    if (step === STEPS.EMAIL_VERIFY) {
-      setStep(STEPS.ADDRESS);
-      return;
-    }
+    // if (step === STEPS.ACCOUNT) {
+    //   setStep(STEPS.PHONE_VERIFY);
+    //   return;
+    // }
+
+    // if (step === STEPS.PHONE_VERIFY) {
+    //   if (data.email) {
+    //     setStep(STEPS.EMAIL_VERIFY);
+    //   } else {
+    //     setStep(STEPS.ADDRESS);
+    //   }
+    //   return;
+    // }
+
+    // if (step === STEPS.EMAIL_VERIFY) {
+    //   setStep(STEPS.ADDRESS);
+    //   return;
+    // }
 
     if (step === STEPS.ADDRESS) {
       setStep(STEPS.INTERESTS);
@@ -201,7 +252,7 @@ export default function Register() {
   };
 
   return (
-    <div className="form-holder">
+    <div className="form-holder register">
       <form onSubmit={handleSubmit(onSubmit)}>
         {[
           STEPS.PHONE_VERIFY,

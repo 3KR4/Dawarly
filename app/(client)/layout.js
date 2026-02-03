@@ -4,7 +4,7 @@ import Footer from "@/components/home/Sections/Footer";
 import { SettingsProvider } from "@/Contexts/settings";
 import { FiltersProvider } from "@/Contexts/filters";
 import { SelectorsProvider } from "@/Contexts/selectors";
-
+import { AuthProvider } from "@/Contexts/AuthContext";
 import "@/styles/client/globals.css";
 
 const cairo = Cairo({
@@ -46,13 +46,15 @@ export default function RootLayout({ children }) {
     <html lang="en" className={cairo.className}>
       <body>
         <SettingsProvider>
-          <FiltersProvider>
-            <SelectorsProvider>
-              <Header />
-              {children}
-              <Footer />
-            </SelectorsProvider>
-          </FiltersProvider>
+          <AuthProvider>
+            <FiltersProvider>
+              <SelectorsProvider>
+                <Header />
+                {children}
+                <Footer />
+              </SelectorsProvider>
+            </FiltersProvider>
+          </AuthProvider>
         </SettingsProvider>
       </body>
     </html>

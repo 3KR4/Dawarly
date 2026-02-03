@@ -1,0 +1,96 @@
+.dash-holder .cats-holder {
+  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+.dash-holder .cats-holder .cat-body {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  height: fit-content;
+}
+.dash-holder .cats-holder .cat-body h4 {
+  padding: 10px;
+  background: var(--hover-color);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.dash-holder .cats-holder .cat-body h4:hover {
+  background: var(--main-color);
+  color: white;
+}
+.dash-holder .cats-holder .cat-body h4 svg {
+  font-size: 13px;
+}
+.dash-holder .cats-holder .cat-body h4:hover svg {
+  opacity: 1;
+  color: white;
+}
+.dash-holder .cats-holder .cat-body ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 7px 9px;
+}
+.dash-holder .cats-holder .cat-body ul li {
+  color: var(--paragraph-2);
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  padding: 6px 7px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.dash-holder .cats-holder .cat-body ul li:hover {
+  background: var(--lighter-main-color);
+}
+.dash-holder .cats-holder .cat-body ul li svg {
+  font-size: 14px;
+}
+.dash-holder .cats-holder .cat-body ul li:hover svg {
+  opacity: 1;
+}
+.dash-holder .cats-holder .cat-body ul .input-holder {
+  align-items: center;
+  display: flex;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+.dash-holder .cats-holder .cat-body ul .input-holder input {
+  flex: 1;
+  height: 100%;
+  padding: 0 8px;
+}
+.dash-holder .cats-holder .cat-body ul .input-holder span {
+  background: var(--hover-color);
+  align-items: center;
+  gap: 2px;
+  display: flex;
+  font-weight: 600;
+  height: 100%;
+  padding: 0 8px;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.dash-holder .cats-holder .cat-body ul .input-holder span:not(.disabled):hover {
+  background: var(--main-color);
+  color: white;
+  cursor: pointer;
+}
+
+@media (min-width: 1200px) {
+  .dash-holder .cats-holder .cat-body h4 svg,
+  .dash-holder .cats-holder .cat-body ul li svg {
+    opacity: 0;
+  }
+}

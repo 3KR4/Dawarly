@@ -151,6 +151,9 @@ const ar = {
     favorietList: "قائمة المفضلة",
     next: "التالي",
     clear_all: "مسح الكل",
+    add: "اضافة",
+    edit: "تعديل",
+    delete: "حذف",
   },
   location: {
     egyptGovernorates: "محافظات مصر",
@@ -234,6 +237,9 @@ const ar = {
 
       create_slide: "إنشاء شريحة",
       update_slide: "تحديث الشريحة",
+      edit_sub_category: "تعديل الفئة الفرعية",
+      enter_new_sub_category: "قم بأنشاء فئة جديدة",
+
       errors: {
         titleRequired: "اسم المنتج مطلوب",
         titleMin: "اسم المنتج يجب أن يكون 3 أحرف على الأقل",
@@ -282,7 +288,8 @@ const ar = {
     bookings: "الحجوزات",
     activeBookings: "حجوزات نشطة",
     pendingBookings: "حجوزات معلّقة",
-
+    sub_categories: "التصنيفات الفرعية",
+    filters: "الفلاتر",
     support: "الدعم",
 
     profile: "الملف الشخصي",
