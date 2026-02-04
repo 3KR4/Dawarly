@@ -122,14 +122,18 @@ export default function SubCategories() {
         <div className="forFilters">
           <div className="top">
             <div className="hidden-element" style={{ width: "30px" }}></div>
-            <h4 className="title">Dynamic Filter</h4>
+            <h4 className="title">
+              {locale == "ar" && t.dashboard.filters.Filter_data}
+              {t.xxxxx || ""}
+              {locale == "en" && t.dashboard.filters.Filter_data}
+            </h4>
             <IoIosClose className="close" />
           </div>
 
           <form className="builder" onSubmit={handleSubmit(onSubmit)}>
             {/* KEY */}
             <div className="box forInput">
-              <label>Key</label>
+              <label>{t.dashboard.forms.filterKey}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <input
@@ -151,7 +155,7 @@ export default function SubCategories() {
 
             {/* LABEL */}
             <div className="box forInput">
-              <label>Label</label>
+              <label>{t.dashboard.forms.Label}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <input
@@ -173,7 +177,7 @@ export default function SubCategories() {
 
             {/* PLACEHOLDER */}
             <div className="box forInput">
-              <label>Placeholder</label>
+              <label>{t.dashboard.forms.Placeholder}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <input
@@ -214,14 +218,14 @@ export default function SubCategories() {
             {uiType && uiType !== "input" && (
               <div className="options">
                 <div className="top">
-                  Options{" "}
+                  {t.dashboard.forms.Options}{" "}
                   <button
                     type="button"
                     className="edit-filter-btn"
-                    style={{position: "relative"}}
+                    style={{ position: "relative" }}
                     onClick={() => append({ label: "", value: "" })}
                   >
-                    <TiPlus/> Add Option
+                    <TiPlus /> {t.actions.AddOption}
                   </button>
                 </div>
 
@@ -256,7 +260,7 @@ export default function SubCategories() {
             )}
 
             <button className="main-button" type="submit">
-              Create Filter
+              {t.actions.Create_Filter}
             </button>
           </form>
         </div>

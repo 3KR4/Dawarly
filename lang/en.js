@@ -1,3 +1,5 @@
+import dynamic from "next/dynamic";
+
 const en = {
   header: {
     Dawaarly: "Dawaarly",
@@ -151,6 +153,8 @@ const en = {
     add: "add",
     edit: "edit",
     delete: "delete",
+    AddOption: "Add Option",
+    Create_Filter: "Create Filter",
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -236,7 +240,12 @@ const en = {
       update_slide: "update slide",
       edit_sub_category: "edit sub category",
       enter_new_sub_category: "enter new sub category",
-
+      Filter_data: "Filter data",
+      Options: "Options",
+      filterKey: "filter Key",
+      Label: "input Label",
+      Placeholder: "Placeholder",
+      Options: "Options",
       errors: {
         titleRequired: "Product title is required",
         titleMin: "Title must be at least 3 characters",

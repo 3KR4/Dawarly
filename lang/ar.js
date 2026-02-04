@@ -154,6 +154,8 @@ const ar = {
     add: "اضافة",
     edit: "تعديل",
     delete: "حذف",
+    AddOption: "اضافت خيار",
+    Create_Filter: "انشاء الفلتر",
   },
   location: {
     egyptGovernorates: "محافظات مصر",
@@ -239,6 +241,13 @@ const ar = {
       update_slide: "تحديث الشريحة",
       edit_sub_category: "تعديل الفئة الفرعية",
       enter_new_sub_category: "قم بأنشاء فئة جديدة",
+      Filter_data: "بيانات فلتر",
+      Options: "الاختيارات",
+      filterKey: "المفتاح التعريفي للفلتر",
+
+      Label: "عنوان الحقل",
+
+      Placeholder: "النص الإرشادي لحقل الإدخال",
 
       errors: {
         titleRequired: "اسم المنتج مطلوب",
