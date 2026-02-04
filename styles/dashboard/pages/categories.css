@@ -3,6 +3,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
+.dash-holder .cats-holder {
+  grid-template-columns: repeat(auto-fill, minmax(445px, 1fr));
+}
 .dash-holder .cats-holder .cat-body {
   border: 1px solid var(--border-color);
   border-radius: 10px;

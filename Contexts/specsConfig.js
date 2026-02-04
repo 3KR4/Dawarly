@@ -30,7 +30,7 @@ export const specsConfig = {
   vehicles_type: { label: "type" },
   bedrooms: { icon: MdOutlineKingBed, showInMini: true },
   bathrooms: { icon: PiBathtubBold, showInMini: true },
-  area_m2: { icon: TbMeterSquare, label: "area", showInMini: true },
+  area: { icon: TbMeterSquare, label: "area", showInMini: true },
   furnished: { icon: MdOutlineChair },
 
   model_year: {

@@ -8,20 +8,7 @@
   transition: all 0.3s;
 }
 
-.filters .close {
-  color: var(--paragraph);
-  border-radius: 5px;
-  width: 25px;
-  height: 25px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 0px;
-}
-.filters .close:hover {
-  background: var(--red-color);
-  color: white;
-}
+
 .filters .holder {
   gap: 10px !important;
 }

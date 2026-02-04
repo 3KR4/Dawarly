@@ -1620,7 +1620,7 @@ export const propertiesFiltersEn = [
     uiType: "input",
     inputType: "number",
     required: true,
-    label: "Area (m²)",
+    label: "Area",
     placeholder: "Enter area",
     requiredMessage: "Area is required",
   },
@@ -1854,6 +1854,13 @@ export const dashboardRoutes = {
     label: {
       en: "Users",
       ar: "المستخدمين",
+    },
+    canCreate: true,
+  },
+  filters: {
+    label: {
+      en: "filters",
+      ar: "الفلاتر",
     },
     canCreate: true,
   },
