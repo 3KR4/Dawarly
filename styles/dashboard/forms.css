@@ -164,9 +164,7 @@ form .form-section .dynamicFilters-holder > * {
   color: white;
   background: var(--main-color);
 }
-.dashboard .box.forInput .inputHolder .holder input {
-  height: 40px;
-}
+
 .box.forInput .spec-list {
   border: 1px solid var(--input-border-color);
   border-radius: 11px;

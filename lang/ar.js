@@ -45,6 +45,8 @@ const ar = {
     choose_category: "اختر القسم",
     choose_sub_category: "اختر القسم الفرعي",
     ad_basics: "البيانات الأساسية",
+    filter_form: "بيانات الفلتر",
+
     ad_details: "تفاصيل الإعلان",
     contact_information: "بيانات التواصل",
 
@@ -53,6 +55,7 @@ const ar = {
     ad_basics_description: "أدخل المعلومات الأساسية الخاصة بالإعلان.",
     ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
     contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
+    filter_form_description: "قم بأدخال بيانات الفلتر الجديد",
     create_your_ad: "انشيء اعلانك الان",
     create_ad: "انشيء اعلان ",
     contact_via_email: "تواصل عبر البريد الإلكتروني",

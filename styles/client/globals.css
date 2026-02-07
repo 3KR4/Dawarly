@@ -122,6 +122,29 @@ svg {
 :disabled svg {
   cursor: no-drop;
 }
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--main-color);
+  border-bottom-color: transparent !important;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  transition: 0.3s;
+}
+button:hover .loader {
+  border-color: white;
+  
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 svg.close {
   color: var(--paragraph);
   border-radius: 5px;
@@ -816,6 +839,131 @@ svg.main-ico {
   justify-content: center;
   align-items: center;
 }
+
+
+.dynamic-menu {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff57;
+  backdrop-filter: blur(3px);
+}
+.dynamic-menu > .holder {
+  background: var(--body-color);
+  border-radius: 30px;
+  width: 550px;
+  max-width: 95%;
+  padding: 15px 20px;
+  box-shadow: 0 0 13px #00000021;
+}
+.dynamic-menu .top {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.dynamic-menu .top h4 {
+  font-size: 19px;
+}
+.dynamic-menu .top svg {
+  top: unset;
+  right: unset;
+  left: unset;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  position: relative;
+}
+.dynamic-menu form {
+  margin: 0 !important;
+  gap: 15px !important;
+}
+.dynamic-menu .main-button {
+  margin-top: 1px;
+}
+.dynamic-menu .options .inputHolder {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dashboard .dynamic-menu .options .holder input {
+  height: 33px !important;
+}
+.lang-switch {
+  gap: 7px;
+  background: var(--section-color);
+  border: 1px solid var(--main-color);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.lang-switch button {
+  cursor: pointer;
+  border: 1px solid var(--paragraph);
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--title-color);
+  font-weight: 500;
+}
+.lang-switch button:hover {
+  background: var(--lighter-main-color-2);
+}
+
+.lang-switch button.active {
+  background: var(--main-color);
+  border-color: transparent;
+  color: #fff;
+}
+.dynamic-menu .buttons-holder {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+  transition: 0.3s;
+}
+.dynamic-menu .buttons-holder:has(.danger) {
+  grid-template-columns: 0.3fr 0.7fr;
+}
+.dynamic-menu .buttons-holder:has(.cancel) {
+  grid-template-columns: 0.4fr 0.6fr;
+}
+.dynamic-menu .buttons-holder > * {
+  width: 100%;
+  border-radius: 10px;
+  height: 40px !important;
+  cursor: pointer !important;
+}
+.dynamic-menu .buttons-holder > .danger {
+}
+.dynamic-menu .buttons-holder > .danger:hover {
+  background: #ffbbbb;
+  color: #ff0000;
+  border-color: red;
+}
+
+.dynamic-menu .warning {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+.dynamic-menu .warning > * {
+  font-size: 15px;
+  color: var(--paragraph);
+}
+.dynamic-menu .warning svg {
+  width: 17px;
+  height: 17px;
+}
+
 
 @media (max-width: 1300px) {
   .hero-image-holder .details h3 {

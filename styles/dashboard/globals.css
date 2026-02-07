@@ -152,7 +152,7 @@ header .actions-btns .userMenu .top {
 .dashboard .main-holder {
   flex: 1;
 }
-.dashboard .holder {
+.dashboard > .holder {
   flex: 1;
 }
 .dashboard .dash-holder {
@@ -322,7 +322,7 @@ header .actions-btns .userMenu .top {
   color: white;
 }
 .table-container .actions svg.delete:hover {
-  background: #ff4f4ff5;
+  background: var(--red-color);
   color: white;
 }
 .table-container .actions hr {

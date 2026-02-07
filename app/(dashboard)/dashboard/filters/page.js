@@ -1,130 +1,382 @@
 "use client";
+
 import useTranslate from "@/Contexts/useTranslation";
+import "@/styles/dashboard/forms.css";
 import "@/styles/dashboard/tables.css";
 import "@/styles/dashboard/pages/filters.css";
+
+import React, { useContext, useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
-import React, { useContext, useState, useEffect, useRef } from "react";
-import {
-  subcategoriesAr,
-  subcategoriesEn,
-  propertiesFiltersEn,
-  propertiesFiltersAr,
-} from "@/data";
+import { CircleAlert } from "lucide-react";
+import { TiPlus } from "react-icons/ti";
+import { IoIosClose, IoMdRadioButtonOn } from "react-icons/io";
+
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { RxComponentBoolean } from "react-icons/rx";
+
 import { settings } from "@/Contexts/settings";
 import { specsConfig } from "@/Contexts/specsConfig";
-import { FaEyeLowVision } from "react-icons/fa6";
-import { FaRegEyeSlash } from "react-icons/fa6";
-import { RxComponentBoolean } from "react-icons/rx";
-import { IoMdRadioButtonOn } from "react-icons/io";
-import { FaBarsStaggered } from "react-icons/fa6";
-import { IoIosClose } from "react-icons/io";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import { CircleAlert } from "lucide-react";
-import "@/styles/client/forms.css";
-import "@/styles/dashboard/forms.css";
-import { TiPlus } from "react-icons/ti";
 
-export default function SubCategories() {
+import DynamicMenu from "@/components/Tools/DynamicMenu";
+import DeleteConfirm from "@/components/Tools/DeleteConfirm";
+import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+
+import {
+  getAllFilter,
+  getOneFilter,
+  createFilter,
+  updateFilter,
+  updateFilterLang,
+  deleteFilter,
+  createOption,
+  updateOption,
+  updateOptionLang,
+  deleteOption,
+} from "@/services/filters/filters.service";
+import { FaBarsStaggered } from "react-icons/fa6";
+import CatCard from "@/components/home/CatCard";
+
+export default function FiltersPage() {
+
+  
   const { locale } = useContext(settings);
   const t = useTranslate();
+
+  const [filters, setFilters] = useState([]);
+  console.log(filters);
+
+    const STEPS = {
+    CATEGORIES: 1,
+    SUB_CATEGORIES: 2,
+    FORM: 3,
+
+  };
+    const [step, setStep] = useState(STEPS.CATEGORIES);
+
+      const [category, setCategory] = useState();
+  const titles = {
+    [STEPS.CATEGORIES]: t.ad.choose_category,
+    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
+    [STEPS.FORM]: t.ad.filter_form,
+  };
+
+  const descriptions = {
+    [STEPS.CATEGORIES]: t.ad.choose_category_description,
+    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category_description,
+    [STEPS.FORM]: t.ad.filter_form_description,
+
+  };
+
+
+  const [loading, setLoading] = useState(false);
+
+  const [mode, setMode] = useState(null); // create | edit
+  const [menuType, setMenuType] = useState(null); // form | delete
+  const [editingFilter, setEditingFilter] = useState(null);
+  const [originalData, setOriginalData] = useState(null);
 
   const {
     register,
     control,
     watch,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
       key: "",
+      type: "",
       label: "",
-      placeholder: "",
-      uiType: "",
-      options: [{ label: "", value: "" }],
+      options: [],
     },
   });
 
-  const uiType = watch("uiType");
-
-  const [filters, setFilters] = useState([]);
-
-  useEffect(() => {
-    setFilters(locale === "en" ? propertiesFiltersEn : propertiesFiltersAr);
-  }, [locale]);
-
-  // حالة Input
-  const [activFilters, setActivFilters] = useState(null);
-  const getSpecConfig = (key) => specsConfig[key];
+  const uiType = watch("type");
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "options",
   });
 
-  const onSubmit = (data) => {
-    const finalConfig = {
-      key: data.key,
-      label: data.label,
-      placeholder: data.placeholder,
-      uiType: data.uiType,
-      required: true,
-      ...(data.uiType !== "input" && { options: data.options }),
-    };
+  /* ================= EFFECTS ================= */
 
-    console.log("FINAL CONFIG 👉", finalConfig);
+  useEffect(() => {
+    getAllFilter(locale)
+      .then((res) => setFilters(res.data.data))
+      .catch(console.error);
+  }, [locale]);
+
+  /* ================= HANDLERS ================= */
+
+  const openCreate = () => {
+    setMode("create");
+    setMenuType("form");
+    setEditingFilter(null);
+    setOriginalData(null);
+    reset({
+      key: "",
+      type: "",
+      label: "",
+      options: [],
+    });
   };
+
+  const openEdit = (filter) => {
+    setMode("edit");
+    setMenuType("form");
+    setEditingFilter(filter);
+
+    getOneFilter(filter.id, locale).then((res) => {
+      const data = res.data.data;
+
+      reset({
+        key: data.key,
+        type: data.type,
+        label: data.translations?.label || "",
+        options:
+          data.options?.map((o) => ({
+            id: o.id,
+            value: o.value,
+            label: o.translations?.label || "",
+          })) || [],
+      });
+
+      setOriginalData(data);
+    });
+  };
+
+  const closeMenu = () => {
+    setMenuType(null);
+    setMode(null);
+    setEditingFilter(null);
+    setOriginalData(null);
+    reset();
+  };
+
+  /* ================= SUBMIT ================= */
+
+  const onSubmit = async (data) => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      /* ===== CREATE ===== */
+      if (mode === "create") {
+        const payload = {
+          key: data.key,
+          type: data.type,
+          required: true,
+          filterable: true,
+          translations: [
+            { lang: "en", label: data.label },
+            { lang: "ar", label: data.label },
+          ],
+        };
+
+        const res = await createFilter(payload);
+        const filterId = res.data.data.id;
+
+        if (data.type !== "input") {
+          for (const opt of data.options) {
+            await createOption(filterId, {
+              value: opt.value,
+              translations: [
+                { lang: "en", label: opt.label },
+                { lang: "ar", label: opt.label },
+              ],
+            });
+          }
+        }
+
+        setFilters((prev) => [...prev, res.data.data]);
+        closeMenu();
+      }
+
+      /* ===== EDIT ===== */
+      if (mode === "edit") {
+        if (data.key !== originalData.key || data.type !== originalData.type) {
+          await updateFilter(editingFilter.id, {
+            key: data.key,
+            type: data.type,
+          });
+        }
+
+        if (data.label !== originalData.translations?.label) {
+          await updateFilterLang(editingFilter.id, {
+            label: data.label,
+          });
+        }
+
+        for (const opt of data.options) {
+          if (!opt.id) {
+            await createOption(editingFilter.id, {
+              value: opt.value,
+              translations: [
+                { lang: "en", label: opt.label },
+                { lang: "ar", label: opt.label },
+              ],
+            });
+          } else {
+            await updateOption(opt.id, { value: opt.value });
+            await updateOptionLang(opt.id, { label: opt.label });
+          }
+        }
+
+        setFilters((prev) =>
+          prev.map((f) =>
+            f.id === editingFilter.id
+              ? { ...f, key: data.key, label: data.label }
+              : f,
+          ),
+        );
+
+        closeMenu();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = () => {
+    setLoading(true);
+    deleteFilter(editingFilter.id)
+      .then(() => {
+        setFilters((prev) => prev.filter((f) => f.id !== editingFilter.id));
+        closeMenu();
+      })
+      .finally(() => setLoading(false));
+  };
+
+  /* ================= RENDER ================= */
 
   return (
     <div className="dash-holder">
       <div className="body">
         <div className="filters-holder">
-          {filters?.map((filt) => {
-            const config = getSpecConfig(filt.key);
-            const Icon = config?.icon;
-            return (
-              <div key={filt.key} className="filter-body">
-                {Icon ? <Icon /> : <FaRegEyeSlash />}
-                <h4>{filt.label}</h4>
+          <button className="main-button" onClick={openCreate}>
+            <TiPlus /> Create Filter
+          </button>
 
-                <div className="row">
-                  <li>
-                    {`uiType`}:{" "}
-                    <span>
-                      {filt.uiType}{" "}
-                      {filt.uiType == "select" ? (
-                        <FaBarsStaggered />
-                      ) : filt.uiType == "boolean" ? (
-                        <RxComponentBoolean />
-                      ) : (
-                        <IoMdRadioButtonOn />
-                      )}
-                    </span>
-                  </li>
-                  <li>
-                    {`required`}:{" "}
-                    <span>{filt.required ? "required" : "optional"}</span>
-                  </li>
-                </div>
-                <li>
-                  <span>conented with 5 sub categories</span>
-                </li>
-                <div className="edit-filter-btn">
-                  <MdEdit />
-                  {t.actions.edit}
-                </div>
-              </div>
-            );
-          })}
+{Object.entries(filters || {}).map(([subCategoryName, filtersList]) => (
+  <div key={subCategoryName} className="sub-category-group">
+    <h3 className="sub-category-title">{subCategoryName}</h3>
+
+    {filtersList.map((filt) => {
+      const Icon = specsConfig[filt.key]?.icon;
+
+      return (
+        <div key={filt.id} className="filter-body">
+          {Icon && <Icon />}
+          <h4>{filt.label}</h4>
+
+          <div className="row">
+            <li>
+              uiType:{" "}
+              <span>
+                {filt.type}{" "}
+                {filt.type === "select" ? (
+                  <FaBarsStaggered />
+                ) : filt.type === "boolean" ? (
+                  <RxComponentBoolean />
+                ) : (
+                  <IoMdRadioButtonOn />
+                )}
+              </span>
+            </li>
+
+            <li>
+              required:{" "}
+              <span>{filt.required ? "required" : "optional"}</span>
+            </li>
+          </div>
+
+          <li>
+            <span>
+              contained in {filtersList.length} sub categories
+            </span>
+          </li>
+
+          <div
+            className="edit-filter-btn"
+            onClick={() => openEdit(filt)}
+          >
+            <MdEdit /> Edit
+          </div>
+        </div>
+      );
+    })}
+  </div>
+))}
+
         </div>
       </div>
-      <div className="dynamic-menu">
-        <div className="forFilters">
-          <div className="top">
-            <div className="hidden-element" style={{ width: "30px" }}></div>
-            <h4 className="title">Dynamic Filter</h4>
-            <IoIosClose className="close" />
+
+      {/* ================= DYNAMIC MENU ================= */}
+
+      <DynamicMenu
+        open={!!menuType}
+        title={}
+        descriptions={}
+        onClose={closeMenu}
+      >
+        {menuType === "form" && (
+          <>
+                  <div className="steps-holder">
+          {Object.values(STEPS).map((stepItem, index, arr) => (
+            <div className="step-wrapper" key={stepItem}>
+              <div
+                className={`step 
+                  ${step > stepItem ? "done" : ""} 
+                  ${step === stepItem ? "current" : ""}
+                `}
+              >
+                {stepItem}
+              </div>
+              {index !== arr.length - 1 && <span className="bar"></span>}
+            </div>
+          ))}
+        </div>
+        {step === STEPS.CATEGORIES && (
+          <div className="options-grid">
+            {categories.map((cat) => (
+              <CatCard
+                key={cat?.id}
+                data={cat}
+                position={`when-create-ad`}
+                type={`cat`}
+                activeClass={cat?.id == category}
+                onSelect={() => {
+                  setCategory(cat?.id);
+                  setStep(STEPS.SUB_CATEGORIES);
+                }}
+              />
+            ))}
           </div>
+        )}
+
+        {/* ================= SUB_CATEGORIES STEP 2 ================= */}
+        {step === STEPS.SUB_CATEGORIES && (
+          <div className="options-grid verfiyMethod">
+            {subcategories
+              ?.filter((x) => x?.categoryId == category)
+              ?.map((subCat) => (
+                <CatCard
+                  key={subCat?.id}
+                  data={subCat}
+                  position={`when-create-ad`}
+                  type={`sub-cat`}
+                  activeClass={subCat?.id == subCategory}
+                  onSelect={() => {
+                    setSubCategory(subCat?.id);
+                    setStep(STEPS.BASICS);
+                  }}
+                />
+              ))}
+          </div>
+        )}
+        {step === STEPS.FORM && (
 
           <form className="builder" onSubmit={handleSubmit(onSubmit)}>
             {/* KEY */}
@@ -132,21 +384,14 @@ export default function SubCategories() {
               <label>Key</label>
               <div className="inputHolder">
                 <div className="holder">
-                  <input
-                    type="text"
-                    placeholder="property_type"
-                    {...register("key", {
-                      required: "Key is required",
-                    })}
-                  />
+                  <input {...register("key", { required: true })} />
                 </div>
-                {errors.key && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.key.message}
-                  </span>
-                )}
               </div>
+              {errors.key && (
+                <span className="error">
+                  <CircleAlert /> Key is required
+                </span>
+              )}
             </div>
 
             {/* LABEL */}
@@ -154,113 +399,79 @@ export default function SubCategories() {
               <label>Label</label>
               <div className="inputHolder">
                 <div className="holder">
-                  <input
-                    type="text"
-                    placeholder="Property Type"
-                    {...register("label", {
-                      required: "Label is required",
-                    })}
-                  />
+                  <input {...register("label", { required: true })} />
                 </div>
-                {errors.label && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.label.message}
-                  </span>
-                )}
               </div>
             </div>
 
-            {/* PLACEHOLDER */}
-            <div className="box forInput">
-              <label>Placeholder</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="text"
-                    placeholder="Select type"
-                    {...register("placeholder", {
-                      required: "Placeholder is required",
-                    })}
-                  />
-                </div>
-                {errors.placeholder && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.placeholder.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* UI TYPE (SelectOptions) */}
+            {/* TYPE */}
             <Controller
-              name="uiType"
+              name="type"
               control={control}
-              rules={{ required: "UI type is required" }}
+              rules={{ required: true }}
               render={({ field }) => (
                 <SelectOptions
                   label="UI Type"
-                  placeholder="Select the UI type"
                   options={["input", "select", "radio", "boolean"]}
                   value={field.value}
-                  error={errors.uiType?.message}
-                  onChange={(val) => field.onChange(val)}
+                  onChange={field.onChange}
                 />
               )}
             />
 
             {/* OPTIONS */}
-            {uiType && uiType !== "input" && (
+            {uiType !== "input" && (
               <div className="options">
-                <div className="top">
-                  Options{" "}
-                  <button
-                    type="button"
-                    className="edit-filter-btn"
-                    style={{position: "relative"}}
-                    onClick={() => append({ label: "", value: "" })}
-                  >
-                    <TiPlus/> Add Option
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="edit-filter-btn"
+                  onClick={() => append({ value: "", label: "" })}
+                >
+                  <TiPlus /> Add Option
+                </button>
 
                 {fields.map((field, index) => (
                   <div key={field.id} className="box forInput">
                     <div className="inputHolder">
-                      <div className="holder">
-                        <input
-                          placeholder="Label"
-                          {...register(`options.${index}.label`, {
-                            required: "Option label required",
-                          })}
-                        />
-                      </div>
-                      <div className="holder">
-                        <input
-                          placeholder="Value"
-                          {...register(`options.${index}.value`, {
-                            required: "Option value required",
-                          })}
-                        />
-                      </div>
-
-                      <IoIosClose
-                        className="close"
-                        onClick={() => remove(index)}
-                      />
+                      <input {...register(`options.${index}.label`)} />
+                      <input {...register(`options.${index}.value`)} />
+                      <IoIosClose onClick={() => remove(index)} />
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            <button className="main-button" type="submit">
-              Create Filter
-            </button>
+            <div className="buttons-holder">
+              {mode === "edit" && (
+                <button
+                  type="button"
+                  className="main-button danger"
+                  onClick={() => setMenuType("delete")}
+                >
+                  Delete
+                </button>
+              )}
+
+              <button className="main-button" disabled={loading}>
+                {loading ? <span className="loader" /> : "Save"}
+              </button>
+            </div>
           </form>
-        </div>
-      </div>
+        )}
+
+          </>
+        )}
+
+        {menuType === "delete" && (
+          <DeleteConfirm
+            message="This filter will be permanently deleted."
+            loading={loading}
+            onCancel={() => setMenuType("form")}
+            onConfirm={confirmDelete}
+          />
+        )}
+      </DynamicMenu>
     </div>
   );
 }

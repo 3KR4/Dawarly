@@ -26,6 +26,7 @@ import Tags from "@/components/Tools/data-collector/Tags";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import useRequireAuth from "@/Contexts/useRequireAuth";
+
 const RenderRentAvailability = ({
   t,
   rentAvailability,

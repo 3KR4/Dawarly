@@ -91,9 +91,3 @@
   cursor: pointer;
 }
 
-@media (min-width: 1200px) {
-  .dash-holder .cats-holder .cat-body h4 svg,
-  .dash-holder .cats-holder .cat-body ul li svg {
-    opacity: 0;
-  }
-}

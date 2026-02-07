@@ -44,6 +44,7 @@ const en = {
 
     choose_category: "Choose a category",
     choose_sub_category: "Choose a subcategory",
+    filter_form: "filter information",
     ad_basics: "Ad basics",
     ad_details: "Ad details",
     contact_information: "Contact information",
@@ -51,6 +52,9 @@ const en = {
       "Select the main category that best fits your ad.",
     choose_sub_category_description:
       "Choose a subcategory to better describe your ad.",
+    filter_form_description:
+      "fill the new filter data",
+      
     ad_basics_description: "Enter the essential information about your ad.",
     ad_details_description: "Add more details to make your ad more attractive.",
     contact_information_description: "Provide your preferred contact method.",

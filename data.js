@@ -264,35 +264,68 @@ export const govs = [
   "North Sinai",
   "Sohag",
 ];
+// export const categoriesEn = [
+//   { id: 1, name: "dawaarly_sale", icon: BiSolidStoreAlt },
+//   { id: 2, name: "dawaarly_rent", icon: BiSolidStoreAlt },
+//   { id: 3, name: "properties_sale", icon: BiSolidStoreAlt },
+//   { id: 4, name: "properties_rent", icon: FaHandshake },
+//   { id: 3, name: "Vehicles", icon: FaCar },
+//   { id: 5, name: "Mobiles & Tablets", icon: FaMobileScreenButton },
+//   { id: 6, name: "Electronics", icon: SiApplearcade },
+//   { id: 7, name: "Home & Office", icon: FaHome },
+//   { id: 8, name: "Fashion", icon: FaTshirt },
+//   { id: 9, name: "Jobs", icon: FaBriefcase },
+//   { id: 10, name: "Services", icon: FaTools },
+//   { id: 11, name: "Pets", icon: FaDog },
+//   { id: 12, name: "Kids & Babies", icon: FaBabyCarriage },
+//   { id: 13, name: "Sports & Hobbies", icon: FaFootballBall },
+//   { id: 14, name: "Business & Industrial", icon: FaIndustry },
+// ];
+// export const categoriesAr = [
+//   { id: 1, name: "dawaarly_sale", icon: BiSolidStoreAlt },
+//   { id: 2, name: "dawaarly_rent", icon: BiSolidStoreAlt },
+//   { id: 3, name: "properties_sale", icon: BiSolidStoreAlt },
+//   { id: 4, name: "properties_rent", icon: FaHandshake },
+//   { id: 2, name: "عقارات للإيجار", icon: BiSolidStoreAlt },
+//   { id: 3, name: "عقارات للبيع", icon: BiSolidStoreAlt },
+//   { id: 4, name: "عقارات للإيجار", icon: FaHandshake },
+//   { id: 3, name: "مركبات", icon: FaCar },
+//   { id: 5, name: "هواتف وأجهزة لوحية", icon: FaMobileScreenButton },
+//   { id: 6, name: "إلكترونيات", icon: SiApplearcade },
+//   { id: 7, name: "المنزل والمكتب", icon: FaHome },
+//   { id: 8, name: "أزياء", icon: FaTshirt },
+//   { id: 9, name: "وظائف", icon: FaBriefcase },
+//   { id: 10, name: "خدمات", icon: FaTools },
+//   { id: 11, name: "حيوانات أليفة", icon: FaDog },
+//   { id: 12, name: "أطفال ورضع", icon: FaBabyCarriage },
+//   { id: 13, name: "رياضة وهوايات", icon: FaFootballBall },
+//   { id: 14, name: "أعمال وصناعة", icon: FaIndustry },
+// ];
+
 export const categoriesEn = [
-  { id: 1, name: "Properties for Sale", icon: BiSolidStoreAlt },
-  { id: 2, name: "Properties for Rent", icon: FaHandshake },
-  { id: 3, name: "Vehicles", icon: FaCar },
-  { id: 5, name: "Mobiles & Tablets", icon: FaMobileScreenButton },
-  { id: 6, name: "Electronics", icon: SiApplearcade },
-  { id: 7, name: "Home & Office", icon: FaHome },
-  { id: 8, name: "Fashion", icon: FaTshirt },
-  { id: 9, name: "Jobs", icon: FaBriefcase },
-  { id: 10, name: "Services", icon: FaTools },
-  { id: 11, name: "Pets", icon: FaDog },
-  { id: 12, name: "Kids & Babies", icon: FaBabyCarriage },
-  { id: 13, name: "Sports & Hobbies", icon: FaFootballBall },
-  { id: 14, name: "Business & Industrial", icon: FaIndustry },
+  {
+    id: "dawaarly_sale",
+    name: "Dawaarly Deals – Sale",
+    icon: BiSolidStoreAlt,
+  },
+  { id: "dawaarly_rent", name: "Dawaarly Deals – Rent", icon: FaHandshake },
+  {
+    id: "properties_sale",
+    name: "Properties for Sale",
+    icon: BiSolidStoreAlt,
+  },
+  {
+    id: "properties_rent",
+    name: "Properties for Rent",
+    icon: BiSolidStoreAlt,
+  },
 ];
+
 export const categoriesAr = [
-  { id: 1, name: "عقارات للبيع", icon: BiSolidStoreAlt },
-  { id: 2, name: "عقارات للإيجار", icon: FaHandshake },
-  { id: 3, name: "مركبات", icon: FaCar },
-  { id: 5, name: "هواتف وأجهزة لوحية", icon: FaMobileScreenButton },
-  { id: 6, name: "إلكترونيات", icon: SiApplearcade },
-  { id: 7, name: "المنزل والمكتب", icon: FaHome },
-  { id: 8, name: "أزياء", icon: FaTshirt },
-  { id: 9, name: "وظائف", icon: FaBriefcase },
-  { id: 10, name: "خدمات", icon: FaTools },
-  { id: 11, name: "حيوانات أليفة", icon: FaDog },
-  { id: 12, name: "أطفال ورضع", icon: FaBabyCarriage },
-  { id: 13, name: "رياضة وهوايات", icon: FaFootballBall },
-  { id: 14, name: "أعمال وصناعة", icon: FaIndustry },
+  { id: "dawaarly_sale", name: "عروض دوارلي – بيع", icon: BiSolidStoreAlt },
+  { id: "dawaarly_rent", name: "عروض دوارلي – إيجار", icon: FaHandshake },
+  { id: "properties_sale", name: "عقارات للبيع", icon: BiSolidStoreAlt },
+  { id: "properties_rent", name: "عقارات للإيجار", icon: BiSolidStoreAlt },
 ];
 export const subcategoriesEn = [
   // Properties (categoryId 1,2 → category 0,1 في النظام)
@@ -661,7 +694,6 @@ export const ads = [
       phone: true,
     },
     isEditable: false,
-
   },
   {
     id: 102,
@@ -1856,6 +1888,12 @@ export const dashboardRoutes = {
       ar: "المستخدمين",
     },
     canCreate: true,
+  },
+  subcategories: {
+    label: {
+      en: "subcategories",
+      ar: "التصنيفات الفرعية",
+    },
   },
   filters: {
     label: {
