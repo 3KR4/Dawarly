@@ -96,56 +96,7 @@ body:has(.form-holder) footer {
 .form-holder form .top svg:hover {
   background: var(--hover-color);
 }
-.form-holder form .steps-holder {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
 
-.form-holder form .steps-holder .step-wrapper {
-  display: flex;
-  align-items: center;
-  flex: 1; /* 👈 كل خطوة تاخد نفس العرض */
-}
-.form-holder form .steps-holder .step-wrapper:last-child {
-  flex: 0;
-}
-.form-holder form .steps-holder .step {
-  color: var(--paragraph-2);
-  border: 1px solid var(--border-color);
-  z-index: 2;
-  background: #fff;
-  border-radius: 50%;
-  justify-content: center;
-  align-items: center;
-  width: 33px;
-  height: 33px;
-  display: flex;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.form-holder form .steps-holder .step.current {
-  background: var(--hover-color);
-  border-color: var(--main-color);
-}
-
-.form-holder form .steps-holder .step.done {
-  background: var(--main-color);
-  color: #fff;
-  border-color: var(--main-color);
-}
-
-/* الخط الواصل */
-.form-holder form .steps-holder .bar {
-  flex: 1; /* 👈 يملأ المسافة */
-  height: 3px;
-  background: var(--border-color);
-  border-radius: 5px;
-}
-.form-holder form .steps-holder .step-wrapper:has(.step.done) .bar {
-  background: var(--main-color);
-}
 .form-holder form .rowHolder {
   display: grid;
   gap: 10px;

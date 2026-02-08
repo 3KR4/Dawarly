@@ -4,6 +4,16 @@
   grid-template-columns: repeat(auto-fill, minmax(425px, 1fr));
   gap: 10px;
 }
+.dash-holder .filters-holder .sub-category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  height: fit-content;
+  border-radius: 14px;
+  background: var(--section-color);
+}
 .dashboard:has(.filters-holder) form {
   margin: 0;
   gap: 10px;
@@ -18,6 +28,7 @@
   border-radius: 12px;
   gap: 7px;
   position: relative;
+  background: var(--body-color);
 }
 .dash-holder .filters-holder .filter-body > svg {
   color: var(--main-color);
@@ -35,23 +46,23 @@
 .dash-holder .filters-holder .filter-body .row {
   align-items: center;
   gap: 7px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
 }
 .dash-holder .filters-holder .filter-body li {
-  justify-content: space-between;
+  background: var(--hover-color);
+  text-align: center;
+  border-radius: 8px;
+  justify-content: center;
   align-items: center;
   gap: 5px;
-  display: flex;
-  background: var(--hover-color);
   padding: 8px 10px;
-  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  width: 100%;
-  text-align: center;
-  justify-content: center;
+  display: flex;
+  min-width: 49%;
+  flex: 1;
 }
 
 .dash-holder .filters-holder .filter-body li span {
@@ -60,22 +71,21 @@
   gap: 3px;
 }
 .dash-holder .edit-filter-btn {
-  display: flex;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: var(--hover-color);
-  border-radius: 8px;
-  padding: 0px 10px;
-  color: var(--paragraph);
-  font-weight: 600;
-  text-transform: capitalize;
-  font-size: 14px;
-  transition: 0.3s;
-  cursor: pointer;
+    color: var(--paragraph);
+    text-transform: capitalize;
+    cursor: pointer;
+    border-radius: 8px;
+    align-items: center;
+    gap: 3px;
+    padding: 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .3s;
+    display: flex;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    height: 22px;
 }
 .dash-holder .edit-filter-btn:hover {
   color: white;
@@ -90,8 +100,60 @@
 .dash-holder .edit-filter-btn:hover svg {
   color: white;
 }
-@media (min-width: 1200px) {
-  .dash-holder .filters-holder .filter-body .edit-filter-btn {
-    opacity: 0;
-  }
+
+.dash-holder.for-filters .dynamic-menu .steps-holder {
+  align-items: center;
+  width: 80%;
+  display: flex;
+  margin: 12px auto;
+}
+.dash-holder.for-filters .dynamic-menu .options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.dynamic-menu .form-holder {
+  margin: 0;
+}
+.dynamic-menu .options {
+  flex-direction: column;
+  gap: 7px;
+  display: flex;
+  overflow: auto;
+  max-height: 277px;
+}
+.dynamic-menu .options .top-holder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+.dynamic-menu .options .top-holder .main-button {
+  border-radius: 9px;
+  align-items: center;
+  gap: 2px;
+  padding: 9px;
+  font-size: 12px;
+  display: flex;
+}
+
+.dynamic-menu .options .box.forInput .inputHolder .holder {
+  flex: 1;
+}
+.dynamic-menu .options .inputHolder svg {
+  border-radius: 10px;
+  width: 35px;
+  height: 35px;
+  padding: 3px;
+  top: unset !important;
+  right: unset !important;
+  position: relative !important;
+  border: 1px solid var(--input-border-color);
+}
+.dynamic-menu .options svg:hover {
+  border-color: var(--red-color);
+}
+.dynamic-menu:has(.options) .lang-switch {
+  margin: 0;
 }

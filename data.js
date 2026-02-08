@@ -317,7 +317,7 @@ export const categoriesEn = [
   {
     id: "properties_rent",
     name: "Properties for Rent",
-    icon: BiSolidStoreAlt,
+    icon: FaHandshake,
   },
 ];
 
@@ -325,7 +325,7 @@ export const categoriesAr = [
   { id: "dawaarly_sale", name: "عروض دوارلي – بيع", icon: BiSolidStoreAlt },
   { id: "dawaarly_rent", name: "عروض دوارلي – إيجار", icon: FaHandshake },
   { id: "properties_sale", name: "عقارات للبيع", icon: BiSolidStoreAlt },
-  { id: "properties_rent", name: "عقارات للإيجار", icon: BiSolidStoreAlt },
+  { id: "properties_rent", name: "عقارات للإيجار", icon: FaHandshake },
 ];
 export const subcategoriesEn = [
   // Properties (categoryId 1,2 → category 0,1 في النظام)

@@ -32,4 +32,21 @@ export const ENDPOINTS = {
       `/subCategory/filter/options/translations/${id}`,
     DELETE_OPTION: (id) => `/subCategory/filter/options/${id}`,
   },
+
+  ADS: {
+    GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
+    GET_ONE_AD: (cat, id) => `/${cat}/${id}`,
+    CREATE: (cat, subId) => `/${cat}/subCategory/${subId}`,
+    UPDATE: (cat, id) => `/${cat}/${id}`,
+    DELETE: (cat, id) => `/${cat}/${id}`,
+  },
+
+  BOOKING: {
+    CREATE: (id) => `/Booking/create/Properties/${id}`,
+    GET_BY_PROPERTIES: (id) => `/Booking/Properties/${id}`,
+    GET_BY_USER: (id) => `/Booking/user/${id}`,
+    UPDATE_STATUS: (id) => `/Booking/${id}`,
+    UPDATE_DATES: (userId, adId) => `/Booking/${userId}/Properties/${adId}`,
+    CANCEL: (id) => `/Booking/${id}/Cancel`,
+  },
 };

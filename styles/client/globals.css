@@ -135,7 +135,6 @@ svg {
 }
 button:hover .loader {
   border-color: white;
-  
 }
 @keyframes rotation {
   0% {
@@ -157,7 +156,7 @@ svg.close {
 }
 svg.close:hover {
   background: var(--red-color);
-  color: white;
+  color: white !important;
 }
 p,
 pre {
@@ -839,7 +838,56 @@ svg.main-ico {
   justify-content: center;
   align-items: center;
 }
+.steps-holder {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
 
+.steps-holder .step-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1; /* 👈 كل خطوة تاخد نفس العرض */
+}
+.steps-holder .step-wrapper:last-child {
+  flex: 0;
+}
+.steps-holder .step {
+  color: var(--paragraph-2);
+  border: 1px solid var(--border-color);
+  z-index: 2;
+  background: #fff;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 33px;
+  height: 33px;
+  display: flex;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.steps-holder .step.current {
+  background: var(--hover-color);
+  border-color: var(--main-color);
+}
+
+.steps-holder .step.done {
+  background: var(--main-color);
+  color: #fff;
+  border-color: var(--main-color);
+}
+
+/* الخط الواصل */
+.steps-holder .bar {
+  flex: 1; /* 👈 يملأ المسافة */
+  height: 3px;
+  background: var(--border-color);
+  border-radius: 5px;
+}
+.steps-holder .step-wrapper:has(.step.done) .bar {
+  background: var(--main-color);
+}
 
 .dynamic-menu {
   position: fixed;
@@ -868,6 +916,15 @@ svg.main-ico {
   align-items: center;
   margin-bottom: 7px;
 }
+.dynamic-menu .holder:has(p.descriptions) .top {
+  margin-bottom: 2px;
+}
+.dash-holder.for-filters
+  .dynamic-menu
+  .holder:has(p.descriptions)
+  .steps-holder {
+  margin: 15px auto;
+}
 .dynamic-menu .top h4 {
   font-size: 19px;
 }
@@ -875,10 +932,11 @@ svg.main-ico {
   top: unset;
   right: unset;
   left: unset;
-  padding: 0;
   width: 30px;
   height: 30px;
+  padding: 0;
   position: relative;
+  color: var(--paragraph);
 }
 .dynamic-menu form {
   margin: 0 !important;
@@ -963,7 +1021,6 @@ svg.main-ico {
   width: 17px;
   height: 17px;
 }
-
 
 @media (max-width: 1300px) {
   .hero-image-holder .details h3 {

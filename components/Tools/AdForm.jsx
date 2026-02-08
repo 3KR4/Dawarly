@@ -28,6 +28,8 @@ import { FiUsers } from "react-icons/fi";
 import { LuUserCog } from "react-icons/lu";
 import Tags from "@/components/Tools/data-collector/Tags";
 
+import { crateAd } from "@/services/ads/ads.service";
+
 export default function AdForm({ type = "client", adId }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
@@ -71,6 +73,7 @@ export default function AdForm({ type = "client", adId }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [localeDataLoaded, setLocaleDataLoaded] = useState(false);
   const [isEditable, setIsEditable] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [rentAvailability, setRentAvailability] = useState({
     from: "",
     to: "",
@@ -309,12 +312,12 @@ export default function AdForm({ type = "client", adId }) {
     const hasSelectedContact = Object.values(selectedContactMethods).some(
       (v) => v === true,
     );
-    if (!hasSelectedContact) {
-      newErrors.contact =
-        t.ad.contact_method_required ||
-        "Please select at least one contact method";
-      hasErrors = true;
-    }
+    // if (!hasSelectedContact) {
+    //   newErrors.contact =
+    //     t.ad.contact_method_required ||
+    //     "Please select at least one contact method";
+    //   hasErrors = true;
+    // }
 
     // التحقق من الحقول الديناميكية الإلزامية
     dynamicFilters.forEach((field) => {
@@ -373,6 +376,8 @@ export default function AdForm({ type = "client", adId }) {
 
     if (hasErrors) {
       setFieldErrors(newErrors);
+      console.log("newErrors", newErrors);
+
       window.scrollTo({ top: 0, behavior: "smooth" });
       return false;
     }
@@ -393,28 +398,25 @@ export default function AdForm({ type = "client", adId }) {
       title: data.adTitle,
       price: data.price,
       description: data.description || "",
-      categoryId: selectedCategory,
-      subCategoryId: selectedSubCategory,
-      images: images,
-      additionalDetail: dynamicValues,
-      location: {
-        governorate: selectedGovernorate,
-        city: selectedCity,
-      },
-      contactMethods: selectedContactMethods,
-      adminId: selectedAdmin?.id,
-      mediatorMethod: selectedMediatorMethod,
+      // categoryId: selectedCategory,
+      // subCategoryId: selectedSubCategory,
+      // images: images,
+      attributes: dynamicValues,
+      location: selectedGovernorate?.name,
+      // contactMethods: selectedContactMethods,
+      // adminId: selectedAdmin?.id,
+      // mediatorMethod: selectedMediatorMethod,
     };
-    if (selectedCategory?.id === 2) {
-      finalData.rentAvailability = {
-        from: rentAvailability.from,
-        to: rentAvailability.to,
-      };
-      finalData.minimumRentalDuration = {
-        value: Number(minRentalDuration.value),
-        unit: minRentalDuration?.unit?.id, // day | week | month
-      };
-    }
+    // if (selectedCategory?.id === 2) {
+    //   finalData.rentAvailability = {
+    //     from: rentAvailability.from,
+    //     to: rentAvailability.to,
+    //   };
+    //   finalData.minimumRentalDuration = {
+    //     value: Number(minRentalDuration.value),
+    //     unit: minRentalDuration?.unit?.id, // day | week | month
+    //   };
+    // }
     // إذا كان تعديلاً، أضف الـ ID
     if (adId) {
       finalData.id = adId;
@@ -424,26 +426,45 @@ export default function AdForm({ type = "client", adId }) {
 
     if (adId) {
       // تحديث الإعلان
-      alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
-      // try {
-      //   const response = await putService.updateAd(adId, finalData);
-      //   console.log("Ad updated successfully:", response);
-      //   alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
-      // } catch (error) {
-      //   console.error("Error updating ad:", error);
-      //   alert(t.ad.update_error || "حدث خطأ أثناء تحديث الإعلان");
-      // }
+      updateAd("rent", adId, finalData)
+        .then((res) => {
+          console.log("UPDATE RESPONSE 👉", res.data);
+
+          alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
+        })
+        .catch((err) => {
+          console.error("UPDATE ERROR ❌", err);
+          alert(
+            err?.response?.data?.message ||
+              (locale === "ar" ? "حصل خطأ أثناء التحديث" : "Update failed"),
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } else {
       // إنشاء إعلان جديد
-      alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
-      // try {
-      //   const response = await postService.createAd(finalData);
-      //   console.log("Ad created successfully:", response);
-      //   alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
-      // } catch (error) {
-      //   console.error("Error creating ad:", error);
-      //   alert(t.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
-      // }
+      setLoading(true);
+
+      crateAd("rent", "336263ae-d02c-4b6b-957d-67fb038be013", finalData)
+        .then((res) => {
+          console.log("CREATE RESPONSE 👉", res.data);
+
+          alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
+        })
+        .catch((err) => {
+          console.error("CREATE ERROR ❌", err);
+
+          alert(
+            err?.response?.data?.message ||
+              (locale === "ar"
+                ? "حصل خطأ أثناء إنشاء الإعلان"
+                : "Create failed"),
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
 
@@ -699,56 +720,107 @@ export default function AdForm({ type = "client", adId }) {
   };
   const RenderRentAvailability = () => {
     return (
-      <div className="form-section">
-        <h2 className="section-title">{t.ad.rental_period}</h2>
+      <>
+        <div className="form-section">
+          <h2 className="section-title">{t.ad.rental_period}</h2>
 
-        <div className="row-holder for-dates">
-          {/* From */}
-          <div className="box forInput">
-            <label>
-              {t.ad.from} <span className="required">*</span>
-            </label>
-            <div className="inputHolder">
-              <div className="holder">
-                <input
-                  type="date"
-                  value={rentAvailability.from}
-                  disabled={!isEditable}
-                  onChange={(e) =>
-                    setRentAvailability((prev) => ({
-                      ...prev,
-                      from: e.target.value,
-                    }))
-                  }
-                />
+          <div className="row-holder for-dates">
+            {/* From */}
+            <div className="box forInput">
+              <label>
+                {t.ad.from} <span className="required">*</span>
+              </label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="date"
+                    value={rentAvailability.from}
+                    disabled={!isEditable}
+                    onChange={(e) =>
+                      setRentAvailability((prev) => ({
+                        ...prev,
+                        from: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* To */}
-          <div className="box forInput">
-            <label>
-              {t.ad.to} <span className="required">*</span>
-            </label>
-            <div className="inputHolder">
-              <div className="holder">
-                <input
-                  type="date"
-                  value={rentAvailability.to}
-                  min={rentAvailability.from}
-                  disabled={!isEditable}
-                  onChange={(e) =>
-                    setRentAvailability((prev) => ({
-                      ...prev,
-                      to: e.target.value,
-                    }))
-                  }
-                />
+            {/* To */}
+            <div className="box forInput right">
+              <label>
+                {t.ad.to} <span className="required">*</span>
+              </label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="date"
+                    value={rentAvailability.to}
+                    min={rentAvailability.from}
+                    disabled={!isEditable}
+                    onChange={(e) =>
+                      setRentAvailability((prev) => ({
+                        ...prev,
+                        to: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+        <div className="form-section">
+          <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
+
+          <div className="row-holder for-dates">
+            {/* الرقم */}
+            <div className="box forInput right">
+              <label>
+                {t.ad.durationValue} <span className="required">*</span>
+              </label>
+
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="number"
+                    min={1}
+                    disabled={!isEditable}
+                    value={minRentalDuration.value}
+                    onChange={(e) =>
+                      setMinRentalDuration((prev) => ({
+                        ...prev,
+                        value: e.target.value,
+                      }))
+                    }
+                    placeholder={t.ad.durationValuePlaceholder}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* الوحدة باستخدام SelectOptions */}
+            <SelectOptions
+              label={t.ad.durationUnit}
+              placeholder={t.ad.select}
+              options={RENT_DURATION_UNITS}
+              value={minRentalDuration.unit}
+              tPath="ad" // 👈 مهم
+              required={true}
+              locale={locale}
+              disabled={!isEditable}
+              t={t}
+              onChange={(item) =>
+                setMinRentalDuration((prev) => ({
+                  ...prev,
+                  unit: item,
+                }))
+              }
+            />
+          </div>
+        </div>
+      </>
     );
   };
 
@@ -878,60 +950,11 @@ export default function AdForm({ type = "client", adId }) {
                   </div>
                 </div>
               </div>
-              {selectedCategory?.id == 2 && <RenderRentAvailability />}
-              {selectedCategory?.id == 2 && (
-                <div className="form-section">
-                  <h2 className="section-title">
-                    {t.ad.minimumRentalDuration}
-                  </h2>
-
-                  <div className="row-holder for-dates">
-                    {/* الرقم */}
-                    <div className="box forInput">
-                      <label>
-                        {t.ad.durationValue} <span className="required">*</span>
-                      </label>
-
-                      <div className="inputHolder">
-                        <div className="holder">
-                          <input
-                            type="number"
-                            min={1}
-                            disabled={!isEditable}
-                            value={minRentalDuration.value}
-                            onChange={(e) =>
-                              setMinRentalDuration((prev) => ({
-                                ...prev,
-                                value: e.target.value,
-                              }))
-                            }
-                            placeholder={t.ad.durationValuePlaceholder}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* الوحدة باستخدام SelectOptions */}
-                    <SelectOptions
-                      label={t.ad.durationUnit}
-                      placeholder={t.ad.select}
-                      options={RENT_DURATION_UNITS}
-                      value={minRentalDuration.unit}
-                      tPath="ad" // 👈 مهم
-                      required={true}
-                      locale={locale}
-                      disabled={!isEditable}
-                      t={t}
-                      onChange={(item) =>
-                        setMinRentalDuration((prev) => ({
-                          ...prev,
-                          unit: item,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-              )}
+              {type == "client" &&
+                (selectedCategory?.id == `dawaarly_rent` ||
+                  selectedCategory?.id == `properties_rent`) && (
+                  <RenderRentAvailability />
+                )}
             </div>
             <div className="right">
               <Images
@@ -1067,6 +1090,11 @@ export default function AdForm({ type = "client", adId }) {
             </div>
           )}
         </div>
+        {type == "admin" &&
+          (selectedCategory?.id == `dawaarly_rent` ||
+            selectedCategory?.id == `properties_rent`) && (
+            <RenderRentAvailability />
+          )}
         <Tags disabled={!isEditable} />
         {/* === الحقول الديناميكية === */}
         {selectedSubCategory && dynamicFilters.length > 0 && (
