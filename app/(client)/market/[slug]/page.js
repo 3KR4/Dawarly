@@ -7,7 +7,6 @@ import Link from "next/link";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaCircleCheck } from "react-icons/fa6";
 import Rating from "@mui/material/Rating";
-import { getService } from "@/services/api/getService";
 import Navigations from "@/components/Tools/Navigations";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { TbBrandWhatsappFilled } from "react-icons/tb";
