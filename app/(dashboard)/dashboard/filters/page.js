@@ -29,6 +29,7 @@ import {
   updateOption,
   updateOptionLang,
   deleteOption,
+  getFilterOptions,
 } from "@/services/filters/filters.service";
 import { getAllSubCats } from "@/services/subCategories/subCats.service";
 import { FaBarsStaggered } from "react-icons/fa6";
@@ -38,7 +39,7 @@ import "@/styles/dashboard/forms.css";
 import "@/styles/dashboard/pages/filters.css";
 
 export default function FiltersPage() {
-  const { locale } = useContext(settings);
+  const { locale, setOnCreate } = useContext(settings);
   const t = useTranslate();
 
   const [filters, setFilters] = useState({});
@@ -111,6 +112,12 @@ export default function FiltersPage() {
       .catch(console.error);
   }, [locale]);
 
+  useEffect(() => {
+    setOnCreate(() => openCreate);
+
+    return () => setOnCreate(null); // cleanup مهم
+  }, []);
+
   const openCreate = () => {
     setMode("create");
     setMenuType("form");
@@ -127,44 +134,75 @@ export default function FiltersPage() {
     });
   };
 
-  const openEdit = (filter) => {
+  const openEdit = async (filter) => {
     setMode("edit");
     setMenuType("form");
-    setEditingFilter(filter);
     setStep(STEPS.FORM);
+    setEditingFilter(filter);
 
-    getOneFilter(filter.id, locale).then((res) => {
-      const data = res.data.data;
+    try {
+      /* ===== 1. GET FILTER ===== */
+      const filterRes = await getOneFilter(filter.id);
+      const data = filterRes.data.data;
+      console.log("data", data);
 
-      // Build translations object for label
+      /* ===== 2. BUILD LABEL TRANSLATIONS ===== */
       const labelTranslations = { en: "", ar: "" };
-      data.translations?.forEach((t) => (labelTranslations[t.lang] = t.label));
+      data.translations?.forEach((t) => {
+        labelTranslations[t.lang] = t.label;
+      });
+      console.log("labelTranslations", labelTranslations);
 
-      const optionsWithTranslations = data.options?.map((o) => {
-        const trans = { en: "", ar: "" };
-        o.translations?.forEach((t) => (trans[t.lang] = t.label));
-        return {
-          id: o.id,
-          value: o.value,
-          translations: trans,
+      /* ===== 3. GET OPTIONS (EN & AR) ===== */
+      const [optionsEn, optionsAr] = await Promise.all([
+        getFilterOptions(filter.id, "en"),
+        getFilterOptions(filter.id, "ar"),
+      ]);
+
+      /* ===== 4. MERGE OPTIONS ===== */
+      const optionsMap = {};
+
+      optionsEn.data.data.forEach((opt) => {
+        optionsMap[opt.id] = {
+          id: opt.id,
+          value: opt.value,
+          translations: { en: opt.label, ar: "" },
         };
       });
 
+      optionsAr.data.data.forEach((opt) => {
+        if (!optionsMap[opt.id]) {
+          optionsMap[opt.id] = {
+            id: opt.id,
+            value: opt.value,
+            translations: { en: "", ar: opt.label },
+          };
+        } else {
+          optionsMap[opt.id].translations.ar = opt.label;
+        }
+      });
+
+      const mergedOptions = Object.values(optionsMap);
+
+      console.log("mergedOptions", mergedOptions);
+
+      /* ===== 5. RESET FORM ===== */
       reset({
         key: data.key,
-        type: data.type,
+        type: { value: data.type, label: data.type },
         label: labelTranslations,
         required: data.required,
         filterable: data.filterable,
-        options: optionsWithTranslations || [
-          { value: "", translations: { en: "", ar: "" } },
-        ],
+        options:
+          mergedOptions.length > 0
+            ? mergedOptions
+            : [{ value: "", translations: { en: "", ar: "" } }],
       });
 
       setOriginalData(data);
-      setCategory(data.subCategoryId);
-      setSubCategory(data.subCategoryId);
-    });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const closeMenu = () => {
@@ -299,9 +337,6 @@ export default function FiltersPage() {
   return (
     <div className="dash-holder for-filters">
       <div className="body">
-        <button className="main-button" onClick={openCreate}>
-          <TiPlus /> Create Filter
-        </button>
         <div className="filters-holder">
           {Object.entries(filters).map(([subCat, filtersList]) => (
             <div key={subCat} className="sub-category-group">
@@ -309,9 +344,18 @@ export default function FiltersPage() {
               {filtersList.map((filt) => {
                 const Icon = specsConfig[filt.key]?.icon;
                 return (
-                  <div key={filt.id} className="filter-body">
+                  <div key={filt.key} className="filter-body">
                     {Icon && <Icon />}
-                    <h4>{filt.label}</h4>
+                    <div className="top-data">
+                      <h4>{filt.label}</h4>
+                      <div
+                        className="edit-filter-btn"
+                        onClick={() => openEdit(filt)}
+                      >
+                        <MdEdit /> Edit
+                      </div>
+                    </div>
+
                     <div className="row">
                       <li>
                         required:{" "}
@@ -335,12 +379,6 @@ export default function FiltersPage() {
                         </span>
                       </li>
                     </div>
-                    <div
-                      className="edit-filter-btn"
-                      onClick={() => openEdit(filt)}
-                    >
-                      <MdEdit /> Edit
-                    </div>
                   </div>
                 );
               })}
@@ -360,23 +398,25 @@ export default function FiltersPage() {
         {menuType === "form" && (
           <>
             {/* Steps Holder */}
-            <div className="steps-holder">
-              {Object.values(STEPS).map((s, i, arr) => (
-                <div key={s} className="step-wrapper">
-                  <div
-                    className={`step ${step > s ? "done" : ""} ${
-                      step === s ? "current" : ""
-                    }`}
-                  >
-                    {s}
+            {mode !== "edit" && (
+              <div className="steps-holder">
+                {Object.values(STEPS).map((s, i, arr) => (
+                  <div key={s} className="step-wrapper">
+                    <div
+                      className={`step ${step > s ? "done" : ""} ${
+                        step === s ? "current" : ""
+                      }`}
+                    >
+                      {s}
+                    </div>
+                    {i !== arr.length - 1 && <span className="bar"></span>}
                   </div>
-                  {i !== arr.length - 1 && <span className="bar"></span>}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Step 1: Categories */}
-            {step === STEPS.CATEGORIES && (
+            {mode !== "edit" && step === STEPS.CATEGORIES && (
               <div className="options-grid">
                 {categories.map((cat) => (
                   <CatCard
@@ -395,7 +435,7 @@ export default function FiltersPage() {
             )}
 
             {/* Step 2: Sub Categories */}
-            {step === STEPS.SUB_CATEGORIES && (
+            {mode !== "edit" && step === STEPS.SUB_CATEGORIES && (
               <div className="options-grid">
                 {subCategories
                   .filter((x) => x.categoryName === category)

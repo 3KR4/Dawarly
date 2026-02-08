@@ -11,7 +11,7 @@ import { IoMenu, IoLanguage } from "react-icons/io5";
 import { dashboardRoutes } from "@/data";
 
 function Head() {
-  const { pathname, searchParams, screenSize, locale, setIsNavOpen } =
+  const { pathname, searchParams, screenSize, locale, setIsNavOpen, onCreate } =
     useContext(settings);
 
   const breadcrumbItems = getDashboardBreadcrumb(
@@ -22,7 +22,6 @@ function Head() {
 
   const mainKey = breadcrumbItems[0]?.key;
   const canCreate = dashboardRoutes[mainKey]?.canCreate;
-  console.log(breadcrumbItems);
 
   return (
     <div className="head">
@@ -45,9 +44,24 @@ function Head() {
 
       {!pathname.includes("/form") && canCreate && (
         <div className="right">
-          <Link href={`/dashboard/${mainKey}/form`} className="main-button">
-            {locale === "ar" ? "إضافة" : "Create"} {breadcrumbItems[0]?.name}
-          </Link>
+          {!pathname.includes("/form") && canCreate && (
+            <div className="right">
+              {onCreate ? (
+                <button className="main-button" onClick={onCreate}>
+                  {locale === "ar" ? "إضافة" : "Create"}{" "}
+                  {breadcrumbItems[0]?.name}
+                </button>
+              ) : (
+                <Link
+                  href={`/dashboard/${mainKey}/form`}
+                  className="main-button"
+                >
+                  {locale === "ar" ? "إضافة" : "Create"}{" "}
+                  {breadcrumbItems[0]?.name}
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

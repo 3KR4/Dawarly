@@ -25,14 +25,13 @@ export const ENDPOINTS = {
     DELETE_FILTER: (id) => `/subCategory/filter/${id}/`,
     //options
     GET_OPTIONS: (id, lang) =>
-      `/subCategory/filter/?${id}/options?lang=${lang}`,
+      `/subCategory/filter/${id}/options?lang=${lang}`,
     CREATE_OPTION: (id) => `/subCategory/filter/${id}/options`,
     UPDATE_OPTION: (id) => `/subCategory/filter/options/${id}`,
     UPDATE_OPTION_LANG: (id) =>
       `/subCategory/filter/options/translations/${id}`,
     DELETE_OPTION: (id) => `/subCategory/filter/options/${id}`,
   },
-
   ADS: {
     GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
     GET_ONE_AD: (cat, id) => `/${cat}/${id}`,
@@ -40,7 +39,6 @@ export const ENDPOINTS = {
     UPDATE: (cat, id) => `/${cat}/${id}`,
     DELETE: (cat, id) => `/${cat}/${id}`,
   },
-
   BOOKING: {
     CREATE: (id) => `/Booking/create/Properties/${id}`,
     GET_BY_PROPERTIES: (id) => `/Booking/Properties/${id}`,

@@ -21,7 +21,6 @@
 .dash-holder .filters-holder .filter-body {
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   display: flex;
   padding: 15px;
   border: 1px solid var(--border-color);
@@ -29,6 +28,11 @@
   gap: 7px;
   position: relative;
   background: var(--body-color);
+}
+.dash-holder .filters-holder .filter-body .top-data {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .dash-holder .filters-holder .filter-body > svg {
   color: var(--main-color);
@@ -40,7 +44,7 @@
   padding: 10px;
 }
 .dash-holder .filters-holder .filter-body h4 {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 4px;
 }
 .dash-holder .filters-holder .filter-body .row {
@@ -51,18 +55,19 @@
   flex-wrap: wrap;
 }
 .dash-holder .filters-holder .filter-body li {
-  background: var(--hover-color);
+  background: var(--section-color);
   text-align: center;
   border-radius: 8px;
+  flex: 1;
   justify-content: center;
   align-items: center;
   gap: 5px;
+  min-width: 49%;
   padding: 8px 10px;
   font-size: 13px;
   font-weight: 600;
   display: flex;
-  min-width: 49%;
-  flex: 1;
+  border: 1px solid var(--input-border-color);
 }
 
 .dash-holder .filters-holder .filter-body li span {
@@ -71,21 +76,18 @@
   gap: 3px;
 }
 .dash-holder .edit-filter-btn {
-    color: var(--paragraph);
-    text-transform: capitalize;
-    cursor: pointer;
-    border-radius: 8px;
-    align-items: center;
-    gap: 3px;
-    padding: 0 10px;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all .3s;
-    display: flex;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    height: 22px;
+  color: var(--paragraph);
+  text-transform: capitalize;
+  cursor: pointer;
+  border-radius: 8px;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: flex;
+  height: 22px;
 }
 .dash-holder .edit-filter-btn:hover {
   color: white;

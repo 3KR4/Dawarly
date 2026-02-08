@@ -6,7 +6,7 @@ import { ENDPOINTS } from "../endpoints";
 export const getAllFilter = (lang) => {
   return api.get(ENDPOINTS.FILTERS.GET_ALL_FILTERS(lang));
 };
-export const getOneFilter = (id, lang) => {
+export const getOneFilter = (id) => {
   return api.get(ENDPOINTS.FILTERS.GET_ONE_FILTER(id));
 };
 export const getSubFilters = (id, lang) => {

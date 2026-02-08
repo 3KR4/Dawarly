@@ -919,6 +919,12 @@ svg.main-ico {
 .dynamic-menu .holder:has(p.descriptions) .top {
   margin-bottom: 2px;
 }
+.dynamic-menu .holder:not(:has(.steps-holder)) p.descriptions {
+  margin-bottom: 13px;
+}
+.dynamic-menu .holder:not(:has(.steps-holder)) .arrow {
+  visibility: hidden !important;
+}
 .dash-holder.for-filters
   .dynamic-menu
   .holder:has(p.descriptions)
