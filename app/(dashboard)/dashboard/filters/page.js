@@ -1,26 +1,23 @@
 "use client";
 
-import useTranslate from "@/Contexts/useTranslation";
-import "@/styles/dashboard/forms.css";
-import "@/styles/dashboard/tables.css";
-import "@/styles/dashboard/pages/filters.css";
-
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
-import { CircleAlert } from "lucide-react";
 import { TiPlus } from "react-icons/ti";
-import { IoIosClose, IoMdRadioButtonOn } from "react-icons/io";
-
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { IoIosClose } from "react-icons/io";
+import { CircleAlert } from "lucide-react";
 import { RxComponentBoolean } from "react-icons/rx";
-
-import { settings } from "@/Contexts/settings";
-import { specsConfig } from "@/Contexts/specsConfig";
+import { IoMdRadioButtonOn } from "react-icons/io";
 
 import DynamicMenu from "@/components/Tools/DynamicMenu";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import CatCard from "@/components/home/CatCard";
 
+import { settings } from "@/Contexts/settings";
+import useTranslate from "@/Contexts/useTranslation";
+import { specsConfig } from "@/Contexts/specsConfig";
+import { categoriesEn, categoriesAr } from "@/data";
 import {
   getAllFilter,
   getOneFilter,
@@ -33,47 +30,44 @@ import {
   updateOptionLang,
   deleteOption,
 } from "@/services/filters/filters.service";
+import { getAllSubCats } from "@/services/subCategories/subCats.service";
 import { FaBarsStaggered } from "react-icons/fa6";
-import CatCard from "@/components/home/CatCard";
+
+import "@/styles/client/forms.css";
+import "@/styles/dashboard/forms.css";
+import "@/styles/dashboard/pages/filters.css";
 
 export default function FiltersPage() {
-
-  
   const { locale } = useContext(settings);
   const t = useTranslate();
 
-  const [filters, setFilters] = useState([]);
-  console.log(filters);
+  const [filters, setFilters] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [category, setCategory] = useState(null);
+  const [subCategory, setSubCategory] = useState(null);
+  console.log(subCategory);
 
-    const STEPS = {
-    CATEGORIES: 1,
-    SUB_CATEGORIES: 2,
-    FORM: 3,
+  const STEPS = { CATEGORIES: 1, SUB_CATEGORIES: 2, FORM: 3 };
+  const [step, setStep] = useState(STEPS.CATEGORIES);
 
-  };
-    const [step, setStep] = useState(STEPS.CATEGORIES);
-
-      const [category, setCategory] = useState();
   const titles = {
     [STEPS.CATEGORIES]: t.ad.choose_category,
     [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
     [STEPS.FORM]: t.ad.filter_form,
   };
-
   const descriptions = {
     [STEPS.CATEGORIES]: t.ad.choose_category_description,
     [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category_description,
     [STEPS.FORM]: t.ad.filter_form_description,
-
   };
-
-
-  const [loading, setLoading] = useState(false);
 
   const [mode, setMode] = useState(null); // create | edit
   const [menuType, setMenuType] = useState(null); // form | delete
   const [editingFilter, setEditingFilter] = useState(null);
   const [originalData, setOriginalData] = useState(null);
+  const [curentCreateLocale, setCurentCreateLocale] = useState(locale);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -81,43 +75,55 @@ export default function FiltersPage() {
     watch,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
       key: "",
       type: "",
-      label: "",
-      options: [],
+      label: { en: "", ar: "" },
+      required: true,
+      filterable: true,
+      options: [{ value: "", translations: { en: "", ar: "" } }],
     },
   });
 
   const uiType = watch("type");
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: "options",
   });
 
-  /* ================= EFFECTS ================= */
+  const options = useWatch({
+    control,
+    name: "options",
+    defaultValue: [],
+  });
 
   useEffect(() => {
+    setCategories(locale === "en" ? categoriesEn : categoriesAr);
+    getAllSubCats(locale)
+      .then((res) => setSubCategories(res.data.data))
+      .catch(console.error);
     getAllFilter(locale)
       .then((res) => setFilters(res.data.data))
       .catch(console.error);
   }, [locale]);
-
-  /* ================= HANDLERS ================= */
 
   const openCreate = () => {
     setMode("create");
     setMenuType("form");
     setEditingFilter(null);
     setOriginalData(null);
+    setStep(STEPS.CATEGORIES);
     reset({
       key: "",
       type: "",
-      label: "",
-      options: [],
+      label: { en: "", ar: "" },
+      required: true,
+      filterable: true,
+      options: [{ value: "", translations: { en: "", ar: "" } }],
     });
   };
 
@@ -125,23 +131,39 @@ export default function FiltersPage() {
     setMode("edit");
     setMenuType("form");
     setEditingFilter(filter);
+    setStep(STEPS.FORM);
 
     getOneFilter(filter.id, locale).then((res) => {
       const data = res.data.data;
 
+      // Build translations object for label
+      const labelTranslations = { en: "", ar: "" };
+      data.translations?.forEach((t) => (labelTranslations[t.lang] = t.label));
+
+      const optionsWithTranslations = data.options?.map((o) => {
+        const trans = { en: "", ar: "" };
+        o.translations?.forEach((t) => (trans[t.lang] = t.label));
+        return {
+          id: o.id,
+          value: o.value,
+          translations: trans,
+        };
+      });
+
       reset({
         key: data.key,
         type: data.type,
-        label: data.translations?.label || "",
-        options:
-          data.options?.map((o) => ({
-            id: o.id,
-            value: o.value,
-            label: o.translations?.label || "",
-          })) || [],
+        label: labelTranslations,
+        required: data.required,
+        filterable: data.filterable,
+        options: optionsWithTranslations || [
+          { value: "", translations: { en: "", ar: "" } },
+        ],
       });
 
       setOriginalData(data);
+      setCategory(data.subCategoryId);
+      setSubCategory(data.subCategoryId);
     });
   };
 
@@ -151,9 +173,10 @@ export default function FiltersPage() {
     setEditingFilter(null);
     setOriginalData(null);
     reset();
+    setStep(STEPS.CATEGORIES);
+    setCategory(null);
+    setSubCategory(null);
   };
-
-  /* ================= SUBMIT ================= */
 
   const onSubmit = async (data) => {
     if (loading) return;
@@ -164,302 +187,491 @@ export default function FiltersPage() {
       if (mode === "create") {
         const payload = {
           key: data.key,
-          type: data.type,
-          required: true,
-          filterable: true,
+          type: data.type.value, // أو data.type حسب SelectOptions
+          required: data.required,
+          filterable: data.filterable,
           translations: [
-            { lang: "en", label: data.label },
-            { lang: "ar", label: data.label },
+            { lang: "en", label: data.label.en },
+            { lang: "ar", label: data.label.ar },
           ],
+          options:
+            data.type.value !== "input"
+              ? data.options.map((opt) => ({
+                  value: opt.value,
+                  translations: [
+                    { lang: "en", label: opt.translations.en },
+                    { lang: "ar", label: opt.translations.ar },
+                  ],
+                }))
+              : [],
         };
 
-        const res = await createFilter(payload);
-        const filterId = res.data.data.id;
+        const res = await createFilter(subCategory, payload);
 
-        if (data.type !== "input") {
-          for (const opt of data.options) {
-            await createOption(filterId, {
-              value: opt.value,
-              translations: [
-                { lang: "en", label: opt.label },
-                { lang: "ar", label: opt.label },
-              ],
-            });
-          }
-        }
+        setFilters((prev) => {
+          const updated = { ...prev };
+          if (!updated[subCategory]) updated[subCategory] = [];
+          updated[subCategory].push(res.data.data);
+          return updated;
+        });
 
-        setFilters((prev) => [...prev, res.data.data]);
         closeMenu();
       }
-
       /* ===== EDIT ===== */
       if (mode === "edit") {
-        if (data.key !== originalData.key || data.type !== originalData.type) {
-          await updateFilter(editingFilter.id, {
-            key: data.key,
-            type: data.type,
-          });
-        }
+        await updateFilter(editingFilter.id, {
+          key: data.key,
+          type: data.type,
+          required: data.required,
+          filterable: data.filterable,
+        });
 
-        if (data.label !== originalData.translations?.label) {
-          await updateFilterLang(editingFilter.id, {
-            label: data.label,
-          });
-        }
+        const transId = editingFilter.translations.find(
+          (t) => t.lang === curentCreateLocale,
+        ).id;
+        await updateFilterLang(transId, {
+          label: data.label[curentCreateLocale],
+        });
 
         for (const opt of data.options) {
           if (!opt.id) {
             await createOption(editingFilter.id, {
               value: opt.value,
               translations: [
-                { lang: "en", label: opt.label },
-                { lang: "ar", label: opt.label },
+                { lang: "en", label: opt.translations.en },
+                { lang: "ar", label: opt.translations.ar },
               ],
             });
           } else {
             await updateOption(opt.id, { value: opt.value });
-            await updateOptionLang(opt.id, { label: opt.label });
+            const optTransId = opt.translations?.find(
+              (t) => t.lang === curentCreateLocale,
+            )?.id;
+            if (optTransId)
+              await updateOptionLang(optTransId, {
+                label: opt.translations[curentCreateLocale],
+              });
           }
         }
 
-        setFilters((prev) =>
-          prev.map((f) =>
-            f.id === editingFilter.id
-              ? { ...f, key: data.key, label: data.label }
-              : f,
-          ),
-        );
-
+        setFilters((prev) => {
+          const updated = { ...prev };
+          Object.keys(updated).forEach((subCat) => {
+            updated[subCat] = updated[subCat].map((f) =>
+              f.id === editingFilter.id
+                ? { ...f, key: data.key, label: data.label[curentCreateLocale] }
+                : f,
+            );
+          });
+          return updated;
+        });
         closeMenu();
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     setLoading(true);
-    deleteFilter(editingFilter.id)
-      .then(() => {
-        setFilters((prev) => prev.filter((f) => f.id !== editingFilter.id));
-        closeMenu();
-      })
-      .finally(() => setLoading(false));
+    try {
+      await deleteFilter(editingFilter.id);
+      setFilters((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((subCat) => {
+          updated[subCat] = updated[subCat].filter(
+            (f) => f.id !== editingFilter.id,
+          );
+        });
+        return updated;
+      });
+      closeMenu();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ================= RENDER ================= */
-
   return (
-    <div className="dash-holder">
+    <div className="dash-holder for-filters">
       <div className="body">
+        <button className="main-button" onClick={openCreate}>
+          <TiPlus /> Create Filter
+        </button>
         <div className="filters-holder">
-          <button className="main-button" onClick={openCreate}>
-            <TiPlus /> Create Filter
-          </button>
-
-{Object.entries(filters || {}).map(([subCategoryName, filtersList]) => (
-  <div key={subCategoryName} className="sub-category-group">
-    <h3 className="sub-category-title">{subCategoryName}</h3>
-
-    {filtersList.map((filt) => {
-      const Icon = specsConfig[filt.key]?.icon;
-
-      return (
-        <div key={filt.id} className="filter-body">
-          {Icon && <Icon />}
-          <h4>{filt.label}</h4>
-
-          <div className="row">
-            <li>
-              uiType:{" "}
-              <span>
-                {filt.type}{" "}
-                {filt.type === "select" ? (
-                  <FaBarsStaggered />
-                ) : filt.type === "boolean" ? (
-                  <RxComponentBoolean />
-                ) : (
-                  <IoMdRadioButtonOn />
-                )}
-              </span>
-            </li>
-
-            <li>
-              required:{" "}
-              <span>{filt.required ? "required" : "optional"}</span>
-            </li>
-          </div>
-
-          <li>
-            <span>
-              contained in {filtersList.length} sub categories
-            </span>
-          </li>
-
-          <div
-            className="edit-filter-btn"
-            onClick={() => openEdit(filt)}
-          >
-            <MdEdit /> Edit
-          </div>
-        </div>
-      );
-    })}
-  </div>
-))}
-
-        </div>
-      </div>
-
-      {/* ================= DYNAMIC MENU ================= */}
-
-      <DynamicMenu
-        open={!!menuType}
-        title={}
-        descriptions={}
-        onClose={closeMenu}
-      >
-        {menuType === "form" && (
-          <>
-                  <div className="steps-holder">
-          {Object.values(STEPS).map((stepItem, index, arr) => (
-            <div className="step-wrapper" key={stepItem}>
-              <div
-                className={`step 
-                  ${step > stepItem ? "done" : ""} 
-                  ${step === stepItem ? "current" : ""}
-                `}
-              >
-                {stepItem}
-              </div>
-              {index !== arr.length - 1 && <span className="bar"></span>}
+          {Object.entries(filters).map(([subCat, filtersList]) => (
+            <div key={subCat} className="sub-category-group">
+              <h3 className="sub-category-title">{subCat}</h3>
+              {filtersList.map((filt) => {
+                const Icon = specsConfig[filt.key]?.icon;
+                return (
+                  <div key={filt.id} className="filter-body">
+                    {Icon && <Icon />}
+                    <h4>{filt.label}</h4>
+                    <div className="row">
+                      <li>
+                        required:{" "}
+                        <span>{filt.required ? "required" : "optional"}</span>
+                      </li>
+                      <li>
+                        filterable:{" "}
+                        <span>{filt.filterable ? "true" : "false"}</span>
+                      </li>
+                      <li>
+                        uiType:{" "}
+                        <span>
+                          {filt.type}{" "}
+                          {filt.type === "select" ? (
+                            <FaBarsStaggered />
+                          ) : filt.type === "boolean" ? (
+                            <RxComponentBoolean />
+                          ) : (
+                            <IoMdRadioButtonOn />
+                          )}
+                        </span>
+                      </li>
+                    </div>
+                    <div
+                      className="edit-filter-btn"
+                      onClick={() => openEdit(filt)}
+                    >
+                      <MdEdit /> Edit
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
-        {step === STEPS.CATEGORIES && (
-          <div className="options-grid">
-            {categories.map((cat) => (
-              <CatCard
-                key={cat?.id}
-                data={cat}
-                position={`when-create-ad`}
-                type={`cat`}
-                activeClass={cat?.id == category}
-                onSelect={() => {
-                  setCategory(cat?.id);
-                  setStep(STEPS.SUB_CATEGORIES);
-                }}
-              />
-            ))}
-          </div>
-        )}
+      </div>
 
-        {/* ================= SUB_CATEGORIES STEP 2 ================= */}
-        {step === STEPS.SUB_CATEGORIES && (
-          <div className="options-grid verfiyMethod">
-            {subcategories
-              ?.filter((x) => x?.categoryId == category)
-              ?.map((subCat) => (
-                <CatCard
-                  key={subCat?.id}
-                  data={subCat}
-                  position={`when-create-ad`}
-                  type={`sub-cat`}
-                  activeClass={subCat?.id == subCategory}
-                  onSelect={() => {
-                    setSubCategory(subCat?.id);
-                    setStep(STEPS.BASICS);
-                  }}
-                />
-              ))}
-          </div>
-        )}
-        {step === STEPS.FORM && (
-
-          <form className="builder" onSubmit={handleSubmit(onSubmit)}>
-            {/* KEY */}
-            <div className="box forInput">
-              <label>Key</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input {...register("key", { required: true })} />
-                </div>
-              </div>
-              {errors.key && (
-                <span className="error">
-                  <CircleAlert /> Key is required
-                </span>
-              )}
-            </div>
-
-            {/* LABEL */}
-            <div className="box forInput">
-              <label>Label</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input {...register("label", { required: true })} />
-                </div>
-              </div>
-            </div>
-
-            {/* TYPE */}
-            <Controller
-              name="type"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <SelectOptions
-                  label="UI Type"
-                  options={["input", "select", "radio", "boolean"]}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-
-            {/* OPTIONS */}
-            {uiType !== "input" && (
-              <div className="options">
-                <button
-                  type="button"
-                  className="edit-filter-btn"
-                  onClick={() => append({ value: "", label: "" })}
-                >
-                  <TiPlus /> Add Option
-                </button>
-
-                {fields.map((field, index) => (
-                  <div key={field.id} className="box forInput">
-                    <div className="inputHolder">
-                      <input {...register(`options.${index}.label`)} />
-                      <input {...register(`options.${index}.value`)} />
-                      <IoIosClose onClick={() => remove(index)} />
-                    </div>
+      <DynamicMenu
+        open={!!menuType}
+        title={titles[step]}
+        descriptions={descriptions[step]}
+        onClose={closeMenu}
+        step={step}
+        setStep={setStep}
+      >
+        {menuType === "form" && (
+          <>
+            {/* Steps Holder */}
+            <div className="steps-holder">
+              {Object.values(STEPS).map((s, i, arr) => (
+                <div key={s} className="step-wrapper">
+                  <div
+                    className={`step ${step > s ? "done" : ""} ${
+                      step === s ? "current" : ""
+                    }`}
+                  >
+                    {s}
                   </div>
+                  {i !== arr.length - 1 && <span className="bar"></span>}
+                </div>
+              ))}
+            </div>
+
+            {/* Step 1: Categories */}
+            {step === STEPS.CATEGORIES && (
+              <div className="options-grid">
+                {categories.map((cat) => (
+                  <CatCard
+                    key={cat.id}
+                    data={cat}
+                    position="when-create-ad"
+                    type="cat"
+                    activeClass={cat.id === category}
+                    onSelect={() => {
+                      setCategory(cat.id);
+                      setStep(STEPS.SUB_CATEGORIES);
+                    }}
+                  />
                 ))}
               </div>
             )}
 
-            <div className="buttons-holder">
-              {mode === "edit" && (
-                <button
-                  type="button"
-                  className="main-button danger"
-                  onClick={() => setMenuType("delete")}
-                >
-                  Delete
-                </button>
-              )}
+            {/* Step 2: Sub Categories */}
+            {step === STEPS.SUB_CATEGORIES && (
+              <div className="options-grid">
+                {subCategories
+                  .filter((x) => x.categoryName === category)
+                  .map((subCat) => (
+                    <CatCard
+                      key={subCat.id}
+                      data={subCat}
+                      position="when-create-ad"
+                      type="sub-cat"
+                      activeClass={subCat.id === subCategory}
+                      onSelect={() => {
+                        setSubCategory(subCat.id);
+                        setStep(STEPS.FORM);
+                      }}
+                    />
+                  ))}
+              </div>
+            )}
 
-              <button className="main-button" disabled={loading}>
-                {loading ? <span className="loader" /> : "Save"}
-              </button>
-            </div>
-          </form>
-        )}
+            {/* Step 3: Form */}
+            {step === STEPS.FORM && (
+              <form className="builder" onSubmit={handleSubmit(onSubmit)}>
+                {/* Lang switch */}
+                <div className="lang-switch">
+                  {["en", "ar"].map((lng) => (
+                    <button
+                      key={lng}
+                      type="button"
+                      className={curentCreateLocale === lng ? "active" : ""}
+                      onClick={() => setCurentCreateLocale(lng)}
+                    >
+                      {lng.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
 
+                {/* Key */}
+                <div className="box forInput">
+                  <label>{t.dashboard.forms.filterKey}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        placeholder="filter key"
+                        {...register("key", { required: true })}
+                      />
+                    </div>
+                  </div>
+                  {errors.key && (
+                    <span className="error">
+                      <CircleAlert /> Key is required
+                    </span>
+                  )}
+                </div>
+
+                {/* Label */}
+                <div className="box forInput">
+                  <label>
+                    Name ({curentCreateLocale.toUpperCase()}){" "}
+                    <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        placeholder={
+                          curentCreateLocale === "en"
+                            ? "Filter Name"
+                            : "اسم الفلتر"
+                        }
+                        value={watch(`label.${curentCreateLocale}`)}
+                        onChange={(e) =>
+                          setValue(
+                            `label.${curentCreateLocale}`,
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                  {errors.label && (
+                    <span className="error">
+                      <CircleAlert /> Label is required
+                    </span>
+                  )}
+                </div>
+
+                {/* UI Type */}
+                <Controller
+                  name="type"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <SelectOptions
+                      label="UI Type"
+                      options={[
+                        { value: "input", name: "input" },
+                        { value: "select", name: "select" },
+                        { value: "radio", name: "radio" },
+                        { value: "boolean", name: "boolean" },
+                      ]}
+                      value={field.value}
+                      placeholder={"select the Ui type"}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+
+                {/* Required */}
+                <div className="form-holder">
+                  <div className="box forInput ">
+                    <label>Required</label>
+                    <div className="options-grid flex">
+                      {["true", "false"].map((val) => (
+                        <div
+                          key={val}
+                          className={`option-box small ${
+                            watch("required").toString() === val ? "active" : ""
+                          }`}
+                          onClick={() => setValue("required", val === "true")}
+                        >
+                          {val}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filterable */}
+                <div className="form-holder">
+                  <div className="box forInput ">
+                    <label>Filterable</label>
+                    <div className="options-grid flex">
+                      {["true", "false"].map((val) => (
+                        <div
+                          key={val}
+                          className={`option-box small ${
+                            watch("filterable").toString() === val
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() => setValue("filterable", val === "true")}
+                        >
+                          {val}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Options */}
+                {/* Options */}
+                {uiType !== "input" && (
+                  <div className="options">
+                    <div className="top-holder">
+                      <h4>
+                        Filter options ({curentCreateLocale.toUpperCase()})
+                      </h4>
+                      <button
+                        type="button"
+                        className="main-button"
+                        onClick={() => {
+                          // تحقق إن كل options الحالية فيها value و label للإنجليزي والعربي
+                          const allFilled = options.every(
+                            (opt) =>
+                              opt.value?.trim() &&
+                              opt.translations?.en?.trim() &&
+                              opt.translations?.ar?.trim(),
+                          );
+
+                          if (allFilled) {
+                            append({
+                              value: "",
+                              translations: { en: "", ar: "" },
+                            });
+                          } else {
+                            alert(
+                              "Please fill all Value and Label fields for all existing options before adding a new one.",
+                            );
+                          }
+                        }}
+                      >
+                        <TiPlus /> Add Option
+                      </button>
+                    </div>
+
+                    {fields.map((field, index) => (
+                      <div key={field.id} className="box forInput row">
+                        <label>{`Option ${index + 1}`}</label>
+                        <div className="inputHolder">
+                          <div className="holder">
+                            {/* Input Value */}
+                            <input
+                              type="text"
+                              placeholder="Value"
+                              {...register(`options.${index}.value`, {
+                                required: "Value is required",
+                              })}
+                            />
+                            {errors.options?.[index]?.value && (
+                              <span className="error small">
+                                <CircleAlert size={14} /> Value is required
+                              </span>
+                            )}
+                          </div>
+                          <div className="holder">
+                            {/* Input Label للغة الحالية */}
+                            <input
+                              type="text"
+                              placeholder={`Label (${curentCreateLocale.toUpperCase()})`}
+                              value={
+                                watch(
+                                  `options.${index}.translations.${curentCreateLocale}`,
+                                ) || ""
+                              }
+                              onChange={(e) =>
+                                setValue(
+                                  `options.${index}.translations.${curentCreateLocale}`,
+                                  e.target.value,
+                                )
+                              }
+                            />
+
+                            {errors.options?.[index]?.translations?.[
+                              curentCreateLocale
+                            ] && (
+                              <span className="error small">
+                                <CircleAlert size={14} /> Label is required
+                              </span>
+                            )}
+                          </div>
+                          <IoIosClose
+                            className="close"
+                            onClick={() => {
+                              if (fields.length > 1) remove(index);
+                              else {
+                                setValue(`options.${index}.value`, "");
+                                setValue(
+                                  `options.${index}.translations.${curentCreateLocale}`,
+                                  "",
+                                );
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="buttons-holder">
+                  {mode === "edit" && (
+                    <button
+                      type="button"
+                      className="main-button danger"
+                      onClick={() => setMenuType("delete")}
+                    >
+                      Delete
+                    </button>
+                  )}
+
+                  <button
+                    className="main-button"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span class="loader"></span>
+                    ) : mode === "create" ? (
+                      "Create"
+                    ) : (
+                      "Update"
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </>
         )}
 
