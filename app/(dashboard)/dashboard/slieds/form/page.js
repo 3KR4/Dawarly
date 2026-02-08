@@ -7,8 +7,7 @@ import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import governoratesEn from "@/data/governoratesEn.json";
 import governoratesAr from "@/data/governoratesAr.json";
-import citiesEn from "@/data/citiesEn.json";
-import citiesAr from "@/data/citiesAr.json";
+import cities from "@/data/cities.json";
 import {
   categoriesEn,
   categoriesAr,

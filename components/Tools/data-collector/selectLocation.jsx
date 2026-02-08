@@ -3,57 +3,35 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   FaAngleDown,
-  FaAngleLeft,
   FaAngleRight,
   FaArrowLeft,
 } from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
 import useClickOutside from "@/Contexts/useClickOutside";
-import governoratesEn from "@/data/governoratesEn.json";
-import governoratesAr from "@/data/governoratesAr.json";
-import citiesEn from "@/data/citiesEn.json";
-import citiesAr from "@/data/citiesAr.json";
-import districtsEn from "@/data/districtsEn.json";
-import districtsAr from "@/data/districtsAr.json";
+
+import governorates from "@/data/governorates.json";
+import cities from "@/data/cities.json";
 
 function SelectLocation({ locale = "en", onSelect }) {
   const t = useTranslate();
+
   const [activeMenu, setActiveMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedGovernorate, setSelectedGovernorate] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-
-  const [governorates, setGovernorates] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [districts, setDistricts] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-      setCities(locale == "en" ? citiesEn : citiesAr);
-      setDistricts(locale == "en" ? districtsEn : districtsAr);
-    };
-    fetchCategories();
-  }, [locale]);
 
   const menuRef = useRef(null);
 
   useClickOutside(menuRef, () => {
     setActiveMenu(false);
     setCurrentPage(1);
+    setSelectedGovernorate(null);
     setSearchValue("");
   });
+
+  const getName = (item) =>
+    locale === "en" ? item.name_en : item.name_ar;
 
   const handleSelectGovernorate = (gov) => {
     setSelectedGovernorate(gov);
@@ -62,17 +40,13 @@ function SelectLocation({ locale = "en", onSelect }) {
   };
 
   const handleSelectCity = (city) => {
-    setSelectedCity(city);
-    setCurrentPage(3);
-    setSearchValue("");
-  };
-
-  const handleSelectDistrict = (district) => {
-    if (onSelect) onSelect(district);
+    onSelect?.({
+      governorate: selectedGovernorate,
+      city,
+    });
     setActiveMenu(false);
     setCurrentPage(1);
     setSelectedGovernorate(null);
-    setSelectedCity(null);
     setSearchValue("");
   };
 
@@ -91,21 +65,21 @@ function SelectLocation({ locale = "en", onSelect }) {
                 <FaArrowLeft
                   className="arrow"
                   onClick={() => {
-                    setCurrentPage((prev) => (prev === 3 ? 2 : 1));
-                    setSelectedCity(null);
+                    setCurrentPage(1);
+                    setSelectedGovernorate(null);
                   }}
                 />
               )}
 
               <div>
-                {currentPage === 1 && <h5>{t.location.egyptGovernorates}</h5>}
-                {currentPage === 2 && selectedGovernorate && (
-                  <h5>{selectedGovernorate.name}</h5>
+                {currentPage === 1 && (
+                  <h5>{t.location.egyptGovernorates}</h5>
                 )}
-                {currentPage === 3 && selectedCity && (
-                  <h5>{selectedCity.name}</h5>
+                {currentPage === 2 && selectedGovernorate && (
+                  <h5>{getName(selectedGovernorate)}</h5>
                 )}
               </div>
+
               <div className="hidden-element">-</div>
             </div>
 
@@ -115,13 +89,11 @@ function SelectLocation({ locale = "en", onSelect }) {
               placeholder={
                 currentPage === 1
                   ? t.location.searchGovernorate
-                  : currentPage === 2
-                    ? `${t.location.searchCity} ${
-                        selectedGovernorate ? selectedGovernorate.name : ""
-                      }...`
-                    : `${t.location.searchCity} ${
-                        selectedCity ? selectedCity.name : ""
-                      }...`
+                  : `${t.location.searchCity} ${
+                      selectedGovernorate
+                        ? getName(selectedGovernorate)
+                        : ""
+                    }...`
               }
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
@@ -132,13 +104,9 @@ function SelectLocation({ locale = "en", onSelect }) {
               className={`items-list ${
                 (currentPage === 1
                   ? governorates.length
-                  : currentPage === 2
-                    ? cities.filter(
-                        (city) =>
-                          city.governorate_id === selectedGovernorate?.id,
-                      ).length
-                    : districts.filter((d) => d.city_id === selectedCity?.id)
-                        .length) < 11
+                  : cities.filter(
+                      (c) => c.gov_id === selectedGovernorate?.id
+                    ).length) < 11
                   ? "has-padding"
                   : ""
               }`}
@@ -146,64 +114,57 @@ function SelectLocation({ locale = "en", onSelect }) {
               {/* Governorates */}
               {currentPage === 1 &&
                 governorates
-                  .filter((gov) => {
-                    const govName = gov.name;
-                    return govName
+                  .filter((gov) =>
+                    getName(gov)
                       .toLowerCase()
-                      .includes(searchValue.toLowerCase());
-                  })
-                  .map((gov) => (
-                    <button key={gov.id}>
-                      <Link href={`/${gov.id}`}>{gov.name}</Link>
-                      {gov.cities_count > 0 && (
-                        <span onClick={() => handleSelectGovernorate(gov)}>
-                          {gov.cities_count}
-                          <FaAngleRight className="arrow" />
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                      .includes(searchValue.toLowerCase())
+                  )
+                  .map((gov) => {
+                    const govCities = cities.filter(
+                      (c) => c.gov_id === gov.id
+                    );
+
+                    return (
+                      <button key={gov.id}>
+                        <Link href={`/${gov.id}`}>
+                          {getName(gov)}
+                        </Link>
+
+                        {govCities.length > 0 && (
+                          <span
+                            onClick={() =>
+                              handleSelectGovernorate(gov)
+                            }
+                          >
+                            {govCities.length}
+                            <FaAngleRight className="arrow" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
 
               {/* Cities */}
               {currentPage === 2 &&
                 selectedGovernorate &&
                 cities
                   .filter(
-                    (city) => city.governorate_id === selectedGovernorate.id,
+                    (city) =>
+                      city.gov_id === selectedGovernorate.id
                   )
-                  .filter((city) => {
-                    const cityName = city.name;
-                    return cityName
+                  .filter((city) =>
+                    getName(city)
                       .toLowerCase()
-                      .includes(searchValue.toLowerCase());
-                  })
+                      .includes(searchValue.toLowerCase())
+                  )
                   .map((city) => (
-                    <button key={city.id}>
-                      <Link href={`/${city.id}`}>{city.name}</Link>
-                      {city.districts_count > 0 && (
-                        <span onClick={() => handleSelectCity(city)}>
-                          {city.districts_count}
-                          <FaAngleRight className="arrow" />
-                        </span>
-                      )}
-                    </button>
-                  ))}
-
-              {/* Districts */}
-              {currentPage === 3 &&
-                selectedCity &&
-                districts
-                  .filter((district) => district.city_id === selectedCity.id)
-                  .filter((district) => {
-                    const districtName = district.name;
-
-                    return districtName
-                      .toLowerCase()
-                      .includes(searchValue.toLowerCase());
-                  })
-                  .map((district) => (
-                    <button key={district.id}>
-                      <Link href={`/${district.id}`}>{district.name}</Link>
+                    <button
+                      key={city.id}
+                      onClick={() => handleSelectCity(city)}
+                    >
+                      <Link href={`/${city.id}`}>
+                        {getName(city)}
+                      </Link>
                     </button>
                   ))}
             </div>
@@ -215,3 +176,25 @@ function SelectLocation({ locale = "en", onSelect }) {
 }
 
 export default SelectLocation;
+
+
+
+//   sale and rent
+// ==============
+// Area (m²)
+// Bedrooms
+// Bathrooms
+// Furnished
+// Level
+// Ownershipx
+// Payment Option
+// Payment Period  
+// Down Payment
+// Delivery Term
+
+
+// ========================
+// rent
+// ======
+// Monthly Installments  
+// Rental Frequency

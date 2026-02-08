@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import governoratesEn from "@/data/governoratesEn.json";
 import governoratesAr from "@/data/governoratesAr.json";
-import citiesEn from "@/data/citiesEn.json";
-import citiesAr from "@/data/citiesAr.json";
+import cities from "@/data/cities.json";
+
 import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
@@ -40,7 +40,6 @@ export default function Register() {
   const redirectAfterLogin = useRedirectAfterLogin();
   const [categories, setCategories] = useState([]);
   const [governorates, setGovernorates] = useState([]);
-  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -55,7 +54,6 @@ export default function Register() {
       // }
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
       setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-      setCities(locale == "en" ? citiesEn : citiesAr);
     };
     fetchCategories();
   }, [locale]);
@@ -101,7 +99,7 @@ export default function Register() {
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id,
+    (c) => c.gov_id === userAddress.gov?.id,
   );
 
   const toggleCategory = (id) => {

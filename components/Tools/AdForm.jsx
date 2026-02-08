@@ -6,8 +6,7 @@ import { useSearchParams } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
 import governoratesEn from "@/data/governoratesEn.json";
 import governoratesAr from "@/data/governoratesAr.json";
-import citiesEn from "@/data/citiesEn.json";
-import citiesAr from "@/data/citiesAr.json";
+import cities from "@/data/cities.json";
 import {
   categoriesEn,
   categoriesAr,
@@ -40,7 +39,6 @@ export default function AdForm({ type = "client", adId }) {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [governorates, setGovernorates] = useState([]);
-  const [cities, setCities] = useState([]);
   const [filteredSubcategories, setFilteredSubcategories] = useState([]);
 
   // State لبيانات الإعلان
@@ -99,7 +97,6 @@ export default function AdForm({ type = "client", adId }) {
     setCategories(locale == "en" ? categoriesEn : categoriesAr);
     setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
     setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-    setCities(locale == "en" ? citiesEn : citiesAr);
 
     setLocaleDataLoaded(true); // دلوقتي البيانات جاهزة
   }, [locale]);
@@ -157,7 +154,7 @@ export default function AdForm({ type = "client", adId }) {
     // ملء الموقع
     if (ad.area) {
       const governorate = governorates.find((g) => g.id == ad.area.governorate);
-      const city = cities.find((c) => c.id == ad.area.city);
+      const city = cities.find((c) => c.gov_id == ad.area.city);
 
       if (governorate) setSelectedGovernorate(governorate);
       if (city) setSelectedCity(city);
@@ -204,7 +201,7 @@ export default function AdForm({ type = "client", adId }) {
 
   // تصفية المدن حسب المحافظة المختارة
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === selectedGovernorate?.id,
+    (c) => c.gov_id === selectedGovernorate?.id,
   );
 
   const adminOptions = users.map((user) => ({

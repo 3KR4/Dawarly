@@ -5,8 +5,7 @@ import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import governoratesEn from "@/data/governoratesEn.json";
 import governoratesAr from "@/data/governoratesAr.json";
-import citiesEn from "@/data/citiesEn.json";
-import citiesAr from "@/data/citiesAr.json";
+import cities from "@/data/cities.json";
 import {
   categoriesEn,
   categoriesAr,
@@ -116,7 +115,7 @@ if (!allowed) return null;
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
       setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
       setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-      setCities(locale == "en" ? citiesEn : citiesAr);
+      
     };
     fetchdynamicFilters();
   }, [locale]);
@@ -299,7 +298,7 @@ if (!allowed) return null;
   };
 
   const filteredCities = cities.filter(
-    (c) => c.governorate_id === userAddress.gov?.id,
+    (c) => c.gov_id === userAddress.gov?.id,
   );
 
   const onSubmit = async (data) => {
