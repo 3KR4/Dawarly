@@ -328,153 +328,315 @@ export const categoriesAr = [
   { id: "properties_rent", name: "عقارات للإيجار", icon: FaHandshake },
 ];
 export const subcategoriesEn = [
-  // Properties (categoryId 1,2 → category 0,1 في النظام)
-  { id: 0, categoryId: 1, name: "Apartments" }, // للبيع
-  { id: 1, categoryId: 2, name: "Apartments" }, // للإيجار
+  // Apartments
+  {
+    id: "11675fce-6a98-427a-903f-ceb917a96ee1",
+    categoryId: "dawaarly_sale",
+    name: "Apartments for sale",
+    key: "dawarrly_sale_apartments",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "336263ae-d02c-4b6b-957d-67fb038be013",
+    categoryId: "dawaarly_rent",
+    name: "Apartments for rent",
+    key: "dawarrly_rent_apartments",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 2, categoryId: 1, name: "Villas" }, // للبيع
-  { id: 3, categoryId: 2, name: "Villas" }, // للإيجار
+  // Villas
+  {
+    id: "8b3c985d-a209-44a8-9e3d-17dec91d6ea9",
+    categoryId: "dawaarly_sale",
+    name: "Villas for sale",
+    key: "dawarrly_sale_villas",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "31fa2a3d-de78-4ca8-8134-96914b504afd",
+    categoryId: "dawaarly_rent",
+    name: "Villas for rent",
+    key: "dawarrly_rent_villas",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 4, categoryId: 1, name: "Vacation Homes" }, // للبيع
-  { id: 5, categoryId: 2, name: "Vacation Homes" }, // للإيجار
+  // Vacation Homes
+  {
+    id: "8ee1c1b8-746b-41e4-ad48-bd51e93d8e7c",
+    categoryId: "dawaarly_sale",
+    name: "Vacation homes for sale",
+    key: "dawarrly_sale_vacationhomes",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "6b3ac7a9-6b5d-409f-b97d-6933cbefce9a",
+    categoryId: "dawaarly_rent",
+    name: "Vacation homes for rent",
+    key: "dawarrly_rent_vacationhomes",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 6, categoryId: 1, name: "Commercial" }, // للبيع
-  { id: 7, categoryId: 2, name: "Commercial" }, // للإيجار
+  // Commercial
+  {
+    id: "1bbd37c9-9827-495e-b7d6-445b2f934996",
+    categoryId: "dawaarly_sale",
+    name: "Commercial for sale",
+    key: "dawarrly_sale_commercial",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "224a4f0d-2c39-4e90-8d38-a913e2d096af",
+    categoryId: "dawaarly_rent",
+    name: "Commercial for rent",
+    key: "dawarrly_rent_commercial",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 8, categoryId: 1, name: "Buildings & Lands" }, // للبيع
-  { id: 9, categoryId: 2, name: "Buildings & Lands" }, // للإيجار
-
-  // Vehicles (categoryId 3,4 → category 2 في النظام)
-  { id: 10, categoryId: 3, name: "Cars" },
-  { id: 11, categoryId: 3, name: "Motorcycles" },
-  { id: 12, categoryId: 3, name: "Spare Parts" },
-  { id: 13, categoryId: 3, name: "Heavy Vehicles" },
-
-  // Mobiles & Tablets (categoryId 5 → category 3 في النظام)
-  { id: 14, categoryId: 5, name: "Mobile Phones" },
-  { id: 15, categoryId: 5, name: "Tablets" },
-  { id: 16, categoryId: 5, name: "Accessories" },
-
-  // Electronics (categoryId 6 → category 4 في النظام)
-  { id: 17, categoryId: 6, name: "TV & Audio" },
-  { id: 18, categoryId: 6, name: "Computers" },
-  { id: 19, categoryId: 6, name: "Video Games" },
-  { id: 20, categoryId: 6, name: "Cameras" },
-
-  // Home & Office (categoryId 7 → category 5 في النظام)
-  { id: 21, categoryId: 8, name: "Furniture" },
-  { id: 22, categoryId: 8, name: "Office Furniture" },
-  { id: 23, categoryId: 8, name: "Home Decor" },
-
-  // Fashion (categoryId 8 → category 6 في النظام)
-  { id: 24, categoryId: 8, name: "Men Clothing" },
-  { id: 25, categoryId: 8, name: "Women Clothing" },
-  { id: 26, categoryId: 8, name: "Shoes & Bags" },
-
-  // Jobs (categoryId 9 → category 7 في النظام)
-  { id: 27, categoryId: 9, name: "Full Time" },
-  { id: 28, categoryId: 9, name: "Part Time" },
-  { id: 29, categoryId: 9, name: "Freelance" },
-
-  // Services (categoryId 10 → category 8 في النظام)
-  { id: 30, categoryId: 10, name: "Home Services" },
-  { id: 31, categoryId: 10, name: "Education" },
-  { id: 32, categoryId: 10, name: "Repair Services" },
-
-  // Pets (categoryId 11 → category 9 في النظام)
-  { id: 33, categoryId: 11, name: "Dogs" },
-  { id: 34, categoryId: 11, name: "Cats" },
-  { id: 35, categoryId: 11, name: "Pet Accessories" },
-
-  // Kids & Babies (categoryId 12 → category 10 في النظام)
-  { id: 36, categoryId: 12, name: "Toys" },
-  { id: 37, categoryId: 12, name: "Kids Clothes" },
-  { id: 38, categoryId: 12, name: "Baby Gear" },
-
-  // Sports & Hobbies (categoryId 13 → category 11 في النظام)
-  { id: 39, categoryId: 13, name: "Sports Equipment" },
-  { id: 40, categoryId: 13, name: "Bicycles" },
-  { id: 41, categoryId: 13, name: "Musical Instruments" },
-
-  // Business & Industrial (categoryId 14 → category 12 في النظام)
-  { id: 42, categoryId: 14, name: "Industrial Equipment" },
-  { id: 43, categoryId: 14, name: "Office Equipment" },
-  { id: 44, categoryId: 14, name: "Wholesale" },
+  // Buildings & Lands
+  {
+    id: "769e28f5-038b-40e9-9718-427bdd95cae6",
+    categoryId: "dawaarly_sale",
+    name: "Buildings & lands for sale",
+    key: "dawarrly_sale_buildingsandlands",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "0f81033e-f9ec-4b1d-85b9-4375904bc56a",
+    categoryId: "dawaarly_rent",
+    name: "Buildings & lands for rent",
+    key: "dawarrly_rent_buildingsandlands",
+    categoryName: "dawaarly_rent",
+  },
 ];
 export const subcategoriesAr = [
-  // Properties (categoryId 1,2 → category 0,1 في النظام)
-  { id: 0, categoryId: 0, name: "شقق" }, // للبيع
-  { id: 1, categoryId: 1, name: "شقق" }, // للإيجار
+  // شقق - Apartments
+  {
+    id: "11675fce-6a98-427a-903f-ceb917a96ee1",
+    categoryId: "dawaarly_sale",
+    name: "شقق للبيع",
+    key: "dawarrly_sale_apartments",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "336263ae-d02c-4b6b-957d-67fb038be013",
+    categoryId: "dawaarly_rent",
+    name: "شقق للإيجار",
+    key: "dawarrly_rent_apartments",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 2, categoryId: 0, name: "فلل" }, // للبيع
-  { id: 3, categoryId: 1, name: "فلل" }, // للإيجار
+  // فلل - Villas
+  {
+    id: "8b3c985d-a209-44a8-9e3d-17dec91d6ea9",
+    categoryId: "dawaarly_sale",
+    name: "فلل للبيع",
+    key: "dawarrly_sale_villas",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "31fa2a3d-de78-4ca8-8134-96914b504afd",
+    categoryId: "dawaarly_rent",
+    name: "فلل للإيجار",
+    key: "dawarrly_rent_villas",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 4, categoryId: 0, name: "منازل العطلات" }, // للبيع
-  { id: 5, categoryId: 1, name: "منازل العطلات" }, // للإيجار
+  // عقارات مصيفية - Vacation Homes
+  {
+    id: "8ee1c1b8-746b-41e4-ad48-bd51e93d8e7c",
+    categoryId: "dawaarly_sale",
+    name: "عقارات مصيفية للبيع",
+    key: "dawarrly_sale_vacationhomes",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "6b3ac7a9-6b5d-409f-b97d-6933cbefce9a",
+    categoryId: "dawaarly_rent",
+    name: "عقارات مصيفية للإيجار",
+    key: "dawarrly_rent_vacationhomes",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 6, categoryId: 0, name: "تجاري" }, // للبيع
-  { id: 7, categoryId: 1, name: "تجاري" }, // للإيجار
+  // عقارات تجارية - Commercial
+  {
+    id: "1bbd37c9-9827-495e-b7d6-445b2f934996",
+    categoryId: "dawaarly_sale",
+    name: "عقارات تجارية للبيع",
+    key: "dawarrly_sale_commercial",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "224a4f0d-2c39-4e90-8d38-a913e2d096af",
+    categoryId: "dawaarly_rent",
+    name: "عقارات تجارية للإيجار",
+    key: "dawarrly_rent_commercial",
+    categoryName: "dawaarly_rent",
+  },
 
-  { id: 8, categoryId: 0, name: "مباني وأراضي" }, // للبيع
-  { id: 9, categoryId: 1, name: "مباني وأراضي" }, // للإيجار
-
-  // Vehicles (categoryId 3,4 → category 2 في النظام)
-  { id: 10, categoryId: 2, name: "سيارات" },
-  { id: 11, categoryId: 2, name: "دراجات نارية" },
-  { id: 12, categoryId: 2, name: "قطع غيار" },
-  { id: 13, categoryId: 2, name: "مركبات ثقيلة" },
-
-  // Mobiles & Tablets (categoryId 5 → category 3 في النظام)
-  { id: 14, categoryId: 3, name: "موبايلات" },
-  { id: 15, categoryId: 3, name: "أجهزة لوحية" },
-  { id: 16, categoryId: 3, name: "إكسسوارات" },
-
-  // Electronics (categoryId 6 → category 4 في النظام)
-  { id: 17, categoryId: 4, name: "تلفزيون وصوتيات" },
-  { id: 18, categoryId: 4, name: "كمبيوترات" },
-  { id: 19, categoryId: 4, name: "ألعاب فيديو" },
-  { id: 20, categoryId: 4, name: "كاميرات" },
-
-  // Home & Office (categoryId 7 → category 5 في النظام)
-  { id: 21, categoryId: 5, name: "أثاث" },
-  { id: 22, categoryId: 5, name: "أثاث مكتب" },
-  { id: 23, categoryId: 5, name: "ديكور منزلي" },
-
-  // Fashion (categoryId 8 → category 6 في النظام)
-  { id: 24, categoryId: 6, name: "ملابس رجالية" },
-  { id: 25, categoryId: 6, name: "ملابس نسائية" },
-  { id: 26, categoryId: 6, name: "أحذية وحقائب" },
-
-  // Jobs (categoryId 9 → category 7 في النظام)
-  { id: 27, categoryId: 7, name: "دوام كامل" },
-  { id: 28, categoryId: 7, name: "دوام جزئي" },
-  { id: 29, categoryId: 7, name: "عمل حر" },
-
-  // Services (categoryId 10 → category 8 في النظام)
-  { id: 30, categoryId: 8, name: "خدمات منزلية" },
-  { id: 31, categoryId: 8, name: "تعليم" },
-  { id: 32, categoryId: 8, name: "خدمات صيانة" },
-
-  // Pets (categoryId 11 → category 9 في النظام)
-  { id: 33, categoryId: 9, name: "كلاب" },
-  { id: 34, categoryId: 9, name: "قطط" },
-  { id: 35, categoryId: 9, name: "إكسسوارات حيوانات" },
-
-  // Kids & Babies (categoryId 12 → category 10 في النظام)
-  { id: 36, categoryId: 10, name: "ألعاب" },
-  { id: 37, categoryId: 10, name: "ملابس أطفال" },
-  { id: 38, categoryId: 10, name: "معدات أطفال" },
-
-  // Sports & Hobbies (categoryId 13 → category 11 في النظام)
-  { id: 39, categoryId: 11, name: "معدات رياضية" },
-  { id: 40, categoryId: 11, name: "دراجات" },
-  { id: 41, categoryId: 11, name: "آلات موسيقية" },
-
-  // Business & Industrial (categoryId 14 → category 12 في النظام)
-  { id: 42, categoryId: 12, name: "معدات صناعية" },
-  { id: 43, categoryId: 12, name: "معدات مكتبية" },
-  { id: 44, categoryId: 12, name: "جملة" },
+  // مباني وأراضي - Buildings & Lands
+  {
+    id: "769e28f5-038b-40e9-9718-427bdd95cae6",
+    categoryId: "dawaarly_sale",
+    name: "مباني وأراضي للبيع",
+    key: "dawarrly_sale_buildingsandlands",
+    categoryName: "dawaarly_sale",
+  },
+  {
+    id: "0f81033e-f9ec-4b1d-85b9-4375904bc56a",
+    categoryId: "dawaarly_rent",
+    name: "مباني واراضي للإيجار",
+    key: "dawarrly_rent_buildingsandlands",
+    categoryName: "dawaarly_rent",
+  },
 ];
+// export const subcategoriesEn = [
+//   // Properties (categoryId 1,2 → category 0,1 في النظام)
+//   { id: 0, categoryId: 1, name: "Apartments" }, // للبيع
+//   { id: 1, categoryId: 2, name: "Apartments" }, // للإيجار
+
+//   { id: 2, categoryId: 1, name: "Villas" }, // للبيع
+//   { id: 3, categoryId: 2, name: "Villas" }, // للإيجار
+
+//   { id: 4, categoryId: 1, name: "Vacation Homes" }, // للبيع
+//   { id: 5, categoryId: 2, name: "Vacation Homes" }, // للإيجار
+
+//   { id: 6, categoryId: 1, name: "Commercial" }, // للبيع
+//   { id: 7, categoryId: 2, name: "Commercial" }, // للإيجار
+
+//   { id: 8, categoryId: 1, name: "Buildings & Lands" }, // للبيع
+//   { id: 9, categoryId: 2, name: "Buildings & Lands" }, // للإيجار
+
+//   // Vehicles (categoryId 3,4 → category 2 في النظام)
+//   { id: 10, categoryId: 3, name: "Cars" },
+//   { id: 11, categoryId: 3, name: "Motorcycles" },
+//   { id: 12, categoryId: 3, name: "Spare Parts" },
+//   { id: 13, categoryId: 3, name: "Heavy Vehicles" },
+
+//   // Mobiles & Tablets (categoryId 5 → category 3 في النظام)
+//   { id: 14, categoryId: 5, name: "Mobile Phones" },
+//   { id: 15, categoryId: 5, name: "Tablets" },
+//   { id: 16, categoryId: 5, name: "Accessories" },
+
+//   // Electronics (categoryId 6 → category 4 في النظام)
+//   { id: 17, categoryId: 6, name: "TV & Audio" },
+//   { id: 18, categoryId: 6, name: "Computers" },
+//   { id: 19, categoryId: 6, name: "Video Games" },
+//   { id: 20, categoryId: 6, name: "Cameras" },
+
+//   // Home & Office (categoryId 7 → category 5 في النظام)
+//   { id: 21, categoryId: 8, name: "Furniture" },
+//   { id: 22, categoryId: 8, name: "Office Furniture" },
+//   { id: 23, categoryId: 8, name: "Home Decor" },
+
+//   // Fashion (categoryId 8 → category 6 في النظام)
+//   { id: 24, categoryId: 8, name: "Men Clothing" },
+//   { id: 25, categoryId: 8, name: "Women Clothing" },
+//   { id: 26, categoryId: 8, name: "Shoes & Bags" },
+
+//   // Jobs (categoryId 9 → category 7 في النظام)
+//   { id: 27, categoryId: 9, name: "Full Time" },
+//   { id: 28, categoryId: 9, name: "Part Time" },
+//   { id: 29, categoryId: 9, name: "Freelance" },
+
+//   // Services (categoryId 10 → category 8 في النظام)
+//   { id: 30, categoryId: 10, name: "Home Services" },
+//   { id: 31, categoryId: 10, name: "Education" },
+//   { id: 32, categoryId: 10, name: "Repair Services" },
+
+//   // Pets (categoryId 11 → category 9 في النظام)
+//   { id: 33, categoryId: 11, name: "Dogs" },
+//   { id: 34, categoryId: 11, name: "Cats" },
+//   { id: 35, categoryId: 11, name: "Pet Accessories" },
+
+//   // Kids & Babies (categoryId 12 → category 10 في النظام)
+//   { id: 36, categoryId: 12, name: "Toys" },
+//   { id: 37, categoryId: 12, name: "Kids Clothes" },
+//   { id: 38, categoryId: 12, name: "Baby Gear" },
+
+//   // Sports & Hobbies (categoryId 13 → category 11 في النظام)
+//   { id: 39, categoryId: 13, name: "Sports Equipment" },
+//   { id: 40, categoryId: 13, name: "Bicycles" },
+//   { id: 41, categoryId: 13, name: "Musical Instruments" },
+
+//   // Business & Industrial (categoryId 14 → category 12 في النظام)
+//   { id: 42, categoryId: 14, name: "Industrial Equipment" },
+//   { id: 43, categoryId: 14, name: "Office Equipment" },
+//   { id: 44, categoryId: 14, name: "Wholesale" },
+// ];
+// export const subcategoriesAr = [
+//   // Properties (categoryId 1,2 → category 0,1 في النظام)
+//   { id: 0, categoryId: 0, name: "شقق" }, // للبيع
+//   { id: 1, categoryId: 1, name: "شقق" }, // للإيجار
+
+//   { id: 2, categoryId: 0, name: "فلل" }, // للبيع
+//   { id: 3, categoryId: 1, name: "فلل" }, // للإيجار
+
+//   { id: 4, categoryId: 0, name: "منازل العطلات" }, // للبيع
+//   { id: 5, categoryId: 1, name: "منازل العطلات" }, // للإيجار
+
+//   { id: 6, categoryId: 0, name: "تجاري" }, // للبيع
+//   { id: 7, categoryId: 1, name: "تجاري" }, // للإيجار
+
+//   { id: 8, categoryId: 0, name: "مباني وأراضي" }, // للبيع
+//   { id: 9, categoryId: 1, name: "مباني وأراضي" }, // للإيجار
+
+//   // Vehicles (categoryId 3,4 → category 2 في النظام)
+//   { id: 10, categoryId: 2, name: "سيارات" },
+//   { id: 11, categoryId: 2, name: "دراجات نارية" },
+//   { id: 12, categoryId: 2, name: "قطع غيار" },
+//   { id: 13, categoryId: 2, name: "مركبات ثقيلة" },
+
+//   // Mobiles & Tablets (categoryId 5 → category 3 في النظام)
+//   { id: 14, categoryId: 3, name: "موبايلات" },
+//   { id: 15, categoryId: 3, name: "أجهزة لوحية" },
+//   { id: 16, categoryId: 3, name: "إكسسوارات" },
+
+//   // Electronics (categoryId 6 → category 4 في النظام)
+//   { id: 17, categoryId: 4, name: "تلفزيون وصوتيات" },
+//   { id: 18, categoryId: 4, name: "كمبيوترات" },
+//   { id: 19, categoryId: 4, name: "ألعاب فيديو" },
+//   { id: 20, categoryId: 4, name: "كاميرات" },
+
+//   // Home & Office (categoryId 7 → category 5 في النظام)
+//   { id: 21, categoryId: 5, name: "أثاث" },
+//   { id: 22, categoryId: 5, name: "أثاث مكتب" },
+//   { id: 23, categoryId: 5, name: "ديكور منزلي" },
+
+//   // Fashion (categoryId 8 → category 6 في النظام)
+//   { id: 24, categoryId: 6, name: "ملابس رجالية" },
+//   { id: 25, categoryId: 6, name: "ملابس نسائية" },
+//   { id: 26, categoryId: 6, name: "أحذية وحقائب" },
+
+//   // Jobs (categoryId 9 → category 7 في النظام)
+//   { id: 27, categoryId: 7, name: "دوام كامل" },
+//   { id: 28, categoryId: 7, name: "دوام جزئي" },
+//   { id: 29, categoryId: 7, name: "عمل حر" },
+
+//   // Services (categoryId 10 → category 8 في النظام)
+//   { id: 30, categoryId: 8, name: "خدمات منزلية" },
+//   { id: 31, categoryId: 8, name: "تعليم" },
+//   { id: 32, categoryId: 8, name: "خدمات صيانة" },
+
+//   // Pets (categoryId 11 → category 9 في النظام)
+//   { id: 33, categoryId: 9, name: "كلاب" },
+//   { id: 34, categoryId: 9, name: "قطط" },
+//   { id: 35, categoryId: 9, name: "إكسسوارات حيوانات" },
+
+//   // Kids & Babies (categoryId 12 → category 10 في النظام)
+//   { id: 36, categoryId: 10, name: "ألعاب" },
+//   { id: 37, categoryId: 10, name: "ملابس أطفال" },
+//   { id: 38, categoryId: 10, name: "معدات أطفال" },
+
+//   // Sports & Hobbies (categoryId 13 → category 11 في النظام)
+//   { id: 39, categoryId: 11, name: "معدات رياضية" },
+//   { id: 40, categoryId: 11, name: "دراجات" },
+//   { id: 41, categoryId: 11, name: "آلات موسيقية" },
+
+//   // Business & Industrial (categoryId 14 → category 12 في النظام)
+//   { id: 42, categoryId: 12, name: "معدات صناعية" },
+//   { id: 43, categoryId: 12, name: "معدات مكتبية" },
+//   { id: 44, categoryId: 12, name: "جملة" },
+// ];
 export const users = [
   {
     id: "u_001",

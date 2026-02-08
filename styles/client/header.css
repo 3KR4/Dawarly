@@ -455,7 +455,7 @@ header .bottom .nav .places-select .items-list span {
 header .bottom .nav .cats-nav {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 2px;
 }
 header .bottom .nav .cats-nav .cat-item {
   position: relative;

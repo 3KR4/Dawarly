@@ -3,11 +3,13 @@ import "@/styles/client/pages/home.css";
 import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 import HeroSwiper from "@/components/home/Sections/LandingSwiper";
 import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
+import SearchSection from "@/components/home/Sections/SearchSection";
 
 export default function Home() {
   return (
     <>
       <HeroSwiper />
+      <SearchSection />
       <CategoriesSwiper type={`cat`} />
       {/* <CategoriesSwiper type={`sub-cat`} catId={3} /> */}
       <AdsSwiper type={`newly_added`} />

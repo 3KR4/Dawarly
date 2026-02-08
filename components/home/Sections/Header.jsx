@@ -20,8 +20,8 @@ import { GrLanguage } from "react-icons/gr";
 import { usePathname } from "next/navigation";
 import {
   categoriesEn,
-  subcategoriesEn,
   categoriesAr,
+  subcategoriesEn,
   subcategoriesAr,
 } from "@/data";
 import { LuMessageSquare } from "react-icons/lu";
@@ -30,6 +30,8 @@ import { MdLogout } from "react-icons/md";
 import useTranslate from "@/Contexts/useTranslation";
 import SelectLocation from "@/components/Tools/data-collector/selectLocation";
 import useClickOutside from "@/Contexts/useClickOutside";
+import { getAllSubCats } from "@/services/subCategories/subCats.service";
+import { ImPower } from "react-icons/im";
 
 function Header() {
   const t = useTranslate();
@@ -43,8 +45,10 @@ function Header() {
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-
+  const [dawaarlySubCat, setDawaarlySubCat] = useState([]);
   useEffect(() => {
+    setDawaarlySubCat(locale == "en" ? subcategoriesEn : subcategoriesAr);
+
     const fetchCategories = async () => {
       // try {
       //   const { data } = await getService.getDynamicFilters(6);
@@ -56,10 +60,15 @@ function Header() {
       //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
       // }
       setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
+
+      getAllSubCats(locale)
+        .then((res) => setSubcategories(res.data.data))
+        .catch(console.error);
     };
     fetchCategories();
   }, [locale]);
+
+  console.log(dawaarlySubCat);
 
   const [isLogin, setIsLogin] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
@@ -72,20 +81,20 @@ function Header() {
 
   const searchInputRef = useRef(null);
 
-  let firstCategories = [];
-  let secondCategories = [];
+  // let firstCategories = [];
+  // let secondCategories = [];
 
-  if (screenSize === "large") {
-    firstCategories = categories.slice(0, 4);
-    secondCategories = categories.slice(4, 12);
-  } else if (screenSize === "med") {
-    firstCategories = categories.slice(0, 2);
-    secondCategories = categories.slice(2, 12);
-  } else {
-    // small
-    firstCategories = categories;
-    secondCategories = [];
-  }
+  // if (screenSize === "large") {
+  //   firstCategories = categories.slice(0, 4);
+  //   secondCategories = categories.slice(4, 12);
+  // } else if (screenSize === "med") {
+  //   firstCategories = categories.slice(0, 2);
+  //   secondCategories = categories.slice(2, 12);
+  // } else {
+  //   // small
+  //   firstCategories = categories;
+  //   secondCategories = [];
+  // }
 
   const openMenu = (id) => {
     setActiveMenu("sub-cats");
@@ -291,7 +300,55 @@ function Header() {
                 className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
                 ref={menuRef2}
               >
-                {firstCategories?.map((cat) => {
+                <div
+                  className="cat-item"
+                  onMouseEnter={
+                    !screenSize.includes("small")
+                      ? () => openMenu("dawaarly-exclusive")
+                      : undefined
+                  }
+                  onMouseLeave={
+                    !screenSize.includes("small") ? closeMenu : undefined
+                  }
+                >
+                  <Link
+                    href={""}
+                    onClick={(e) => {
+                      if (screenSize !== "large") {
+                        e.preventDefault();
+                        toggleMenu("dawaarly-exclusive");
+                      }
+                    }}
+                  >
+                    <ImPower />
+                    {"dawaarly-exclusive"}
+                    <FaAngleDown />
+                  </Link>
+
+                  {activeSubCat === `dawaarly-exclusive` && (
+                    <div
+                      className="menu active"
+                      onMouseEnter={
+                        !screenSize.includes("small")
+                          ? () => openMenu(`dawaarly-exclusive`)
+                          : undefined
+                      }
+                      onMouseLeave={
+                        !screenSize.includes("small") ? closeMenu : undefined
+                      }
+                    >
+                      <div className="sub-cats">
+                        {/* ترتيب يدوي حسب المطلوب */}
+                        {dawaarlySubCat?.map((x) => (
+                          <Link key={x.id} href={`/market?subcat=${x.id}`}>
+                            {x.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {categories?.slice(2, 4)?.map((cat) => {
                   const isActive = activeSubCat === cat?.id;
                   const Icon = cat?.icon;
 
@@ -340,7 +397,7 @@ function Header() {
                         >
                           <div className="sub-cats">
                             {subcategories
-                              .filter((x) => x.categoryId === cat?.id)
+                              .filter((x) => x.categoryName == cat?.id)
                               .map((sub) => (
                                 <Link
                                   key={sub.id}
@@ -356,7 +413,7 @@ function Header() {
                   );
                 })}
 
-                {!screenSize.includes("small") && (
+                {/* {!screenSize.includes("small") && (
                   <div
                     key={50}
                     className="cat-item"
@@ -414,7 +471,7 @@ function Header() {
                       </div>
                     )}
                   </div>
-                )}
+                )} */}
               </div>
             </div>
             {!screenSize.includes("small") && (

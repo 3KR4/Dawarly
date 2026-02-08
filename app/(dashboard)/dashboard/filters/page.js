@@ -47,7 +47,6 @@ export default function FiltersPage() {
   const [subCategories, setSubCategories] = useState([]);
   const [category, setCategory] = useState(null);
   const [subCategory, setSubCategory] = useState(null);
-  console.log(subCategory);
 
   const STEPS = { CATEGORIES: 1, SUB_CATEGORIES: 2, FORM: 3 };
   const [step, setStep] = useState(STEPS.CATEGORIES);
@@ -134,76 +133,105 @@ export default function FiltersPage() {
     });
   };
 
-  const openEdit = async (filter) => {
-    setMode("edit");
-    setMenuType("form");
-    setStep(STEPS.FORM);
-    setEditingFilter(filter);
+const openEdit = async (filter) => {
+  setMode("edit");
+  setMenuType("form");
+  setStep(STEPS.FORM);
+  setEditingFilter(filter);
 
-    try {
-      /* ===== 1. GET FILTER ===== */
-      const filterRes = await getOneFilter(filter.id);
-      const data = filterRes.data.data;
-      console.log("data", data);
+  try {
+    /* ===== 1. GET FILTER ===== */
+    const filterRes = await getOneFilter(filter.id);
+    const data = filterRes.data.data;
 
-      /* ===== 2. BUILD LABEL TRANSLATIONS ===== */
-      const labelTranslations = { en: "", ar: "" };
-      data.translations?.forEach((t) => {
-        labelTranslations[t.lang] = t.label;
-      });
-      console.log("labelTranslations", labelTranslations);
+    /* ===== 2. FILTER LABEL TRANSLATIONS ===== */
+    const labelTranslations = { en: "", ar: "" };
+    data.translations.forEach((t) => {
+      labelTranslations[t.lang] = t.label;
+    });
 
-      /* ===== 3. GET OPTIONS (EN & AR) ===== */
-      const [optionsEn, optionsAr] = await Promise.all([
-        getFilterOptions(filter.id, "en"),
-        getFilterOptions(filter.id, "ar"),
-      ]);
+    /* ===== 3. GET OPTIONS (EN & AR) ===== */
+    const [optionsEn, optionsAr] = await Promise.all([
+      getFilterOptions(filter.id, "en"),
+      getFilterOptions(filter.id, "ar"),
+    ]);
 
-      /* ===== 4. MERGE OPTIONS ===== */
-      const optionsMap = {};
+    /* ===== 4. MERGE OPTIONS ===== */
+    const optionsMap = {};
 
-      optionsEn.data.data.forEach((opt) => {
+    // EN
+    optionsEn.data.data.forEach((opt) => {
+      optionsMap[opt.id] = {
+        id: opt.id,
+        value: opt.value,
+        translations: {
+          en: {
+            id: opt.translations[0].id,
+            label: opt.label,
+          },
+          ar: {
+            id: null,
+            label: "",
+          },
+        },
+      };
+    });
+
+    // AR
+    optionsAr.data.data.forEach((opt) => {
+      if (!optionsMap[opt.id]) {
         optionsMap[opt.id] = {
           id: opt.id,
           value: opt.value,
-          translations: { en: opt.label, ar: "" },
+          translations: {
+            en: { id: null, label: "" },
+            ar: {
+              id: opt.translations[0].id,
+              label: opt.label,
+            },
+          },
         };
-      });
+      } else {
+        optionsMap[opt.id].translations.ar = {
+          id: opt.translations[0].id,
+          label: opt.label,
+        };
+      }
+    });
 
-      optionsAr.data.data.forEach((opt) => {
-        if (!optionsMap[opt.id]) {
-          optionsMap[opt.id] = {
-            id: opt.id,
-            value: opt.value,
-            translations: { en: "", ar: opt.label },
-          };
-        } else {
-          optionsMap[opt.id].translations.ar = opt.label;
-        }
-      });
+    const mergedOptions = Object.values(optionsMap);
 
-      const mergedOptions = Object.values(optionsMap);
+    /* ===== 5. RESET FORM ===== */
+    reset({
+      key: data.key,
+      type: { value: data.type, label: data.type },
+      label: labelTranslations,
+      required: data.required,
+      filterable: data.filterable,
+      options:
+        mergedOptions.length > 0
+          ? mergedOptions
+          : [
+              {
+                value: "",
+                translations: {
+                  en: { id: null, label: "" },
+                  ar: { id: null, label: "" },
+                },
+              },
+            ],
+    });
 
-      console.log("mergedOptions", mergedOptions);
+    // مهم جدًا للمقارنة
+    setOriginalData({
+      ...data,
+      options: mergedOptions,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-      /* ===== 5. RESET FORM ===== */
-      reset({
-        key: data.key,
-        type: { value: data.type, label: data.type },
-        label: labelTranslations,
-        required: data.required,
-        filterable: data.filterable,
-        options:
-          mergedOptions.length > 0
-            ? mergedOptions
-            : [{ value: "", translations: { en: "", ar: "" } }],
-      });
-
-      setOriginalData(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const closeMenu = () => {
     setMenuType(null);
@@ -256,55 +284,59 @@ export default function FiltersPage() {
         closeMenu();
       }
       /* ===== EDIT ===== */
-      if (mode === "edit") {
-        await updateFilter(editingFilter.id, {
-          key: data.key,
-          type: data.type,
-          required: data.required,
-          filterable: data.filterable,
-        });
+if (mode === "edit") {
+  /* ===== 1. UPDATE FILTER BASE ===== */
+  await updateFilter(editingFilter.id, {
+    key: data.key,
+    type: data.type.value,
+    required: data.required,
+    filterable: data.filterable,
+  });
 
-        const transId = editingFilter.translations.find(
-          (t) => t.lang === curentCreateLocale,
-        ).id;
-        await updateFilterLang(transId, {
-          label: data.label[curentCreateLocale],
-        });
+  /* ===== 2. UPDATE FILTER TRANSLATIONS ===== */
+  for (const trans of editingFilter.translations) {
+    const newLabel = data.label[trans.lang];
+    if (newLabel !== trans.label) {
+      await updateFilterLang(trans.id, { label: newLabel });
+    }
+  }
 
-        for (const opt of data.options) {
-          if (!opt.id) {
-            await createOption(editingFilter.id, {
-              value: opt.value,
-              translations: [
-                { lang: "en", label: opt.translations.en },
-                { lang: "ar", label: opt.translations.ar },
-              ],
-            });
-          } else {
-            await updateOption(opt.id, { value: opt.value });
-            const optTransId = opt.translations?.find(
-              (t) => t.lang === curentCreateLocale,
-            )?.id;
-            if (optTransId)
-              await updateOptionLang(optTransId, {
-                label: opt.translations[curentCreateLocale],
-              });
-          }
-        }
+  /* ===== 3. OPTIONS ===== */
+  for (const opt of data.options) {
+    /* --- NEW OPTION --- */
+    if (!opt.id) {
+      await createOption(editingFilter.id, {
+        value: opt.value,
+        translations: [
+          { lang: "en", label: opt.translations.en.label },
+          { lang: "ar", label: opt.translations.ar.label },
+        ],
+      });
+      continue;
+    }
 
-        setFilters((prev) => {
-          const updated = { ...prev };
-          Object.keys(updated).forEach((subCat) => {
-            updated[subCat] = updated[subCat].map((f) =>
-              f.id === editingFilter.id
-                ? { ...f, key: data.key, label: data.label[curentCreateLocale] }
-                : f,
-            );
-          });
-          return updated;
-        });
-        closeMenu();
+    const originalOpt = originalData.options.find((o) => o.id === opt.id);
+
+    /* --- UPDATE VALUE --- */
+    if (originalOpt.value !== opt.value) {
+      await updateOption(opt.id, { value: opt.value });
+    }
+
+    /* --- UPDATE TRANSLATIONS --- */
+    for (const lang of ["en", "ar"]) {
+      const oldLabel = originalOpt.translations[lang]?.label;
+      const newLabel = opt.translations[lang]?.label;
+      const transId = opt.translations[lang]?.id;
+
+      if (newLabel !== oldLabel && transId) {
+        await updateOptionLang(transId, { label: newLabel });
       }
+    }
+  }
+
+  closeMenu();
+}
+
     } catch (err) {
       console.error(err);
     } finally {

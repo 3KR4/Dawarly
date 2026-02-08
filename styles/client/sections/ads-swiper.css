@@ -18,7 +18,7 @@
   font-size: 20px;
   transform: translateY(-2px);
 }
-.swiper-section:not(:has(.nav-btn)) .top {
+.swiper-section:not(:has(.nav-btn)) > .top {
   padding: 0 5px;
 }
 .swiper-section .top .link {
