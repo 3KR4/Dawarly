@@ -2,7 +2,7 @@
 import Rating from "@mui/material/Rating";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { formatEGP } from "@/utils/formatCurrency";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 import Image from "next/image";
 import { FaTrashAlt, FaEye } from "react-icons/fa";
@@ -119,13 +119,13 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                     </div>
 
                     <div className="item-price">
-                      {formatEGP(item?.price, locale)}
+                      {formatCurrency(item?.price, "EGP", locale)}
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="item-price">
-                      {formatEGP(item?.price, locale)}
+                      {formatCurrency(item?.price, "EGP", locale)}
                     </div>
 
                     <div className="item-categories nisted">

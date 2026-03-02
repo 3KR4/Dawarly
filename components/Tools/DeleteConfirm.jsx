@@ -6,7 +6,6 @@ export default function DeleteConfirm({
   onCancel,
   loading,
 }) {
-  console.log(loading);
   
   return (
     <div className="confirm-box">

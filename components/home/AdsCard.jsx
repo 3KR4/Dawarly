@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import React, { useContext, useState, useEffect } from "react";
-import { formatEGP } from "@/utils/formatCurrency";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { settings } from "@/Contexts/settings";
 import "@/styles/client/ad-card.css";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
@@ -11,6 +11,7 @@ import { isArabic } from "@/utils/detectDirection";
 import useTranslate from "@/Contexts/useTranslation";
 import { specsConfig } from "@/Contexts/specsConfig";
 import { subcategoriesEn, subcategoriesAr } from "@/data";
+import { FaEye } from "react-icons/fa";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
@@ -96,7 +97,7 @@ export default function CardItem({ data }) {
           </Link>
         </div>
         <div className="row-holder">
-          <h3>{formatEGP(data?.price, locale)}</h3>
+          <h3>{formatCurrency(data?.price, "EGP", locale)}</h3>
           <span className={`status`}>{data?.status}</span>
           <span className={`condition`}>{data?.condition}</span>
         </div>

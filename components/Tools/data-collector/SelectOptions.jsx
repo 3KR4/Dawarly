@@ -117,7 +117,6 @@ function SelectOptions({
   };
 
   const handleSelect = (item) => {
-    console.log(item);
 
     onChange(item);
     setActive(false);
