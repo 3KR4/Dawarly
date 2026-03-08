@@ -1,15 +1,9 @@
 "use client";
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo, useContext } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { CircleAlert } from "lucide-react";
-
-const normalize = (text = "") =>
-  text
-    .toLowerCase()
-    .replace(/[أإآ]/g, "ا")
-    .replace(/ى/g, "ي")
-    .replace(/ة/g, "ه");
+import { settings } from "@/Contexts/settings";
 
 function SelectOptions({
   size = "large",
@@ -18,142 +12,101 @@ function SelectOptions({
   options = [],
   value,
   onChange,
-  tPath,
+  type,
   disabled = false,
-  noTranslate = false,
-  error, // error message
+  error,
   required = false,
-  t, // translation object
-  locale = "en", // current locale
 }) {
+  const { locale } = useContext(settings);
   const [active, setActive] = useState(false);
   const [search, setSearch] = useState("");
-  const [hasError, setHasError] = useState(false);
   const selectRef = useRef(null);
 
-  // 👈 دالة جديدة لاستخراج النص بناءً على locale
   const getText = (item) => {
-    if (noTranslate) {
-      // إذا كان noTranslate = true، اسم العرض بناءً على locale
-      if (typeof item.name === "object" && item.name !== null) {
-        // كائن name يحتوي على en و ar
-        return item.name[locale] || item.name.en || "";
-      }
-      // إذا كان string قديم
-      return item.name || "";
-    }
+    if (!item) return "";
 
-    // إذا كان هناك ترجمة من tPath
-    if (t && t[tPath] && typeof item.name === "string") {
-      return t[tPath][item.name] || item.name;
-    }
+    if (type === "users") return item.full_name;
 
-    // fallback
-    if (typeof item.name === "object") {
-      return item.name[locale] || item.name.en || "";
-    }
-
-    return item.name || "";
+    return item[`name_${locale}`] || item.name_en || "";
   };
 
-  // 👈 دالة للحصول على القيمة المحددة للعرض
-  const getDisplayValue = () => {
-    if (!value) return "";
-
-    if (typeof value === "object") {
-      // لو فيه label (أغلب الـ selects)
-      if (value.label) return value.label;
-
-      // لو فيه value
-      if (value.value) return value.value;
-
-      // لو فيه name (احتياطي)
-      if (value.name) {
-        if (typeof value.name === "object") {
-          return value.name[locale] || value.name.en || "";
-        }
-        return value.name;
-      }
-      return "";
-    }
-
-    // string أو number
-    return value.toString();
-  };
+  /* ---------------- SEARCH ---------------- */
   const filteredOptions = useMemo(() => {
     if (!search) return options;
 
+    const normalizedSearch = search.toLowerCase();
+
     return options.filter((item) => {
-      const text = getText(item);
-      return normalize(text).includes(normalize(search));
+      const combinedText =
+        `${item.name_en || ""} ${item.name_ar || ""}`.toLowerCase();
+      return combinedText.includes(normalizedSearch);
     });
-  }, [options, search, noTranslate, tPath, t, locale]);
+  }, [options, search]);
+
+  /* ---------------- CLOSE OUTSIDE ---------------- */
 
   useEffect(() => {
-    const close = () => {
-      setActive(false);
-      setSearch("");
+    const handleClickOutside = (e) => {
+      if (selectRef.current && !selectRef.current.contains(e.target)) {
+        setActive(false);
+        setSearch("");
+      }
     };
-    window.addEventListener("closeAllSelects", close);
-    return () => window.removeEventListener("closeAllSelects", close);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    // Update error state when external error changes
-    setHasError(!!error);
-  }, [error]);
+  /* ---------------- STATUS COLORS ---------------- */
 
-  useEffect(() => {
-    // Clear error when value is selected
-    if (value && hasError) {
-      setHasError(false);
-    }
-  }, [value, hasError]);
-
-  const openSelect = () => {
-    if (disabled) return;
-    window.dispatchEvent(new Event("closeAllSelects"));
-    setActive(true);
-  };
-
-  const handleSelect = (item) => {
-    console.log(item);
-
-    onChange(item);
-    setActive(false);
-    setSearch("");
-    setHasError(false);
-  };
-
-  const handleClose = () => {
-    setActive(false);
-    setSearch("");
-  };
   const statusColors = {
-    active: "#deffe7", // أخضر فاتح
-    paused: "#fff6db", // أصفر فاتح
-    sold: "#ddcff7", // أحمر فاتح
+    active: "#deffe7",
+    paused: "#fff6db",
+    sold: "#ddcff7",
+    cancelled: "#ffdede",
+    accepted: "#deffe7",
   };
+
   const getBtnBg = () => {
-    if (!value) return ""; // default
-    const val = typeof value === "object" ? value.name : value; // خدي الاسم الفعلي
+    if (!value) return "";
+
+    const val = typeof value === "object" ? value.name || value.status : value;
 
     return statusColors[val] || "";
   };
+
+  /* ---------------- HANDLERS ---------------- */
+
+  const toggle = () => {
+    if (disabled) return;
+    setActive(!active);
+  };
+
+  const handleSelect = (item) => {
+    onChange(item);
+    setActive(false);
+    setSearch("");
+  };
+
+  /* ---------------- UI ---------------- */
+
   return (
-    <div className={`box forInput ${disabled ? "disabled" : ""}`}>
+    <div
+      className={`box forInput ${disabled ? "disabled" : ""}`}
+      ref={selectRef}
+    >
       {label && (
         <label>
           {label} {required && <span className="required">*</span>}
         </label>
       )}
 
-      <div className={`selectOptions ${size}`} ref={selectRef}>
+      <div className={`selectOptions ${size}`}>
         <div
-          className={`btn ${hasError ? "error-border" : ""}`}
+          className={`btn ${error ? "error-border" : ""}`}
           style={{ backgroundColor: getBtnBg() }}
         >
-          <h4 className="ellipsis" onClick={openSelect}>
+          <h4 className="ellipsis" onClick={toggle}>
             {active ? (
               <input
                 autoFocus
@@ -162,46 +115,42 @@ function SelectOptions({
                 placeholder={placeholder}
                 className="search-input"
               />
+            ) : value ? (
+              // العرض حسب الـ locale بس
+              value[`name_${locale}`]
             ) : (
-              getDisplayValue() || placeholder
+              placeholder
             )}
           </h4>
 
           {active ? (
-            <IoMdClose className="main-ico" onClick={handleClose} />
+            <IoMdClose className="main-ico" onClick={toggle} />
           ) : (
-            <IoIosArrowDown className="main-ico" onClick={openSelect} />
+            <IoIosArrowDown className="main-ico" onClick={toggle} />
           )}
         </div>
 
         {active && (
           <div className="menu active">
             {filteredOptions.length ? (
-              filteredOptions.map((item) => {
-                const text = getText(item);
-                const isSelected = getDisplayValue() === text;
-
-                return (
-                  <button
-                    type="button"
-                    key={item.id}
-                    className={isSelected ? "active" : ""}
-                    onClick={() => handleSelect(item)}
-                  >
-                    {text}
-                  </button>
-                );
-              })
+              filteredOptions.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={value?.id === item.id ? "active" : ""}
+                  onClick={() => handleSelect(item)}
+                >
+                  {getText(item)}
+                </button>
+              ))
             ) : (
-              <div className="no-results">
-                {locale === "ar" ? "لا توجد نتائج" : "No results"}
-              </div>
+              <div className="no-results">No results</div>
             )}
           </div>
         )}
       </div>
 
-      {hasError && !disabled && (
+      {error && !disabled && (
         <span className="error">
           <CircleAlert size={16} />
           {error}

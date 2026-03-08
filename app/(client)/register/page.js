@@ -4,9 +4,6 @@ import Image from "next/image";
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
-import governoratesEn from "@/data/governoratesEn.json";
-import governoratesAr from "@/data/governoratesAr.json";
-import cities from "@/data/cities.json";
 
 import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
@@ -32,49 +29,58 @@ import {
   resendEmailOtp,
 } from "@/services/auth/auth.service";
 import { useAuth } from "@/Contexts/AuthContext";
+import {
+  getCities,
+  getGovernorates,
+  getSubCategories,
+} from "@/services/data/data.service";
 export default function Register() {
   const { login } = useAuth();
   const t = useTranslate();
-  const { locale } = useContext(settings);
+  const { locale, theme } = useContext(settings);
   const auth = t.auth;
   const redirectAfterLogin = useRedirectAfterLogin();
-  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
   const [governorates, setGovernorates] = useState([]);
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
+    const fetchData = async () => {
+      try {
+        const [govRes, subCatRes] = await Promise.all([
+          getGovernorates(null),
+          getSubCategories(null),
+        ]);
+        console.log("govRes: ", govRes);
+
+        setGovernorates(govRes.data);
+        setSubCategories(subCatRes.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
-    fetchCategories();
-  }, [locale]);
+
+    fetchData();
+  }, []);
 
   const STEPS = {
     ACCOUNT: 1,
-    PHONE_VERIFY: 2,
-    EMAIL_VERIFY: 3,
     ADDRESS: 4,
     INTERESTS: 5,
+    // PHONE_VERIFY: 2,
+    EMAIL_VERIFY: 3,
     LOGIN: 6,
     FORGET_PASS: 7,
     FORGET_PASS_VERIFY: 8,
     VIEW_OR_UPDATE_PASS: 9,
   };
   const [userId, setUserId] = useState(null);
-  const [step, setStep] = useState(STEPS.ACCOUNT);
+  const [step, setStep] = useState(STEPS.ADDRESS);
   const [userAddress, setUserAddress] = useState({
     gov: null,
     city: null,
   });
+
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [verifyMethod, setVerifyMethod] = useState("");
   const [availableMethod, setAvailableMethod] = useState("both");
@@ -87,8 +93,14 @@ export default function Register() {
     handleSubmit,
     watch,
     formState: { errors },
-    reset,
   } = useForm();
+
+  const [errorTracker, setErrorTracker] = useState({
+    gov: null,
+    city: null,
+    gender: null,
+    birthDate: null,
+  });
 
   const password = watch("password", "");
   const [passEye, setPassEye] = useState({ password: false, confirm: false });
@@ -98,9 +110,22 @@ export default function Register() {
     setUserAddress((prev) => ({ ...prev, [type]: value }));
   };
 
-  const filteredCities = cities.filter(
-    (c) => c.gov_id === userAddress.gov?.id,
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!userAddress.gov?.id) return;
+
+        const citiesRes = await getCities(userAddress.gov.id);
+        console.log("citiesRes: ", citiesRes);
+
+        setCities(citiesRes.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [userAddress.gov]);
 
   const toggleCategory = (id) => {
     setSelectedCategories((prev) =>
@@ -138,75 +163,48 @@ export default function Register() {
       }
       /* ===== CREATE ACCOUNT ===== */
       if (step === STEPS.ACCOUNT) {
-        const payload = {
-          name: data.fullname,
-          email: data.email,
-          pass: data.password,
-          confirmpassword: data.passwordConfirmation,
-          phone: data.phone,
-        };
-
-        const res = await registerUser(payload);
-
-        localStorage.setItem("token", res.data.token);
-        setUserId(res.data.data.id);
-
-        setStep(STEPS.PHONE_VERIFY);
-        return;
-      }
-
-      /* ===== VERIFY OTP ===== */
-      if (step === STEPS.PHONE_VERIFY || step === STEPS.EMAIL_VERIFY) {
-        const code = otp.join("");
-
-        await verifyUserOtp(userId, code);
-        redirectAfterLogin();
         setStep(STEPS.ADDRESS);
         return;
       }
+      if (step === STEPS.ADDRESS) {
+        if (!data.gov) return; // سيب validation يقوم بعرض الرسالة
+        if (!data.city) return;
+        setStep(STEPS.INTERESTS);
+        return;
+      }
+      if (step === STEPS.INTERESTS) {
+        setStep(STEPS.EMAIL_VERIFY);
+        return;
+      }
+
+      if (step === STEPS.FORGET_PASS) {
+        setStep(STEPS.FORGET_PASS_VERIFY);
+        return;
+      }
+
+      if (step === STEPS.FORGET_PASS_VERIFY) {
+        setStep(STEPS.VIEW_OR_UPDATE_PASS);
+        return;
+      }
+
+      console.log("FINAL REQUEST", {
+        full_name: data.fullname,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        birth_date: "2000-04-10",
+        gender: "MALE",
+
+        country_id: 1,
+        governorate_id: userAddress.gov,
+        city_id: userAddress.city,
+        language: locale,
+        theme: theme,
+        interests: selectedCategories,
+      });
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      console.log(err);
     }
-
-    // if (step === STEPS.ACCOUNT) {
-    //   setStep(STEPS.PHONE_VERIFY);
-    //   return;
-    // }
-
-    // if (step === STEPS.PHONE_VERIFY) {
-    //   if (data.email) {
-    //     setStep(STEPS.EMAIL_VERIFY);
-    //   } else {
-    //     setStep(STEPS.ADDRESS);
-    //   }
-    //   return;
-    // }
-
-    // if (step === STEPS.EMAIL_VERIFY) {
-    //   setStep(STEPS.ADDRESS);
-    //   return;
-    // }
-
-    if (step === STEPS.ADDRESS) {
-      setStep(STEPS.INTERESTS);
-      return;
-    }
-
-    if (step === STEPS.FORGET_PASS) {
-      setStep(STEPS.FORGET_PASS_VERIFY);
-      return;
-    }
-
-    if (step === STEPS.FORGET_PASS_VERIFY) {
-      setStep(STEPS.VIEW_OR_UPDATE_PASS);
-      return;
-    }
-
-    console.log("FINAL REQUEST", {
-      userData: data,
-      address: userAddress,
-      categories: selectedCategories,
-    });
   };
 
   const titles = {
@@ -248,6 +246,8 @@ export default function Register() {
 
     [STEPS.INTERESTS]: auth.finishAccount,
   };
+
+  console.log(errors.gov?.message);
 
   return (
     <div className="form-holder register">
@@ -395,51 +395,14 @@ export default function Register() {
             </div>
 
             <div className="box forInput">
-              <label>{auth.phone}</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <Phone />
-                  <input
-                    type="tel"
-                    id="phone"
-                    {...register("phone", {
-                      required: auth.errors.requiredPhone,
-                      pattern: {
-                        value:
-                          /^\+?[0-9]{1,3}?[-.\s]?(\(?\d{1,4}\)?[-.\s]?){1,4}\d{1,4}$/,
-                        message: auth.errors.invalidPhone,
-                      },
-                      minLength: {
-                        value: 7,
-                        message: auth.errors.phoneTooShort,
-                      },
-                      maxLength: {
-                        value: 15,
-                        message: auth.errors.phoneTooLong,
-                      },
-                    })}
-                    placeholder={auth.placeholders.phone}
-                  />
-                </div>
-                {errors.phone && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.phone.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="box forInput">
-              <label>
-                {auth.email} <span>({auth.optional})</span>
-              </label>
+              <label>{auth.email}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <Mail />
                   <input
                     type="email"
                     {...register("email", {
+                      required: auth.errors.requiredEmail,
                       pattern: {
                         value:
                           /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -453,6 +416,33 @@ export default function Register() {
                   <span className="error">
                     <CircleAlert />
                     {errors.email.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="box forInput">
+              <label>{auth.phone}</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <Phone />
+                  <input
+                    type="tel"
+                    id="phone"
+                    {...register("phone", {
+                      required: auth.errors.requiredPhone,
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: auth.errors.invalidPhone,
+                      },
+                    })}
+                    placeholder={auth.placeholders.phone}
+                  />
+                </div>
+                {errors.phone && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.phone.message}
                   </span>
                 )}
               </div>
@@ -678,22 +668,30 @@ export default function Register() {
               label={t.location.yourGovernorate}
               placeholder={t.location.selectGovernorate}
               options={governorates}
-              value={userAddress.gov ? userAddress.gov.name : ""}
-              tPath="governorates"
+              value={watch("gov") || null} // ربط القيمة بالـ form
+              type="govs"
               onChange={(item) => {
+                setValue("gov", item, { shouldValidate: true }); // مهم للتحقق
                 handleAddress("gov", item);
+                setValue("city", null, { shouldValidate: true }); // مسح المدينة عند تغيير المحافظة
                 handleAddress("city", null);
               }}
+              error={errors.gov?.message} // اظهار الرسالة
+              required={true}
             />
 
             <SelectOptions
               label={t.location.yourCity}
               placeholder={t.location.selectCity}
-              options={filteredCities}
-              value={userAddress.city ? userAddress.city.name : ""}
-              tPath="cities"
-              disabled={!userAddress.gov}
-              onChange={(item) => handleAddress("city", item)}
+              options={cities}
+              value={watch("city") || null}
+              type="citys"
+              disabled={!watch("gov")}
+              onChange={(item) =>
+                setValue("city", item, { shouldValidate: true })
+              }
+              error={errors.city?.message}
+              required={true}
             />
           </>
         )}
@@ -701,8 +699,8 @@ export default function Register() {
         {/* ================= INTERESTS SELECTION ================= */}
         {step === STEPS.INTERESTS && (
           <div className="options-grid">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
+            {subCategories?.map((cat) => {
+              const Icon = cat?.icon;
               const active = selectedCategories.includes(cat.id);
 
               return (
@@ -711,8 +709,8 @@ export default function Register() {
                   className={`option-box ${active ? "active" : ""}`}
                   onClick={() => toggleCategory(cat.id)}
                 >
-                  <Icon className="cat-icon" />
-                  <span>{cat.name}</span>
+                  {/* <Icon className="cat-icon" /> */}
+                  <span>{cat[`name_${locale}`]}</span>
                 </div>
               );
             })}
