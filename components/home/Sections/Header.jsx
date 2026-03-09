@@ -68,7 +68,6 @@ function Header() {
     fetchCategories();
   }, [locale]);
 
-  console.log(dawaarlySubCat);
 
   const [isLogin, setIsLogin] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");

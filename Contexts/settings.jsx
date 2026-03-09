@@ -38,7 +38,6 @@ export const SettingsProvider = ({ children }) => {
       setIsNavOpen(false);
     }
   }, [screenSize]);
-  console.log(isNavOpen);
 
   useEffect(() => {
     setIsNavOpen(false);

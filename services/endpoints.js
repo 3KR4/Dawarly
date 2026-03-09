@@ -35,7 +35,7 @@ export const ENDPOINTS = {
 
   ADS: {
     GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
-    GET_ONE_AD: (cat, id) => `/${cat}/${id}`,
+    GET_ONE_AD: (id) => `/ads/${id}`,
     CREATE: (cat, subId) => `/${cat}/subCategory/${subId}`,
     UPDATE: (cat, id) => `/${cat}/${id}`,
     DELETE: (cat, id) => `/${cat}/${id}`,

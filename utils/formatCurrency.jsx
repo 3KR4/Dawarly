@@ -1,11 +1,11 @@
-export const formatEGP = (value, locale = "ar") => {
-  if (value === null || value === undefined) return "";
+export const formatCurrency = (amount, currency = "EGP", locale = "en") => {
+  if (!amount) return "";
 
-  const lang = locale === "en" ? "en-EG" : "ar-EG";
-
-  return new Intl.NumberFormat(lang, {
-    style: "currency",
-    currency: "EGP",
-    maximumFractionDigits: 0,
-  }).format(value);
+  return new Intl.NumberFormat(
+    locale === "ar" ? "ar-EG" : "en-US",
+    {
+      style: "currency",
+      currency,
+    }
+  ).format(Number(amount));
 };

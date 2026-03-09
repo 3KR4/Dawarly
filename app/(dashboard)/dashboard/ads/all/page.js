@@ -2,7 +2,7 @@
 import Rating from "@mui/material/Rating";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { formatEGP } from "@/utils/formatCurrency";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 import Image from "next/image";
 import "@/styles/dashboard/tables.css";

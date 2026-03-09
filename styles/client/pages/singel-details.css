@@ -73,7 +73,7 @@
 .single-page .images-holder .imgs-swiper .img img {
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
   transition: 0.3s;
   position: relative !important;
 }
@@ -149,6 +149,12 @@
   justify-content: space-between;
   gap: 15px;
   line-height: 1;
+}
+.single-page .details-holder .row.stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
 }
 .single-page .details-holder .card .btns {
   display: flex;
@@ -393,7 +399,7 @@
   color: var(--main-color);
   font-size: 28px;
   font-weight: 700;
-  margin: 3px 0 4px;
+  margin: 7px 0 5px;
 }
 .single-page .details-holder h5 {
   font-size: 16px;
@@ -450,9 +456,14 @@
   font-weight: 400;
   line-height: 1.4;
 }
+.single-page .details-holder .right .user-info .row-holder {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .single-page .details-holder .right .user-info p {
   font-weight: 600;
-  margin: 0px 0 4px;
   font-size: 14px;
 }
 
@@ -496,24 +507,26 @@
   height: 35px;
 }
 
-.single-page .details-holder .right .safety {
-}
-.single-page .details-holder .right .safety ul {
+
+.single-page .details-holder ul.list {
   flex-direction: column;
   gap: 7px;
   font-size: 14px;
   display: flex;
   padding-left: 15px;
 }
-[lang="ar"] .single-page .details-holder .right .safety ul {
+[lang="ar"] .single-page .details-holder ul.list {
   padding-right: 15px;
   padding-left: unset;
 }
-.single-page .details-holder .right .safety ul li {
+.single-page .details-holder ul.list li {
   line-height: 1.2;
   position: relative;
 }
-.single-page .details-holder .right .safety ul li::before {
+.single-page .details-holder .left ul.list li {
+      font-weight: 600;
+}
+.single-page .details-holder ul.list li::before {
   content: "•";
   font-size: 14px;
   border-radius: 50%;
@@ -522,7 +535,7 @@
   left: -12px;
   top: -2px;
 }
-[lang="ar"] .single-page .details-holder .right .safety ul li::before {
+[lang="ar"] .single-page .details-holder ul.list li::before {
   left: unset;
   right: -12px;
 }

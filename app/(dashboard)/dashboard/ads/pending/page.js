@@ -2,7 +2,7 @@
 import Rating from "@mui/material/Rating";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { formatEGP } from "@/utils/formatCurrency";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 import Image from "next/image";
 import "@/styles/dashboard/tables.css";
@@ -111,7 +111,7 @@ export default function ActiveAds() {
                     </div>
                   </div>
                   <div className="item-price">
-                    {formatEGP(item?.price, locale)}
+                    {formatCurrency(item?.price, "EGP", locale)}
                   </div>
                   <div className="item-categories nisted">
                     <Link href={`/market?cat=${adCat?.id}`} className="link">
