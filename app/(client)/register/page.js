@@ -161,7 +161,6 @@ export default function Register() {
         // setStep(STEPS.PHONE_VERIFY);
         return;
       }
-      /* ===== CREATE ACCOUNT ===== */
       if (step === STEPS.ACCOUNT) {
         setStep(STEPS.ADDRESS);
         return;
@@ -176,12 +175,10 @@ export default function Register() {
         setStep(STEPS.EMAIL_VERIFY);
         return;
       }
-
       if (step === STEPS.FORGET_PASS) {
         setStep(STEPS.FORGET_PASS_VERIFY);
         return;
       }
-
       if (step === STEPS.FORGET_PASS_VERIFY) {
         setStep(STEPS.VIEW_OR_UPDATE_PASS);
         return;
