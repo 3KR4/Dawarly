@@ -165,6 +165,8 @@ const ar = {
     searchGovernorate: "ابحث في المحافظات...",
     searchCity: "ابحث في",
     inside: "داخل",
+    yourGender: "جنسك",
+    selectGender: "اختر جنسك",
     yourGovernorate: "محافظتك",
     selectGovernorate: "اختر محافظتك",
     yourCity: "مدينتك",
@@ -358,6 +360,8 @@ const ar = {
     update_pass_and_continue: "تحديث كلمة المرور والمتابعة",
     skip_and_login: "تخطي وتسجيل الدخول",
     viewYourCurrentPassword: "كلمة المرور الحالية",
+    yourBirthDate: "تاريخ ميلادك",
+
     placeholders: {
       fullName: "أدخل اسمك الكامل",
       phone: "أدخل رقم هاتفك",

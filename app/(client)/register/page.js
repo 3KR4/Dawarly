@@ -74,11 +74,25 @@ export default function Register() {
     FORGET_PASS_VERIFY: 8,
     VIEW_OR_UPDATE_PASS: 9,
   };
+  const GENDER = [
+    {
+      id: "MALE",
+      name_en: "male",
+      name_ar: "ذكر",
+    },
+    {
+      id: "FEMALE",
+      name_en: "female",
+      name_ar: "انثي",
+    },
+  ];
   const [userId, setUserId] = useState(null);
   const [step, setStep] = useState(STEPS.ADDRESS);
-  const [userAddress, setUserAddress] = useState({
+  const [additionalData, setAdditionalData] = useState({
     gov: null,
     city: null,
+    gender: null,
+    birthDate: null,
   });
 
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -87,7 +101,16 @@ export default function Register() {
 
   const canUseEmail = availableMethod === "email" || availableMethod === "both";
   const canUsePhone = availableMethod === "phone" || availableMethod === "both";
+  const [cooldown, setCooldown] = useState(60);
+  useEffect(() => {
+    if (cooldown <= 0) return;
 
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
   const {
     register,
     handleSubmit,
@@ -106,16 +129,19 @@ export default function Register() {
   const [passEye, setPassEye] = useState({ password: false, confirm: false });
   const newPassValue = watch("newPass");
   /* ================= HELPERS ================= */
-  const handleAddress = (type, value) => {
-    setUserAddress((prev) => ({ ...prev, [type]: value }));
+  const handleAdditionalData = (type, value) => {
+    setAdditionalData((prev) => ({ ...prev, [type]: value }));
+  };
+  const handleErrors = (type, value) => {
+    setErrorTracker((prev) => ({ ...prev, [type]: value }));
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!userAddress.gov?.id) return;
+        if (!additionalData.gov?.id) return;
 
-        const citiesRes = await getCities(userAddress.gov.id);
+        const citiesRes = await getCities(additionalData.gov.id);
         console.log("citiesRes: ", citiesRes);
 
         setCities(citiesRes.data);
@@ -125,7 +151,7 @@ export default function Register() {
     };
 
     fetchData();
-  }, [userAddress.gov]);
+  }, [additionalData.gov]);
 
   const toggleCategory = (id) => {
     setSelectedCategories((prev) =>
@@ -166,13 +192,57 @@ export default function Register() {
         return;
       }
       if (step === STEPS.ADDRESS) {
-        if (!data.gov) return; // سيب validation يقوم بعرض الرسالة
-        if (!data.city) return;
+        let hasError = false;
+
+        if (!additionalData.birthDate) {
+          handleErrors("birthDate", "your birth Date is required");
+          hasError = true;
+        }
+        if (!additionalData.gender) {
+          handleErrors("gender", "your gender is required");
+          hasError = true;
+        }
+        if (!additionalData.gov) {
+          handleErrors("gov", "your governorate is required");
+          hasError = true;
+        }
+
+        if (!additionalData.city) {
+          handleErrors("city", "your city is required");
+          hasError = true;
+        }
+
+        if (hasError) return; // وقف هنا لو في أي error
+
         setStep(STEPS.INTERESTS);
         return;
       }
       if (step === STEPS.INTERESTS) {
-        setStep(STEPS.EMAIL_VERIFY);
+        try {
+          const payload = {
+            full_name: data.fullname,
+            email: data.email,
+            password: data.password,
+            phone: data.phone,
+            birth_date: additionalData.birthDate,
+            gender: additionalData.gender,
+            country_id: 1,
+            governorate_id: additionalData.gov?.id,
+            city_id: additionalData.city?.id,
+            language: locale,
+            theme: theme,
+            interests: selectedCategories,
+          };
+
+          const res = await registerUser(payload);
+
+          alert(res.data.message);
+
+          setStep(STEPS.EMAIL_VERIFY);
+        } catch (err) {
+          alert(err.response?.data?.message || "Something went wrong");
+        }
+
         return;
       }
       if (step === STEPS.FORGET_PASS) {
@@ -193,14 +263,46 @@ export default function Register() {
         gender: "MALE",
 
         country_id: 1,
-        governorate_id: userAddress.gov,
-        city_id: userAddress.city,
+        governorate_id: additionalData.gov,
+        city_id: additionalData.city,
         language: locale,
         theme: theme,
         interests: selectedCategories,
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const handleOtpSubmit = async (code) => {
+    try {
+      const res = await verifyUserOtp({
+        email: getValues("email"),
+        code,
+      });
+
+      login({
+        user: res.data.user,
+        token: res.data.accessToken,
+      });
+
+      redirectAfterLogin();
+    } catch (err) {
+      alert(err.response?.data?.message || "Invalid code");
+      setOtp(Array(OTP_LENGTH).fill(""));
+    }
+  };
+  const handleResend = async () => {
+    try {
+      await resendEmailOtp({
+        email: getValues("email"),
+      });
+
+      alert("OTP sent again");
+
+      setCooldown(60);
+    } catch (err) {
+      alert(err.response?.data?.message);
     }
   };
 
@@ -654,26 +756,80 @@ export default function Register() {
           step === STEPS.EMAIL_VERIFY ||
           step === STEPS.FORGET_PASS_VERIFY) && (
           <>
-            <OtpInputs length={OTP_LENGTH} value={otp} onChange={setOtp} />
+            <OtpInputs
+              length={OTP_LENGTH}
+              value={otp}
+              onChange={setOtp}
+              onComplete={handleOtpSubmit}
+            />
+            <button
+              type="button"
+              disabled={cooldown > 0}
+              onClick={handleResend}
+            >
+              {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
+            </button>
           </>
         )}
 
         {/* ================= ADDRESS SELECTION ================= */}
         {step === STEPS.ADDRESS && (
           <>
+            <div className="box forInput">
+              <label>
+                {t.auth.yourBirthDate} <span className="required">*</span>
+              </label>
+
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="date"
+                    value={additionalData.birthDate || ""}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => {
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        birthDate: e.target.value,
+                      }));
+
+                      handleErrors("birthDate", null); // يمسح الايرور لو المستخدم اختار
+                    }}
+                  />
+                </div>
+
+                {errorTracker.birthDate && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errorTracker.birthDate}
+                  </span>
+                )}
+              </div>
+            </div>
+            <SelectOptions
+              label={t.location.yourGender}
+              placeholder={t.location.selectGender}
+              options={GENDER}
+              value={additionalData?.gender || null}
+              type="genders"
+              onChange={(item) => {
+                handleAdditionalData("gender", item);
+                handleErrors("gender", null);
+              }}
+              error={errorTracker.gender}
+              required={true}
+            />
             <SelectOptions
               label={t.location.yourGovernorate}
               placeholder={t.location.selectGovernorate}
               options={governorates}
-              value={watch("gov") || null} // ربط القيمة بالـ form
+              value={additionalData?.gov || null}
               type="govs"
               onChange={(item) => {
-                setValue("gov", item, { shouldValidate: true }); // مهم للتحقق
-                handleAddress("gov", item);
-                setValue("city", null, { shouldValidate: true }); // مسح المدينة عند تغيير المحافظة
-                handleAddress("city", null);
+                handleAdditionalData("gov", item);
+                handleAdditionalData("city", null);
+                handleErrors("gov", null);
               }}
-              error={errors.gov?.message} // اظهار الرسالة
+              error={errorTracker.gov}
               required={true}
             />
 
@@ -681,13 +837,14 @@ export default function Register() {
               label={t.location.yourCity}
               placeholder={t.location.selectCity}
               options={cities}
-              value={watch("city") || null}
+              value={additionalData?.city || null}
               type="citys"
-              disabled={!watch("gov")}
-              onChange={(item) =>
-                setValue("city", item, { shouldValidate: true })
-              }
-              error={errors.city?.message}
+              disabled={!additionalData?.gov}
+              onChange={(item) => {
+                handleAdditionalData("city", item);
+                handleErrors("city", null);
+              }}
+              error={errorTracker.city}
               required={true}
             />
           </>

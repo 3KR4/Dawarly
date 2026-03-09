@@ -54,9 +54,8 @@ const en = {
       "Select the main category that best fits your ad.",
     choose_sub_category_description:
       "Choose a subcategory to better describe your ad.",
-    filter_form_description:
-      "fill the new filter data",
-      
+    filter_form_description: "fill the new filter data",
+
     ad_basics_description: "Enter the essential information about your ad.",
     ad_details_description: "Add more details to make your ad more attractive.",
     contact_information_description: "Provide your preferred contact method.",
@@ -165,6 +164,8 @@ const en = {
     searchGovernorate: "Search in governorate...",
     searchCity: "Search in",
     inside: "Inside",
+    yourGender: "your gender",
+    selectGender: "select your gender",
     yourGovernorate: "your governorate",
     selectGovernorate: "select your governorate",
     yourCity: "your City",
@@ -357,6 +358,7 @@ const en = {
     update_pass_and_continue: "Update password and continue",
     skip_and_login: "Skip and log in",
     viewYourCurrentPassword: "Your Current Password",
+    yourBirthDate: "your birth Date",
 
     placeholders: {
       fullName: "Enter your full name",

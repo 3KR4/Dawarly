@@ -520,6 +520,9 @@ a {
   height: 44px;
   padding-right: 10px;
 }
+.box.forInput .inputHolder .holder input[type="date"] {
+  padding: 10px !important;
+}
 [lang="ar"] .box.forInput .inputHolder .holder input {
   padding-right: unset;
   padding-left: 10px;
