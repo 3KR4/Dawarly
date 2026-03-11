@@ -1,9 +1,13 @@
 export const ENDPOINTS = {
   AUTH: {
-    REGISTER: () => "/users/register",
-    LOGIN: () => "/users/login",
-    VERIFY: (id) => `/users/verify/${id}`,
-    RESEND_EMAIL: (id) => `/users/resend-email/${id}`,
+    REGISTER: () => "/auth/register",
+    LOGIN: () => "/auth/login",
+    VERIFY: (id) => `/auth/verify/${id}`,
+    RESEND_EMAIL: (id) => `/auth/resend-email/${id}`,
+    REFRESH: () => "/auth/refresh-token",
+    All_USERS: () => "/auth/users",
+    ONE_USER: (id) => `/auth/users/${id}`,
+    ME: () => "/auth/me",
   },
   // SUBCATEGORIES: {
   //   GETALL: (lang) => `/subCategory/all?lang=${lang}`,
@@ -52,12 +56,17 @@ export const ENDPOINTS = {
     GET_COUNTRIES: () => `data/countries`,
 
     GET_GOVERNRATES: (country_id) =>
-      country_id ? `data/governorates?country_id=${country_id}` : `data/governorates`,
+      country_id
+        ? `data/governorates?country_id=${country_id}`
+        : `data/governorates`,
 
     GET_CITIES: (governorate_id) =>
-      governorate_id ? `data/cities?governorate_id=${governorate_id}` : `data/cities`,
+      governorate_id
+        ? `data/cities?governorate_id=${governorate_id}`
+        : `data/cities`,
 
-    GET_AREAS: (city_id) => (city_id ? `data/areas?city_id=${city_id}` : `data/areas`),
+    GET_AREAS: (city_id) =>
+      city_id ? `data/areas?city_id=${city_id}` : `data/areas`,
 
     GET_COMPOUNDS: (area_id) =>
       area_id ? `data/compounds?area_id=${area_id}` : `data/compounds`,

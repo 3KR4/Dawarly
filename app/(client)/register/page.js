@@ -87,7 +87,7 @@ export default function Register() {
     },
   ];
   const [userId, setUserId] = useState(null);
-  const [step, setStep] = useState(STEPS.ADDRESS);
+  const [step, setStep] = useState(STEPS.ACCOUNT);
   const [additionalData, setAdditionalData] = useState({
     gov: null,
     city: null,
@@ -174,14 +174,16 @@ export default function Register() {
       if (step === STEPS.LOGIN) {
         const payload = {
           email: data.emailPhoneLogin,
-          pass: data.loginPassword,
+          password: data.loginPassword,
         };
 
         const res = await loginUser(payload);
+        console.log("res: ", res);
+        
 
         login({
-          user: res.data.data,
-          token: res.data.token,
+          user: res.data.user,
+          accessToken: res.data.accessToken,
         });
         redirectAfterLogin();
         // setStep(STEPS.PHONE_VERIFY);
@@ -283,7 +285,7 @@ export default function Register() {
 
       login({
         user: res.data.user,
-        token: res.data.accessToken,
+        accessToken: res.data.accessToken,
       });
 
       redirectAfterLogin();

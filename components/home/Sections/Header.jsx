@@ -32,12 +32,15 @@ import SelectLocation from "@/components/Tools/data-collector/selectLocation";
 import useClickOutside from "@/Contexts/useClickOutside";
 import { getAllSubCats } from "@/services/subCategories/subCats.service";
 import { ImPower } from "react-icons/im";
+import { useAuth } from "@/Contexts/AuthContext";
 
 function Header() {
   const t = useTranslate();
   const pathname = usePathname();
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
+
+  const { user, isAuthenticated, loading, logout } = useAuth();
 
   // useEffect(() => {
   //   setActiveMenu(null);
@@ -68,8 +71,6 @@ function Header() {
     fetchCategories();
   }, [locale]);
 
-
-  const [isLogin, setIsLogin] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSmallMenu, setActiveSmallMenu] = useState(false);
   const [activeSubCat, setActiveSubCat] = useState(0);
@@ -160,7 +161,7 @@ function Header() {
               </div>
             </div>
             <div className="account">
-              {isLogin ? (
+              {isAuthenticated ? (
                 <>
                   {!screenSize.includes("small") && (
                     <>
@@ -188,7 +189,11 @@ function Header() {
                       <Image src={`/user-logo.jpg`} fill alt="user-image" />
                       {screenSize == "large" ? (
                         <>
-                          <h4 className="ellipsis">mahmoud elshazly</h4>{" "}
+                          <h4 className="ellipsis">
+                            {loading
+                              ? "Loading..."
+                              : user?.full_name || "Guest"}
+                          </h4>
                           <FaAngleDown />
                         </>
                       ) : (
@@ -259,7 +264,7 @@ function Header() {
                           <li>
                             <button
                               className="btn logout"
-                              onClick={() => setIsLogin(false)}
+                              onClick={() => logout()}
                             >
                               <MdLogout />
                               {t.actions.logout}
@@ -272,11 +277,7 @@ function Header() {
                 </>
               ) : (
                 <>
-                  <Link
-                    className="main-button login-in"
-                    href={`/register`}
-                    onClick={() => setIsLogin(true)}
-                  >
+                  <Link className="main-button login-in" href={`/register`}>
                     {!screenSize.includes("small") ? t.auth.login : <FaUser />}
                   </Link>
                 </>
