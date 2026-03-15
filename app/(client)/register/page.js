@@ -1,7 +1,7 @@
 "use client";
 import "@/styles/client/forms.css";
 import Image from "next/image";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 
@@ -27,6 +27,8 @@ import {
   loginUser,
   verifyUserOtp,
   resendEmailOtp,
+  forgetPassword,
+  resetPassword,
 } from "@/services/auth/auth.service";
 import { useAuth } from "@/Contexts/AuthContext";
 import {
@@ -65,15 +67,25 @@ export default function Register() {
 
   const STEPS = {
     ACCOUNT: 1,
-    ADDRESS: 4,
-    INTERESTS: 5,
-    // PHONE_VERIFY: 2,
-    EMAIL_VERIFY: 3,
-    LOGIN: 6,
-    FORGET_PASS: 7,
-    FORGET_PASS_VERIFY: 8,
-    VIEW_OR_UPDATE_PASS: 9,
+    ADDRESS: 2,
+    INTERESTS: 3,
+    EMAIL_VERIFY: 4,
+    LOGIN: 5,
+
+    FORGET_PASS_REQUEST: 6, // ارسال الايميل
+    FORGET_PASS_OTP: 7, // ادخال OTP
+    FORGET_PASS_RESET: 8, // ادخال باسورد جديد
+    PASS_CHANGED: 9, // نجاح تغيير الباسورد
   };
+  const [additionalData, setAdditionalData] = useState({
+    gov: null,
+    city: null,
+    gender: null,
+    birthYear: null,
+    birthMonth: null,
+    birthDay: null,
+  });
+
   const GENDER = [
     {
       id: "MALE",
@@ -86,14 +98,52 @@ export default function Register() {
       name_ar: "انثي",
     },
   ];
+
+  const years = Array.from({ length: 100 }, (_, i) => {
+    const year = new Date().getFullYear() - i;
+    return { id: year, name: year };
+  });
+
+  const months = [
+    { id: 1, name_en: "Jan", name_ar: "يناير" },
+    { id: 2, name_en: "Feb", name_ar: "فبراير" },
+    { id: 3, name_en: "Mar", name_ar: "مارس" },
+    { id: 4, name_en: "Apr", name_ar: "أبريل" },
+    { id: 5, name_en: "May", name_ar: "مايو" },
+    { id: 6, name_en: "Jun", name_ar: "يونيو" },
+    { id: 7, name_en: "Jul", name_ar: "يوليو" },
+    { id: 8, name_en: "Aug", name_ar: "أغسطس" },
+    { id: 9, name_en: "Sep", name_ar: "سبتمبر" },
+    { id: 10, name_en: "Oct", name_ar: "أكتوبر" },
+    { id: 11, name_en: "Nov", name_ar: "نوفمبر" },
+    { id: 12, name_en: "Dec", name_ar: "ديسمبر" },
+  ];
+
+  const days = useMemo(() => {
+    if (!additionalData.birthYear || !additionalData.birthMonth) return [];
+
+    const year = additionalData.birthYear.id;
+    const month = additionalData.birthMonth.id;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, i) => ({
+      id: i + 1,
+      name: i + 1,
+    }));
+  }, [additionalData.birthYear, additionalData.birthMonth]);
+
+  useEffect(() => {
+    if (!additionalData.birthDay || !days.length) return;
+
+    if (additionalData.birthDay.id > days.length) {
+      handleAdditionalData("birthDay", null);
+    }
+  }, [days]);
+
   const [userId, setUserId] = useState(null);
   const [step, setStep] = useState(STEPS.ACCOUNT);
-  const [additionalData, setAdditionalData] = useState({
-    gov: null,
-    city: null,
-    gender: null,
-    birthDate: null,
-  });
+  console.log(step);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [verifyMethod, setVerifyMethod] = useState("");
@@ -115,6 +165,10 @@ export default function Register() {
     register,
     handleSubmit,
     watch,
+    setError,
+    clearErrors,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm();
 
@@ -126,8 +180,15 @@ export default function Register() {
   });
 
   const password = watch("password", "");
-  const [passEye, setPassEye] = useState({ password: false, confirm: false });
   const newPassValue = watch("newPass");
+  const emailPhoneLogininputvalue = watch("emailPhoneLogin");
+  useEffect(() => {
+    if (emailPhoneLogininputvalue) {
+      // لو فيه قيمة، نمسح الخطأ
+      clearErrors("emailPhoneLogin");
+    }
+  }, [emailPhoneLogininputvalue, clearErrors]);
+  const [passEye, setPassEye] = useState({ password: false, confirm: false });
   /* ================= HELPERS ================= */
   const handleAdditionalData = (type, value) => {
     setAdditionalData((prev) => ({ ...prev, [type]: value }));
@@ -159,8 +220,9 @@ export default function Register() {
     );
   };
 
-  const OTP_LENGTH = 5;
+  const OTP_LENGTH = 6;
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+  console.log(otp);
 
   useEffect(() => {
     if (step === STEPS.PHONE_VERIFY || step === STEPS.EMAIL_VERIFY) {
@@ -171,6 +233,7 @@ export default function Register() {
   /* ================= SUBMIT ================= */
   const onSubmit = async (data) => {
     try {
+      // -------- LOGIN --------
       if (step === STEPS.LOGIN) {
         const payload = {
           email: data.emailPhoneLogin,
@@ -178,104 +241,175 @@ export default function Register() {
         };
 
         const res = await loginUser(payload);
-        console.log("res: ", res);
-        
 
         login({
           user: res.data.user,
           accessToken: res.data.accessToken,
         });
+
         redirectAfterLogin();
-        // setStep(STEPS.PHONE_VERIFY);
         return;
       }
+
+      // -------- ACCOUNT --------
       if (step === STEPS.ACCOUNT) {
         setStep(STEPS.ADDRESS);
         return;
       }
+
+      // -------- ADDRESS --------
       if (step === STEPS.ADDRESS) {
         let hasError = false;
 
-        if (!additionalData.birthDate) {
-          handleErrors("birthDate", "your birth Date is required");
+        if (
+          !additionalData.birthYear ||
+          !additionalData.birthMonth ||
+          !additionalData.birthDay
+        ) {
+          handleErrors("birthDate", "Your birth date is required");
           hasError = true;
         }
         if (!additionalData.gender) {
-          handleErrors("gender", "your gender is required");
+          handleErrors("gender", "Your gender is required");
           hasError = true;
         }
         if (!additionalData.gov) {
-          handleErrors("gov", "your governorate is required");
+          handleErrors("gov", "Your governorate is required");
           hasError = true;
         }
-
         if (!additionalData.city) {
-          handleErrors("city", "your city is required");
+          handleErrors("city", "Your city is required");
           hasError = true;
         }
 
-        if (hasError) return; // وقف هنا لو في أي error
+        if (hasError) return;
 
         setStep(STEPS.INTERESTS);
         return;
       }
+
+      // -------- INTERESTS --------
       if (step === STEPS.INTERESTS) {
+        // Build birth_date safely
+        const birth_date =
+          additionalData.birthYear &&
+          additionalData.birthMonth &&
+          additionalData.birthDay
+            ? `${additionalData.birthYear.id}-${String(additionalData.birthMonth.id).padStart(2, "0")}-${String(additionalData.birthDay.id).padStart(2, "0")}`
+            : null;
+
+        const payload = {
+          full_name: data.fullname,
+          email: data.email,
+          password: data.password,
+          phone: data.phone,
+          birth_date,
+          gender: additionalData.gender?.id,
+          country_id: 1,
+          governorate_id: additionalData.gov?.id,
+          city_id: additionalData.city?.id,
+          language: locale,
+          theme: theme,
+          interests: selectedCategories,
+        };
+
         try {
-          const payload = {
-            full_name: data.fullname,
-            email: data.email,
-            password: data.password,
-            phone: data.phone,
-            birth_date: additionalData.birthDate,
-            gender: additionalData.gender,
-            country_id: 1,
-            governorate_id: additionalData.gov?.id,
-            city_id: additionalData.city?.id,
-            language: locale,
-            theme: theme,
-            interests: selectedCategories,
-          };
-
           const res = await registerUser(payload);
-
           alert(res.data.message);
-
           setStep(STEPS.EMAIL_VERIFY);
         } catch (err) {
-          alert(err.response?.data?.message || "Something went wrong");
+          const msg = err.response?.data?.message || "Something went wrong";
+          alert(msg);
+
+          if (msg === "Email already exists") {
+            await handleResend();
+            setStep(STEPS.EMAIL_VERIFY);
+          } else {
+            setStep(STEPS.ACCOUNT);
+          }
         }
 
         return;
       }
-      if (step === STEPS.FORGET_PASS) {
-        setStep(STEPS.FORGET_PASS_VERIFY);
-        return;
-      }
-      if (step === STEPS.FORGET_PASS_VERIFY) {
-        setStep(STEPS.VIEW_OR_UPDATE_PASS);
+
+      // -------- EMAIL VERIFY --------
+      if (step === STEPS.EMAIL_VERIFY) {
+        try {
+          const res = await handleOtpSubmit(otp.join(""));
+          login({
+            user: res.data.user,
+            accessToken: res.data.accessToken,
+          });
+          redirectAfterLogin();
+        } catch (err) {
+          alert(err.response?.data?.message || "Something went wrong");
+        }
         return;
       }
 
-      console.log("FINAL REQUEST", {
-        full_name: data.fullname,
-        email: data.email,
-        password: data.password,
-        phone: data.phone,
-        birth_date: "2000-04-10",
-        gender: "MALE",
+      // if (step === STEPS.FORGET_PASS) {
+      //   const email = getValues("emailPhoneLogin") || getValues("email");
+      //   if (!email) {
+      //     setError("emailPhoneLogin", {
+      //       type: "manual",
+      //       message: auth.errors.requiredEmail,
+      //     });
+      //     return;
+      //   }
 
-        country_id: 1,
-        governorate_id: additionalData.gov,
-        city_id: additionalData.city,
-        language: locale,
-        theme: theme,
-        interests: selectedCategories,
-      });
+      //   const isValid = await trigger("emailPhoneLogin");
+      //   if (!isValid) return;
+
+      //   try {
+      //     await forgetPassword(email); // API call
+      //     alert("OTP sent to your email");
+      //     setStep(STEPS.FORGET_PASS_VERIFY); // نروح step الـ OTP
+      //   } catch (err) {
+      //     alert(err.response?.data?.message || "Something went wrong");
+      //   }
+      //   return;
+      // }
+
+      if (step === STEPS.FORGET_PASS_RESET) {
+        const email = getValues("emailPhoneLogin") || getValues("email");
+        const new_password = getValues("newPass");
+        const otpCode = otp.join("");
+
+        if (!new_password) {
+          setError("newPass", {
+            type: "manual",
+            message: "Please enter a new password",
+          });
+          return;
+        }
+
+        try {
+          await resetPassword({
+            email,
+            otp: otpCode,
+            new_password,
+          });
+
+          alert("Password reset successfully");
+          setStep(STEPS.PASS_CHANGED);
+        } catch (err) {
+          alert(err.response?.data?.message || "Something went wrong");
+          setOtp(Array(OTP_LENGTH).fill(""));
+        }
+
+        return;
+      }
+      if (step === STEPS.PASS_CHANGED) {
+        setStep(STEPS.LOGIN);
+        return;
+      }
     } catch (err) {
-      console.log(err);
+      console.log(err.response.data.message);
+      alert(err.response.data.message);
     }
   };
 
+  // ---------------- HANDLE OTP SUBMIT ----------------
   const handleOtpSubmit = async (code) => {
     try {
       const res = await verifyUserOtp({
@@ -289,45 +423,66 @@ export default function Register() {
       });
 
       redirectAfterLogin();
+      return res;
     } catch (err) {
       alert(err.response?.data?.message || "Invalid code");
       setOtp(Array(OTP_LENGTH).fill(""));
+      throw err;
     }
   };
+
+  // ---------------- HANDLE RESEND ----------------
   const handleResend = async () => {
     try {
       await resendEmailOtp({
-        email: getValues("email"),
+        email: getValues("emailPhoneLogin"), // خلي نفس القيمة المستخدمة
       });
 
       alert("OTP sent again");
+      setCooldown(60);
+      return true; // رجع نجاح
+    } catch (err) {
+      console.log("err:otp: ", err);
+      alert(err.response?.data?.message || "Something went wrong");
+      throw err; // لازم ترميه لبرا عشان الكود اللي بعد await ما يكملش
+    }
+  };
+  const handleForgetPass = async () => {
+    try {
+      await forgetPassword(getValues("emailPhoneLogin"));
 
       setCooldown(60);
+      return true;
     } catch (err) {
-      alert(err.response?.data?.message);
+      console.log(err);
+
+      alert(err.response?.data?.message || "Something went wrong");
+      throw err;
     }
   };
 
   const titles = {
     [STEPS.ACCOUNT]: auth.createAccount,
     [STEPS.LOGIN]: auth.loginToAccount,
-    [STEPS.PHONE_VERIFY]: auth.verifyPhone,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmail,
-    [STEPS.FORGET_PASS_VERIFY]: auth.forgetPass,
-    [STEPS.FORGET_PASS]: auth.choose_verify_method,
-    [STEPS.VIEW_OR_UPDATE_PASS]: auth.userVerified,
+    [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_RESET]: "Create New Password",
+    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
     [STEPS.ADDRESS]: auth.chooseAddress,
     [STEPS.INTERESTS]: auth.chooseInterests,
   };
 
   const descriptions = {
     [STEPS.ACCOUNT]: auth.accountDescription,
-    [STEPS.LOGIN]: auth.loginDescription || "",
+    [STEPS.LOGIN]: auth.accountDescription || "",
     [STEPS.PHONE_VERIFY]: auth.phoneDescription,
     [STEPS.EMAIL_VERIFY]: auth.emailDescription,
-    [STEPS.FORGET_PASS_VERIFY]:
-      verifyMethod == "email" ? auth.emailDescription : auth.phoneDescription,
-    [STEPS.FORGET_PASS]: auth.choose_verify_method_description,
+    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
+
+    [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_RESET]: "Create New Password",
     [STEPS.VIEW_OR_UPDATE_PASS]: auth.userVerifiedDescription,
     [STEPS.ADDRESS]: auth.addressDescription,
     [STEPS.INTERESTS]: auth.interestsDescription,
@@ -338,8 +493,11 @@ export default function Register() {
     [STEPS.LOGIN]: auth.login,
     [STEPS.PHONE_VERIFY]: auth.verifyPhoneBtn,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmailBtn,
-    [STEPS.FORGET_PASS_VERIFY]: auth.forgetPassBtn,
-    [STEPS.FORGET_PASS]: auth.sendCode,
+    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
+
+    [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
+    [STEPS.FORGET_PASS_RESET]: "Create New Password",
     [STEPS.VIEW_OR_UPDATE_PASS]: newPassValue
       ? auth.update_pass_and_continue
       : auth.login,
@@ -348,17 +506,11 @@ export default function Register() {
     [STEPS.INTERESTS]: auth.finishAccount,
   };
 
-  console.log(errors.gov?.message);
-
   return (
     <div className="form-holder register">
       <form onSubmit={handleSubmit(onSubmit)}>
-        {[
-          STEPS.PHONE_VERIFY,
-          STEPS.EMAIL_VERIFY,
-          STEPS.FORGET_PASS_VERIFY,
-        ].includes(step) ? (
-          step === STEPS.FORGET_PASS_VERIFY ? (
+        {[STEPS.EMAIL_VERIFY].includes(step) ? (
+          step === STEPS.FORGET_PASS_OTP ? (
             verifyMethod === "phone" ? (
               <FaCommentSms className="big-ico" />
             ) : (
@@ -444,9 +596,28 @@ export default function Register() {
             </div>
             <div
               className="have-problem"
-              onClick={() => {
-                setStep(STEPS.FORGET_PASS);
-                reset();
+              onClick={async () => {
+                const value = getValues("emailPhoneLogin");
+                if (!value) {
+                  setError("emailPhoneLogin", {
+                    type: "manual",
+                    message: auth.errors.emailPhoneLoginRequired,
+                  });
+                  return;
+                }
+
+                const isValid = await trigger("emailPhoneLogin");
+                if (!isValid) return;
+
+                try {
+                  await handleForgetPass();
+                  setStep(STEPS.FORGET_PASS_OTP);
+                } catch (err) {
+                  console.log(err);
+
+                  // هنا ممكن تسيبها فاضية أو تعمل حاجة للمستخدم
+                  console.log("Resend failed, stay in current step");
+                }
               }}
             >
               {auth.forgetPassword}{" "}
@@ -635,9 +806,8 @@ export default function Register() {
         )}
 
         {/* ================= FORGET PASSWORD METHOD SELECTION ================= */}
-        {step === STEPS.FORGET_PASS && (
+        {/* {step === STEPS.FORGET_PASS && (
           <div className="options-grid verfiyMethod">
-            {/* ===== Email ===== */}
             <div
               className={`option-box ${
                 canUseEmail
@@ -656,7 +826,6 @@ export default function Register() {
               <span>{t.auth.verify_by_email}</span>
             </div>
 
-            {/* ===== Phone ===== */}
             <div
               className={`option-box ${
                 canUsePhone
@@ -675,43 +844,12 @@ export default function Register() {
               <span>{t.auth.verify_by_phone}</span>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* ================= VIEW/UPDATE PASSWORD ================= */}
-        {step === STEPS.VIEW_OR_UPDATE_PASS && (
+        {step === STEPS.FORGET_PASS_RESET && (
           <>
             <div className="box forInput">
-              <label>{auth.viewYourCurrentPassword}</label>
-              <div className="inputHolder password">
-                <div className="holder">
-                  <LockKeyhole />
-                  <input
-                    type={passEye.password ? "text" : "password"}
-                    value={"Aa123456@"}
-                    readOnly
-                  />
-                  {passEye.password ? (
-                    <Eye
-                      className="eye"
-                      onClick={() =>
-                        setPassEye((p) => ({ ...p, password: false }))
-                      }
-                    />
-                  ) : (
-                    <EyeOff
-                      className="eye"
-                      onClick={() =>
-                        setPassEye((p) => ({ ...p, password: true }))
-                      }
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="box forInput">
-              <label>
-                {auth.makeNewPassword} <span>({auth.optional})</span>
-              </label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
@@ -742,27 +880,25 @@ export default function Register() {
                     />
                   )}
                 </div>
-                {errors.newPass && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.newPass.message}
-                  </span>
-                )}
               </div>
+              {errors.newPass && (
+                <span className="error">
+                  <CircleAlert />
+                  {errors.newPass.message}
+                </span>
+              )}
             </div>
           </>
         )}
 
         {/* ================= OTP VERIFICATION ================= */}
-        {(step === STEPS.PHONE_VERIFY ||
-          step === STEPS.EMAIL_VERIFY ||
-          step === STEPS.FORGET_PASS_VERIFY) && (
+        {(step === STEPS.EMAIL_VERIFY || step === STEPS.FORGET_PASS_OTP) && (
           <>
             <OtpInputs
               length={OTP_LENGTH}
               value={otp}
               onChange={setOtp}
-              onComplete={handleOtpSubmit}
+              onComplete={() => {}}
             />
             <button
               type="button"
@@ -777,35 +913,43 @@ export default function Register() {
         {/* ================= ADDRESS SELECTION ================= */}
         {step === STEPS.ADDRESS && (
           <>
-            <div className="box forInput">
-              <label>
-                {t.auth.yourBirthDate} <span className="required">*</span>
-              </label>
+            <div className="birth-date-selects">
+              <SelectOptions
+                label="your birthdate"
+                placeholder="Day"
+                options={days}
+                value={additionalData?.birthDay}
+                onChange={(item) => {
+                  handleAdditionalData("birthDay", item);
+                  handleErrors("birthDate", null);
+                }}
+              />
+              <SelectOptions
+                placeholder="Month"
+                options={months}
+                value={additionalData?.birthMonth}
+                onChange={(item) => {
+                  handleAdditionalData("birthMonth", item);
+                  handleErrors("birthDate", null);
+                }}
+              />
 
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="date"
-                    value={additionalData.birthDate || ""}
-                    max={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => {
-                      setAdditionalData((prev) => ({
-                        ...prev,
-                        birthDate: e.target.value,
-                      }));
+              <SelectOptions
+                placeholder="Year"
+                options={years}
+                value={additionalData?.birthYear}
+                onChange={(item) => {
+                  handleAdditionalData("birthYear", item);
+                  handleErrors("birthDate", null);
+                }}
+              />
 
-                      handleErrors("birthDate", null); // يمسح الايرور لو المستخدم اختار
-                    }}
-                  />
-                </div>
-
-                {errorTracker.birthDate && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errorTracker.birthDate}
-                  </span>
-                )}
-              </div>
+              {errorTracker.birthDate && (
+                <span className="error">
+                  <CircleAlert />
+                  {errorTracker.birthDate}
+                </span>
+              )}
             </div>
             <SelectOptions
               label={t.location.yourGender}
@@ -874,7 +1018,22 @@ export default function Register() {
         )}
 
         {/* ================= SUBMIT BUTTON ================= */}
-        <button type="submit" className="main-button">
+        <button
+          type={step === STEPS.FORGET_PASS_OTP ? "button" : "submit"}
+          className="main-button"
+          onClick={() => {
+            if (step === STEPS.FORGET_PASS_OTP) {
+              const otpCode = otp.join("");
+
+              if (!otpCode || otpCode.length < OTP_LENGTH) {
+                alert("Please enter the complete OTP");
+                return;
+              }
+
+              setStep(STEPS.FORGET_PASS_RESET);
+            }
+          }}
+        >
           {buttonLabels[step]}
         </button>
 
@@ -908,7 +1067,6 @@ export default function Register() {
             className="have-problem"
             onClick={() => {
               setStep(step === STEPS.ACCOUNT ? STEPS.LOGIN : STEPS.ACCOUNT);
-              reset();
             }}
           >
             {step === STEPS.LOGIN ? auth.noAccount : auth.haveAccount}{" "}

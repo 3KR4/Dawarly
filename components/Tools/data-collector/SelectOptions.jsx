@@ -27,9 +27,17 @@ function SelectOptions({
 
     if (type === "users") return item.full_name;
 
-    return item[`name_${locale}`] || item.name_en || "";
-  };
+    if (type === "date") {
+      const value = typeof item === "string" ? item : item?.name || item?.id;
 
+      const date = new Date(value);
+      if (isNaN(date)) return value || "";
+
+      return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US");
+    }
+
+    return item[`name_${locale}`] || item.name_en || item.name || "";
+  };
   /* ---------------- SEARCH ---------------- */
   const filteredOptions = useMemo(() => {
     if (!search) return options;
@@ -37,11 +45,20 @@ function SelectOptions({
     const normalizedSearch = search.toLowerCase();
 
     return options.filter((item) => {
-      const combinedText =
-        `${item.name_en || ""} ${item.name_ar || ""}`.toLowerCase();
-      return combinedText.includes(normalizedSearch);
+      const searchPool = [
+        item.name_en,
+        item.name_ar,
+        item.name,
+        item.id,
+        getText(item),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchPool.includes(normalizedSearch);
     });
-  }, [options, search]);
+  }, [options, search, locale]);
 
   /* ---------------- CLOSE OUTSIDE ---------------- */
 
@@ -95,11 +112,9 @@ function SelectOptions({
       className={`box forInput ${disabled ? "disabled" : ""}`}
       ref={selectRef}
     >
-      {label && (
-        <label>
-          {label} {required && <span className="required">*</span>}
-        </label>
-      )}
+      <label>
+        {label || " "} {required && <span className="required">*</span>}
+      </label>
 
       <div className={`selectOptions ${size}`}>
         <div
@@ -117,7 +132,7 @@ function SelectOptions({
               />
             ) : value ? (
               // العرض حسب الـ locale بس
-              value[`name_${locale}`]
+              getText(value)
             ) : (
               placeholder
             )}

@@ -139,29 +139,32 @@ header .top .account:has(.sign-ub) {
   gap: 5px;
 }
 header .top .account hr {
-  width: 1px;
   background: var(--border-color);
-  margin: 0 8px 0 9px;
+  width: 1px;
   height: 39px;
+  margin: 0 4px 0 5px;
 }
 header .top .account .user {
   cursor: pointer;
   border-radius: 67px;
   height: 49px;
   position: relative;
+      display: flex;
+    align-items: center;
 }
 header .top .account .user .holder {
-  align-items: center;
-  gap: 5px;
-  max-width: 250px;
-  height: 100%;
-  display: flex;
-  border-radius: 50px 20px 20px 50px;
-  padding-right: 6px;
   border: 1px solid var(--border-color);
-  color: white;
+  color: #fff;
   background: var(--section-color);
-  transition: 0.3s;
+  border-radius: 8px;
+  align-items: center;
+  gap: 3px;
+  max-width: 250px;
+  height: 44px;
+  padding: 9px;
+  padding-right: 7px;
+  transition: all 0.3s;
+  display: flex;
 }
 header .top .account .user .holder:hover {
   background: var(--hover-color);
@@ -186,22 +189,34 @@ header .top .account .user svg {
 }
 header .top .account .user svg.small-drop-down {
   background: var(--main-color);
+  color: #fff;
   border-radius: 50%;
   width: 16px;
   height: 16px;
   padding: 2px;
   position: absolute;
-  bottom: 0;
-  right: 0;
-  color: white;
+  bottom: 0px;
+  right: 4px;
 }
-header .top .account .user .holder img {
+/* header .top .account .user .holder img {
   position: relative !important;
   border-radius: 50%;
   width: unset !important;
   aspect-ratio: 1;
   object-fit: cover;
   height: 100% !important;
+} */
+header .top .account .user .holder .name-letters {
+  background: var(--hover-color);
+  color: var(--main-color);
+  justify-content: center;
+  align-items: center;
+  width: 49px;
+  height: 100%;
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  border-radius: 8px;
 }
 header .top .account .user .holder h4 {
   font-size: 14px;
@@ -547,18 +562,13 @@ header .bottom .actions button:hover svg {
   header .bottom .actions button {
     gap: 3px;
   }
-    header .bottom .actions button {
+  header .bottom .actions button {
     width: 35px;
-
   }
 }
 @media (max-width: 992px) {
   header .top .account .user .holder {
-    padding-right: 0;
-    border-radius: 50%;
-  }
-  [lang="ar"] header .top .account .user .holder {
-    padding-left: 0;
+    padding: 0;
   }
 }
 @media (max-width: 768px) {
@@ -567,7 +577,7 @@ header .bottom .actions button:hover svg {
     gap: 7px;
   }
   header .top {
-    gap: 15px;
+    gap: 10px;
   }
   header .top .logo img {
     width: 42px !important;
@@ -580,7 +590,7 @@ header .bottom .actions button:hover svg {
     max-width: unset;
   }
   header .top .search .search-holder {
-    height: 38px;
+    height: 40px;
     gap: 3px;
   }
   header .top .search .search-holder input {
@@ -603,6 +613,26 @@ header .bottom .actions button:hover svg {
   }
   header .bottom .nav > * {
     flex: 1;
+  }
+  header .top .account .user .holder:hover ,
+  header .top .account .user:has(.menu.active) .holder {
+background: transparent;
+  }
+
+  header .top .account .user .holder {
+    border-color: unset;
+    height: 42px;
+  }
+  header .top .account .user .holder .name-letters {
+    border-radius: 50px;
+    width: 43px;
+    font-size: 16px;
+  }
+  header .top .account .user svg.small-drop-down {
+    width: 14px;
+    height: 14px;
+    bottom: -6px;
+    right: 4px;
   }
   header .bottom .nav .cats-nav {
     position: absolute;
@@ -687,10 +717,7 @@ header .bottom .actions button:hover svg {
   [theme="dark"] header .bottom .nav h4 {
     color: var(--paragraph);
   }
-  [lang="ar"] header .top .account .user .holder {
-    padding: 0;
-    border-radius: 50%;
-  }
+
   [lang="ar"] header .bottom .nav .cats-nav {
     left: unset;
     right: 0;

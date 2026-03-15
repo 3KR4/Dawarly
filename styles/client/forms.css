@@ -48,6 +48,9 @@ body:has(.form-holder) footer {
   display: flex;
   box-shadow: 0 1px 10px #00000023;
 }
+.form-holder form .error {
+  margin: -1px 4px -6px;
+}
 .form-holder form .top {
   position: relative;
 }
@@ -207,22 +210,22 @@ p.have-problem {
   font-size: 25px;
 }
 .form-holder .option-box {
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    border-radius: 10px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    height: 86px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all .3s;
-    display: flex;
-    position: relative;
-    flex: 1;
-    min-width: 25%;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  height: 86px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.3s;
+  display: flex;
+  position: relative;
+  flex: 1;
+  min-width: 25%;
 }
 .form-holder .option-box:not(.disabled):hover {
   background: var(--hover-color);
@@ -262,11 +265,11 @@ p.have-problem {
 }
 
 .otp-wrapper {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 5px;
-  display: grid;
-  width: 65%;
+  width: 80%;
   margin: 0 auto;
+  display: grid;
 }
 .otp-wrapper .box.forInput {
   aspect-ratio: 1.2;

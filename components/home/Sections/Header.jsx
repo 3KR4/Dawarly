@@ -186,7 +186,8 @@ function Header() {
                         setActiveMenu((prev) => (prev == "user" ? "" : "user"))
                       }
                     >
-                      <Image src={`/user-logo.jpg`} fill alt="user-image" />
+                      {/* <Image src={`/user-logo.jpg`} fill alt="user-image" /> */}
+
                       {screenSize == "large" ? (
                         <>
                           <h4 className="ellipsis">
@@ -197,7 +198,16 @@ function Header() {
                           <FaAngleDown />
                         </>
                       ) : (
-                        <FaAngleDown className="small-drop-down" />
+                        <>
+                          <div className="name-letters">
+                            {user?.full_name
+                              ?.split(" ")
+                              .slice(0, 2)
+                              .map((word) => word[0])
+                              .join("")}
+                          </div>
+                          <FaAngleDown className="small-drop-down" />
+                        </>
                       )}
                     </div>
                     {activeMenu == "user" && (

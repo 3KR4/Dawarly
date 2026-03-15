@@ -2,8 +2,10 @@ export const ENDPOINTS = {
   AUTH: {
     REGISTER: () => "/auth/register",
     LOGIN: () => "/auth/login",
-    VERIFY: (id) => `/auth/verify/${id}`,
-    RESEND_EMAIL: (id) => `/auth/resend-email/${id}`,
+    VERIFY: () => `/auth/verify-email/`,
+    RESEND_EMAIL: () => `/auth/resend-otp/`,
+    FORGET_PASSWORD: () => `/auth/forgot-password/`,
+    RESET_PASSWORD: () => `/auth/reset-password/`,
     REFRESH: () => "/auth/refresh-token",
     All_USERS: () => "/auth/users",
     ONE_USER: (id) => `/auth/users/${id}`,

@@ -10,15 +10,22 @@ export const loginUser = (payload) => {
 };
 
 /* ================= VERIFY OTP ================= */
-export const verifyUserOtp = (userId, otp) => {
-  return api.post(ENDPOINTS.AUTH.VERIFY(userId), { otp });
+export const verifyUserOtp = (payload) => {
+  return api.post(ENDPOINTS.AUTH.VERIFY(), payload);
 };
 
 /* ================= RESEND OTP ================= */
-export const resendEmailOtp = (userId) => {
-  return api.post(ENDPOINTS.AUTH.RESEND_EMAIL(userId));
+export const resendEmailOtp = (payload) => {
+  return api.post(ENDPOINTS.AUTH.RESEND_EMAIL(), payload);
+};
+export const forgetPassword = (email) => {
+  return api.post(ENDPOINTS.AUTH.FORGET_PASSWORD(), { email });
 };
 
+// اعادة تعيين الباسورد: نرسل الايميل + OTP + الباسورد الجديد
+export const resetPassword = (payload) => {
+  return api.post(ENDPOINTS.AUTH.RESET_PASSWORD(), payload);
+};
 /* ================= REFRESH TOKEN ================= */
 export const refreshToken = () => {
   return api.post(ENDPOINTS.AUTH.REFRESH());
