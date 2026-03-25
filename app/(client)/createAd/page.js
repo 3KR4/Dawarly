@@ -3,28 +3,18 @@ import "@/styles/client/forms.css";
 import React, { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
-import governoratesEn from "@/data/governoratesEn.json";
-import governoratesAr from "@/data/governoratesAr.json";
-import cities from "@/data/cities.json";
-import {
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-  propertiesFiltersEn,
-  propertiesFiltersAr,
-} from "@/data";
+
+import { propertiesFiltersEn, propertiesFiltersAr } from "@/data";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import CatCard from "@/components/home/CatCard";
 import { FaArrowLeft } from "react-icons/fa6";
 import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
-import { BsChatDots } from "react-icons/bs";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
-import { useAuth } from "@/Contexts/AuthContext";
-import { useRouter } from "next/navigation";
 import useRequireAuth from "@/Contexts/useRequireAuth";
+import { getCities } from "@/services/data/data.service";
+import { useAppData } from "@/Contexts/DataContext";
 
 const RenderRentAvailability = ({
   t,
@@ -86,36 +76,26 @@ const RenderRentAvailability = ({
 };
 
 export default function CreateAd() {
-const { allowed } = useRequireAuth();
-if (!allowed) return null;
+  const {
+    governorates,
+    categories,
+    subCategories,
+    fetchCities,
+  } = useAppData();
+
+  const { allowed } = useRequireAuth();
+  if (!allowed) return null;
 
   const { locale } = useContext(settings);
 
   const t = useTranslate();
   const [dynamicFilters, setDynamicFilters] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [governorates, setGovernorates] = useState([]);
-  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const fetchdynamicFilters = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
       setDynamicFilters(
         locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
       );
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
-      setGovernorates(locale == "en" ? governoratesEn : governoratesAr);
-      
     };
     fetchdynamicFilters();
   }, [locale]);
@@ -297,9 +277,7 @@ if (!allowed) return null;
     setUserAddress((prev) => ({ ...prev, [type]: value }));
   };
 
-  const filteredCities = cities.filter(
-    (c) => c.gov_id === userAddress.gov?.id,
-  );
+  const filteredCities = getCities(userAddress?.gov);
 
   const onSubmit = async (data) => {
     if (step === STEPS.CATEGORIES) {
@@ -451,8 +429,8 @@ if (!allowed) return null;
         {/* ================= SUB_CATEGORIES STEP 2 ================= */}
         {step === STEPS.SUB_CATEGORIES && (
           <div className="options-grid verfiyMethod">
-            {subcategories
-              ?.filter((x) => x?.categoryId == category)
+            {subCategories
+              ?.filter((x) => x?.category_id == category)
               ?.map((subCat) => (
                 <CatCard
                   key={subCat?.id}

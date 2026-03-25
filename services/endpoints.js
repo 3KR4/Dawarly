@@ -41,10 +41,18 @@ export const ENDPOINTS = {
 
   ADS: {
     GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
+    GET_ALL: () => `/ads/all`,
     GET_ONE_AD: (id) => `/ads/${id}`,
-    CREATE: (cat, subId) => `/${cat}/subCategory/${subId}`,
-    UPDATE: (cat, id) => `/${cat}/${id}`,
+    CREATE: () => `/ads/create`,
+    UPDATE: (id) => `/ads/update/${id}`,
     DELETE: (cat, id) => `/${cat}/${id}`,
+  },
+  IMAGES: {
+    ADD: (entity_type, entity_id) => `/images/${entity_type}/${entity_id}`,
+    DELETE: (entity_type, entity_id, image_id) =>
+      `/images/${entity_type}/${entity_id}/${image_id}`,
+    EDIT: (entity_type, entity_id, image_id) =>
+      `/images/${entity_type}/${entity_id}/${image_id}`,
   },
   BOOKING: {
     CREATE: (id) => `/Booking/create/Properties/${id}`,

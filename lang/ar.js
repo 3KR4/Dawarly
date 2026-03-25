@@ -19,20 +19,20 @@ const ar = {
     all_ads: "كل الاعلانات",
   },
   ad: {
+    // Basic
     ad_details: "تفاصيل الإعلان",
     price: "السعر",
     amenities: "المميزات",
     description: "الوصف",
     specifecs: "المواصفات",
     booking: "الحجوزات",
-
     listed_by: "تم النشر بواسطة",
     member_since: "عضو منذ",
-
     see_profile: "عرض الملف الشخصي",
     phone_number: "رقم الهاتف",
     whatsapp: "واتساب",
 
+    // Safety
     safety_title: "سلامتك تهمنا!",
     safety_rules: [
       "قابل البائع أو المشتري في أماكن عامة أو مزدحمة مثل المترو أو المولات.",
@@ -42,27 +42,32 @@ const ar = {
     ],
     yes: "نعم",
     no: "لا",
+    ad_created: "تم إنشاء الإعلان بنجاح",
+    ad_updated: "تم تحديث الإعلان بنجاح",
+    // Form sections
     choose_category: "اختر القسم",
     choose_sub_category: "اختر القسم الفرعي",
+    select_category: "اختر القسم",
+    select_sub_category: "اختر القسم الفرعي",
     ad_basics: "البيانات الأساسية",
     filter_form: "بيانات الفلتر",
-
     ad_details: "تفاصيل الإعلان",
     contact_information: "بيانات التواصل",
-
     choose_category_description: "حدد القسم الرئيسي المناسب لإعلانك.",
     choose_sub_category_description: "اختر القسم الفرعي لوصف إعلانك بدقة.",
     ad_basics_description: "أدخل المعلومات الأساسية الخاصة بالإعلان.",
     ad_details_description: "أضف تفاصيل أكثر لجعل إعلانك أكثر جاذبية.",
     contact_information_description: "حدد وسيلة التواصل المفضلة لديك.",
     filter_form_description: "قم بأدخال بيانات الفلتر الجديد",
-    create_your_ad: "انشيء اعلانك الان",
-    create_ad: "انشيء اعلان ",
+    create_your_ad: "أنشئ إعلانك الآن",
+    create_ad: "أنشئ إعلان",
+    update_ad: "تحديث الإعلان",
     contact_via_email: "تواصل عبر البريد الإلكتروني",
     contact_via_phone: "تواصل عبر الهاتف",
     contact_via_chat: "تواصل عبر الدردشة",
     contact_method_required: "طرق التواصل مطلوبة",
 
+    // Info sections
     basic_info: "المعلومات الأساسية",
     category_info: "معلومات القسم",
     admin_contact: "بيانات مسؤول النظام",
@@ -72,34 +77,71 @@ const ar = {
     userToAdmin: "مستخدم لمسؤول",
     choose_admin: "اختيار المسؤول",
     select_admin: "اختر الشخص المسؤول",
+
+    // Rental
     rental_period: "الفترة المتاحة للإيجار",
     minimumRentalDuration: "أقل مدة للإيجار",
     durationValue: "المدة",
     durationValuePlaceholder: "مثال: 3",
     durationUnit: "الوحدة",
     rentUnit: "وحدة الإيجار",
-
     select: "اختر",
     from: "من",
-    to: "الي",
+    to: "إلى",
     day: "يوم",
     week: "أسبوع",
     month: "شهر",
-    rentPrice: "سعر الايجار",
-    rentPricePlaceholder: "مثال: 500",
+    rentPrice: "سعر الإيجار",
+    rentPricePlaceholder: "مثال: 1500",
+    deposit_amount: "التأمين المدفوع",
+    deposit_amount_Placeholder: "مثال: 5000",
+
+    // Property details
+    bedrooms: "عدد غرف النوم",
+    bedroomsPlaceholder: "عدد غرف النوم",
+    bathrooms: "عدد دورات المياه",
+    bathroomsPlaceholder: "عدد دورات المياه",
+    level: "الدور",
+    levelPlaceholder: "رقم الدور",
+
+    // Guest capacity
+    childMax: "الحد الأقصى للأطفال",
+    childMaxPlaceholder: "عدد الأطفال المسموح به",
+    adultMax: "الحد الأقصى للكبار",
+    adultMaxPlaceholder: "عدد الكبار المسموح به",
+
+    // Loading
+    loading: "جاري تحميل البيانات...",
+    fetch_error: "حدث خطأ أثناء جلب بيانات الإعلان",
+
+    // Placeholders
     placeholders: {
-      adTitle: "قم بكتابة عنوان اعلانك",
+      adTitle: "قم بكتابة عنوان إعلانك",
     },
+
+    // Errors
     errors: {
-      adTitle: "عنوان اعلانك مطلوب",
-      adTitleValidation: "عنوان اعلانك قصير للغاية",
+      adTitle: "عنوان الإعلان مطلوب",
+      adTitleValidation: "عنوان الإعلان قصير للغاية",
       governorate: "المحافظة مطلوبة",
       city: "المدينة مطلوبة",
       category: "القسم مطلوب",
       subCategory: "القسم الفرعي مطلوب",
       admin: "اختيار المسؤول مطلوب",
+      currency: "العملة مطلوبة",
+      frequency: "نوع الدفع مطلوب",
+      rentalDuration: "مدة الإيجار مطلوبة",
+      minOne: "يجب أن تكون القيمة 1 على الأقل",
+      minZero: "لا يمكن أن تكون القيمة أقل من 0",
+      priceRequired: "السعر مطلوب",
+      priceMin: "السعر يجب أن يكون أكبر من 0",
+      deposit_amount_reqire: "التأمين المطلوب",
+      deposit_amount_Min: "التأمين يجب أن يكون 1 على الأقل",
+      required: "هذا الحقل مطلوب",
+      maxHundred: "لا يجب ان تتخطي القيمة المدخلة العدد 100",
     },
 
+    // Images
     images: {
       label: "الصور",
       helperText: "اسحب وأفلت الصور هنا أو انقر للتحميل",
@@ -116,6 +158,8 @@ const ar = {
         maxLimit: "يمكنك رفع {limit} صور كحد أقصى",
       },
     },
+
+    // Tags
     tags: {
       label: "الكلمات المفتاحية",
       placeholder: "اكتب الكلمات المفتاحية",
@@ -125,13 +169,21 @@ const ar = {
         duplicate: "تمت إضافة هذه الكلمة من قبل",
       },
     },
+
+    // Status
     status: {
-      pending: "قيد المراجعة",
-      active: "نشط الأن",
-      sold: "تم بيعه",
-      paused: "توقف مؤقتًا",
+      PENDING: "قيد المراجعة",
+      ACTIVE: "نشط الآن",
+      SOLD: "تم بيعه",
+      PAUSED: "توقف مؤقتًا",
       label: "تصفية حسب الحالة",
     },
+  },
+
+  // Enum
+  enum: {
+    currencies: "العملة",
+    frequency: "نوع الدفع",
   },
 
   placeholders: {
@@ -171,6 +223,16 @@ const ar = {
     selectGovernorate: "اختر محافظتك",
     yourCity: "مدينتك",
     selectCity: "اختر مدينتك",
+    yourGovernorate: "المحافظة",
+    selectGovernorate: "اختر المحافظة",
+    yourCity: "المدينة",
+    selectCity: "اختر المدينة",
+    yourArea: "المنطقة",
+    selectArea: "اختر المنطقة",
+    yourCompound: "الكمبوند",
+    selectCompound: "اختر الكمبوند",
+    select_currency: "اختر العملة",
+    select_frequency: "اختر نوع الدفع",
   },
   dashboard: {
     head: {
@@ -253,8 +315,14 @@ const ar = {
       Label: "عنوان الحقل",
 
       Placeholder: "النص الإرشادي لحقل الإدخال",
-
       errors: {
+        required: "هذا الحقل مطلوب",
+        minOne: "يجب أن تكون القيمة 1 على الأقل",
+        minZero: "لا يمكن أن تكون القيمة أقل من 0",
+        priceRequired: "السعر مطلوب",
+        priceMin: "السعر يجب أن يكون أكبر من 0",
+        deposit_amount_reqire: "التأمين المطلوب",
+        deposit_amount_Min: "التأمين يجب أن يكون 1 على الأقل",
         titleRequired: "اسم المنتج مطلوب",
         titleMin: "اسم المنتج يجب أن يكون 3 أحرف على الأقل",
 
@@ -280,6 +348,8 @@ const ar = {
       ad_details: "تفاصيل الاعلان",
       status: "الاحصائيات",
       location: "الموقع",
+      property_details: "تفاصيل العقار",
+      pricing_details: "تفاصيل التسعير",
       actions: "الاجرائات",
       slide_details: "تفاصيل الشريحة",
       link: "الرابط",

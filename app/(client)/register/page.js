@@ -10,7 +10,7 @@ import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { MdMarkEmailUnread } from "react-icons/md";
-
+import { useNotification } from "@/Contexts/NotificationContext";
 import {
   LockKeyhole,
   Mail,
@@ -31,39 +31,23 @@ import {
   resetPassword,
 } from "@/services/auth/auth.service";
 import { useAuth } from "@/Contexts/AuthContext";
-import {
-  getCities,
-  getGovernorates,
-  getSubCategories,
-} from "@/services/data/data.service";
+import { useAppData } from "@/Contexts/DataContext";
+
 export default function Register() {
+  const { governorates, subCategories, cities, fetchCities } = useAppData();
+
+  const { addNotification } = useNotification();
   const { login } = useAuth();
   const t = useTranslate();
   const { locale, theme } = useContext(settings);
   const auth = t.auth;
   const redirectAfterLogin = useRedirectAfterLogin();
-  const [subCategories, setSubCategories] = useState([]);
-  const [governorates, setGovernorates] = useState([]);
-  const [cities, setCities] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [govRes, subCatRes] = await Promise.all([
-          getGovernorates(null),
-          getSubCategories(null),
-        ]);
-        console.log("govRes: ", govRes);
-
-        setGovernorates(govRes.data);
-        setSubCategories(subCatRes.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [loadings, setLoadings] = useState({
+    submit: false,
+    resend: false,
+    otp: false,
+  });
 
   const STEPS = {
     ACCOUNT: 1,
@@ -141,16 +125,20 @@ export default function Register() {
     }
   }, [days]);
 
-  const [userId, setUserId] = useState(null);
+  useEffect(() => {
+    if (additionalData.gov?.id) {
+      fetchCities(additionalData.gov.id);
+    }
+  }, [additionalData.gov]);
+
   const [step, setStep] = useState(STEPS.ACCOUNT);
-  console.log(step);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [verifyMethod, setVerifyMethod] = useState("");
   const [availableMethod, setAvailableMethod] = useState("both");
 
-  const canUseEmail = availableMethod === "email" || availableMethod === "both";
-  const canUsePhone = availableMethod === "phone" || availableMethod === "both";
+  // const canUseEmail = availableMethod === "email" || availableMethod === "both";
+  // const canUsePhone = availableMethod === "phone" || availableMethod === "both";
   const [cooldown, setCooldown] = useState(60);
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -197,23 +185,6 @@ export default function Register() {
     setErrorTracker((prev) => ({ ...prev, [type]: value }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!additionalData.gov?.id) return;
-
-        const citiesRes = await getCities(additionalData.gov.id);
-        console.log("citiesRes: ", citiesRes);
-
-        setCities(citiesRes.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, [additionalData.gov]);
-
   const toggleCategory = (id) => {
     setSelectedCategories((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
@@ -222,7 +193,6 @@ export default function Register() {
 
   const OTP_LENGTH = 6;
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
-  console.log(otp);
 
   useEffect(() => {
     if (step === STEPS.PHONE_VERIFY || step === STEPS.EMAIL_VERIFY) {
@@ -232,6 +202,7 @@ export default function Register() {
 
   /* ================= SUBMIT ================= */
   const onSubmit = async (data) => {
+    setLoadings((prev) => ({ ...prev, submit: true }));
     try {
       // -------- LOGIN --------
       if (step === STEPS.LOGIN) {
@@ -246,8 +217,11 @@ export default function Register() {
           user: res.data.user,
           accessToken: res.data.accessToken,
         });
-
         redirectAfterLogin();
+        addNotification({
+          type: "success",
+          message: "You have successfully logged into your account.",
+        });
         return;
       }
 
@@ -315,20 +289,25 @@ export default function Register() {
 
         try {
           const res = await registerUser(payload);
-          alert(res.data.message);
+          addNotification({
+            type: "success",
+            message: res.data.message,
+          });
           setStep(STEPS.EMAIL_VERIFY);
         } catch (err) {
           const msg = err.response?.data?.message || "Something went wrong";
-          alert(msg);
-
+          addNotification({
+            type: "warning",
+            message: msg,
+          });
           if (msg === "Email already exists") {
             await handleResend();
+
             setStep(STEPS.EMAIL_VERIFY);
           } else {
             setStep(STEPS.ACCOUNT);
           }
         }
-
         return;
       }
 
@@ -341,8 +320,15 @@ export default function Register() {
             accessToken: res.data.accessToken,
           });
           redirectAfterLogin();
+          addNotification({
+            type: "success",
+            message: "Your account has been created successfully.",
+          });
         } catch (err) {
-          alert(err.response?.data?.message || "Something went wrong");
+          addNotification({
+            type: "warning",
+            message: err.response?.data?.message || "Something went wrong",
+          });
         }
         return;
       }
@@ -389,11 +375,16 @@ export default function Register() {
             otp: otpCode,
             new_password,
           });
-
-          alert("Password reset successfully");
+          addNotification({
+            type: "success",
+            message: "Password reset successfully",
+          });
           setStep(STEPS.PASS_CHANGED);
         } catch (err) {
-          alert(err.response?.data?.message || "Something went wrong");
+          addNotification({
+            type: "warning",
+            message: err.response?.data?.message || "Something went wrong",
+          });
           setOtp(Array(OTP_LENGTH).fill(""));
         }
 
@@ -405,7 +396,12 @@ export default function Register() {
       }
     } catch (err) {
       console.log(err.response.data.message);
-      alert(err.response.data.message);
+      addNotification({
+        type: "warning",
+        message: err.response.data.message,
+      });
+    } finally {
+      setLoadings((prev) => ({ ...prev, submit: false }));
     }
   };
 
@@ -425,7 +421,10 @@ export default function Register() {
       redirectAfterLogin();
       return res;
     } catch (err) {
-      alert(err.response?.data?.message || "Invalid code");
+      addNotification({
+        type: "warning",
+        message: err.response?.data?.message || "Invalid code",
+      });
       setOtp(Array(OTP_LENGTH).fill(""));
       throw err;
     }
@@ -435,15 +434,30 @@ export default function Register() {
   const handleResend = async () => {
     try {
       await resendEmailOtp({
-        email: getValues("emailPhoneLogin"), // خلي نفس القيمة المستخدمة
+        email: getValues("email"), // خلي نفس القيمة المستخدمة
       });
 
-      alert("OTP sent again");
+      addNotification({
+        type: "success",
+        message: "OTP sent again",
+      });
       setCooldown(60);
       return true; // رجع نجاح
     } catch (err) {
-      console.log("err:otp: ", err);
-      alert(err.response?.data?.message || "Something went wrong");
+      if (err.response?.data?.message == "Email already verified") {
+        addNotification({
+          type: "warning",
+          message:
+            "This account is already registered. You can log in directly.",
+        });
+        // setStep(STEPS.LOGIN);
+      } else {
+        addNotification({
+          type: "warning",
+          message: err.response?.data?.message || "Something went wrong",
+        });
+      }
+
       throw err; // لازم ترميه لبرا عشان الكود اللي بعد await ما يكملش
     }
   };
@@ -456,7 +470,10 @@ export default function Register() {
     } catch (err) {
       console.log(err);
 
-      alert(err.response?.data?.message || "Something went wrong");
+      addNotification({
+        type: "warning",
+        message: err.response?.data?.message || "Something went wrong",
+      });
       throw err;
     }
   };
@@ -523,7 +540,16 @@ export default function Register() {
           )
         ) : null}
         <div className="top">
-          <h1>{titles[step]}</h1>
+          <h1
+            onClick={() => {
+              addNotification({
+                type: "warning",
+                message: "Something went wrong",
+              });
+            }}
+          >
+            {titles[step]}
+          </h1>
           <p>{descriptions[step]}</p>
         </div>
 
@@ -613,10 +639,10 @@ export default function Register() {
                   await handleForgetPass();
                   setStep(STEPS.FORGET_PASS_OTP);
                 } catch (err) {
-                  console.log(err);
-
-                  // هنا ممكن تسيبها فاضية أو تعمل حاجة للمستخدم
-                  console.log("Resend failed, stay in current step");
+                  addNotification({
+                    type: "warning",
+                    message: "Resend failed, stay in current step",
+                  });
                 }
               }}
             >
@@ -1021,12 +1047,16 @@ export default function Register() {
         <button
           type={step === STEPS.FORGET_PASS_OTP ? "button" : "submit"}
           className="main-button"
+          disabled={loadings.submit}
           onClick={() => {
             if (step === STEPS.FORGET_PASS_OTP) {
               const otpCode = otp.join("");
 
               if (!otpCode || otpCode.length < OTP_LENGTH) {
-                alert("Please enter the complete OTP");
+                addNotification({
+                  type: "warning",
+                  message: "Please enter the complete OTP",
+                });
                 return;
               }
 
@@ -1034,7 +1064,11 @@ export default function Register() {
             }
           }}
         >
-          {buttonLabels[step]}
+          {loadings.submit ? (
+            <span className="loader"></span>
+          ) : (
+            buttonLabels[step]
+          )}
         </button>
 
         {/* ================= SOCIAL LOGIN ================= */}

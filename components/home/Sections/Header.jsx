@@ -18,58 +18,24 @@ import {
 import { FiSun } from "react-icons/fi";
 import { GrLanguage } from "react-icons/gr";
 import { usePathname } from "next/navigation";
-import {
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-} from "@/data";
 import { LuMessageSquare } from "react-icons/lu";
 import { MdPostAdd } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
 import useTranslate from "@/Contexts/useTranslation";
 import SelectLocation from "@/components/Tools/data-collector/selectLocation";
 import useClickOutside from "@/Contexts/useClickOutside";
-import { getAllSubCats } from "@/services/subCategories/subCats.service";
 import { ImPower } from "react-icons/im";
 import { useAuth } from "@/Contexts/AuthContext";
+import { useAppData } from "@/Contexts/DataContext";
 
 function Header() {
   const t = useTranslate();
   const pathname = usePathname();
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
+  const { categories, subCategories } = useAppData();
 
   const { user, isAuthenticated, loading, logout } = useAuth();
-
-  // useEffect(() => {
-  //   setActiveMenu(null);
-  // }, [pathname]);
-
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [dawaarlySubCat, setDawaarlySubCat] = useState([]);
-  useEffect(() => {
-    setDawaarlySubCat(locale == "en" ? subcategoriesEn : subcategoriesAr);
-
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-
-      getAllSubCats(locale)
-        .then((res) => setSubcategories(res.data.data))
-        .catch(console.error);
-    };
-    fetchCategories();
-  }, [locale]);
 
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSmallMenu, setActiveSmallMenu] = useState(false);
@@ -80,21 +46,6 @@ function Header() {
   useClickOutside(menuRef2, () => setActiveSmallMenu(false));
 
   const searchInputRef = useRef(null);
-
-  // let firstCategories = [];
-  // let secondCategories = [];
-
-  // if (screenSize === "large") {
-  //   firstCategories = categories.slice(0, 4);
-  //   secondCategories = categories.slice(4, 12);
-  // } else if (screenSize === "med") {
-  //   firstCategories = categories.slice(0, 2);
-  //   secondCategories = categories.slice(2, 12);
-  // } else {
-  //   // small
-  //   firstCategories = categories;
-  //   secondCategories = [];
-  // }
 
   const openMenu = (id) => {
     setActiveMenu("sub-cats");
@@ -306,59 +257,12 @@ function Header() {
                 </h4>
               )}
               <SelectLocation locale={locale} />
+
               <div
                 className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
                 ref={menuRef2}
               >
-                <div
-                  className="cat-item"
-                  onMouseEnter={
-                    !screenSize.includes("small")
-                      ? () => openMenu("dawaarly-exclusive")
-                      : undefined
-                  }
-                  onMouseLeave={
-                    !screenSize.includes("small") ? closeMenu : undefined
-                  }
-                >
-                  <Link
-                    href={""}
-                    onClick={(e) => {
-                      if (screenSize !== "large") {
-                        e.preventDefault();
-                        toggleMenu("dawaarly-exclusive");
-                      }
-                    }}
-                  >
-                    <ImPower />
-                    {"dawaarly-exclusive"}
-                    <FaAngleDown />
-                  </Link>
-
-                  {activeSubCat === `dawaarly-exclusive` && (
-                    <div
-                      className="menu active"
-                      onMouseEnter={
-                        !screenSize.includes("small")
-                          ? () => openMenu(`dawaarly-exclusive`)
-                          : undefined
-                      }
-                      onMouseLeave={
-                        !screenSize.includes("small") ? closeMenu : undefined
-                      }
-                    >
-                      <div className="sub-cats">
-                        {/* ترتيب يدوي حسب المطلوب */}
-                        {dawaarlySubCat?.map((x) => (
-                          <Link key={x.id} href={`/market?subcat=${x.id}`}>
-                            {x.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {categories?.slice(2, 4)?.map((cat) => {
+                {categories?.map((cat) => {
                   const isActive = activeSubCat === cat?.id;
                   const Icon = cat?.icon;
 
@@ -387,7 +291,7 @@ function Header() {
                         }}
                       >
                         {Icon ? <Icon /> : null}
-                        {cat?.name}
+                        {cat?.[`name_${locale}`]}
                         <FaAngleDown />
                       </Link>
 
@@ -406,14 +310,14 @@ function Header() {
                           }
                         >
                           <div className="sub-cats">
-                            {subcategories
-                              .filter((x) => x.categoryName == cat?.id)
+                            {subCategories
+                              .filter((x) => x.category_id == cat?.id)
                               .map((sub) => (
                                 <Link
                                   key={sub.id}
                                   href={`/market?subcat=${sub.id}`}
                                 >
-                                  {sub.name}
+                                  {sub?.[`name_${locale}`]}
                                 </Link>
                               ))}
                           </div>
@@ -422,66 +326,6 @@ function Header() {
                     </div>
                   );
                 })}
-
-                {/* {!screenSize.includes("small") && (
-                  <div
-                    key={50}
-                    className="cat-item"
-                    onMouseEnter={
-                      !screenSize.includes("small")
-                        ? () => openMenu("other")
-                        : undefined
-                    }
-                    onMouseLeave={
-                      !screenSize.includes("small") ? closeMenu : undefined
-                    }
-                  >
-                    <Link
-                      href={`/`}
-                      onClick={(e) => {
-                        if (screenSize !== "large") {
-                          e.preventDefault();
-                          toggleMenu("other");
-                        }
-                      }}
-                    >
-                      {t.header.other}
-                      <FaAngleDown />
-                    </Link>
-
-                    {activeMenu === "sub-cats" && activeSubCat === "other" && (
-                      <div
-                        className="menu active"
-                        onMouseEnter={
-                          !screenSize.includes("small")
-                            ? () => openMenu("other")
-                            : undefined
-                        }
-                        onMouseLeave={
-                          !screenSize.includes("small") ? closeMenu : undefined
-                        }
-                      >
-                        <div className="sub-cats">
-                          {secondCategories.map((otherCat) => (
-                            <Link
-                              key={otherCat?.id}
-                              href={`/market${
-                                !screenSize.includes("small")
-                                  ? `?cat=${otherCat?.id}`
-                                  : ""
-                              }`}
-                              onClick={() => {
-                                if (screenSize !== "large") closeMenu();
-                              }}
-                            >
-                              {otherCat?.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )} */}
               </div>
             </div>
             {!screenSize.includes("small") && (

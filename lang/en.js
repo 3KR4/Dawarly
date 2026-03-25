@@ -20,20 +20,20 @@ const en = {
     all_ads: "all ads",
   },
   ad: {
+    // Basic
     ad_details: "Ad Details",
     price: "Price",
     amenities: "Amenities",
     description: "Description",
     specifecs: "Specifications",
-    booking: "booking",
-
+    booking: "Booking",
     listed_by: "Listed by",
     member_since: "Member since",
-
     see_profile: "See profile",
     phone_number: "Phone number",
     whatsapp: "WhatsApp",
 
+    // Safety
     safety_title: "Your safety matters to us!",
     safety_rules: [
       "Only meet in public or crowded places such as metro stations or malls.",
@@ -41,65 +41,111 @@ const en = {
       "Inspect the product carefully before purchasing.",
       "Never pay or transfer money in advance.",
     ],
-    yes: "yes",
-    no: "no",
+    yes: "Yes",
+    no: "No",
+    ad_created: "Ad created successfully",
+    ad_updated: "Ad updated successfully",
 
+    // Form sections
     choose_category: "Choose a category",
     choose_sub_category: "Choose a subcategory",
-    filter_form: "filter information",
+    select_category: "Select a category",
+    select_sub_category: "Select a subcategory",
     ad_basics: "Ad basics",
+    filter_form: "Filter information",
     ad_details: "Ad details",
     contact_information: "Contact information",
     choose_category_description:
       "Select the main category that best fits your ad.",
     choose_sub_category_description:
       "Choose a subcategory to better describe your ad.",
-    filter_form_description: "fill the new filter data",
-
     ad_basics_description: "Enter the essential information about your ad.",
     ad_details_description: "Add more details to make your ad more attractive.",
     contact_information_description: "Provide your preferred contact method.",
-    create_your_ad: "create your ad",
-    create_ad: "create ad",
+    filter_form_description: "Fill the new filter data",
+    create_your_ad: "Create your ad",
+    create_ad: "Create ad",
+    update_ad: "Update ad",
     contact_via_email: "Contact via Email",
     contact_via_phone: "Contact via Phone",
     contact_via_chat: "Contact via Chat",
-    contact_method_required: "the contact method required",
+    contact_method_required: "Contact method is required",
+
+    // Info sections
     basic_info: "Basic Information",
     category_info: "Category Information",
     admin_contact: "Administrator Contact",
     theContactMethod: "Current communication method",
     additional_details: "Additional Details",
-    userToUser: "user To User",
-    userToAdmin: "user To Admin",
-    choose_admin: "choosing admin",
-    select_admin: "select admin user",
+    userToUser: "User to User",
+    userToAdmin: "User to Admin",
+    choose_admin: "Choose admin",
+    select_admin: "Select admin user",
+
+    // Rental
     rental_period: "Rental Period",
     minimumRentalDuration: "Minimum Rental Duration",
     durationValue: "Duration",
     durationValuePlaceholder: "e.g. 3",
     durationUnit: "Unit",
-    rentUnit: "rent Unit",
+    rentUnit: "Rent Unit",
     select: "Select",
+    from: "From",
+    to: "To",
     day: "Day",
     week: "Week",
     month: "Month",
-    from: "from",
-    to: "to",
-    rentPrice: "rent price",
+    rentPrice: "Rent Price",
     rentPricePlaceholder: "e.g. 1500",
+    deposit_amount: "Deposit Amount",
+    deposit_amount_Placeholder: "e.g. 5000",
+
+    // Property details
+    bedrooms: "Bedrooms",
+    bedroomsPlaceholder: "Number of bedrooms",
+    bathrooms: "Bathrooms",
+    bathroomsPlaceholder: "Number of bathrooms",
+    level: "Level",
+    levelPlaceholder: "Floor number",
+
+    // Guest capacity
+    childMax: "Max Children",
+    childMaxPlaceholder: "Maximum number of children allowed",
+    adultMax: "Max Adults",
+    adultMaxPlaceholder: "Maximum number of adults allowed",
+
+    // Loading
+    loading: "Loading data...",
+    fetch_error: "An error occurred while fetching ad data",
+
+    // Placeholders
     placeholders: {
-      adTitle: "enter your ad title",
+      adTitle: "Enter your ad title",
     },
+
+    // Errors
     errors: {
-      adTitle: "your ad title is required",
-      adTitleValidation: "your ad title is too short",
+      adTitle: "Ad title is required",
+      adTitleValidation: "Ad title is too short",
       governorate: "Governorate is required",
       city: "City is required",
       category: "Category is required",
       subCategory: "Subcategory is required",
       admin: "Admin user is required",
+      currency: "Currency is required",
+      frequency: "Payment frequency is required",
+      rentalDuration: "Rental duration is required",
+      minOne: "Value must be at least 1",
+      minZero: "Value cannot be less than 0",
+      priceRequired: "Price is required",
+      priceMin: "Price must be greater than 0",
+      deposit_amount_reqire: "Deposit amount is required",
+      deposit_amount_Min: "Deposit amount must be at least 1",
+      required: "This field is required",
+      maxHundred: "Value must not exceed 100",
     },
+
+    // Images
     images: {
       label: "Images",
       helperText: "Drag and drop images here or click to upload",
@@ -117,6 +163,7 @@ const en = {
       },
     },
 
+    // Tags
     tags: {
       label: "Tags",
       placeholder: "Enter your tags",
@@ -126,13 +173,20 @@ const en = {
         duplicate: "This tag has already been added before",
       },
     },
+
+    // Status
     status: {
-      pending: "pending",
-      active: "active",
-      sold: "sold",
-      paused: "paused",
+      PENDING: "pending",
+      ACTIVE: "Active",
+      SOLD: "Sold",
+      PAUSED: "Paused",
       label: "Filter by status",
     },
+  },
+  // Enum
+  enum: {
+    currencies: "Currency",
+    frequency: "Payment Frequency",
   },
   placeholders: {
     search: "search on anything ...",
@@ -170,6 +224,11 @@ const en = {
     selectGovernorate: "select your governorate",
     yourCity: "your City",
     selectCity: "select your City",
+    selectArea: "Select area",
+    yourCompound: "Compound",
+    selectCompound: "Select compound",
+    select_currency: "Select currency",
+    select_frequency: "Select payment frequency",
   },
   dashboard: {
     head: {
@@ -250,11 +309,16 @@ const en = {
       filterKey: "filter Key",
       Label: "input Label",
       Placeholder: "Placeholder",
-      Options: "Options",
+
       errors: {
         titleRequired: "Product title is required",
         titleMin: "Title must be at least 3 characters",
-
+        required: "This field is required",
+        minOne: "Value must be at least 1",
+        minZero: "Value cannot be less than 0",
+        deposit_amount_reqire: "Deposit amount is required",
+        deposit_amount_Min: "Deposit amount must be at least 1",
+        priceMin: "Price must be greater than 0",
         stockRequired: "Stock is required",
         stockMin: "Minimum stock is 1",
 
@@ -277,7 +341,9 @@ const en = {
     tables: {
       ad_details: "ad details",
       status: "status",
-      location: "location",
+      location: "Location",
+      property_details: "Property Details",
+      pricing_details: "Pricing Details",
       actions: "actions",
       slide_details: "slide details",
       link: "link",

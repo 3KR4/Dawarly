@@ -28,12 +28,14 @@ body:has(.form-holder) footer {
   position: relative !important;
 }
 .form-holder.register {
+  margin: 0;
+}
+body:has(.form-holder.register) {
   background: linear-gradient(
     13deg,
     var(--main-color) -60%,
     var(--body-color) 100%
   );
-  margin: 0;
 }
 .form-holder form {
   background: var(--body-color);

@@ -5,6 +5,10 @@ import { SettingsProvider } from "@/Contexts/settings";
 import { FiltersProvider } from "@/Contexts/filters";
 import { SelectorsProvider } from "@/Contexts/selectors";
 import { AuthProvider } from "@/Contexts/AuthContext";
+import { NotificationProvider } from "@/Contexts/NotificationContext";
+import NotificationHolder from "@/components/Tools/NotificationHolder";
+import { DataProvider } from "@/Contexts/DataContext";
+
 import "@/styles/client/globals.css";
 
 const cairo = Cairo({
@@ -46,15 +50,20 @@ export default function RootLayout({ children }) {
     <html lang="en" className={cairo.className}>
       <body>
         <SettingsProvider>
-          <AuthProvider>
-            <FiltersProvider>
-              <SelectorsProvider>
-                <Header />
-                {children}
-                <Footer />
-              </SelectorsProvider>
-            </FiltersProvider>
-          </AuthProvider>
+          <NotificationProvider>
+            <AuthProvider>
+              <FiltersProvider>
+                <SelectorsProvider>
+                  <DataProvider>
+                    <Header />
+                    {children}
+                    <Footer />
+                    <NotificationHolder />;
+                  </DataProvider>
+                </SelectorsProvider>
+              </FiltersProvider>
+            </AuthProvider>
+          </NotificationProvider>
         </SettingsProvider>
       </body>
     </html>

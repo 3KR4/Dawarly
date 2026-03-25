@@ -44,12 +44,13 @@ export const SettingsProvider = ({ children }) => {
     setIsMounted(true);
   }, [pathname]);
 
-  const [theme, setTheme] = useState("light");
+const [theme, setTheme] = useState(() => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("theme") || "light";
+  }
+  return "light";
+});
 
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved) setTheme(saved);
-  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("theme", theme);
@@ -59,12 +60,14 @@ export const SettingsProvider = ({ children }) => {
   const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
-  const [locale, setLocale] = useState("en");
+const [locale, setLocale] = useState(() => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("locale") || "en";
+  }
+  return "en";
+});
 
-  useEffect(() => {
-    const saved = localStorage.getItem("locale");
-    if (saved) setLocale(saved);
-  }, []);
+
 
   useEffect(() => {
     document.documentElement.setAttribute("lang", locale);

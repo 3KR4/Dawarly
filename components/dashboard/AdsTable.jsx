@@ -11,13 +11,6 @@ import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
 
-import {
-  ads,
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-} from "@/data";
 import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -26,10 +19,10 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
   const { screenSize, locale } = useContext(settings);
   const t = useTranslate();
   const statusOptions = [
-    { id: "pending", name: t.ad.status.pending },
-    { id: "active", name: t.ad.status.active },
-    { id: "sold", name: t.ad.status.sold },
-    { id: "paused", name: t.ad.status.paused },
+    { id: "PENDING", name: t.ad.status.PENDING },
+    { id: "ACTIVE", name: t.ad.status.ACTIVE },
+    { id: "SOLD", name: t.ad.status.SOLD },
+    { id: "PAUSED", name: t.ad.status.PAUSED },
   ];
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
@@ -53,28 +46,12 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
 
         <div className="table-items">
           {ads.slice(0, limit).map((item) => {
-            const adCat =
-              locale == "en"
-                ? categoriesEn?.find((x) => x.id == item?.category)
-                : categoriesAr?.find((x) => x.id == item?.category);
-            const adSubCat =
-              locale == "en"
-                ? subcategoriesEn?.find((x) => x.id == item?.sub_category)
-                : subcategoriesAr?.find((x) => x.id == item?.sub_category);
-            const views = Math.floor(Math.random() * 5000) + 500;
-            const purchases = Math.floor(views * 0.004);
-
-            const possibleStatuses = ["pending", "active", "sold", "paused"];
-            item.status =
-              possibleStatuses[
-                Math.floor(Math.random() * possibleStatuses.length)
-              ];
             return (
               <div key={item?.id} className="table-item">
                 <div className="holder">
                   <Link href={`/`} className="item-image">
                     <Image
-                      src={item?.images[0]}
+                      src={item?.image[0]?.secure_url}
                       alt={item?.name}
                       fill
                       className="product-image"
@@ -87,17 +64,17 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                     </Link>
                     <div className="item-location nisted">
                       <Link
-                        href={`/market?gov=${item?.area?.governorate?.id}`}
+                        href={`/market?gov=${item?.governorate?.id}`}
                         className="link"
                       >
-                        {item?.area?.governorate?.[locale]} /
+                        {item?.governorate?.[`name_${locale}`]} /
                       </Link>
 
                       <Link
-                        href={`/market?city=${item?.area?.city?.id}`}
+                        href={`/market?city=${item?.city?.id}`}
                         className="link"
                       >
-                        {item?.area?.city[locale]}
+                        {item?.city?.[`name_${locale}`]}
                       </Link>
                     </div>
                   </div>
@@ -125,57 +102,63 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                 ) : (
                   <>
                     <div className="item-price">
-                      {formatCurrency(item?.price, "EGP", locale)}
+                      {formatCurrency(
+                        item?.rent_amount,
+                        item?.rent_currency,
+                        locale,
+                      )}
                     </div>
 
                     <div className="item-categories nisted">
-                      <Link href={`/market?cat=${adCat?.id}`} className="link">
-                        {adCat?.name} /
+                      <Link
+                        href={`/market?cat=${item?.Categories?.id}`}
+                        className="link"
+                      >
+                        {item?.Categories?.[`name_${locale}`]} /
                       </Link>
 
                       <Link
-                        href={`/market?subcat=${adSubCat?.id}`}
+                        href={`/market?subcat=${item?.SubCategories?.id}`}
                         className="link"
                       >
-                        {adSubCat?.name}
+                        {item?.SubCategories?.[`name_${locale}`]}
                       </Link>
                     </div>
                   </>
                 )}
 
                 <p className="date">
-                  {formatRelativeDate(item?.creation_date, locale, "detailed")}
+                  {formatRelativeDate(item?.created_at, locale, "detailed")}
                 </p>
                 {page === "user" ? (
                   <div className="item-status">
-                    {item.status === "pending" ? (
-                      <span className="pending">{t.ad.status.pending}</span>
+                    {/* {item?.status === "PENDING" ? (
+                      <span className="PENDING">{t.ad.status.PENDING}</span>
                     ) : (
                       <SelectOptions
-                      size="ultra-small"
+                        size="ultra-small"
                         options={statusOptions.filter(
-                          (s) => s.id !== "pending" // pending غير قابل للتفاعل
+                          (s) => s.id !== "PENDING", // pending غير قابل للتفاعل
                         )}
                         value={
-                          statusOptions.find((s) => s.id === item.status)
+                          statusOptions.find((s) => s.id === item?.status)
                             ?.name || ""
                         }
                         locale={locale}
-                        t={t}
                         onChange={(selected) => {
                           // نحدث الحالة هنا
-                          item.status = selected.id;
+                          item?.status = selected?.id;
                         }}
                       />
-                    )}
+                    )} */}
                   </div>
                 ) : (
                   <div className="item-overview">
                     <h4>
-                      {views} <FaEye />
+                      {151} <FaEye />
                     </h4>
                     <h4 className="green">
-                      {purchases} <BiSolidPurchaseTagAlt />
+                      {50505} <BiSolidPurchaseTagAlt />
                     </h4>
                   </div>
                 )}

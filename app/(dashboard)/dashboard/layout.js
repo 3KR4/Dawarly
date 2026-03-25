@@ -7,6 +7,10 @@ import Head from "@/components/dashboard/Head";
 import { SettingsProvider } from "@/Contexts/settings";
 import { FiltersProvider } from "@/Contexts/filters";
 import { SelectorsProvider } from "@/Contexts/selectors";
+import { DataProvider } from "@/Contexts/DataContext";
+import { NotificationProvider } from "@/Contexts/NotificationContext";
+import NotificationHolder from "@/components/Tools/NotificationHolder";
+
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -47,18 +51,22 @@ export default function RootLayout({ children }) {
     <html lang="en" className={cairo.className}>
       <body>
         <SettingsProvider>
-          <FiltersProvider>
-            <SelectorsProvider>
-              <div className="dashboard">
-                <SideNav />
-
-                <div className="holder">
-                  <Head />
-                  {children}
-                </div>
-              </div>
-            </SelectorsProvider>
-          </FiltersProvider>
+          <NotificationProvider>
+            <FiltersProvider>
+              <SelectorsProvider>
+                <DataProvider>
+                  <div className="dashboard">
+                    <SideNav />
+                    <div className="holder">
+                      <Head />
+                      {children}
+                    </div>
+                    <NotificationHolder />
+                  </div>
+                </DataProvider>
+              </SelectorsProvider>
+            </FiltersProvider>
+          </NotificationProvider>
         </SettingsProvider>
       </body>
     </html>
