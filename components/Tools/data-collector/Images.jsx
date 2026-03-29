@@ -54,10 +54,10 @@ function Images({
   };
 
   const handleRemoveImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-    setErrorMessage("");
+    const updated = [...images];
+    updated.splice(index, 1);
+    setImages(updated);
   };
-
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
       <label>
@@ -117,7 +117,9 @@ function Images({
             <div className="uploaded" key={index}>
               <Image
                 src={
-                  typeof image === "string" ? image : URL.createObjectURL(image)
+                  image.secure_url
+                    ? image.secure_url
+                    : URL.createObjectURL(image)
                 }
                 alt={`image-${index}`}
                 width={150}

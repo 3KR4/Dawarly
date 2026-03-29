@@ -343,11 +343,12 @@ form .form-section .dynamicFilters-holder > * {
 }
 
 .images-uplouder .uploaded img {
-  max-width: unset !important;
-  width: 100%;
-  height: 95px !important;
-  border-radius: 7px;
   object-fit: cover;
+  border-radius: 7px;
+  width: 100%;
+  max-width: unset !important;
+  height: 95px !important;
+  background: var(--lighter-main-color);
 }
 
 .images-uplouder .uploaded svg {

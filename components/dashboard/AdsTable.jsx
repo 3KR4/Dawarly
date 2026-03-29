@@ -14,40 +14,81 @@ import React, { useContext, useState, useEffect } from "react";
 import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import { useNotification } from "@/Contexts/NotificationContext";
+import { deleteAd } from "@/services/ads/ads.service";
+import { TbListSearch } from "react-icons/tb";
+import { AdStatuses, RentFrequencies } from "@/data/enums";
 
-export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
+export default function AdsTable({
+  ads,
+  loadingContent,
+  activeAds,
+  removeAd,
+  changeStatus,
+  page = "dashboard",
+}) {
   const { screenSize, locale } = useContext(settings);
   const t = useTranslate();
-  const statusOptions = [
-    { id: "PENDING", name: t.ad.status.PENDING },
-    { id: "ACTIVE", name: t.ad.status.ACTIVE },
-    { id: "SOLD", name: t.ad.status.SOLD },
-    { id: "PAUSED", name: t.ad.status.PAUSED },
-  ];
+  const { addNotification } = useNotification();
+
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
-      <div className="table-container products">
+      <div
+        className={`table-container products ${!activeAds ? "pending-ads" : ""}`}
+      >
         <div className="table-header">
           {!screenSize.includes("small") && (
             <>
               <div className="header-item details">
                 {t.dashboard.tables.ad_details}
               </div>
-              <div className="header-item">{t.dashboard.forms.price}</div>
+              <div className="header-item">{t.ad.rentPrice}</div>
+              {!activeAds && (
+                <div className="header-item">{t.ad.deposit_amount}</div>
+              )}
+
               <div className="header-item">{t.home.categories}</div>
               <div className="header-item">
-                {t.dashboard.tables.published_at}
+                {activeAds
+                  ? t.dashboard.tables.created_at
+                  : t.dashboard.tables.published_at}
               </div>
               <div className="header-item">{t.dashboard.tables.status}</div>
+
+              {activeAds && (
+                <>
+                  <div className="header-item">{t.dashboard.tables.reach}</div>
+                </>
+              )}
+
               <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
           )}
         </div>
 
-        <div className="table-items">
-          {ads.slice(0, limit).map((item) => {
-            return (
-              <div key={item?.id} className="table-item">
+        <div
+          className="table-items"
+          style={{
+            position: "relative",
+            opacity: loadingContent ? "0.6" : "1",
+          }}
+        >
+          {loadingContent && (
+            <div className="loading-content">
+              <span
+                className="loader"
+                style={{ opacity: loadingContent ? "1" : "0" }}
+              ></span>
+            </div>
+          )}
+          {!ads.length && !loadingContent ? (
+            <div className="no-data-found">
+              <TbListSearch />
+              <p>{activeAds ? "no data found" : "no more pending ads"} </p>
+            </div>
+          ) : (
+            ads?.map((item) => (
+              <div key={item?.id} className={`table-item ${item?.status}`}>
                 <div className="holder">
                   <Link href={`/`} className="item-image">
                     <Image
@@ -83,31 +124,61 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                 {screenSize === "small" || screenSize === "ultra-small" ? (
                   <>
                     <div className="item-categories nisted">
-                      <Link href={`/market?cat=${adCat?.id}`} className="link">
-                        {adCat?.name} /
+                      <Link
+                        href={`/market?cat=${item?.Categories?.id}`}
+                        className="link"
+                      >
+                        {item?.Categories?.[`name_${locale}`]} /
                       </Link>
 
                       <Link
-                        href={`/market?subcat=${adSubCat?.id}`}
+                        href={`/market?subcat=${item?.SubCategories?.id}`}
                         className="link"
                       >
-                        {adSubCat?.name}
+                        {item?.SubCategories?.[`name_${locale}`]}
                       </Link>
                     </div>
 
-                    <div className="item-price">
-                      {formatCurrency(item?.price, "EGP", locale)}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="item-price">
+                    <div className="item-price" style={{ lineHeight: `1.3` }}>
                       {formatCurrency(
                         item?.rent_amount,
                         item?.rent_currency,
                         locale,
                       )}
                     </div>
+                    {!activeAds && (
+                      <div className="item-price" style={{ lineHeight: `1.3` }}>
+                        {formatCurrency(
+                          item?.deposit_amount,
+                          item?.rent_currency,
+                          locale,
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="item-price" style={{ lineHeight: `1.3` }}>
+                      {formatCurrency(
+                        item?.rent_amount,
+                        item?.rent_currency,
+                        locale,
+                      )}{" "}
+                      {
+                        RentFrequencies?.find(
+                          (x) => x.id == item?.rent_frequency,
+                        )?.[`name_${locale}`]
+                      }
+                    </div>
+                    {!activeAds && (
+                      <div className="item-price" style={{ lineHeight: `1.3` }}>
+                        {formatCurrency(
+                          item?.deposit_amount,
+                          item?.rent_currency,
+                          locale,
+                        )}
+                      </div>
+                    )}
 
                     <div className="item-categories nisted">
                       <Link
@@ -130,37 +201,65 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                 <p className="date">
                   {formatRelativeDate(item?.created_at, locale, "detailed")}
                 </p>
-                {page === "user" ? (
+                {activeAds && (
+                  <div className="item-overview onlyOne">
+                    <h4
+                      style={{
+                        background: AdStatuses.find((x) => x.id == item?.status)
+                          ?.bg,
+                        color: AdStatuses.find((x) => x.id == item?.status)?.tx,
+                      }}
+                    >
+                      {item?.status}
+                    </h4>
+                  </div>
+                )}
+                {page === "user" || !activeAds ? (
                   <div className="item-status">
-                    {/* {item?.status === "PENDING" ? (
-                      <span className="PENDING">{t.ad.status.PENDING}</span>
-                    ) : (
-                      <SelectOptions
-                        size="ultra-small"
-                        options={statusOptions.filter(
-                          (s) => s.id !== "PENDING", // pending غير قابل للتفاعل
-                        )}
-                        value={
-                          statusOptions.find((s) => s.id === item?.status)
-                            ?.name || ""
+                    <SelectOptions
+                      size="ultra-small"
+                      options={[
+                        {
+                          id: "ACTIVE",
+                          name_en: "Active",
+                          name_ar: "نشط",
+                          bg: "#E6F9F0",
+                          tx: "#0F9D58",
+                        },
+                        {
+                          id: "REJECTED",
+                          name_en: "Rejected",
+                          name_ar: "مرفوض",
+                          bg: "#FDECEA",
+                          tx: "#D93025",
+                        },
+                      ]}
+                      value={
+                        AdStatuses.find((s) => s.id === item?.status)?.[
+                          `name_${locale}`
+                        ] || {
+                          id: "PENDING",
+                          name_en: "Pending",
+                          name_ar: "قيد المراجعة",
+                          bg: "#FFF4E5",
+                          tx: "#F59E0B",
                         }
-                        locale={locale}
-                        onChange={(selected) => {
-                          // نحدث الحالة هنا
-                          item?.status = selected?.id;
-                        }}
-                      />
-                    )} */}
+                      }
+                      locale={locale}
+                      onChange={(selected) => changeStatus(item.id, selected)}
+                    />
                   </div>
                 ) : (
-                  <div className="item-overview">
-                    <h4>
-                      {151} <FaEye />
-                    </h4>
-                    <h4 className="green">
-                      {50505} <BiSolidPurchaseTagAlt />
-                    </h4>
-                  </div>
+                  activeAds && (
+                    <div className="item-overview">
+                      <h4>
+                        {151} <FaEye />
+                      </h4>
+                      <h4 className="green">
+                        {50505} <BiSolidPurchaseTagAlt />
+                      </h4>
+                    </div>
+                  )
                 )}
 
                 <div className="actions">
@@ -179,19 +278,16 @@ export default function AdsTable({ ads, page = "dashboard", limit = 11 }) {
                   </Link>
 
                   <hr />
-                  <FaTrashAlt className="delete" />
+                  <FaTrashAlt
+                    className="delete"
+                    onClick={() => removeAd(item?.id)}
+                  />
                 </div>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
       </div>
-      <Pagination
-        pageCount={50}
-        screenSize={screenSize}
-        onPageChange={() => {}}
-        isDashBoard={true}
-      />
     </div>
   );
 }

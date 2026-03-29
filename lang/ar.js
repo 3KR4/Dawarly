@@ -346,7 +346,8 @@ const ar = {
     },
     tables: {
       ad_details: "تفاصيل الاعلان",
-      status: "الاحصائيات",
+      reach: "الاحصائيات",
+      status: "الحالة",
       location: "الموقع",
       property_details: "تفاصيل العقار",
       pricing_details: "تفاصيل التسعير",

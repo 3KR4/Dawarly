@@ -11,29 +11,41 @@ import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
-import { crateAd, updateAd, getOneAd } from "@/services/ads/ads.service";
+import {
+  crateAd,
+  updateAd,
+  getOneAd,
+  assignAdmin,
+} from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import { Amenities, Currencies, RentFrequencies } from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
 import { selectors } from "@/Contexts/selectors";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
+import { useAuth } from "@/Contexts/AuthContext";
+import { getAllUsers } from "@/services/auth/auth.service";
+import { deleteImage, uploadImages } from "@/services/images/images.service";
 
 export default function AdForm({ type = "client", adId }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
   const { governorates, categories, subCategories, cities, areas, compounds } =
     useAppData();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
-  const { tags } = useContext(selectors);
+  const { tags, setTags } = useContext(selectors);
 
   // ======= FORM STATES =======
   const [adData, setAdData] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
+  const [allAdmins, setAllAdmins] = useState([]);
+  const canAssignAdmin = user?.permissions?.includes("ASSIGN_RESPONSIBILITY");
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  console.log(allAdmins);
 
   const [selectedCats, setSelectedCats] = useState({ cat: null, subCat: null });
 
@@ -51,17 +63,19 @@ export default function AdForm({ type = "client", adId }) {
   });
   const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
-    email: false,
     phone: false,
   });
 
   const [images, setImages] = useState([]);
+  const [originalImages, setOriginalImages] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
+
+  console.log(selectedAmenities);
+
   const [additionalData, setAdditionalData] = useState({
     currency: null,
     frequency: null,
     minRentalUnit: null,
-    unit: null,
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
@@ -80,6 +94,15 @@ export default function AdForm({ type = "client", adId }) {
   useEffect(() => {
     if (adId) fetchAdData();
   }, [adId]);
+
+  // fetch admins
+  useEffect(() => {
+    console.log(adId, canAssignAdmin);
+
+    if (adId && canAssignAdmin) {
+      fetchAdmins();
+    }
+  }, [adId, canAssignAdmin]);
 
   const fetchAdData = async () => {
     setIsLoading(true);
@@ -100,6 +123,21 @@ export default function AdForm({ type = "client", adId }) {
       setIsLoading(false);
     }
   };
+  const fetchAdmins = async () => {
+    try {
+      const res = await getAllUsers("ADMIN", "CHANGE_ADS_STATUS", 1, 10000);
+      const admins = res?.data.users;
+      if (!admins) return alert(t.ad.fetch_error);
+      setAllAdmins(admins);
+    } catch (error) {
+      console.log(error);
+
+      addNotification({
+        type: "error",
+        message: error.message,
+      });
+    }
+  };
 
   const canEditAd = (ad) => {
     if (!ad) return false;
@@ -112,54 +150,59 @@ export default function AdForm({ type = "client", adId }) {
     setValue("rentAmount", ad.rent_amount);
     setValue("deposit_amount", ad.deposit_amount);
     setValue("description", ad.description || "");
-    setValue("bedrooms", ad.bedrooms);
-    setValue("bathrooms", ad.bathrooms);
-    setValue("level", ad.level);
+    setValue("bedrooms", ad.details.bedrooms);
+    setValue("bathrooms", ad.details.bathrooms);
+    setValue("level", ad.details.level);
     setValue("child_no_max", ad.child_no_max);
     setValue("adult_no_max", ad.adult_no_max);
     setValue("rentalDuration", ad.min_rent_period);
 
     setSelectedCats({
-      cat: categories.find((c) => c.id == ad.categoryId),
-      subCat: subCategories.find((s) => s.id == ad.subCategoryId),
+      cat: ad.Categories,
+      subCat: ad.SubCategories,
     });
 
-    if (ad.area) {
-      setSelectedLocations({
-        gov: governorates.find((g) => g.id == ad.governorate_id),
-        city: cities.find((c) => c.id == ad.city_id),
-        area: areas.find((a) => a.id == ad.area_id),
-        compound: compounds.find((c) => c.id == ad.compound_id),
-      });
-    }
+    setSelectedLocations({
+      gov: ad.governorate,
+      city: ad.city,
+      area: ad.area,
+      compound: ad.compound,
+    });
 
-    if (ad.images) setImages(ad.images);
-    if (ad.rentAvailability) {
-      setRentAvailability({
-        from: ad.available_from?.split("T")[0] || "",
-        to: ad.available_to?.split("T")[0] || "",
-      });
+    setImages(ad.image);
+    setOriginalImages(ad.image);
+    const formatDate = (date) => {
+      if (!date) return "";
+      return new Date(date).toISOString().slice(0, 10);
+    };
+    setRentAvailability({
+      from: formatDate(ad.available_from),
+      to: formatDate(ad.available_to),
+    });
+    setAdditionalData({
+      currency: Currencies.find((x) => x.id == ad.rent_currency),
+      frequency: RentFrequencies.find((x) => x.id == ad.rent_frequency),
+      minRentalUnit: RentFrequencies.find(
+        (x) => x.id == ad.min_rent_period_unit,
+      ),
+    });
+
+    const activeAmenities = Amenities.filter(
+      (item) => ad?.amenities?.[item.key],
+    ).map((item) => item.id);
+
+    setSelectedAmenities(activeAmenities);
+    setTags(ad.tags);
+
+    if (ad.admin) {
+      setSelectedAdmin(ad.admin);
+      setSelectedMediatorMethod({ id: 2, name: t.ad.userToAdmin });
     }
-    if (ad.admin) setSelectedAdmin(users.find((u) => u.id === ad.admin.id));
-    if (ad.mediatorMethod) setSelectedMediatorMethod(ad.mediatorMethod);
-    if (ad.contactMethods) setSelectedContactMethods(ad.contactMethods);
-    if (ad.rent_currency) {
-      setAdditionalData((prev) => ({
-        ...prev,
-        currency: Currencies.find((c) => c.id === ad.rent_currency),
-        frequency: RentFrequencies.find((f) => f.id === ad.rent_frequency),
-        unit: RentFrequencies.find((u) => u.id === ad.min_rent_period_unit),
-      }));
-    }
+    setSelectedContactMethods({
+      chat: ad.display_phone,
+      phone: ad.display_whatsapp,
+    });
   };
-
-  // ======= ADMIN OPTIONS =======
-  const adminOptions = users.map((user) => ({
-    id: user.id,
-    name: `${user.first_name} ${user.last_name}`,
-    email: user.email,
-    phone: user.phone,
-  }));
 
   const contactMethod = [
     { id: 1, name: t.ad.userToUser },
@@ -229,14 +272,14 @@ export default function AdForm({ type = "client", adId }) {
     categoryId: selectedCats.cat?.id,
     subCategoryId: selectedCats.subCat?.id,
     display_phone: selectedContactMethods.phone,
-    display_whatsapp: selectedContactMethods.phone,
+    display_whatsapp: selectedContactMethods.chat,
     display_dawaarly_contact: selectedMediatorMethod?.id === 2,
     rent_amount: Number(data.rentAmount),
     rent_currency: additionalData.currency?.id,
     rent_frequency: additionalData.frequency?.id,
     deposit_amount: Number(data.deposit_amount),
     min_rent_period: Number(data.rentalDuration),
-    min_rent_period_unit: additionalData.unit?.id,
+    min_rent_period_unit: additionalData.minRentalUnit?.id,
     available_from: rentAvailability.from
       ? new Date(rentAvailability.from).toISOString()
       : null,
@@ -267,6 +310,29 @@ export default function AdForm({ type = "client", adId }) {
 
   const submitAd = async (payload) =>
     adId ? updateAd(adId, payload) : crateAd(payload);
+
+  const uploadNewImages = async (adId) => {
+    const newImages = images.filter((img) => img instanceof File);
+
+    if (newImages.length === 0) return;
+
+    const formData = new FormData();
+
+    newImages.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    await uploadImages("AD", adId, formData);
+  };
+  const handleDeletedImages = async (adId) => {
+    const deletedImages = originalImages.filter(
+      (oldImg) => !images.find((img) => img.id === oldImg.id),
+    );
+
+    for (let img of deletedImages) {
+      await deleteImage("AD", adId, img.id);
+    }
+  };
   const fieldErrorMap = {
     title: "adTitle",
     categoryId: "category",
@@ -288,17 +354,24 @@ export default function AdForm({ type = "client", adId }) {
     console.log("FINAL REQUEST", payload);
     setLoading(true);
     try {
-      await submitAd(payload);
+      const res = await submitAd(payload);
+      const finalAdId = adId || res.data.adId;
+      await uploadNewImages(finalAdId);
+      if (adId) {
+        await handleDeletedImages(finalAdId);
+      }
+      if (selectedAdmin) {
+        await assignAdmin(adId, { admin_id: selectedAdmin.id });
+      }
+
       addNotification({
         type: "success",
         message: adId ? t.ad.ad_updated : t.ad.ad_created,
       });
-redirectAfterLogin("/dashboard/ads/all");
+      redirectAfterLogin("/dashboard/ads/all");
     } catch (err) {
       console.error("Error:", err);
-
       let message = "An error occurred";
-
       // 🔥 لو فيه validation errors
       if (err.response?.data?.errors) {
         const backendErrors = err.response.data.errors;
@@ -409,13 +482,13 @@ redirectAfterLogin("/dashboard/ads/all");
               label={t.ad.durationUnit}
               placeholder={t.ad.select}
               options={RentFrequencies}
-              value={additionalData.unit}
+              value={additionalData.minRentalUnit}
               required={true}
               disabled={!isEditable}
               onChange={(item) =>
                 setAdditionalData((prev) => ({
                   ...prev,
-                  unit: item,
+                  minRentalUnit: item,
                 }))
               }
             />
@@ -442,6 +515,40 @@ redirectAfterLogin("/dashboard/ads/all");
       }`}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
+        {type == "admin" && canAssignAdmin && allAdmins && (
+          <div className="form-section right">
+            <h2 className="section-title">{t.ad.admin_contact}</h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            >
+              <SelectOptions
+                label={t.ad.theContactMethod}
+                placeholder={""}
+                options={contactMethod}
+                value={selectedMediatorMethod}
+                required={false}
+                onChange={(item) => {
+                  setSelectedMediatorMethod(item);
+                }}
+              />
+              <SelectOptions
+                label={t.ad.choose_admin}
+                placeholder={t.ad.select_admin}
+                options={allAdmins}
+                type={"users"}
+                value={selectedAdmin}
+                required={true}
+                error={fieldErrors.admin}
+                disabled={selectedMediatorMethod?.id == 1}
+                onChange={(item) => {
+                  setSelectedAdmin(item);
+                  handleErrors("admin", null);
+                }}
+              />
+            </div>
+          </div>
+        )}
         {/* === معلومات أساسية === */}
         <div className="form-section">
           <h2 className="section-title">{t.ad.basic_info}</h2>
@@ -500,12 +607,6 @@ redirectAfterLogin("/dashboard/ads/all");
                 isEditing={!!adId}
                 disabled={!isEditable}
               />
-              {fieldErrors.images && (
-                <span className="error">
-                  <CircleAlert />
-                  {fieldErrors.images}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -554,40 +655,6 @@ redirectAfterLogin("/dashboard/ads/all");
             />
           </div>
         </div>
-
-        {type == "admin" && (
-          <div className="form-section right">
-            <h2 className="section-title">{t.ad.admin_contact}</h2>
-            <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-            >
-              <SelectOptions
-                label={t.ad.theContactMethod}
-                placeholder={""}
-                options={contactMethod}
-                value={selectedMediatorMethod}
-                required={false}
-                onChange={(item) => {
-                  setSelectedMediatorMethod(item);
-                }}
-              />
-              <SelectOptions
-                label={t.ad.choose_admin}
-                placeholder={t.ad.select_admin}
-                options={adminOptions}
-                value={selectedAdmin}
-                required={true}
-                error={fieldErrors.admin}
-                disabled={selectedMediatorMethod?.id == 1}
-                onChange={(item) => {
-                  setSelectedAdmin(item);
-                  handleErrors("admin", null);
-                }}
-              />
-            </div>
-          </div>
-        )}
 
         {/* === الموقع === */}
         <div className="form-section">
@@ -983,43 +1050,44 @@ redirectAfterLogin("/dashboard/ads/all");
 
         <Tags disabled={!isEditable} />
 
-        {type == "client" && (
-          <div className="form-section">
-            <h2 className="section-title">{t.ad.theContactMethod}</h2>
-            <div className="options-grid verfiyMethod">
-              {METHODS.map(({ key, label, icon: Icon }) => {
-                const isActive = selectedContactMethods[key];
+        {(adData?.subuser && adData?.admin && adData?.admin !== user.id) ||
+          (type == "client" && (
+            <div className="form-section">
+              <h2 className="section-title">{t.ad.theContactMethod}</h2>
+              <div className="options-grid verfiyMethod">
+                {METHODS.map(({ key, label, icon: Icon }) => {
+                  const isActive = selectedContactMethods[key];
 
-                return (
-                  <div
-                    key={key}
-                    className={`option-box ${isActive ? "active" : ""} ${
-                      fieldErrors.contact ? "error-border" : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedContactMethods((prev) => ({
-                        ...prev,
-                        [key]: !prev[key],
-                      }));
-                      handleErrors("contact", null);
-                    }}
-                  >
-                    <Icon className="cat-icon" />
-                    <span>{label}</span>
-                  </div>
-                );
-              })}
-            </div>
-            {fieldErrors.contact && (
-              <div className="box forInput">
-                <span className="error">
-                  <CircleAlert />
-                  {fieldErrors.contact}
-                </span>
+                  return (
+                    <div
+                      key={key}
+                      className={`option-box ${isActive ? "active" : ""} ${
+                        fieldErrors.contact ? "error-border" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedContactMethods((prev) => ({
+                          ...prev,
+                          [key]: !prev[key],
+                        }));
+                        handleErrors("contact", null);
+                      }}
+                    >
+                      <Icon className="cat-icon" />
+                      <span>{label}</span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </div>
-        )}
+              {fieldErrors.contact && (
+                <div className="box forInput">
+                  <span className="error">
+                    <CircleAlert />
+                    {fieldErrors.contact}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
 
         {/* === زر الإرسال === */}
         <div className="form-section submit-section">

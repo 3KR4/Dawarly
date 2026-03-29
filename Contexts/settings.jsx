@@ -44,13 +44,15 @@ export const SettingsProvider = ({ children }) => {
     setIsMounted(true);
   }, [pathname]);
 
-const [theme, setTheme] = useState(() => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("theme") || "light";
-  }
-  return "light";
-});
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      const user = storedUser ? JSON.parse(storedUser) : null;
 
+      return user?.theme || localStorage.getItem("theme") || "light";
+    }
+    return "light";
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute("theme", theme);
@@ -60,14 +62,15 @@ const [theme, setTheme] = useState(() => {
   const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
-const [locale, setLocale] = useState(() => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("locale") || "en";
-  }
-  return "en";
-});
+  const [locale, setLocale] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      const user = storedUser ? JSON.parse(storedUser) : null;
 
-
+      return user?.language || localStorage.getItem("locale") || "en";
+    }
+    return "en";
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute("lang", locale);

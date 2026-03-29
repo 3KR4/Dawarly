@@ -95,7 +95,7 @@ const en = {
     day: "Day",
     week: "Week",
     month: "Month",
-    rentPrice: "Rent Price",
+    rentPrice: "Rent amount",
     rentPricePlaceholder: "e.g. 1500",
     deposit_amount: "Deposit Amount",
     deposit_amount_Placeholder: "e.g. 5000",
@@ -224,6 +224,8 @@ const en = {
     selectGovernorate: "select your governorate",
     yourCity: "your City",
     selectCity: "select your City",
+    yourArea: "your Area",
+
     selectArea: "Select area",
     yourCompound: "Compound",
     selectCompound: "Select compound",
@@ -340,6 +342,7 @@ const en = {
     },
     tables: {
       ad_details: "ad details",
+      reach: "reach",
       status: "status",
       location: "Location",
       property_details: "Property Details",

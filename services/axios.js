@@ -1,35 +1,68 @@
 // services/api.js
 import axios from "axios";
 
-// Instance عادي بدون interceptors
-export const plainApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
-  withCredentials: true, // عشان الكوكيز تبعت refresh token
-});
+// -------------------- BASE CONFIG --------------------
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// Instance الرئيسي مع interceptors
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+// Instance بدون interceptors (للـ refresh فقط)
+export const plainApi = axios.create({
+  baseURL: BASE_URL,
   withCredentials: true,
 });
 
+// Instance الرئيسي
+const api = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
+
+// -------------------- TOKEN STORAGE --------------------
 let accessToken = null;
+let isAuthenticated = false;
 
 export const setAccessToken = (token) => {
   accessToken = token;
+  isAuthenticated = !!token;
+};
+
+export const clearAuth = () => {
+  accessToken = null;
+  isAuthenticated = false;
 };
 
 export const getAccessToken = () => accessToken;
 
-// -------------------- REQUEST interceptor --------------------
+// -------------------- REFRESH CONTROL --------------------
+let refreshPromise = null;
+
+const refreshToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = plainApi
+      .post("/auth/refresh-token")
+      .then((res) => {
+        accessToken = res.data.accessToken;
+        return accessToken;
+      })
+      .catch((err) => {
+        accessToken = null;
+        throw err;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+};
+
+// -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
-  // لو مفيش access token حاول تجيب واحد من refresh token
+  // 👇 أهم سطر
   if (!accessToken) {
     try {
-      const res = await plainApi.post("/auth/refresh-token");
-      accessToken = res.data.accessToken;
-    } catch (err) {
-      console.log("No refresh token available");
+      await refreshToken();
+    } catch {
+      return Promise.reject("Unauthenticated");
     }
   }
 
@@ -40,27 +73,31 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// -------------------- RESPONSE interceptor --------------------
+// -------------------- RESPONSE INTERCEPTOR --------------------
 api.interceptors.response.use(
-  (res) => res,
+  (response) => response,
   async (error) => {
     const original = error.config;
 
-    // لو 401 والطلب مش already retried
     if (
       error.response?.status === 401 &&
       !original._retry &&
       !original.url.includes("/auth/refresh-token")
     ) {
       original._retry = true;
+
       try {
-        const res = await plainApi.post("/auth/refresh-token");
-        accessToken = res.data.accessToken;
+        await refreshToken();
+
+        // نحط التوكن الجديد ونعيد الطلب
         original.headers.Authorization = `Bearer ${accessToken}`;
-        return api(original); // إعادة محاولة الطلب الأصلي
+        return api(original);
       } catch (err) {
-        // لو الريفرش فشل نودي المستخدم لل login
-        window.location.href = "/login";
+        // logout / redirect
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        return Promise.reject(err);
       }
     }
 

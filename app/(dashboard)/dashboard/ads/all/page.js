@@ -1,161 +1,197 @@
 "use client";
-import Rating from "@mui/material/Rating";
-import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { formatCurrency } from "@/utils/formatCurrency";
-
-import Image from "next/image";
 import "@/styles/dashboard/tables.css";
-import { FaTrashAlt, FaEye } from "react-icons/fa";
-import Link from "next/link";
-import { BiSolidPurchaseTagAlt } from "react-icons/bi";
-import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { getAllAds } from "@/services/ads/ads.service";
-
+import { LuSettings2 } from "react-icons/lu";
+import { getAllAds, deleteAd } from "@/services/ads/ads.service";
 import { settings } from "@/Contexts/settings";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import { LuSettings2 } from "react-icons/lu";
+import { useNotification } from "@/Contexts/NotificationContext";
+import Pagination from "@/components/Tools/Pagination";
+import { IoCloseSharp } from "react-icons/io5";
+import { AdStatuses } from "@/data/enums";
+import { useAuth } from "@/Contexts/AuthContext";
 
 export default function ActiveAds() {
-  const { screenSize, locale } = useContext(settings);
+  const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
+  const { addNotification } = useNotification();
+  const { loading } = useAuth();
+  // 🌟 State واحدة للإعلانات + Pagination
+  const [adsData, setAdsData] = useState({
+    ads: [],
+    pagination: {
+      page: 1,
+      totalPages: 1,
+      limit: 10,
+      total: 0,
+    },
+  });
 
-  const [allAds, setAllAds] = useState([]);
-  const [adsState, setAdsState] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [loadingContent, setLoadingContent] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [searchActive, setSearchActive] = useState(false); // تتحكم بالـ active class
+  const [searchConfirmed, setSearchConfirmed] = useState(false); // هل ضغط البحث؟
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
-  // ✅ fetch بدون أي فلتر دلوقتي
-  const fetchAds = async () => {
+  // ================= FETCH ADS =================
+  const fetchAds = async (page = 1, search) => {
     try {
+      setLoadingContent(true);
+
       const res = await getAllAds({
-        page: 1,
-        limit: 10,
-        search: null,
-        status: null,
-        category: null,
-        subCategory: null,
-        country_id: null,
-        governorate_id: null,
-        city_id: null,
-        area_id: null,
-        compound_id: null,
-        min_rent_amount: null,
-        max_rent_amount: null,
-        rent_currency: null,
-        rent_frequency: null,
-        min_deposit_amount: null,
-        max_deposit_amount: null,
-        min_rent_period: null,
-        max_rent_period: null,
-        min_bedrooms: null,
-        max_bedrooms: null,
-        min_bathrooms: null,
-        max_bathrooms: null,
-        min_level: null,
-        max_level: null,
-        min_adult_no_max: null,
-        max_adult_no_max: null,
-        min_child_no_max: null,
-        max_child_no_max: null,
-        am_pool: null,
-        am_balcony: null,
-        am_private_garden: null,
-        am_kitchen: null,
-        am_ac: null,
-        am_heating: null,
-        am_elevator: null,
-        am_gym: null,
-        min_available_from: null,
-        max_available_to: null,
+        page,
+        limit: adsData.pagination.limit,
+        status: selectedStatus?.id || null,
+        search: search !== undefined ? search : searchText,
       });
 
-      setAllAds(res.data.data);
-      setAdsState(res.data.data);
+      setAdsData({
+        ads: res.data.data || [],
+        pagination: res.data.pagination || adsData.pagination,
+      });
     } catch (err) {
       console.error(err);
+      addNotification({
+        type: "warning",
+        message: "Failed to fetch ads from server ❌",
+      });
+    } finally {
+      setLoadingContent(false);
     }
   };
 
+  // ================= INITIAL FETCH =================
   useEffect(() => {
-    fetchAds();
-  }, []);
-
-  const statusOptions = [
-    { id: "ACTIVE", name: t.ad.status.ACTIVE },
-    { id: "SOLD", name: t.ad.status.SOLD },
-    { id: "PAUSED", name: t.ad.status.PAUSED },
-  ];
-
-  // تغيير الفلتر
-  const handleStatusChange = (selected) => {
-    setSelectedStatus(selected);
-
-    if (!selected) {
-      setAdsState(allAds);
-      return;
+    if (!loading) {
+      fetchAds(1);
     }
+  }, [loading, selectedStatus]);
+  // ================= HANDLERS =================
 
-    const filteredAds = allAds.filter((ad) => ad.status === selected.id);
-    setAdsState(filteredAds);
+  const handlePageChange = (newPage) => {
+    fetchAds(newPage);
   };
 
-  // تغيير البحث
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchText(value);
+  const handleDeleteAd = async (id) => {
+    try {
+      await deleteAd(id);
+      addNotification({
+        type: "success",
+        message: "Ad deleted successfully ✅",
+      });
 
-    if (!value) {
-      setAdsState(allAds);
-      return;
+      // 1️⃣ نحسب كم عنصر باقي بعد الحذف
+      const remainingItems = adsData.ads.length - 1;
+
+      // 2️⃣ نقرر الصفحة الجديدة
+      const newPage =
+        remainingItems === 0 && adsData.pagination.page > 1
+          ? adsData.pagination.page - 1
+          : adsData.pagination.page;
+
+      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
+      fetchAds(newPage);
+    } catch (error) {
+      console.error(error);
+      addNotification({
+        type: "warning",
+        message: error.response?.data?.message || "Something went wrong ❌",
+      });
     }
-
-    const filteredAds = allAds.filter(
-      (ad) =>
-        ad.title.toLowerCase().includes(value.toLowerCase()) ||
-        ad.description.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setAdsState(filteredAds);
   };
 
   return (
     <div className="dash-holder">
+      {/* ================= TOP FILTERS ================= */}
       <div className="top">
+        {/* 🔍 Search */}
+        <div className="filters-header">
+          <input
+            type="text"
+            placeholder={t.placeholders.search}
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setSearchActive(!!e.target.value); // أي نص => active
+              setSearchConfirmed(false); // الكتابة الجديدة تلغي التأكيد
+            }}
+          />
+
+          {searchConfirmed ? (
+            <span
+              style={{ display: "flex", cursor: "pointer" }}
+              className="filters-count delete"
+              onClick={() => {
+                setSearchText("");
+                setSearchActive(false);
+                setSearchConfirmed(false);
+                fetchAds(1, "");
+              }}
+            >
+              <IoCloseSharp style={{ padding: "7px" }} />
+            </span>
+          ) : (
+            // 🔍 Search عادي
+            <span
+              style={{
+                display: "flex",
+                cursor: searchActive ? "pointer" : "default",
+              }}
+              className={`filters-count ${searchActive ? "active" : ""}`}
+              onClick={() => {
+                if (searchText) setSearchConfirmed(true); // اضغط بحث => يتحول لـ X
+                fetchAds(1);
+              }}
+            >
+              <IoSearchSharp style={{ padding: "7px" }} />
+            </span>
+          )}
+        </div>
+
+        {/* 🎯 Status Filter */}
+        <SelectOptions
+          size="small"
+          placeholder={t.ad.status.label}
+          options={AdStatuses}
+          value={selectedStatus}
+          locale={locale}
+          t={t}
+          onChange={(selected) => {
+            setSelectedStatus((prev) => (prev == selected ? null : selected));
+          }}
+        />
+
+        {/* ⚙️ Filters UI */}
         <div className="filters-header">
           {t.actions.filterations}
           <span className="filters-count" style={{ display: "flex" }}>
             <LuSettings2 />
           </span>
         </div>
-
-        <SelectOptions
-          size="small"
-          placeholder={t.ad.status.label}
-          options={statusOptions}
-          value={selectedStatus}
-          locale={locale}
-          t={t}
-          onChange={handleStatusChange}
-        />
-
-        <div className="filters-header">
-          <input
-            type="text"
-            placeholder={t.placeholders.search}
-            value={searchText}
-            onChange={handleSearchChange}
-          />
-          <span className="filters-count" style={{ display: "flex" }}>
-            <IoSearchSharp />
-          </span>
-        </div>
       </div>
 
-      <AdsTable ads={adsState} limit={10} />
+      {/* ================= ADS TABLE ================= */}
+      <AdsTable
+        ads={adsData?.ads}
+        loadingContent={loadingContent}
+        removeAd={handleDeleteAd}
+        activeAds={true}
+        limit={adsData?.pagination.limit}
+      />
+
+      {/* ================= PAGINATION ================= */}
+      {adsData?.pagination?.totalPages > 1 && (
+        <Pagination
+          pageCount={adsData?.pagination.totalPages}
+          screenSize={screenSize}
+          isDashBoard={true}
+          currentPage={adsData?.pagination.page}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }

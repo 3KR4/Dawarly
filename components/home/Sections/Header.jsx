@@ -34,6 +34,7 @@ function Header() {
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
   const { categories, subCategories } = useAppData();
+console.log(categories);
 
   const { user, isAuthenticated, loading, logout } = useAuth();
 

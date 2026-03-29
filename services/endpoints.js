@@ -7,7 +7,8 @@ export const ENDPOINTS = {
     FORGET_PASSWORD: () => `/auth/forgot-password/`,
     RESET_PASSWORD: () => `/auth/reset-password/`,
     REFRESH: () => "/auth/refresh-token",
-    All_USERS: () => "/auth/users",
+    All_USERS: (user_type, permissions, page, limit) =>
+      `/auth/users?user_type=${user_type}&permissions=${permissions}&page=${page}&limit=${limit}`,
     ONE_USER: (id) => `/auth/users/${id}`,
     ME: () => "/auth/me",
   },
@@ -45,7 +46,9 @@ export const ENDPOINTS = {
     GET_ONE_AD: (id) => `/ads/${id}`,
     CREATE: () => `/ads/create`,
     UPDATE: (id) => `/ads/update/${id}`,
-    DELETE: (cat, id) => `/${cat}/${id}`,
+    DELETE: (id) => `/ads/delete/${id}`,
+    ASSIGN_ADMIN: (ad) => `/ads/assign-admin/${ad}`,
+    SHANGE_STATUS: (ad) => `/ads/update/${ad}/status`,
   },
   IMAGES: {
     ADD: (entity_type, entity_id) => `/images/${entity_type}/${entity_id}`,

@@ -16,9 +16,6 @@ export const AuthProvider = ({ children }) => {
     // ✅ حط اليوزر فورًا
     setUser(user);
     localStorage.setItem("user", JSON.stringify(user));
-
-    // ✅ (اختياري) تحدثه من السيرفر في الخلفية
-    fetchUser();
   };
 
   // ================= LOGOUT =================

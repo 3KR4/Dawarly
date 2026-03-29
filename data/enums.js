@@ -50,12 +50,43 @@ export const ImageEntityTypes = [
 ];
 
 export const AdStatuses = [
-  { id: "PENDING", name_en: "Pending", name_ar: "قيد المراجعة" },
-  { id: "ACTIVE", name_en: "Active", name_ar: "نشط" },
-  { id: "REJECTED", name_en: "Rejected", name_ar: "مرفوض" },
-  { id: "SOLD", name_en: "Sold", name_ar: "تم البيع" },
-  { id: "BOOKED", name_en: "Booked", name_ar: "محجوز" },
-  { id: "DISABLED", name_en: "Disabled", name_ar: "معطل" },
+  // { id: "PENDING", name_en: "Pending", name_ar: "قيد المراجعة", bg: "#FFF4E5", tx: "#F59E0B" },
+
+  {
+    id: "ACTIVE",
+    name_en: "Active",
+    name_ar: "نشط",
+    bg: "#E6F9F0",
+    tx: "#0F9D58",
+  },
+  {
+    id: "REJECTED",
+    name_en: "Rejected",
+    name_ar: "مرفوض",
+    bg: "#FDECEA",
+    tx: "#D93025",
+  },
+  {
+    id: "SOLD",
+    name_en: "Sold",
+    name_ar: "تم البيع",
+    bg: "#F3E8FF",
+    tx: "#7E22CE",
+  },
+  {
+    id: "BOOKED",
+    name_en: "Booked",
+    name_ar: "محجوز",
+    bg: "#E8F0FE",
+    tx: "#1A73E8",
+  },
+  {
+    id: "DISABLED",
+    name_en: "Disabled",
+    name_ar: "معطل",
+    bg: "#F1F3F4",
+    tx: "#5F6368",
+  },
 ];
 
 export const RequestStatuses = [
@@ -73,13 +104,23 @@ export const BookingStatuses = [
 ];
 
 export const Amenities = [
-  { id: "am_seeview", name_en: "Sea View", name_ar: "إطلالة بحر" },
-  { id: "am_pool", name_en: "Pool", name_ar: "حمام سباحة" },
-  { id: "am_balcony", name_en: "Balcony", name_ar: "بلكونة" },
-  { id: "am_private_garden", name_en: "Private Garden", name_ar: "حديقة خاصة" },
-  { id: "am_kitchen", name_en: "Kitchen", name_ar: "مطبخ" },
-  { id: "am_ac", name_en: "Air Conditioning", name_ar: "تكييف" },
-  { id: "am_heating", name_en: "Heating", name_ar: "تدفئة" },
-  { id: "am_elevator", name_en: "Elevator", name_ar: "مصعد" },
-  { id: "am_gym", name_en: "Gym", name_ar: "جيم" },
+  {
+    id: "am_seeview",
+    key: "seeview",
+    name_en: "Sea View",
+    name_ar: "إطلالة بحر",
+  },
+  { id: "am_pool", key: "pool", name_en: "Pool", name_ar: "حمام سباحة" },
+  { id: "am_balcony", key: "balcony", name_en: "Balcony", name_ar: "بلكونة" },
+  {
+    id: "am_private_garden",
+    key: "private_garden",
+    name_en: "Private Garden",
+    name_ar: "حديقة خاصة",
+  },
+  { id: "am_kitchen", key: "kitchen", name_en: "Kitchen", name_ar: "مطبخ" },
+  { id: "am_ac", key: "ac", name_en: "Air Conditioning", name_ar: "تكييف" },
+  { id: "am_heating", key: "heating", name_en: "Heating", name_ar: "تدفئة" },
+  { id: "am_elevator", key: "elevator", name_en: "Elevator", name_ar: "مصعد" },
+  { id: "am_gym", key: "gym", name_en: "Gym", name_ar: "جيم" },
 ];

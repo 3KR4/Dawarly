@@ -10,7 +10,7 @@ import { SelectorsProvider } from "@/Contexts/selectors";
 import { DataProvider } from "@/Contexts/DataContext";
 import { NotificationProvider } from "@/Contexts/NotificationContext";
 import NotificationHolder from "@/components/Tools/NotificationHolder";
-
+import { AuthProvider } from "@/Contexts/AuthContext";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -52,20 +52,22 @@ export default function RootLayout({ children }) {
       <body>
         <SettingsProvider>
           <NotificationProvider>
-            <FiltersProvider>
-              <SelectorsProvider>
-                <DataProvider>
-                  <div className="dashboard">
-                    <SideNav />
-                    <div className="holder">
-                      <Head />
-                      {children}
+            <AuthProvider>
+              <FiltersProvider>
+                <SelectorsProvider>
+                  <DataProvider>
+                    <div className="dashboard">
+                      <SideNav />
+                      <div className="holder">
+                        <Head />
+                        {children}
+                      </div>
+                      <NotificationHolder />
                     </div>
-                    <NotificationHolder />
-                  </div>
-                </DataProvider>
-              </SelectorsProvider>
-            </FiltersProvider>
+                  </DataProvider>
+                </SelectorsProvider>
+              </FiltersProvider>
+            </AuthProvider>
           </NotificationProvider>
         </SettingsProvider>
       </body>

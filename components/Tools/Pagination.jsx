@@ -4,6 +4,7 @@ import ReactPaginate from "react-paginate";
 
 const Pagination = ({
   pageCount = 10,
+  currentPage = 1, // الصفحة الحالية لازم تيجي من برينت
   screenSize,
   onPageChange,
   isDashBoard = false,
@@ -21,11 +22,10 @@ const Pagination = ({
       nextLinkClassName="page-num btns"
       containerClassName="pagination"
       activeClassName="active"
-      forcePage={0}
-      onPageChange={onPageChange}
+      forcePage={currentPage - 1} // 🔹 مهم: ReactPaginate index بيبدأ من 0
+      onPageChange={(data) => onPageChange(data.selected + 1)} // 🔹 ناخد selected ونزود 1
       renderOnZeroPageCount={null}
     />
   );
 };
-
 export default Pagination;

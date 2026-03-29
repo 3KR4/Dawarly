@@ -2,7 +2,6 @@
 .table-container {
   width: 100%;
   border-radius: 20px;
-  overflow: hidden;
 }
 .dash-holder.for-client {
   margin: 17px 0px;
@@ -195,7 +194,7 @@
 @media (max-width: 1700px) {
   .table-container .table-header,
   .table-container .table-item {
-    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.6fr;
+    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.45fr 0.9fr 0.6fr;
     gap: 10px;
   }
   .table-container.slieds-tasble .table-header,
@@ -230,7 +229,7 @@
 @media (max-width: 1450px) {
   .table-container .table-header,
   .table-container .table-item {
-    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.9fr 0.5fr;
+    grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.45fr 0.9fr 0.5fr;
   }
 
   .item-price {
@@ -274,7 +273,7 @@
   }
   .table-container .table-header,
   .table-container .table-item {
-    grid-template-columns: 0.9fr 0.45fr 0.6fr 0.5fr 0.35fr 0.4fr;
+    grid-template-columns: 0.9fr 0.45fr 0.6fr 0.5fr 0.45fr 0.35fr 0.4fr;
     gap: 15px;
   }
 
@@ -352,11 +351,11 @@
   .table-container .table-header,
   .table-container .table-item {
     padding: 0.42rem 0.7rem;
-    grid-template-columns: 0.9fr 0.1fr 0.6fr 0.5fr 0.35fr 0.4fr;
+    grid-template-columns: 0.9fr 0.1fr 0.6fr 0.5fr 0.45fr 0.35fr 0.4fr;
     gap: 22px;
   }
-  .table-container.pending-ads-tasble .table-header,
-  .table-container.pending-ads-tasble .table-item {
+  .table-container.pending-ads .table-header,
+  .table-container.pending-ads .table-item {
     grid-template-columns: 0.9fr 0.1fr 0.6fr 0.5fr 0.4fr;
   }
   .item-image .product-image {

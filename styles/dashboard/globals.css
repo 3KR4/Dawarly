@@ -169,23 +169,24 @@ header .actions-btns .userMenu .top {
 }
 .table-container {
   margin-bottom: unset;
-  overflow: auto;
   box-shadow: unset;
   border: 1px solid var(--border-color);
   border-radius: 14px;
   margin: 0;
   gap: 0;
 }
-
+.table-container .table-items {
+  min-height: 70px;
+}
 .table-container .table-header,
 .table-container .table-item {
-  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1.15fr 0.8fr;
+  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1fr 1.15fr 0.8fr;
   gap: 15px;
   padding: 0.42rem 1rem;
 }
-.table-container.pending-ads-tasble .table-header,
-.table-container.pending-ads-tasble .table-item {
-  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.8fr;
+.table-container.pending-ads .table-header,
+.table-container.pending-ads .table-item {
+  grid-template-columns: 1fr 0.7fr 0.7fr 1.2fr 1fr 1fr 0.8fr;
 }
 .table-container.slieds-tasble .table-header,
 .table-container.slieds-tasble .table-item {
@@ -250,13 +251,16 @@ header .actions-btns .userMenu .top {
   grid-template-columns: 1fr 1fr;
   padding: 0 20px;
 }
+.table-container .item-overview.onlyOne {
+  grid-template-columns: 1fr;
+}
 .table-container .item-overview h4 {
   display: flex;
   align-items: center;
   gap: 5px;
   background: var(--hover-color);
   font-size: 14px;
-  padding: 5px 11px;
+  padding: 7px 11px;
   border-radius: 7px;
   color: var(--paragraph);
   justify-content: center;

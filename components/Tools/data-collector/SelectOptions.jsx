@@ -74,24 +74,6 @@ function SelectOptions({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ---------------- STATUS COLORS ---------------- */
-
-  const statusColors = {
-    active: "#deffe7",
-    paused: "#fff6db",
-    sold: "#ddcff7",
-    cancelled: "#ffdede",
-    accepted: "#deffe7",
-  };
-
-  const getBtnBg = () => {
-    if (!value) return "";
-
-    const val = typeof value === "object" ? value.name || value.status : value;
-
-    return statusColors[val] || "";
-  };
-
   /* ---------------- HANDLERS ---------------- */
 
   const toggle = () => {
@@ -112,15 +94,14 @@ function SelectOptions({
       className={`box forInput ${disabled ? "disabled" : ""}`}
       ref={selectRef}
     >
-      <label>
-        {label || " "} {required && <span className="required">*</span>}
-      </label>
+      {label && (
+        <label>
+          {label || " "} {required && <span className="required">*</span>}
+        </label>
+      )}
 
       <div className={`selectOptions ${size}`}>
-        <div
-          className={`btn ${error ? "error-border" : ""}`}
-          style={{ backgroundColor: getBtnBg() }}
-        >
+        <div className={`btn ${error ? "error-border" : ""}`}>
           <h4 className="ellipsis" onClick={toggle}>
             {active ? (
               <input
@@ -154,6 +135,7 @@ function SelectOptions({
                   key={item.id}
                   className={value?.id === item.id ? "active" : ""}
                   onClick={() => handleSelect(item)}
+                  style={{ background: item?.bg, color: item?.tx }}
                 >
                   {getText(item)}
                 </button>

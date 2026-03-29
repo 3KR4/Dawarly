@@ -181,7 +181,7 @@ p.have-problem {
 
 .body.fluid-container.for-user .table-container .table-header,
 .body.fluid-container.for-user .table-container .table-item {
-  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 0.75fr 0.8fr;
+    grid-template-columns: 1fr .5fr 1.25fr .8fr 1fr 1.15fr .8fr;
 }
 .form-holder .options-grid {
   display: flex;
