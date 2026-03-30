@@ -9,6 +9,7 @@ export const ENDPOINTS = {
     REFRESH: () => "/auth/refresh-token",
     All_USERS: (user_type, permissions, page, limit) =>
       `/auth/users?user_type=${user_type}&permissions=${permissions}&page=${page}&limit=${limit}`,
+    DELETE_USER: (id) => `/auth/delete/${id}`,
     ONE_USER: (id) => `/auth/users/${id}`,
     ME: () => "/auth/me",
   },

@@ -192,6 +192,10 @@ header .actions-btns .userMenu .top {
 .table-container.slieds-tasble .table-item {
   grid-template-columns: 2.5fr 1fr 1fr 1fr;
 }
+.table-container.for-users .table-header,
+.table-container.for-users .table-item {
+  grid-template-columns: 1.25fr 1fr 1.25fr 1.5fr 1fr 1fr 0.5fr;
+}
 .table-container .table-item:hover {
   background: var(--section-color);
 }
@@ -267,6 +271,10 @@ header .actions-btns .userMenu .top {
 }
 .table-container .item-overview h4.green {
   background: #fdecd2;
+}
+.table-container.for-users .item-overview h4 {
+  width: 50%;
+  margin: auto;
 }
 .table-container .nisted {
   display: flex;

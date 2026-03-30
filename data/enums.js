@@ -1,7 +1,25 @@
 export const UserTypes = [
-  { id: "USER", name_en: "User", name_ar: "مستخدم" },
-  { id: "ADMIN", name_en: "Admin", name_ar: "مدير" },
-  { id: "SUBUSER", name_en: "Sub User", name_ar: "مستخدم فرعي" },
+  {
+    id: "USER",
+    name_en: "Users",
+    name_ar: "المستخدمين",
+    bg: "#E3F2FD", // أزرق فاتح
+    tx: "#1E88E5", // أزرق غامق
+  },
+  {
+    id: "ADMIN",
+    name_en: "Admins",
+    name_ar: "المسؤلين",
+    bg: "#dfcfff", // أخضر فاتح
+    tx: "#a06dffff", // أخضر غامق
+  },
+  {
+    id: "SUBUSER",
+    name_en: "Sub Users",
+    name_ar: "المشتركين",
+    bg: "#ffedd4ff", // برتقالي فاتح
+    tx: "#F59E0B", // برتقالي
+  },
 ];
 
 export const Permissions = [
@@ -123,4 +141,18 @@ export const Amenities = [
   { id: "am_heating", key: "heating", name_en: "Heating", name_ar: "تدفئة" },
   { id: "am_elevator", key: "elevator", name_en: "Elevator", name_ar: "مصعد" },
   { id: "am_gym", key: "gym", name_en: "Gym", name_ar: "جيم" },
+];
+export const months = [
+  { id: 1, name_en: "Jan", name_ar: "يناير" },
+  { id: 2, name_en: "Feb", name_ar: "فبراير" },
+  { id: 3, name_en: "Mar", name_ar: "مارس" },
+  { id: 4, name_en: "Apr", name_ar: "أبريل" },
+  { id: 5, name_en: "May", name_ar: "مايو" },
+  { id: 6, name_en: "Jun", name_ar: "يونيو" },
+  { id: 7, name_en: "Jul", name_ar: "يوليو" },
+  { id: 8, name_en: "Aug", name_ar: "أغسطس" },
+  { id: 9, name_en: "Sep", name_ar: "سبتمبر" },
+  { id: 10, name_en: "Oct", name_ar: "أكتوبر" },
+  { id: 11, name_en: "Nov", name_ar: "نوفمبر" },
+  { id: 12, name_en: "Dec", name_ar: "ديسمبر" },
 ];

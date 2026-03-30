@@ -42,10 +42,9 @@ export default function AdForm({ type = "client", adId }) {
   const [isEditable, setIsEditable] = useState(true);
   const [allAdmins, setAllAdmins] = useState([]);
   const canAssignAdmin = user?.permissions?.includes("ASSIGN_RESPONSIBILITY");
-  const [isLoading, setIsLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingContent, setLoadingContnet] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  console.log(allAdmins);
 
   const [selectedCats, setSelectedCats] = useState({ cat: null, subCat: null });
 
@@ -69,8 +68,6 @@ export default function AdForm({ type = "client", adId }) {
   const [images, setImages] = useState([]);
   const [originalImages, setOriginalImages] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
-
-  console.log(selectedAmenities);
 
   const [additionalData, setAdditionalData] = useState({
     currency: null,
@@ -105,7 +102,7 @@ export default function AdForm({ type = "client", adId }) {
   }, [adId, canAssignAdmin]);
 
   const fetchAdData = async () => {
-    setIsLoading(true);
+    setLoadingContnet(true);
     try {
       const res = await getOneAd(adId);
       const ad = res?.data;
@@ -120,7 +117,7 @@ export default function AdForm({ type = "client", adId }) {
         message: t.ad.fetch_error,
       });
     } finally {
-      setIsLoading(false);
+      setLoadingContnet(false);
     }
   };
   const fetchAdmins = async () => {
@@ -352,7 +349,7 @@ export default function AdForm({ type = "client", adId }) {
     if (!validateForm()) return;
     const payload = buildPayload(data);
     console.log("FINAL REQUEST", payload);
-    setLoading(true);
+    setLoadingSubmit(true);
     try {
       const res = await submitAd(payload);
       const finalAdId = adId || res.data.adId;
@@ -392,7 +389,7 @@ export default function AdForm({ type = "client", adId }) {
         message,
       });
     } finally {
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
 
@@ -498,24 +495,28 @@ export default function AdForm({ type = "client", adId }) {
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="form-holder create-ad admin-create-ad">
-        <div className="loading-state">
-          <p>{t.ad.loading}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className={`form-holder create-ad ${
         type == "client" ? "user-create-ad" : "admin-create-ad"
       }`}
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {type == "admin" && canAssignAdmin && allAdmins && (
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          position: "relative",
+          opacity: loadingContent ? "0.6" : "1",
+        }}
+      >
+        {loadingContent && (
+          <div className="loading-content cover">
+            <span
+              className="loader"
+              style={{ opacity: loadingContent ? "1" : "0" }}
+            ></span>
+          </div>
+        )}
+        {type == "admin" && adId && canAssignAdmin && allAdmins && (
           <div className="form-section right">
             <h2 className="section-title">{t.ad.admin_contact}</h2>
             <div
@@ -1097,9 +1098,9 @@ export default function AdForm({ type = "client", adId }) {
               adId ? "update-button" : "create-button"
             }`}
             onClick={() => setIsSubmitted(true)}
-            disabled={loading}
+            disabled={loadingSubmit}
           >
-            {loading
+            {loadingSubmit
               ? locale === "ar"
                 ? "جاري..."
                 : "Loading..."

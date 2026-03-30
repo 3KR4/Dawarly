@@ -149,8 +149,8 @@ header .top .account .user {
   border-radius: 67px;
   height: 49px;
   position: relative;
-      display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 header .top .account .user .holder {
   border: 1px solid var(--border-color);
@@ -206,18 +206,7 @@ header .top .account .user svg.small-drop-down {
   object-fit: cover;
   height: 100% !important;
 } */
-header .top .account .user .holder .name-letters {
-  background: var(--hover-color);
-  color: var(--main-color);
-  justify-content: center;
-  align-items: center;
-  width: 49px;
-  height: 100%;
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  border-radius: 8px;
-}
+
 header .top .account .user .holder h4 {
   font-size: 14px;
   font-weight: 700;
@@ -614,16 +603,16 @@ header .bottom .actions button:hover svg {
   header .bottom .nav > * {
     flex: 1;
   }
-  header .top .account .user .holder:hover ,
+  header .top .account .user .holder:hover,
   header .top .account .user:has(.menu.active) .holder {
-background: transparent;
+    background: transparent;
   }
 
   header .top .account .user .holder {
     border-color: unset;
     height: 42px;
   }
-  header .top .account .user .holder .name-letters {
+  .name-letters {
     border-radius: 50px;
     width: 43px;
     font-size: 16px;

@@ -136,21 +136,7 @@ svg {
 button:hover .loader {
   border-color: white;
 }
-.loading-content {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-.loading-content .loader {
-  opacity: 1;
-  width: 35px;
-  height: 35px;
-  border: 4px solid var(--main-color);
-}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
@@ -547,6 +533,25 @@ a {
 .box.forInput .inputHolder.password .holder input {
   padding-right: 0;
 }
+.name-letters {
+  background: var(--hover-color);
+  color: var(--main-color);
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 47px;
+  height: 46px;
+  font-weight: 800;
+  display: flex;
+  font-size: 17px;
+  position: relative;
+}
+.name-letters svg {
+  position: absolute;
+  left: 30%;
+  bottom: -5px;
+  font-size: 21px;
+}
 .no-data-found {
   display: flex;
   align-items: center;
@@ -612,7 +617,25 @@ a {
   gap: 10px;
   align-items: center;
 }
-
+.loading-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.loading-content .loader {
+  opacity: 1;
+  width: 35px;
+  height: 35px;
+  border: 4px solid var(--main-color);
+}
+.loading-content.cover {
+  align-items: flex-start;
+  padding-top: 357px;
+}
 .hero-image-holder {
   background: #000;
   border-radius: 0 0 45px 45px;

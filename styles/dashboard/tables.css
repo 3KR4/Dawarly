@@ -152,6 +152,18 @@
   gap: 5px;
   align-items: flex-start;
 }
+.table-container.for-users .item-details {
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  align-items: center;
+}
+.table-container.for-users .item-details .right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
 .item-name {
   color: var(--paragraph);
   text-align: left;

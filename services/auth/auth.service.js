@@ -35,9 +35,11 @@ export const refreshToken = () => {
 export const getAllUsers = (user_type, permissions, page, limit) => {
   return api.get(ENDPOINTS.AUTH.All_USERS(user_type, permissions, page, limit));
 };
-/* ================= GET CURRENT USER ================= */
 export const getOneUser = (id) => {
   return api.get(ENDPOINTS.AUTH.ONE_USER(id));
+};
+export const deleteUser = (id) => {
+  return api.get(ENDPOINTS.AUTH.DELETE_USER(id));
 };
 export const getCurrentUser = () => {
   return api.get(ENDPOINTS.AUTH.ME());

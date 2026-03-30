@@ -11,6 +11,7 @@ function SelectOptions({
   placeholder,
   options = [],
   value,
+  multi = false,
   onChange,
   type,
   disabled = false,
@@ -25,18 +26,30 @@ function SelectOptions({
   const getText = (item) => {
     if (!item) return "";
 
-    if (type === "users") return item.full_name;
+    // لو multi => نتوقع مصفوفة
+    if (multi) {
+      if (!Array.isArray(item)) return getSingleText(item); // لو مش مصفوفة
+      return item.map((i) => getSingleText(i)).join(", "); // ندمج كل الأسماء بفاصلة
+    }
+
+    // لو single
+    return getSingleText(item);
+  };
+
+  // دالة مساعدة للتعامل مع عنصر واحد
+  const getSingleText = (i) => {
+    if (!i) return "";
+
+    if (type === "users") return i.full_name;
 
     if (type === "date") {
-      const value = typeof item === "string" ? item : item?.name || item?.id;
-
+      const value = typeof i === "string" ? i : i?.name || i?.id;
       const date = new Date(value);
       if (isNaN(date)) return value || "";
-
       return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US");
     }
 
-    return item[`name_${locale}`] || item.name_en || item.name || "";
+    return i[`name_${locale}`] || i.name_en || i.name || "";
   };
   /* ---------------- SEARCH ---------------- */
   const filteredOptions = useMemo(() => {
@@ -133,7 +146,15 @@ function SelectOptions({
                 <button
                   type="button"
                   key={item.id}
-                  className={value?.id === item.id ? "active" : ""}
+                  className={
+                    multi
+                      ? value?.some((v) => v.id === item.id)
+                        ? "active"
+                        : ""
+                      : value?.id === item.id
+                        ? "active"
+                        : ""
+                  }
                   onClick={() => handleSelect(item)}
                   style={{ background: item?.bg, color: item?.tx }}
                 >

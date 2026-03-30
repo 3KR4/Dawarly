@@ -81,7 +81,7 @@ export default function AdsTable({
               ></span>
             </div>
           )}
-          {!ads.length && !loadingContent ? (
+          {!ads?.length && !loadingContent ? (
             <div className="no-data-found">
               <TbListSearch />
               <p>{activeAds ? "no data found" : "no more pending ads"} </p>
