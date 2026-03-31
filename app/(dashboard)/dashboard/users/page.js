@@ -52,6 +52,7 @@ export default function ActiveAds() {
         : "";
 
       const res = await getAllUsers(
+        search,
         userTypeId,
         permissionsStr,
         page || 1,
@@ -175,7 +176,7 @@ export default function ActiveAds() {
           size="small"
           placeholder={t.ad.status.label}
           options={Permissions}
-          value={selectedPermissions} // مصفوفة العناصر المختارة
+          value={selectedPermissions.length ? selectedPermissions : null} // مصفوفة العناصر المختارة
           multi={true}
           onChange={(selected) => {
             setSelectedPermissions((prev) => {
@@ -187,14 +188,6 @@ export default function ActiveAds() {
             });
           }}
         />
-
-        {/* ⚙️ Filters UI */}
-        <div className="filters-header">
-          {t.actions.filterations}
-          <span className="filters-count" style={{ display: "flex" }}>
-            <LuSettings2 />
-          </span>
-        </div>
       </div>
 
       {/* ================= ADS TABLE ================= */}

@@ -191,8 +191,8 @@ export default function UsersTable({
 
                   {/* 📊 Active Ads */}
                   <div className="item-overview onlyOne">
-                    <h4 style={{ color: "#0f9d58", background: "#d4ffea" }}>
-                      {user.active_ads_count}
+                    <h4 style={{ background: type?.bg, color: type?.tx }}>
+                      {user.active_ads_count > 0 ? user.active_ads_count : "-"}
                     </h4>
                   </div>
                   <p className="date">

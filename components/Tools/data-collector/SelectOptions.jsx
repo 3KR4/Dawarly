@@ -22,6 +22,7 @@ function SelectOptions({
   const [active, setActive] = useState(false);
   const [search, setSearch] = useState("");
   const selectRef = useRef(null);
+  console.log("value", value);
 
   const getText = (item) => {
     if (!item) return "";
@@ -125,7 +126,6 @@ function SelectOptions({
                 className="search-input"
               />
             ) : value ? (
-              // العرض حسب الـ locale بس
               getText(value)
             ) : (
               placeholder

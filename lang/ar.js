@@ -432,15 +432,30 @@ const ar = {
     skip_and_login: "تخطي وتسجيل الدخول",
     viewYourCurrentPassword: "كلمة المرور الحالية",
     yourBirthDate: "تاريخ ميلادك",
+    facebook: "فيسبوك",
+    ticktok: "تيك توك",
+
+    profileDetails: "تفاصيل الملف الشخصي",
+    SubscriptionDetails: "تفاصيل الاشتراك",
+    rolesAndPermitions: "الأدوار والصلاحيات",
+    role: "نوع الشخص",
+    Permissions: "صلاحيات الشخص",
+
+    AdsLimit: "الحد الأقصى للإعلانات",
 
     placeholders: {
       fullName: "أدخل اسمك الكامل",
       phone: "أدخل رقم هاتفك",
       email: "أدخل بريدك الإلكتروني",
       password: "أدخل كلمة المرور",
+      role: "اختر النوع",
+      Permissions: "اختر الصلاحيات",
       confirmPassword: "أكد كلمة المرور",
       emailPhoneLogin: "اكتب البريد الإلكتروني أو رقم الهاتف",
       newPassword: "قم بأدخال كلمة المرور الجديدة",
+      facebook: "رابط حساب فيسبوك",
+      ticktok: "رابط حساب تيك توك",
+      subscriptionAdsLimit: "عدد الإعلانات المسموح بها",
     },
 
     errors: {
@@ -449,6 +464,8 @@ const ar = {
       requiredFullName: "الاسم الكامل مطلوب",
       requiredPhone: "رقم الهاتف مطلوب",
       invalidEmail: "أدخل بريدًا إلكترونيًا صالحًا (مثل user@example.com)",
+      invalidFacebook: "رابط فيسبوك غير صالح",
+      invalidticktok: "رابط تيك توك غير صالح",
       invalidPhone: "أدخل رقم هاتف صالح",
       phoneTooShort: "رقم الهاتف قصير جدًا",
       phoneTooLong: "رقم الهاتف طويل جدًا",
@@ -460,6 +477,9 @@ const ar = {
       lastNameShort: "يجب أن يكون الاسم الأخير 3 أحرف على الأقل",
       emailPhoneLoginRequired: "البريد الإلكتروني أو رقم الهاتف مطلوب",
       emailPhoneLoginInvalid: "قم بأدخال أدخل بريد إلكتروني أو رقم هاتف صحيح",
+
+      requiredSubscriptionLimit: "يجب إدخال عدد الإعلانات",
+      invalidSubscriptionLimit: "القيمة المدخلة لعدد الإعلانات غير صحيحة",
     },
   },
 };

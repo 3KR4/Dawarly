@@ -37,6 +37,7 @@
   background-color: #f8f9fa;
   font-weight: bold;
   color: #333;
+  border-radius: 21px 21px 0 0;
 }
 .header-item {
   justify-content: center;

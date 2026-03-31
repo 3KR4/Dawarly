@@ -6,12 +6,19 @@ export const ENDPOINTS = {
     RESEND_EMAIL: () => `/auth/resend-otp/`,
     FORGET_PASSWORD: () => `/auth/forgot-password/`,
     RESET_PASSWORD: () => `/auth/reset-password/`,
+    CHANGE_PASSWORD: () => `/auth/change-password/`,
     REFRESH: () => "/auth/refresh-token",
-    All_USERS: (user_type, permissions, page, limit) =>
-      `/auth/users?user_type=${user_type}&permissions=${permissions}&page=${page}&limit=${limit}`,
+    All_USERS: (search, user_type, permissions, page, limit) =>
+      `/auth/users?search=${search}&user_type=${user_type}&permissions=${permissions}&page=${page}&limit=${limit}`,
     DELETE_USER: (id) => `/auth/delete/${id}`,
     ONE_USER: (id) => `/auth/users/${id}`,
     ME: () => "/auth/me",
+    UPDATE_USER_PROFILE: () => `/auth/profile`,
+    UPDATE_SUBSCRIBER_PROFILE: () => `/auth/subuser-profile`,
+    UPDATE_PERMISSIONS: (id) => `/auth/${id}/permissions`,
+    MAKE_SUBER_ADMIN: (id) => `/auth/${id}/super-admin`,
+    CHANGE_ADS_LIMIT: (id) => `/auth/${id}/subscription-limit`,
+    UPDATE_ROLE: (id) => `/auth/${id}/role`,
   },
   // SUBCATEGORIES: {
   //   GETALL: (lang) => `/subCategory/all?lang=${lang}`,

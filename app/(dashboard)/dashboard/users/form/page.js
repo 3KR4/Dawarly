@@ -2,28 +2,55 @@
 import "@/styles/client/forms.css";
 import "@/styles/dashboard/forms.css";
 
-import React, { useState, useContext, useEffect, useMemo } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { Mail, Phone, UserRound, CircleAlert } from "lucide-react";
-import { getOneUser } from "@/services/auth/auth.service";
-import { useAuth } from "@/Contexts/AuthContext";
+import {
+  change_ads_limit,
+  getOneUser,
+  make_suber_admin,
+  updatePermissions,
+  updateRole,
+  updateSubscriperProfile,
+  updateUserProfile,
+} from "@/services/auth/auth.service";
+import { PiTiktokLogo } from "react-icons/pi";
+import { FiFacebook } from "react-icons/fi";
+import { AiOutlineProduct } from "react-icons/ai";
+
 import { useAppData } from "@/Contexts/DataContext";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import { useSearchParams } from "next/navigation";
-
+import { UserTypes, Permissions } from "@/data/enums";
+const superAdminOption = {
+  id: "SUPER", // قيمة مميزة
+  name_en: "Super Admin",
+  name_ar: "سوبر أدمن",
+  bg: "#ffd700", // ذهبي
+  tx: "#000000",
+};
 export default function UsersForm() {
   const { governorates, subCategories, cities, fetchCities } = useAppData();
+  const [originalData, setOriginalData] = useState(null);
   const [loadingContent, setLoadingContent] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
   const t = useTranslate();
+  const [selectedType, setSelectedType] = useState({
+    id: "USER",
+    name_en: "Users",
+    name_ar: "المستخدمين",
+    tx: "#1E88E5", // أزرق غامق
+  });
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset, // ✅ نضيف reset
   } = useForm();
 
   const [additionalData, setAdditionalData] = useState({
@@ -44,13 +71,53 @@ export default function UsersForm() {
     setLoadingContent(true);
     try {
       const res = await getOneUser(userId);
-      const ad = res?.data;
-      if (!ad) return alert(t.ad.fetch_error);
-      setAdData(ad);
-      setIsEditable(canEditAd(ad));
-      fillFormWithAdData(ad);
+      const userData = res?.data;
+      console.log("res:", res);
+
+      if (!userData) return alert(t.ad.fetch_error);
+
+      // 👇 نملأ الفورم مباشرة
+      reset({
+        fullname: userData.full_name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        facebook_link: userData.facebook_link || "",
+        tiktok_link: userData.tiktok_link || "",
+        subscription_ads_limit: userData.subscription_ads_limit || 0,
+      });
+
+      let typeForSelect = UserTypes.find((p) => p.id == userData.user_type);
+      if (userData.is_super_admin) {
+        typeForSelect = superAdminOption;
+      }
+
+      setSelectedType(typeForSelect);
+
+      console.log(UserTypes.find((p) => p.id == userData.user_type));
+
+      const permsForSelect = Permissions.filter((p) =>
+        userData.permissions.includes(p.id),
+      );
+
+      setSelectedPermissions(permsForSelect);
+
+      setAdditionalData({
+        gov: userData.governorate || null,
+        city: userData.city || null,
+      });
+      setOriginalData({
+        full_name: userData.full_name || "",
+        phone: userData.phone || "",
+        governorate_id: userData.governorate?.id || null,
+        city_id: userData.city?.id || null,
+        tiktok_link: userData.tiktok_link || "",
+        facebook_link: userData.facebook_link || "",
+        subscription_ads_limit: userData.subscription_ads_limit || 0,
+        permissions: userData.permissions || [],
+        user_type: userData.user_type,
+      });
     } catch (error) {
-      console.error("Error fetching ad data:", error);
+      console.error("Error fetching user data:", error);
       addNotification({
         type: "error",
         message: t.ad.fetch_error,
@@ -61,19 +128,105 @@ export default function UsersForm() {
   };
 
   const onSubmit = async (data) => {
-    setLoadingSubmit((prev) => ({ ...prev, submit: true }));
+    setLoadingSubmit(true);
+
+    const updates = {};
+
+    // ------------------ 1) User Profile ------------------
+    const profileChanged =
+      data.fullname !== originalData.full_name ||
+      data.phone !== originalData.phone ||
+      additionalData.gov?.id !== originalData.governorate_id ||
+      additionalData.city?.id !== originalData.city_id;
+
+    if (profileChanged) {
+      updates.profile = {
+        full_name: data.fullname,
+        phone: data.phone,
+        governorate_id: additionalData.gov?.id || null,
+        city_id: additionalData.city?.id || null,
+        subscription_ads_limit: data.subscription_ads_limit || 0,
+      };
+    }
+
+    // ------------------ 2) Subscriber Profile ------------------
+    const subChanged =
+      data.facebook_link !== originalData.facebook_link ||
+      data.tiktok_link !== originalData.tiktok_link;
+
+    if (subChanged) {
+      updates.subscriber = {
+        facebook_link: data.facebook_link,
+        tiktok_link: data.tiktok_link,
+      };
+    }
+
+    // ------------------ 3) Permissions ------------------
+    const selectedPermsIds = selectedPermissions.map((p) => p.id);
+    const permsChanged =
+      selectedPermsIds.sort().join(",") !==
+      originalData.permissions.sort().join(",");
+
+    if (permsChanged) {
+      updates.permissions = selectedPermsIds;
+    }
+
+    // ------------------ 4) Role ------------------
+    const roleChanged = selectedType?.id !== originalData.user_type;
+    if (roleChanged) {
+      updates.role = selectedType?.id;
+    }
+    const suberAdminChanged =
+      selectedType?.id === "SUPER" && !originalData.is_super_admin;
+    if (suberAdminChanged) {
+      updates.suber_admin = true;
+    }
+
+    const adsLimitChanged =
+      data.subscription_ads_limit !== originalData.subscription_ads_limit;
+    if (adsLimitChanged) {
+      updates.ads_limit = data?.subscription_ads_limit;
+    }
+
+    // ------------------ 5) تنفيذ الريكوستات فقط للحاجات اللي اتغيرت ------------------
     try {
-    } catch (err) {
-      console.log(err.response.data.message);
-      addNotification({
-        type: "warning",
-        message: err.response.data.message,
+      if (updates.profile) {
+        await updateUserProfile(updates.profile);
+      }
+      if (updates.subscriber) {
+        await updateSubscriperProfile(updates.subscriber);
+      }
+      if (updates.role) {
+        await updateRole(userId, { user_type: updates.role });
+      }
+      if (updates.suber_admin !== undefined) {
+        await make_suber_admin(userId, { makeSuper: updates.suber_admin });
+      }
+      if (updates.permissions) {
+        await updatePermissions(userId, { permissions: updates.permissions });
+      }
+      if (updates.ads_limit) {
+        await change_ads_limit(userId, {
+          subscription_ads_limit: data?.subscription_ads_limit,
+        });
+      }
+
+      alert("User updated successfully!");
+      // ✅ بعد التحديث، حدث originalData عشان تعكس التغيرات
+      setOriginalData({
+        ...originalData,
+        ...updates.profile,
+        ...updates.subscriber,
+        permissions: updates.permissions || originalData.permissions,
+        user_type: updates.role || originalData.user_type,
       });
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Something went wrong!");
     } finally {
-      setLoadingSubmit((prev) => ({ ...prev, submit: false }));
+      setLoadingSubmit(false);
     }
   };
-
   return (
     <div className={`form-holder create-ad`}>
       <form
@@ -83,11 +236,45 @@ export default function UsersForm() {
           opacity: loadingContent ? "0.6" : "1",
         }}
       >
-        <div className="form-section right">
-          <h2 className="section-title">{t.ad.admin_contact}</h2>
+        {loadingContent && (
+          <div className="loading-content">
+            <span
+              className="loader"
+              style={{ opacity: loadingContent ? "1" : "0" }}
+            ></span>
+          </div>
+        )}
+        <div className="form-section ">
+          <h2 className="section-title">{t.auth.profileDetails}</h2>
+          <div className="box forInput">
+            <label>{t.auth.email}</label>
+            <div className="inputHolder">
+              <div className="holder">
+                <Mail />
+                <input
+                  disabled={true}
+                  type="email"
+                  {...register("email", {
+                    required: t.auth.errors.requiredEmail,
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: t.auth.errors.invalidEmail,
+                    },
+                  })}
+                  placeholder={t.auth.placeholders.email}
+                />
+              </div>
+              {errors.email && (
+                <span className="error">
+                  <CircleAlert />
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
+          </div>
           <div
             className="row-holder"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
           >
             <div className="box forInput">
               <label>{t.auth.fullName}</label>
@@ -123,32 +310,7 @@ export default function UsersForm() {
                 )}
               </div>
             </div>
-            <div className="box forInput">
-              <label>{t.auth.email}</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <Mail />
-                  <input
-                    type="email"
-                    {...register("email", {
-                      required: t.auth.errors.requiredEmail,
-                      pattern: {
-                        value:
-                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                        message: t.auth.errors.invalidEmail,
-                      },
-                    })}
-                    placeholder={t.auth.placeholders.email}
-                  />
-                </div>
-                {errors.email && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.email.message}
-                  </span>
-                )}
-              </div>
-            </div>
+
             <div className="box forInput">
               <label>{t.auth.phone}</label>
               <div className="inputHolder">
@@ -192,7 +354,6 @@ export default function UsersForm() {
             onChange={(item) => {
               handleAdditionalData("gov", item);
               handleAdditionalData("city", null);
-              handleErrors("gov", null);
             }}
             required={true}
           />
@@ -205,16 +366,142 @@ export default function UsersForm() {
             disabled={!additionalData?.gov}
             onChange={(item) => {
               handleAdditionalData("city", item);
-              handleErrors("city", null);
             }}
             required={true}
           />
+        </div>
+
+        <div className="form-section ">
+          <h2 className="section-title">{t.auth.SubscriptionDetails}</h2>
+          <div
+            className="row-holder"
+            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+          >
+            {/* Facebook */}
+            <div className="box forInput">
+              <label>{t.auth.facebook}</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <FiFacebook />
+                  <input
+                    type="text"
+                    {...register("facebook_link", {
+                      pattern: {
+                        value: /^(https?:\/\/)?(www\.)?facebook\.com\/.+$/,
+                        message: t.auth.errors.invalidFacebook,
+                      },
+                    })}
+                    placeholder={t.auth.placeholders.facebook}
+                  />
+                </div>
+                {errors.facebook_link && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.facebook_link.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* TikTok */}
+            <div className="box forInput">
+              <label>{t.auth.ticktok}</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <PiTiktokLogo />
+                  <input
+                    type="text"
+                    {...register("tiktok_link", {
+                      pattern: {
+                        value: /^(https?:\/\/)?(www\.)?tiktok\.com\/.+$/,
+                        message: t.auth.errors.invalidticktok,
+                      },
+                    })}
+                    placeholder={t.auth.placeholders.ticktok}
+                  />
+                </div>
+                {errors.tiktok_link && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.tiktok_link.message}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section ">
+          <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
+          <div
+            className="row-holder"
+            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+          >
+            <SelectOptions
+              label={t.auth.role}
+              placeholder={t.auth.placeholders.role}
+              options={[...UserTypes, superAdminOption]}
+              value={selectedType}
+              onChange={(selected) => {
+                setSelectedType((prev) => (prev == selected ? null : selected));
+              }}
+            />
+            {/* TikTok */}
+            {selectedType?.id == "SUBUSER" ? (
+              <div className="box forInput">
+                <label>{t.auth.AdsLimit}</label>
+
+                <div className="inputHolder">
+                  <div className="holder">
+                    <AiOutlineProduct />
+                    <input
+                      type="number"
+                      {...register("subscription_ads_limit", {
+                        required: t.auth.errors.requiredSubscriptionLimit,
+                        min: {
+                          value: 0,
+                          message: t.auth.errors.invalidSubscriptionLimit,
+                        },
+                        valueAsNumber: true,
+                      })}
+                      placeholder={t.auth.placeholders.subscriptionAdsLimit}
+                    />
+                  </div>
+
+                  {errors.subscription_ads_limit && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.subscription_ads_limit.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : selectedType?.id == "ADMIN" ? (
+              <SelectOptions
+                label={t.auth.Permissions}
+                placeholder={t.auth.placeholders.Permissions}
+                options={Permissions}
+                value={selectedPermissions.length ? selectedPermissions : null} // مصفوفة العناصر المختارة
+                multi={true}
+                onChange={(selected) => {
+                  setSelectedPermissions((prev) => {
+                    if (prev?.find((item) => item.id === selected.id)) {
+                      return prev.filter((item) => item.id !== selected.id);
+                    } else {
+                      return [...prev, selected];
+                    }
+                  });
+                }}
+              />
+            ) : null}
+          </div>
         </div>
 
         <button
           type={"submit"}
           className="main-button"
           disabled={loadingSubmit}
+          style={{ marginTop: "-2px" }}
         >
           {loadingSubmit ? (
             <span className="loader"></span>

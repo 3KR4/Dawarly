@@ -1,3 +1,4 @@
+import { SubscriptIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const en = {
@@ -428,23 +429,41 @@ const en = {
     skip_and_login: "Skip and log in",
     viewYourCurrentPassword: "Your Current Password",
     yourBirthDate: "your birth Date",
+    facebook: "Facebook",
+    ticktok: "ticktok",
 
+    profileDetails: "profile Details",
+    SubscriptionDetails: "Subscription Details",
+    rolesAndPermitions: "roles & Permitions",
+    role: "user role",
+    Permissions: "user Permissions",
+
+    AdsLimit: "Ads Limit",
     placeholders: {
       fullName: "Enter your full name",
       phone: "Enter your phone",
       email: "Enter your email",
+      facebook: "Facebook profile link",
+      ticktok: "ticktok profile link",
+      role: "select role",
+      Permissions: "select Permissions",
+
       password: "Enter your password",
       confirmPassword: "Confirm password",
       emailPhoneLogin: "Enter your email or phone number",
       newPassword: "Enter your new password",
+      subscriptionAdsLimit: "subscription AdsL imit",
     },
 
     errors: {
+      requiredEmail: "Email address is required",
       requiredEmail: "Email address is required",
       requiredPassword: "Password is required",
       requiredFullName: "Your full name is required",
       requiredPhone: "phone number is required",
       invalidEmail: "Enter a valid email address (e.g. user@example.com)",
+      invalidFacebook: "Invalid Facebook link",
+      invalidticktok: "Invalid ticktok link",
       invalidPhone: "Enter a valid phone number",
       phoneTooShort: "Phone number is too short",
       phoneTooLong: "Phone number is too long",
@@ -457,6 +476,8 @@ const en = {
       emailPhoneLoginRequired: "Email or phone number is required",
       emailPhoneLoginInvalid:
         "Please enter a valid email address or phone number",
+      requiredSubscriptionLimit: "Subscription Limit is required",
+      invalidSubscriptionLimit: "invalid Subscription Limit",
     },
   },
 };

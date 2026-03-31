@@ -520,14 +520,16 @@ a {
 .box.forInput .inputHolder .holder input {
   flex: 1;
   height: 44px;
-  padding-right: 10px;
+  padding-right: 10px !important;
+  padding-left: unset !important;
+
 }
 .box.forInput .inputHolder .holder input[type="date"] {
   padding: 10px !important;
 }
 [lang="ar"] .box.forInput .inputHolder .holder input {
-  padding-right: unset;
-  padding-left: 10px;
+  padding-right: unset !important;
+  padding-left: 10px !important;
   direction: rtl;
 }
 .box.forInput .inputHolder.password .holder input {
