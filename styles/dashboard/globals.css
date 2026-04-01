@@ -196,6 +196,9 @@ header .actions-btns .userMenu .top {
 .table-container.for-users .table-item {
   grid-template-columns: 1.25fr 1fr 1.25fr 1.5fr 1fr 1fr 0.5fr;
 }
+.table-container.for-users .table-item {
+  padding: 0.5rem 1rem;
+}
 .table-container .table-item:hover {
   background: var(--section-color);
 }

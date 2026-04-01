@@ -34,7 +34,6 @@ function Header() {
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
   const { categories, subCategories } = useAppData();
-console.log(categories);
 
   const { user, isAuthenticated, loading, logout } = useAuth();
 
@@ -170,7 +169,7 @@ console.log(categories);
                       >
                         <ul className="user-menu">
                           <li>
-                            <Link href={`/account`} className="btn">
+                            <Link href={`/account/${user?.id}`} className="btn">
                               <FaRegUser />
                               {t.actions.accountSettings}
                             </Link>

@@ -19,13 +19,13 @@ export default function ActiveAds() {
   const t = useTranslate();
   const { addNotification } = useNotification();
   const { loading } = useAuth();
-  // 🌟 State واحدة للإعلانات + Pagination
+
   const [users, setUsers] = useState({
     users: [],
     pagination: {
       page: 1,
       totalPages: 1,
-      limit: 10,
+      limit: 12,
       total: 0,
     },
   });
@@ -56,7 +56,7 @@ export default function ActiveAds() {
         userTypeId,
         permissionsStr,
         page || 1,
-        users.pagination.limit || 10,
+        users.pagination.limit || 12,
       );
 
       setUsers({

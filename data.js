@@ -2049,7 +2049,7 @@ export const dashboardRoutes = {
       en: "Users",
       ar: "المستخدمين",
     },
-    canCreate: true,
+    canCreate: false,
   },
   subcategories: {
     label: {

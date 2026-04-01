@@ -34,7 +34,7 @@ import { useAuth } from "@/Contexts/AuthContext";
 import { useAppData } from "@/Contexts/DataContext";
 
 export default function Register() {
-  const { governorates, subCategories, cities, fetchCities } = useAppData();
+  const { governorates, subCategories, cities } = useAppData();
 
   const { addNotification } = useNotification();
   const { login } = useAuth();
@@ -124,12 +124,6 @@ export default function Register() {
       handleAdditionalData("birthDay", null);
     }
   }, [days]);
-
-  useEffect(() => {
-    if (additionalData.gov?.id) {
-      fetchCities(additionalData.gov.id);
-    }
-  }, [additionalData.gov]);
 
   const [step, setStep] = useState(STEPS.ACCOUNT);
 

@@ -58,13 +58,6 @@ const refreshToken = async () => {
 // -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
   // 👇 أهم سطر
-  if (!accessToken) {
-    try {
-      await refreshToken();
-    } catch {
-      return Promise.reject("Unauthenticated");
-    }
-  }
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -95,7 +88,7 @@ api.interceptors.response.use(
       } catch (err) {
         // logout / redirect
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          window.location.href = "/register";
         }
         return Promise.reject(err);
       }

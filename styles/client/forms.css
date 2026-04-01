@@ -50,6 +50,9 @@ body:has(.form-holder.register) {
   display: flex;
   box-shadow: 0 1px 10px #00000023;
 }
+.form-holder form.container {
+  width: 1340px;
+}
 .form-holder form .error {
   margin: -1px 4px -6px;
 }
@@ -181,7 +184,7 @@ p.have-problem {
 
 .body.fluid-container.for-user .table-container .table-header,
 .body.fluid-container.for-user .table-container .table-item {
-    grid-template-columns: 1fr .5fr 1.25fr .8fr 1fr 1.15fr .8fr;
+  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1fr 1.15fr 0.8fr;
 }
 .form-holder .options-grid {
   display: flex;

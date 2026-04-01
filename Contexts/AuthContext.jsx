@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import api, { setAccessToken } from "@/services/axios";
+import api, { plainApi, setAccessToken } from "@/services/axios";
 
 const AuthContext = createContext(null);
 
@@ -48,19 +48,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ================= REFRESH TOKEN =================
-  const refreshAuth = async () => {
-    try {
-      const res = await api.post("/auth/refresh-token");
-      setAccessToken(res.data.accessToken);
+const refreshAuth = async () => {
+  try {
+    const res = await plainApi.post("/auth/refresh-token"); // ✅
+    setAccessToken(res.data.accessToken);
 
-      await fetchUser();
-    } catch (err) {
-      setUser(null);
-      localStorage.removeItem("user");
-    }
+    await fetchUser();
+  } catch (err) {
+    setUser(null);
+    localStorage.removeItem("user");
+  }
 
-    setLoading(false);
-  };
+  setLoading(false);
+};
 
   // ================= INIT =================
   useEffect(() => {

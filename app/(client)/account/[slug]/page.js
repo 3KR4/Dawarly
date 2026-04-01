@@ -4,7 +4,15 @@ import "@/styles/dashboard/forms.css";
 
 import React, { useState, useContext, useEffect } from "react";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import { Mail, Phone, UserRound, CircleAlert } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  UserRound,
+  CircleAlert,
+  LockKeyhole,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import {
   change_ads_limit,
   getOneUser,
@@ -25,6 +33,8 @@ import { useSearchParams } from "next/navigation";
 import { UserTypes, Permissions } from "@/data/enums";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useNotification } from "@/Contexts/NotificationContext";
+import { use } from "react";
+import { settings } from "@/Contexts/settings";
 
 const superAdminOption = {
   id: "SUPER", // قيمة مميزة
@@ -34,17 +44,24 @@ const superAdminOption = {
   tx: "#555555",
 };
 
-export default function UsersForm() {
-  const { governorates, cities } = useAppData();
+export default function UsersForm({ params }) {
+  const unwrappedParams = use(params); // ✅ يفك Promise
+  const slug = unwrappedParams.slug;
+  const { governorates, subCategories, cities } = useAppData();
   const { user } = useAuth();
+  console.log(useContext(settings));
+
+  const { locale, theme } = useContext(settings);
+
   const { addNotification } = useNotification();
+  const [passEye, setPassEye] = useState({ password: false, confirm: false });
 
   const [originalData, setOriginalData] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
   const t = useTranslate();
   const [selectedType, setSelectedType] = useState({
     id: "USER",
@@ -53,14 +70,13 @@ export default function UsersForm() {
     tx: "#1E88E5", // أزرق غامق
   });
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-
-  const isMyProfile = userId == user?.id;
+  const isMyProfile = slug == user?.id;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
+    reset, // ✅ نضيف reset
   } = useForm();
 
   const [additionalData, setAdditionalData] = useState({
@@ -74,14 +90,14 @@ export default function UsersForm() {
   };
 
   useEffect(() => {
-    if (!userId) return;
+    if (!slug) return;
     fetchUserData();
-  }, [userId]);
+  }, [slug]);
 
   const fetchUserData = async () => {
     setLoadingContent(true);
     try {
-      const res = await getOneUser(userId);
+      const res = await getOneUser(slug);
       const userData = res?.data;
 
       if (!userData) return alert(t.ad.fetch_error);
@@ -222,23 +238,23 @@ export default function UsersForm() {
       }
 
       if (updates.role) {
-        await updateRole(userId, { user_type: updates.role });
+        await updateRole(slug, { user_type: updates.role });
       }
 
       if (updates.suber_admin !== undefined) {
-        await make_suber_admin(userId, {
+        await make_suber_admin(slug, {
           makeSuper: updates.suber_admin,
         });
       }
 
       if (updates.permissions) {
-        await updatePermissions(userId, {
+        await updatePermissions(slug, {
           permissions: updates.permissions,
         });
       }
 
       if (updates.ads_limit !== undefined) {
-        await change_ads_limit(userId, {
+        await change_ads_limit(slug, {
           subscription_ads_limit: updates.ads_limit,
         });
       }
@@ -272,6 +288,7 @@ export default function UsersForm() {
   return (
     <div className={`form-holder create-ad`}>
       <form
+        className="container"
         onSubmit={handleSubmit(onSubmit)}
         style={{
           position: "relative",
@@ -479,70 +496,183 @@ export default function UsersForm() {
             </div>
           </div>
         )}
+        {false && (
+          <div className="form-section ">
+            <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            >
+              <SelectOptions
+                label={t.auth.role}
+                placeholder={t.auth.placeholders.role}
+                options={[...UserTypes, superAdminOption]}
+                value={selectedType}
+                onChange={(selected) => {
+                  setSelectedType((prev) =>
+                    prev == selected ? null : selected,
+                  );
+                }}
+              />
+              {/* TikTok */}
+              {selectedType?.id == "SUBUSER" ? (
+                <div className="box forInput">
+                  <label>{t.auth.AdsLimit}</label>
+
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <AiOutlineProduct />
+                      <input
+                        type="number"
+                        {...register("subscription_ads_limit", {
+                          required: t.auth.errors.requiredSubscriptionLimit,
+                          min: {
+                            value: 0,
+                            message: t.auth.errors.invalidSubscriptionLimit,
+                          },
+                          valueAsNumber: true,
+                        })}
+                        placeholder={t.auth.placeholders.subscriptionAdsLimit}
+                      />
+                    </div>
+
+                    {errors.subscription_ads_limit && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.subscription_ads_limit.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : selectedType?.id == "ADMIN" ? (
+                <SelectOptions
+                  label={t.auth.Permissions}
+                  placeholder={t.auth.placeholders.Permissions}
+                  options={Permissions}
+                  value={
+                    selectedPermissions.length ? selectedPermissions : null
+                  } // مصفوفة العناصر المختارة
+                  multi={true}
+                  onChange={(selected) => {
+                    setSelectedPermissions((prev) => {
+                      if (prev?.find((item) => item.id === selected.id)) {
+                        return prev.filter((item) => item.id !== selected.id);
+                      } else {
+                        return [...prev, selected];
+                      }
+                    });
+                  }}
+                />
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        <div className="options-grid">
+          {subCategories?.map((cat) => {
+            const Icon = cat?.icon;
+            const active = selectedCategories.includes(cat.id);
+
+            return (
+              <div
+                key={cat.id}
+                className={`option-box ${active ? "active" : ""}`}
+                onClick={() => toggleCategory(cat.id)}
+              >
+                <Icon className="cat-icon" />
+                <span>{cat[`name_${locale}`]}</span>
+              </div>
+            );
+          })}
+        </div>
 
         <div className="form-section ">
-          <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
+          <h2 className="section-title">{t.auth.profileDetails}</h2>
           <div
             className="row-holder"
             style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
           >
-            <SelectOptions
-              label={t.auth.role}
-              placeholder={t.auth.placeholders.role}
-              options={[...UserTypes, superAdminOption]}
-              value={selectedType}
-              onChange={(selected) => {
-                setSelectedType((prev) => (prev == selected ? null : selected));
-              }}
-            />
-            {/* TikTok */}
-            {selectedType?.id == "SUBUSER" ? (
-              <div className="box forInput">
-                <label>{t.auth.AdsLimit}</label>
-
-                <div className="inputHolder">
-                  <div className="holder">
-                    <AiOutlineProduct />
-                    <input
-                      type="number"
-                      {...register("subscription_ads_limit", {
-                        required: t.auth.errors.requiredSubscriptionLimit,
-                        min: {
-                          value: 0,
-                          message: t.auth.errors.invalidSubscriptionLimit,
-                        },
-                        valueAsNumber: true,
-                      })}
-                      placeholder={t.auth.placeholders.subscriptionAdsLimit}
+            <div className="box forInput">
+              <label>{t.auth.password}</label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+                  <input
+                    type={passEye.password ? "text" : "password"}
+                    {...register("password", {
+                      required: t.auth.errors.requiredPassword,
+                      pattern: {
+                        value:
+                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
+                        message: t.auth.errors.passwordWeak,
+                      },
+                    })}
+                    placeholder={t.auth.placeholders.password}
+                  />
+                  {passEye.password ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: false }))
+                      }
                     />
-                  </div>
-
-                  {errors.subscription_ads_limit && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.subscription_ads_limit.message}
-                    </span>
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, password: true }))
+                      }
+                    />
                   )}
                 </div>
+                {errors.password && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.password.message}
+                  </span>
+                )}
               </div>
-            ) : selectedType?.id == "ADMIN" ? (
-              <SelectOptions
-                label={t.auth.Permissions}
-                placeholder={t.auth.placeholders.Permissions}
-                options={Permissions}
-                value={selectedPermissions.length ? selectedPermissions : null} // مصفوفة العناصر المختارة
-                multi={true}
-                onChange={(selected) => {
-                  setSelectedPermissions((prev) => {
-                    if (prev?.find((item) => item.id === selected.id)) {
-                      return prev.filter((item) => item.id !== selected.id);
-                    } else {
-                      return [...prev, selected];
-                    }
-                  });
-                }}
-              />
-            ) : null}
+            </div>
+            <div className="box forInput">
+              <label>{t.auth.confirmPassword}</label>
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+                  <input
+                    type={passEye.confirm ? "text" : "password"}
+                    {...register("passwordConfirmation", {
+                      required: t.auth.errors.requiredPassword,
+                      validate: (value) =>
+                        value === password
+                          ? true
+                          : t.auth.errors.passwordMismatch,
+                    })}
+                    placeholder={t.auth.placeholders.confirmPassword}
+                  />
+                  {passEye.confirm ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: true }))
+                      }
+                    />
+                  )}
+                </div>
+                {errors.passwordConfirmation && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.passwordConfirmation.message}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -550,7 +680,6 @@ export default function UsersForm() {
           type={"submit"}
           className="main-button"
           disabled={loadingSubmit}
-          style={{ marginTop: "-2px" }}
         >
           {loadingSubmit ? (
             <span className="loader"></span>
@@ -561,102 +690,4 @@ export default function UsersForm() {
       </form>
     </div>
   );
-}
-
-{
-  /* ================= INTERESTS SELECTION ================= */
-}
-{
-  /* {step === STEPS.INTERESTS && (
-          <div className="options-grid">
-            {subCategories?.map((cat) => {
-              const Icon = cat?.icon;
-              const active = selectedCategories.includes(cat.id);
-
-              return (
-                <div
-                  key={cat.id}
-                  className={`option-box ${active ? "active" : ""}`}
-                  onClick={() => toggleCategory(cat.id)}
-                >
-                  <Icon className="cat-icon" />
-                  <span>{cat[`name_${locale}`]}</span>
-                </div>
-              );
-            })}
-          </div>
-        )} */
-}
-{
-  /* <div className="box forInput">
-          <label>{t.auth.password}</label>
-          <div className="inputHolder password">
-            <div className="holder">
-              <LockKeyhole />
-              <input
-                type={passEye.password ? "text" : "password"}
-                {...register("password", {
-                  required: t.auth.errors.requiredPassword,
-                  pattern: {
-                    value:
-                      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
-                    message: t.auth.errors.passwordWeak,
-                  },
-                })}
-                placeholder={t.auth.placeholders.password}
-              />
-              {passEye.password ? (
-                <Eye
-                  className="eye"
-                  onClick={() => setPassEye((p) => ({ ...p, password: false }))}
-                />
-              ) : (
-                <EyeOff
-                  className="eye"
-                  onClick={() => setPassEye((p) => ({ ...p, password: true }))}
-                />
-              )}
-            </div>
-            {errors.password && (
-              <span className="error">
-                <CircleAlert />
-                {errors.password.message}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="box forInput">
-          <label>{t.auth.confirmPassword}</label>
-          <div className="inputHolder password">
-            <div className="holder">
-              <LockKeyhole />
-              <input
-                type={passEye.confirm ? "text" : "password"}
-                {...register("passwordConfirmation", {
-                  required: t.auth.errors.requiredPassword,
-                  validate: (value) =>
-                    value === password ? true : t.auth.errors.passwordMismatch,
-                })}
-                placeholder={t.auth.placeholders.confirmPassword}
-              />
-              {passEye.confirm ? (
-                <Eye
-                  className="eye"
-                  onClick={() => setPassEye((p) => ({ ...p, confirm: false }))}
-                />
-              ) : (
-                <EyeOff
-                  className="eye"
-                  onClick={() => setPassEye((p) => ({ ...p, confirm: true }))}
-                />
-              )}
-            </div>
-            {errors.passwordConfirmation && (
-              <span className="error">
-                <CircleAlert />
-                {errors.passwordConfirmation.message}
-              </span>
-            )}
-          </div>
-        </div> */
 }

@@ -153,7 +153,9 @@ export default function UsersTable({
                     className="item-categories nisted"
                     style={{ gap: `3px 4px` }}
                   >
-                    {user.permissions?.length ? (
+                    {type.id === "SUBUSER" ? (
+                      <span style={{color: type?.tx}}>{user.subscription_ads_limit} active ads</span>
+                    ) : user.permissions?.length ? (
                       <>
                         {user.permissions.slice(0, 4).map((p, index) => {
                           const permission = permissionsMap[p];
