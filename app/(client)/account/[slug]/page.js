@@ -333,7 +333,7 @@ export default function UsersForm({ params }) {
           </div>
           <div
             className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
           >
             <div className="box forInput">
               <label>{t.auth.fullName}</label>
@@ -404,7 +404,7 @@ export default function UsersForm({ params }) {
         {/* ================= ADDRESS SELECTION ================= */}
         <div
           className="row-holder"
-          style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+          style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
         >
           <SelectOptions
             disabled={!isMyProfile}
@@ -438,7 +438,7 @@ export default function UsersForm({ params }) {
             <h2 className="section-title">{t.auth.SubscriptionDetails}</h2>
             <div
               className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+              style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
             >
               {/* Facebook */}
               <div className="box forInput">
@@ -501,7 +501,7 @@ export default function UsersForm({ params }) {
             <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
             <div
               className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+              style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
             >
               <SelectOptions
                 label={t.auth.role}
@@ -570,7 +570,6 @@ export default function UsersForm({ params }) {
 
         <div className="options-grid">
           {subCategories?.map((cat) => {
-            const Icon = cat?.icon;
             const active = selectedCategories.includes(cat.id);
 
             return (
@@ -579,7 +578,7 @@ export default function UsersForm({ params }) {
                 className={`option-box ${active ? "active" : ""}`}
                 onClick={() => toggleCategory(cat.id)}
               >
-                <Icon className="cat-icon" />
+                {/* <Icon className="cat-icon" /> */}
                 <span>{cat[`name_${locale}`]}</span>
               </div>
             );
@@ -590,7 +589,7 @@ export default function UsersForm({ params }) {
           <h2 className="section-title">{t.auth.profileDetails}</h2>
           <div
             className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
           >
             <div className="box forInput">
               <label>{t.auth.password}</label>

@@ -232,6 +232,11 @@ p.have-problem {
   flex: 1;
   min-width: 25%;
 }
+.form-holder form.container .option-box {
+  min-width: 15%;
+  font-size: 13px;
+  height: 50px;
+}
 .form-holder .option-box:not(.disabled):hover {
   background: var(--hover-color);
   border: 1px solid var(--main-color);

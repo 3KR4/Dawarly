@@ -396,8 +396,8 @@ form .form-section .dynamicFilters-holder > * {
 }
 
 @media (max-width: 768px) {
-  .dashboard form .row-holder:has(.right),
-  .dashboard form .row-holder {
+  form .row-holder:has(.right),
+  form .row-holder {
     grid-template-columns: repeat(1, 1fr) !important;
   }
   form .form-section .dynamicFilters-holder > * {
