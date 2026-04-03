@@ -181,7 +181,7 @@ function Header() {
                             </Link>
                           </li>
                           <li>
-                            <Link href={`/mylisting/${user?.id}`} className="btn">
+                            <Link href={`/mylisting`} className="btn">
                               <FaListUl />
                               {t.actions.viewAdsListing}
                             </Link>

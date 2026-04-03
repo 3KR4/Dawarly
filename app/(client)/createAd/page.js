@@ -430,7 +430,7 @@ export default function CreateAd() {
                 data={cat}
                 position={`when-create-ad`}
                 type={`cat`}
-                activeClass={cat?.id == category}
+                activeClass={cat?.id == selectedCats.cat}
                 onSelect={() => {
                   setSelectedCats({ cat: cat?.id, subCat: null });
                   setStep(STEPS.SUB_CATEGORIES);
@@ -444,14 +444,14 @@ export default function CreateAd() {
         {step === STEPS.SUB_CATEGORIES && (
           <div className="options-grid verfiyMethod">
             {subCategories
-              ?.filter((x) => x?.category_id == category)
+              ?.filter((x) => x?.category_id == selectedCats.cat)
               ?.map((subCat) => (
                 <CatCard
                   key={subCat?.id}
                   data={subCat}
                   position={`when-create-ad`}
                   type={`sub-cat`}
-                  activeClass={subCat?.id == subCategory}
+                  activeClass={subCat?.id == selectedCats.subCat}
                   onSelect={() => {
                     setSelectedCats((prev) => ({
                       ...prev,
