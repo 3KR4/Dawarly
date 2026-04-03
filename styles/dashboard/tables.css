@@ -4,16 +4,12 @@
   border-radius: 20px;
 }
 .dash-holder.for-client {
-  margin: 17px 0px;
+  margin-top: 30px;
 }
 .dash-holder.for-client .table-container {
   overflow: visible;
 }
-.dash-holder.for-client .top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+
 .dash-holder.for-client .filters .btn {
   height: 35px !important;
 }
@@ -38,6 +34,10 @@
   font-weight: bold;
   color: #333;
   border-radius: 21px 21px 0 0;
+}
+.dash-holder.for-client .table-header,
+.dash-holder.for-client .table-item {
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 .header-item {
   justify-content: center;

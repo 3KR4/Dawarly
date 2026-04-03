@@ -1,104 +1,42 @@
 "use client";
+
 import "@/styles/client/forms.css";
 import React, { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
-
-import { propertiesFiltersEn, propertiesFiltersAr } from "@/data";
+import { users } from "@/data";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import CatCard from "@/components/home/CatCard";
-import { FaArrowLeft } from "react-icons/fa6";
 import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
-import useRequireAuth from "@/Contexts/useRequireAuth";
-import { getCities } from "@/services/data/data.service";
+import {
+  crateAd,
+  updateAd,
+  getOneAd,
+  assignAdmin,
+} from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
-
-const RenderRentAvailability = ({
-  t,
-  rentAvailability,
-  setRentAvailability,
-}) => {
-  return (
-    <div className="form-section">
-      <h2 className="section-title" style={{ fontSize: "17px" }}>
-        {t.ad.rental_period}
-      </h2>
-
-      <div className="row-holder for-dates">
-        {/* From */}
-        <div className="box forInput">
-          <label>
-            {t.ad.from} <span className="required">*</span>
-          </label>
-          <div className="inputHolder">
-            <div className="holder">
-              <input
-                type="date"
-                value={rentAvailability.from}
-                onChange={(e) =>
-                  setRentAvailability((prev) => ({
-                    ...prev,
-                    from: e.target.value,
-                  }))
-                }
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* To */}
-        <div className="box forInput">
-          <label>
-            {t.ad.to} <span className="required">*</span>
-          </label>
-          <div className="inputHolder">
-            <div className="holder">
-              <input
-                type="date"
-                value={rentAvailability.to}
-                min={rentAvailability.from}
-                onChange={(e) =>
-                  setRentAvailability((prev) => ({
-                    ...prev,
-                    to: e.target.value,
-                  }))
-                }
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { Amenities, Currencies, RentFrequencies } from "@/data/enums";
+import { useNotification } from "@/Contexts/NotificationContext";
+import { selectors } from "@/Contexts/selectors";
+import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
+import { useAuth } from "@/Contexts/AuthContext";
+import { getAllUsers } from "@/services/auth/auth.service";
+import { deleteImage, uploadImages } from "@/services/images/images.service";
+import { FaArrowLeft } from "react-icons/fa";
+import CatCard from "@/components/home/CatCard";
 
 export default function CreateAd() {
-  const {
-    governorates,
-    categories,
-    subCategories,
-    fetchCities,
-  } = useAppData();
-
-  const { allowed } = useRequireAuth();
-  if (!allowed) return null;
-
   const { locale } = useContext(settings);
-
   const t = useTranslate();
-  const [dynamicFilters, setDynamicFilters] = useState([]);
-
-  useEffect(() => {
-    const fetchdynamicFilters = async () => {
-      setDynamicFilters(
-        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
-      );
-    };
-    fetchdynamicFilters();
-  }, [locale]);
+  const { governorates, categories, subCategories, cities, areas, compounds } =
+    useAppData();
+  const { user } = useAuth();
+  const { addNotification } = useNotification();
+  const redirectAfterLogin = useRedirectAfterLogin();
+  const { tags, setTags } = useContext(selectors);
 
   const STEPS = {
     CATEGORIES: 1,
@@ -108,186 +46,147 @@ export default function CreateAd() {
     CONTACT: 5,
   };
 
-  const METHODS = [
-    {
-      key: "email",
-      label: t.ad.contact_via_email,
-      icon: Mail,
-    },
-    {
-      key: "phone",
-      label: t.ad.contact_via_phone,
-      icon: Phone,
-    },
-  ];
-
   const [step, setStep] = useState(STEPS.CATEGORIES);
-  const [category, setCategory] = useState();
-  const [subCategory, setSubCategory] = useState();
-  const [userAddress, setUserAddress] = useState({
-    gov: null,
-    city: null,
-  });
-  const [addressErrors, setAddressErrors] = useState({
-    gov: "",
-    city: "",
-  });
-  // useEffect(() => {
-  //   if (governorates.length && cities.length) {
-  //     setUserAddress({
-  //       gov: governorates[0],
-  //       city: cities[0],
-  //     });
-  //   }
-  // }, [governorates, cities]);
 
-  const [images, setImages] = useState([]);
+  // ======= FORM STATES =======
+  const [adData, setAdData] = useState(null);
+  const [isEditable, setIsEditable] = useState(true);
+  const [allAdmins, setAllAdmins] = useState([]);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const availableMethod = {
-    chat: true,
-    email: true,
-    phone: true,
-  };
-  const [selectedContact, setSelectedContact] = useState({
+  const [selectedCats, setSelectedCats] = useState({ cat: null, subCat: null });
+
+  const [selectedLocations, setSelectedLocations] = useState({
+    gov: null,
+    city: null,
+    area: null,
+    compound: null,
+  });
+
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [selectedMediatorMethod, setSelectedMediatorMethod] = useState({
+    id: 1,
+    name: t.ad.userToUser,
+  });
+  const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
-    email: false,
     phone: false,
   });
 
-  const [dynamicValues, setDynamicValues] = useState({});
-  const [fieldErrors, setFieldErrors] = useState({});
+  const [images, setImages] = useState([]);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
 
+  const [additionalData, setAdditionalData] = useState({
+    currency: null,
+    frequency: null,
+    minRentalUnit: null,
+  });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
     from: "",
     to: "",
   });
-  const [minRentalDuration, setMinRentalDuration] = useState({
-    value: "",
-    unit: null, // هيبقى object راجع من SelectOptions
-  });
-
-  const RENT_DURATION_UNITS = [
-    { id: "day", name: "day" },
-    { id: "week", name: "week" },
-    { id: "month", name: "month" },
-  ];
-
-  const handleDynamicChange = (key, value) => {
-    setDynamicValues((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-
-    // Clear error when value is selected
-    if (fieldErrors[key]) {
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[key];
-        return newErrors;
-      });
-    }
-  };
-
-  const validateStep = () => {
-    if (step === STEPS.ALL_DETAILS) {
-      const newErrors = {};
-      let hasErrors = false;
-
-      dynamicFilters.forEach((field) => {
-        if (field.required) {
-          const value = dynamicValues[field.key];
-          let isEmpty = false;
-
-          if (field.uiType === "select") {
-            isEmpty = !value || !value.id;
-          } else if (field.uiType === "radio") {
-            isEmpty = !value || !value.value;
-          } else if (field.uiType === "boolean") {
-            isEmpty = value === undefined;
-          } else if (field.uiType === "multiSelect") {
-            isEmpty = !value || !Array.isArray(value) || value.length === 0;
-          } else if (field.uiType === "input") {
-            isEmpty = !value && value !== 0;
-          }
-
-          if (isEmpty) {
-            newErrors[field.key] =
-              field.requiredMessage || `${field.label} is required`;
-            hasErrors = true;
-          }
-
-          if (field.uiType === "input" && field.validation?.pattern && value) {
-            const pattern = field.validation.pattern.value;
-            const message = field.validation.pattern.message;
-
-            if (!pattern.test(value.toString())) {
-              newErrors[field.key] = message;
-              hasErrors = true;
-            }
-          }
-        }
-      });
-
-      if (hasErrors) {
-        setFieldErrors(newErrors);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return false;
-      }
-
-      setFieldErrors({});
-      return true;
-    }
-
-    if (step === STEPS.CONTACT) {
-      const hasSelectedContact = Object.values(selectedContact).some(
-        (v) => v === true,
-      );
-
-      if (!hasSelectedContact) {
-        setFieldErrors((prev) => ({
-          ...prev,
-          contact:
-            t.ad.contact_method_required ||
-            "Please select at least one contact method",
-        }));
-        return false;
-      }
-
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.contact;
-        return newErrors;
-      });
-
-      return true;
-    }
-
-    return true;
-  };
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    trigger,
+    setValue,
   } = useForm();
 
-  const handleAddress = (type, value) => {
-    setUserAddress((prev) => ({ ...prev, [type]: value }));
+  const METHODS = [
+    { key: "email", label: t.ad.contact_via_email, icon: Mail },
+    { key: "phone", label: t.ad.contact_via_phone, icon: Phone },
+  ];
+
+  const handleErrors = (type, value) => {
+    setFieldErrors((prev) => ({ ...prev, [type]: value }));
   };
 
-  const filteredCities = getCities(userAddress?.gov);
+  // ======= VALIDATION =======
 
+  // ======= BUILD PAYLOAD =======
+  const buildPayload = (data) => ({
+    title: data.adTitle,
+    description: data.description || "",
+    categoryId: selectedCats.cat?.id,
+    subCategoryId: selectedCats.subCat?.id,
+    display_phone: selectedContactMethods.phone,
+    display_whatsapp: selectedContactMethods.chat,
+    display_dawaarly_contact: selectedMediatorMethod?.id === 2,
+    rent_amount: Number(data.rentAmount),
+    rent_currency: additionalData.currency?.id,
+    rent_frequency: additionalData.frequency?.id,
+    deposit_amount: Number(data.deposit_amount),
+    min_rent_period: Number(data.rentalDuration),
+    min_rent_period_unit: additionalData.minRentalUnit?.id,
+    available_from: rentAvailability.from
+      ? new Date(rentAvailability.from).toISOString()
+      : null,
+    available_to: rentAvailability.to
+      ? new Date(rentAvailability.to).toISOString()
+      : null,
+    country_id: 1,
+    governorate_id: selectedLocations.gov?.id,
+    city_id: selectedLocations.city?.id,
+    area_id: selectedLocations.area?.id || null,
+    compound_id: selectedLocations.compound?.id || null,
+    bedrooms: Number(data.bedrooms),
+    bathrooms: Number(data.bathrooms),
+    level: Number(data.level),
+    adult_no_max: Number(data.adult_no_max),
+    child_no_max: Number(data.child_no_max),
+    tags: tags,
+    ...mapAmenities(selectedAmenities),
+  });
+
+  const mapAmenities = (selected) => {
+    const result = {};
+    Amenities.forEach((am) => {
+      result[am.id] = selected.includes(am.id);
+    });
+    return result;
+  };
+
+  const uploadNewImages = async (adId) => {
+    const newImages = images.filter((img) => img instanceof File);
+
+    if (newImages.length === 0) return;
+
+    const formData = new FormData();
+
+    newImages.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    await uploadImages("AD", adId, formData);
+  };
+
+  const fieldErrorMap = {
+    title: "adTitle",
+    categoryId: "category",
+    subCategoryId: "subCategory",
+    governorate_id: "governorate",
+    city_id: "city",
+    rent_currency: "currency",
+    rent_frequency: "frequency",
+    deposit_amount: "deposit_amount_reqire",
+    rent_amount: "priceRequired",
+    bedrooms: "required",
+    bathrooms: "required",
+    level: "required",
+    country_id: "required",
+  };
   const onSubmit = async (data) => {
     if (step === STEPS.CATEGORIES) {
-      if (!category) return;
+      if (!selectedCats.cat) return;
       setStep(STEPS.SUB_CATEGORIES);
       return;
     }
 
     if (step === STEPS.SUB_CATEGORIES) {
-      if (!subCategory) return;
+      if (!selectedCats.subCat) return;
       setStep(STEPS.BASICS);
       return;
     }
@@ -295,16 +194,18 @@ export default function CreateAd() {
     if (step === STEPS.BASICS) {
       setIsSubmitted(true);
 
-      const isFormValid = await trigger(["adTitle"]);
+      const isFormValid =
+        data.adTitle &&
+        selectedLocations.gov &&
+        selectedLocations.city &&
+        images.length !== 0;
 
       const errors = {
         gov: !userAddress.gov ? t.ad.errors.governorate : "",
         city: !userAddress.city ? t.ad.errors.city : "",
       };
 
-      setAddressErrors(errors);
-
-      if (!isFormValid || images.length === 0 || errors.gov || errors.city) {
+      if (!isFormValid) {
         return;
       }
 
@@ -312,7 +213,7 @@ export default function CreateAd() {
     }
 
     if (step === STEPS.ALL_DETAILS) {
-      const isValid = validateStep();
+      const isValid = additionalData.currency && additionalData.frequency;
       if (!isValid) {
         return;
       }
@@ -330,36 +231,149 @@ export default function CreateAd() {
           contact: t.ad.contact_method_required,
         }));
         return;
-      }
+      } else {
+        const payload = buildPayload(data);
+        console.log("FINAL REQUEST", payload);
+        setLoadingSubmit(true);
+        try {
+          const res = await crateAd(payload);
+          const finalAdId = res.data.adId;
+          await uploadNewImages(finalAdId);
 
-      // تحضير البيانات للإرسال
-      const finalData = {
-        title: data.adTitle,
-        description: dynamicValues.description || "",
-        categoryId: category,
-        subCategoryId: subCategory,
-        images: images,
-        additionalDetail: dynamicValues,
-        location: {
-          governorate: userAddress.gov,
-          city: userAddress.city,
-        },
-        contactMethods: selectedContact,
-      };
-      if (category === 2) {
-        finalData.rentAvailability = {
-          from: rentAvailability.from,
-          to: rentAvailability.to,
-        };
-        finalData.minimumRentalDuration = {
-          value: Number(minRentalDuration.value),
-          unit: minRentalDuration?.unit?.id, // day | week | month
-        };
-      }
+          addNotification({
+            type: "success",
+            message: adId ? t.ad.ad_updated : t.ad.ad_created,
+          });
+          redirectAfterLogin("/mylisting");
+        } catch (err) {
+          console.error("Error:", err);
+          let message = "An error occurred";
+          // 🔥 لو فيه validation errors
+          if (err.response?.data?.errors) {
+            const backendErrors = err.response.data.errors;
 
-      console.log("FINAL REQUEST", finalData);
-      alert(t.ad.submission_success || "تم تجميع البيانات بنجاح!");
+            const translatedErrors = backendErrors.map((e) => {
+              const key = fieldErrorMap[e.field];
+              return key ? t.ad.errors[key] : e.message;
+            });
+
+            message = translatedErrors.join(" \n ");
+          } else {
+            message =
+              err.response?.data?.message || err.message || "An error occurred";
+          }
+
+          addNotification({
+            type: "error",
+            message,
+          });
+        } finally {
+          setLoadingSubmit(false);
+        }
+      }
     }
+  };
+
+  const RenderRentAvailability = () => {
+    return (
+      <>
+        <div className="form-section">
+          <h2 className="section-title">{t.ad.rental_period}</h2>
+
+          <div className="row-holder for-dates">
+            <div className="box forInput">
+              <label>
+                {t.ad.from} <span className="required">*</span>
+              </label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="date"
+                    value={rentAvailability.from}
+                    disabled={!isEditable}
+                    onChange={(e) =>
+                      setRentAvailability((prev) => ({
+                        ...prev,
+                        from: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="box forInput right">
+              <label>
+                {t.ad.to} <span className="required">*</span>
+              </label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="date"
+                    value={rentAvailability.to}
+                    min={rentAvailability.from}
+                    disabled={!isEditable}
+                    onChange={(e) =>
+                      setRentAvailability((prev) => ({
+                        ...prev,
+                        to: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
+
+          <div className="row-holder for-dates">
+            <div className="box forInput right">
+              <label>
+                {t.ad.durationValue} <span className="required">*</span>
+              </label>
+
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    type="number"
+                    min={1}
+                    disabled={!isEditable}
+                    {...register("rentalDuration", {
+                      required: t.ad.errors.rentalDuration,
+                    })}
+                    placeholder={t.ad.durationValuePlaceholder}
+                  />
+                </div>
+                {errors.rentalDuration && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.rentalDuration.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <SelectOptions
+              label={t.ad.durationUnit}
+              placeholder={t.ad.select}
+              options={RentFrequencies}
+              value={additionalData.minRentalUnit}
+              required={true}
+              disabled={!isEditable}
+              onChange={(item) =>
+                setAdditionalData((prev) => ({
+                  ...prev,
+                  minRentalUnit: item,
+                }))
+              }
+            />
+          </div>
+        </div>
+      </>
+    );
   };
 
   const titles = {
@@ -418,7 +432,7 @@ export default function CreateAd() {
                 type={`cat`}
                 activeClass={cat?.id == category}
                 onSelect={() => {
-                  setCategory(cat?.id);
+                  setSelectedCats({ cat: cat?.id, subCat: null });
                   setStep(STEPS.SUB_CATEGORIES);
                 }}
               />
@@ -439,7 +453,11 @@ export default function CreateAd() {
                   type={`sub-cat`}
                   activeClass={subCat?.id == subCategory}
                   onSelect={() => {
-                    setSubCategory(subCat?.id);
+                    setSelectedCats((prev) => ({
+                      ...prev,
+                      subCat: subCat?.id,
+                    }));
+
                     setStep(STEPS.BASICS);
                   }}
                 />
@@ -474,38 +492,79 @@ export default function CreateAd() {
                 )}
               </div>
             </div>
-            <SelectOptions
-              label={t.location.yourGovernorate}
-              placeholder={t.location.selectGovernorate}
-              options={governorates}
-              value={userAddress.gov ? userAddress.gov.name : ""}
-              tPath="governorates"
-              error={addressErrors.gov}
-              onChange={(item) => {
-                handleAddress("gov", item);
-                handleAddress("city", null);
+            <div className="form-section">
+              <h2 className="section-title">{t.dashboard.tables.location}</h2>
+              <div
+                className="row-holder"
+                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+              >
+                <SelectOptions
+                  label={t.location.yourGovernorate}
+                  placeholder={t.location.selectGovernorate}
+                  options={governorates}
+                  value={selectedLocations.gov}
+                  onChange={(item) => {
+                    setSelectedLocations({
+                      gov: item,
+                      city: null,
+                      area: null,
+                      compound: null,
+                    });
+                    handleErrors("gov", null);
+                  }}
+                  error={fieldErrors.gov}
+                  required={true}
+                />
 
-                setAddressErrors((prev) => ({
-                  ...prev,
-                  gov: "",
-                  city: "",
-                }));
-              }}
-            />
+                <SelectOptions
+                  label={t.location.yourCity}
+                  placeholder={t.location.selectCity}
+                  options={cities.filter(
+                    (c) => c.governorate_id === selectedLocations.gov?.id,
+                  )}
+                  value={selectedLocations.city}
+                  disabled={!selectedLocations.gov}
+                  onChange={(item) => {
+                    setSelectedLocations((prev) => ({
+                      ...prev,
+                      city: item,
+                      area: null,
+                    }));
+                    handleErrors("city", null);
+                  }}
+                  error={fieldErrors.city}
+                />
 
-            <SelectOptions
-              label={t.location.yourCity}
-              placeholder={t.location.selectCity}
-              options={filteredCities}
-              value={userAddress.city ? userAddress.city.name : ""}
-              tPath="cities"
-              error={addressErrors.city}
-              disabled={!userAddress.gov}
-              onChange={(item) => {
-                handleAddress("city", item);
-                setAddressErrors((prev) => ({ ...prev, city: "" }));
-              }}
-            />
+                <SelectOptions
+                  label={t.location.yourArea}
+                  placeholder={t.location.selectArea}
+                  options={areas.filter(
+                    (a) => a.city_id === selectedLocations.city?.id,
+                  )}
+                  value={selectedLocations.area}
+                  disabled={!selectedLocations.city}
+                  onChange={(item) => {
+                    setSelectedLocations((prev) => ({
+                      ...prev,
+                      area: item,
+                    }));
+                  }}
+                />
+
+                <SelectOptions
+                  label={t.location.yourCompound}
+                  placeholder={t.location.selectCompound}
+                  options={compounds}
+                  value={selectedLocations.compound}
+                  onChange={(item) => {
+                    setSelectedLocations((prev) => ({
+                      ...prev,
+                      compound: item,
+                    }));
+                  }}
+                />
+              </div>
+            </div>
             <div className="box forInput">
               <label>
                 {category == 2 ? t.ad.rentPrice : t.dashboard.forms.price}

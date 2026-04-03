@@ -233,9 +233,9 @@ p.have-problem {
   min-width: 25%;
 }
 .form-holder form.container .option-box {
-  min-width: 15%;
   font-size: 13px;
-  height: 50px;
+      min-width: 14%;
+    height: 42px;
 }
 .form-holder .option-box:not(.disabled):hover {
   background: var(--hover-color);

@@ -21,7 +21,7 @@ export const resetPassword = (payload) => {
   return api.post(ENDPOINTS.AUTH.RESET_PASSWORD(), payload);
 };
 export const change_password = (payload) => {
-  return api.post(ENDPOINTS.AUTH.CHANGE_PASSWORD(), payload);
+  return api.patch(ENDPOINTS.AUTH.CHANGE_PASSWORD(), payload);
 };
 
 export const refreshToken = () => {

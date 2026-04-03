@@ -522,7 +522,9 @@ a {
   height: 44px;
   padding-right: 10px !important;
   padding-left: unset !important;
-
+}
+.create-ad .box.forInput .inputHolder .holder input {
+  padding: 10px !important;
 }
 .box.forInput .inputHolder .holder input[type="date"] {
   padding: 10px !important;
@@ -1111,6 +1113,7 @@ svg.main-ico {
 }
 .birth-date-selects .selectOptions {
   min-width: unset;
+  align-items: end;
 }
 .birth-date-selects .error {
   margin-top: -7px !important;

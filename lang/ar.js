@@ -434,6 +434,8 @@ const ar = {
     yourBirthDate: "تاريخ ميلادك",
     facebook: "فيسبوك",
     ticktok: "تيك توك",
+    your_interests: "قائمة اهتماماتك",
+    change_your_password: "تغيير كلمة المرور",
 
     profileDetails: "تفاصيل الملف الشخصي",
     SubscriptionDetails: "تفاصيل الاشتراك",
@@ -442,15 +444,20 @@ const ar = {
     Permissions: "صلاحيات الشخص",
 
     AdsLimit: "الحد الأقصى للإعلانات",
-
+    oldPassword: "كلمة المرور القديمة",
+    newPassword: "كلمة المرور الجديدة",
     placeholders: {
       fullName: "أدخل اسمك الكامل",
       phone: "أدخل رقم هاتفك",
       email: "أدخل بريدك الإلكتروني",
       password: "أدخل كلمة المرور",
+      oldPassword: "ادخل كلمة المرور القديمة",
+
+      confirmPassword: "أكد كلمة المرور",
+      newPassword: "أدخل كلمة المرور الجديدة",
+
       role: "اختر النوع",
       Permissions: "اختر الصلاحيات",
-      confirmPassword: "أكد كلمة المرور",
       emailPhoneLogin: "اكتب البريد الإلكتروني أو رقم الهاتف",
       newPassword: "قم بأدخال كلمة المرور الجديدة",
       facebook: "رابط حساب فيسبوك",

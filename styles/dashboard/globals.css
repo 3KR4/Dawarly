@@ -167,6 +167,13 @@ header .actions-btns .userMenu .top {
   display: grid;
   grid-template-columns: 1fr 0.2fr 0.2fr;
 }
+.dash-holder.for-client .top {
+  margin-bottom: 15px;
+  grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr;
+}
+.dash-holder.for-client .top > * {
+  width: 100% !important;
+}
 .table-container {
   margin-bottom: unset;
   box-shadow: unset;

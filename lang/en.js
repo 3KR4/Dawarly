@@ -437,6 +437,10 @@ const en = {
     rolesAndPermitions: "roles & Permitions",
     role: "user role",
     Permissions: "user Permissions",
+    your_interests: "your interests",
+    change_your_password: "change password",
+    oldPassword: "old password",
+    newPassword: "new password",
 
     AdsLimit: "Ads Limit",
     placeholders: {
@@ -449,7 +453,11 @@ const en = {
       Permissions: "select Permissions",
 
       password: "Enter your password",
+      oldPassword: "enter your old password",
+
       confirmPassword: "Confirm password",
+      newPassword: "the new password",
+
       emailPhoneLogin: "Enter your email or phone number",
       newPassword: "Enter your new password",
       subscriptionAdsLimit: "subscription AdsL imit",

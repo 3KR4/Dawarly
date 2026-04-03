@@ -4,6 +4,8 @@ import "@/styles/dashboard/forms.css";
 
 import React, { useState, useContext, useEffect } from "react";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
+
 import {
   Mail,
   Phone,
@@ -15,6 +17,7 @@ import {
 } from "lucide-react";
 import {
   change_ads_limit,
+  change_password,
   getOneUser,
   make_suber_admin,
   updatePermissions,
@@ -47,11 +50,12 @@ const superAdminOption = {
 export default function UsersForm({ params }) {
   const unwrappedParams = use(params); // ✅ يفك Promise
   const slug = unwrappedParams.slug;
+  const redirectAfterLogin = useRedirectAfterLogin();
+
   const { governorates, subCategories, cities } = useAppData();
   const { user } = useAuth();
-  console.log(useContext(settings));
 
-  const { locale, theme } = useContext(settings);
+  const { locale } = useContext(settings);
 
   const { addNotification } = useNotification();
   const [passEye, setPassEye] = useState({ password: false, confirm: false });
@@ -61,7 +65,6 @@ export default function UsersForm({ params }) {
 
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const searchParams = useSearchParams();
   const t = useTranslate();
   const [selectedType, setSelectedType] = useState({
     id: "USER",
@@ -70,6 +73,7 @@ export default function UsersForm({ params }) {
     tx: "#1E88E5", // أزرق غامق
   });
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [interests, setInterests] = useState([]);
   const isMyProfile = slug == user?.id;
 
   const {
@@ -77,7 +81,11 @@ export default function UsersForm({ params }) {
     handleSubmit,
     formState: { errors },
     reset, // ✅ نضيف reset
+    watch,
   } = useForm();
+
+  const oldPassword = watch("password"); // الأول
+  const newPassword = watch("passwordConfirmation"); // الأول
 
   const [additionalData, setAdditionalData] = useState({
     gov: null,
@@ -127,6 +135,7 @@ export default function UsersForm({ params }) {
         gov: userData.governorate || null,
         city: userData.city || null,
       });
+      setInterests(userData.interests || []);
       setOriginalData({
         full_name: userData.full_name || "",
         phone: userData.phone || "",
@@ -138,6 +147,7 @@ export default function UsersForm({ params }) {
         permissions: userData.permissions || [],
         user_type: userData.user_type,
         is_super_admin: userData.is_super_admin,
+        interests: userData.interests || [],
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -148,6 +158,11 @@ export default function UsersForm({ params }) {
     } finally {
       setLoadingContent(false);
     }
+  };
+  const toggleCategory = (id) => {
+    setInterests((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
   };
 
   const onSubmit = async (data) => {
@@ -160,7 +175,8 @@ export default function UsersForm({ params }) {
       data.fullname !== originalData.full_name ||
       data.phone !== originalData.phone ||
       additionalData.gov?.id !== originalData.governorate_id ||
-      additionalData.city?.id !== originalData.city_id;
+      additionalData.city?.id !== originalData.city_id ||
+      interests !== originalData.interests;
 
     if (profileChanged) {
       updates.profile = {
@@ -168,9 +184,16 @@ export default function UsersForm({ params }) {
         phone: data.phone,
         governorate_id: additionalData.gov?.id || null,
         city_id: additionalData.city?.id || null,
+        interests: interests,
       };
     }
 
+    if (oldPassword && newPassword) {
+      updates.password = {
+        old_password: oldPassword,
+        new_password: newPassword,
+      };
+    }
     // ------------------ 2) Subscriber Profile ------------------
     const subChanged =
       data.facebook_link !== originalData.facebook_link ||
@@ -259,7 +282,14 @@ export default function UsersForm({ params }) {
         });
       }
 
-      alert("User updated successfully!");
+      if (updates.password !== undefined) {
+        await change_password(updates.password);
+      }
+
+      addNotification({
+        type: "success",
+        message: "User updated successfully!",
+      });
 
       // ------------------ 7) تحديث originalData ------------------
       setOriginalData((prev) => ({
@@ -277,9 +307,12 @@ export default function UsersForm({ params }) {
             ? updates.ads_limit
             : prev.subscription_ads_limit,
       }));
+      redirectAfterLogin();
     } catch (err) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Something went wrong!");
+      addNotification({
+        type: "warning",
+        message: err?.response?.data?.message || "Something went wrong!",
+      });
     } finally {
       setLoadingSubmit(false);
     }
@@ -423,7 +456,9 @@ export default function UsersForm({ params }) {
             disabled={!isMyProfile || !additionalData?.gov}
             label={t.location.yourCity}
             placeholder={t.location.selectCity}
-            options={cities}
+            options={cities.filter(
+              (x) => x.governorate_id == additionalData?.gov?.id,
+            )}
             value={additionalData?.city || null}
             type="citys"
             onChange={(item) => {
@@ -568,45 +603,21 @@ export default function UsersForm({ params }) {
           </div>
         )}
 
-        <div className="options-grid">
-          {subCategories?.map((cat) => {
-            const active = selectedCategories.includes(cat.id);
-
-            return (
-              <div
-                key={cat.id}
-                className={`option-box ${active ? "active" : ""}`}
-                onClick={() => toggleCategory(cat.id)}
-              >
-                {/* <Icon className="cat-icon" /> */}
-                <span>{cat[`name_${locale}`]}</span>
-              </div>
-            );
-          })}
-        </div>
-
         <div className="form-section ">
-          <h2 className="section-title">{t.auth.profileDetails}</h2>
+          <h2 className="section-title">{t.auth.change_your_password}</h2>
           <div
             className="row-holder"
             style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
           >
             <div className="box forInput">
-              <label>{t.auth.password}</label>
+              <label>{t.auth.oldPassword}</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
                   <input
                     type={passEye.password ? "text" : "password"}
-                    {...register("password", {
-                      required: t.auth.errors.requiredPassword,
-                      pattern: {
-                        value:
-                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
-                        message: t.auth.errors.passwordWeak,
-                      },
-                    })}
-                    placeholder={t.auth.placeholders.password}
+                    {...register("password")}
+                    placeholder={t.auth.placeholders.oldPassword}
                   />
                   {passEye.password ? (
                     <Eye
@@ -624,29 +635,29 @@ export default function UsersForm({ params }) {
                     />
                   )}
                 </div>
-                {errors.password && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.password.message}
-                  </span>
-                )}
               </div>
             </div>
             <div className="box forInput">
-              <label>{t.auth.confirmPassword}</label>
+              <label>{t.auth.newPassword}</label>
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
                   <input
                     type={passEye.confirm ? "text" : "password"}
+                    placeholder={t.auth.placeholders.newPassword}
                     {...register("passwordConfirmation", {
-                      required: t.auth.errors.requiredPassword,
-                      validate: (value) =>
-                        value === password
-                          ? true
-                          : t.auth.errors.passwordMismatch,
+                      required: oldPassword
+                        ? t.auth.errors.requiredPassword
+                        : false,
+
+                      pattern: oldPassword
+                        ? {
+                            value:
+                              /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
+                            message: t.auth.errors.passwordWeak,
+                          }
+                        : undefined,
                     })}
-                    placeholder={t.auth.placeholders.confirmPassword}
                   />
                   {passEye.confirm ? (
                     <Eye
@@ -672,6 +683,26 @@ export default function UsersForm({ params }) {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="form-section ">
+          <h2 className="section-title">{t.auth.your_interests}</h2>
+          <div className="options-grid">
+            {subCategories?.map((cat) => {
+              const active = interests.includes(cat.id);
+
+              return (
+                <div
+                  key={cat.id}
+                  className={`option-box ${active ? "active" : ""}`}
+                  onClick={() => toggleCategory(cat.id)}
+                >
+                  {/* <Icon className="cat-icon" /> */}
+                  <span>{cat[`name_${locale}`]}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

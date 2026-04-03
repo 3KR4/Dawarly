@@ -42,7 +42,7 @@ export default function AdForm({ type = "client", adId }) {
   const [isEditable, setIsEditable] = useState(true);
   const [allAdmins, setAllAdmins] = useState([]);
   const canAssignAdmin = user?.permissions?.includes("ASSIGN_RESPONSIBILITY");
-  const [loadingContent, setLoadingContnet] = useState(true);
+  const [loadingContent, setLoadingContnet] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 

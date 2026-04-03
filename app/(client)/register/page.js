@@ -5,7 +5,6 @@ import React, { useState, useEffect, useContext, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 
-import { categoriesEn, categoriesAr } from "@/data";
 import { FaCommentSms, FaRegCircleUser } from "react-icons/fa6";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -103,19 +102,25 @@ export default function Register() {
     { id: 12, name_en: "Dec", name_ar: "ديسمبر" },
   ];
 
-  const days = useMemo(() => {
-    if (!additionalData.birthYear || !additionalData.birthMonth) return [];
-
-    const year = additionalData.birthYear.id;
-    const month = additionalData.birthMonth.id;
-
-    const daysInMonth = new Date(year, month, 0).getDate();
-
-    return Array.from({ length: daysInMonth }, (_, i) => ({
+const days = useMemo(() => {
+  // 👇 أول تحميلة (قبل اختيار السنة والشهر)
+  if (!additionalData.birthYear || !additionalData.birthMonth) {
+    return Array.from({ length: 30 }, (_, i) => ({
       id: i + 1,
       name: i + 1,
     }));
-  }, [additionalData.birthYear, additionalData.birthMonth]);
+  }
+
+  const year = additionalData.birthYear.id;
+  const month = additionalData.birthMonth.id;
+
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  return Array.from({ length: daysInMonth }, (_, i) => ({
+    id: i + 1,
+    name: i + 1,
+  }));
+}, [additionalData.birthYear, additionalData.birthMonth]);
 
   useEffect(() => {
     if (!additionalData.birthDay || !days.length) return;
@@ -389,7 +394,8 @@ export default function Register() {
         return;
       }
     } catch (err) {
-      console.log(err.response.data.message);
+      console.log("Err",err);
+      
       addNotification({
         type: "warning",
         message: err.response.data.message,
