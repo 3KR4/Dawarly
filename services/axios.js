@@ -72,27 +72,32 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !original._retry &&
-      !original.url.includes("/auth/refresh-token")
-    ) {
-      original._retry = true;
+if (
+  error.response?.status === 401 &&
+  !original._retry &&
+  !original.url.includes("/auth/refresh-token") &&
+  accessToken
+) {
+  original._retry = true;
 
-      try {
-        await refreshToken();
+  try {
+    await refreshToken();
 
-        // نحط التوكن الجديد ونعيد الطلب
-        original.headers.Authorization = `Bearer ${accessToken}`;
-        return api(original);
-      } catch (err) {
-        // logout / redirect
-        if (typeof window !== "undefined") {
-          window.location.href = "/register";
-        }
-        return Promise.reject(err);
+    // نحط التوكن الجديد ونعيد الطلب
+    original.headers.Authorization = `Bearer ${accessToken}`;
+    return api(original);
+  } catch (err) {
+    // logout / redirect
+    if (typeof window !== "undefined") {
+      const currentPath = window.location.pathname;
+
+      if (!currentPath.includes("/register")) {
+        window.location.href = "/register";
       }
     }
+    return Promise.reject(err);
+  }
+}
 
     return Promise.reject(error);
   },

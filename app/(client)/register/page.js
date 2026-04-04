@@ -211,6 +211,8 @@ const days = useMemo(() => {
         };
 
         const res = await loginUser(payload);
+        console.log(res);
+        
 
         login({
           user: res.data.user,
@@ -395,10 +397,9 @@ const days = useMemo(() => {
       }
     } catch (err) {
       console.log("Err",err);
-      
       addNotification({
         type: "warning",
-        message: err.response.data.message,
+        message: err?.response?.data?.message,
       });
     } finally {
       setLoadings((prev) => ({ ...prev, submit: false }));
