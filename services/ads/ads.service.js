@@ -14,8 +14,8 @@ export const getAllAds = (filters) => {
 export const getOneAd = (id) => {
   return api.get(ENDPOINTS.ADS.GET_ONE_AD(id));
 };
-export const userAds = (id) => {
-  return api.get(ENDPOINTS.ADS.GET_USER_ADS(id));
+export const userAds = (id, status, search, page, limit) => {
+  return api.get(ENDPOINTS.ADS.GET_USER_ADS(id, status, search, page, limit));
 };
 export const crateAd = (payload) => {
   return api.post(ENDPOINTS.ADS.CREATE(), payload);

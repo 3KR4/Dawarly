@@ -5,7 +5,12 @@ import "@/styles/dashboard/globals.css";
 import React, { useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
-import { getAllAds, deleteAd, userAds } from "@/services/ads/ads.service";
+import {
+  getAllAds,
+  deleteAd,
+  userAds,
+  changeStatus,
+} from "@/services/ads/ads.service";
 import { settings } from "@/Contexts/settings";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -20,7 +25,7 @@ export default function MyAdsListing() {
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
   const { addNotification } = useNotification();
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
   // 🌟 State واحدة للإعلانات + Pagination
   const [adsData, setAdsData] = useState({
     ads: [],
@@ -43,12 +48,13 @@ export default function MyAdsListing() {
     try {
       setLoadingContent(true);
 
-      const res = await userAds({
+      const res = await userAds(
+        user.id,
+        selectedStatus?.id ? selectedStatus.id : undefined,
+        search !== undefined ? search : searchText,
         page,
-        limit: adsData.pagination.limit,
-        status: selectedStatus?.id || null,
-        search: search !== undefined ? search : searchText,
-      });
+        adsData.pagination.limit,
+      );
 
       setAdsData({
         ads: res.data.data || [],
@@ -75,6 +81,36 @@ export default function MyAdsListing() {
 
   const handlePageChange = (newPage) => {
     fetchAds(newPage);
+  };
+
+  const handelChangeStatus = async (id, status) => {
+    console.log("status:", status);
+
+    try {
+      const res = await changeStatus(id, { status: status.id });
+
+      addNotification({
+        type: "success",
+        message: res?.data?.message,
+      });
+
+      const remainingItems = adsData.ads.length - 1;
+
+      // 2️⃣ نقرر الصفحة الجديدة
+      const newPage =
+        remainingItems === 0 && adsData.pagination.page > 1
+          ? adsData.pagination.page - 1
+          : adsData.pagination.page;
+
+      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
+      fetchAds(newPage);
+    } catch (error) {
+      console.error(error);
+      addNotification({
+        type: "warning",
+        message: error.response?.data?.message || "Something went wrong ❌",
+      });
+    }
   };
 
   const handleDeleteAd = async (id) => {
@@ -188,8 +224,11 @@ export default function MyAdsListing() {
         ads={adsData?.ads}
         loadingContent={loadingContent}
         removeAd={handleDeleteAd}
-        activeAds={true}
+        changeStatus={handelChangeStatus}
+        activeAds={false}
         limit={adsData?.pagination.limit}
+        page={`user`}
+        statusChanger={"client"}
       />
 
       {/* ================= PAGINATION ================= */}

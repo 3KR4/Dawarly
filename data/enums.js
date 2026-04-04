@@ -68,7 +68,7 @@ export const ImageEntityTypes = [
 ];
 
 export const AdStatuses = [
-  // { id: "PENDING", name_en: "Pending", name_ar: "قيد المراجعة", bg: "#FFF4E5", tx: "#F59E0B" },
+  { id: "PENDING", name_en: "Pending", name_ar: "قيد المراجعة", bg: "#FFF4E5", tx: "#F59E0B" },
 
   {
     id: "ACTIVE",

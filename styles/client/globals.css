@@ -450,6 +450,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  border-radius: 9px;
   width: 100%;
 }
 .box.forInput:not(:has(.upload-label.one-image)):has(input:disabled),
@@ -464,7 +465,9 @@ a {
 }
 .dash-holder.for-client .top .box.forInput {
   width: 200px;
+  border-radius: 9px;
 }
+
 .box.forInput:has(.images-uplouder .upload-label) {
   height: 100%;
 }
@@ -753,6 +756,7 @@ a {
   display: flex;
   align-items: center;
 }
+
 .selectOptions .btn h4 {
   color: var(--paragraph);
   font-size: 13px;
@@ -764,6 +768,9 @@ a {
   justify-content: flex-start;
   padding: 0 9px;
 }
+.dash-holder.for-client .top .selectOptions .btn h4 {
+  justify-content: unset;
+}
 .selectOptions.small .btn {
   height: 35px !important;
 }
@@ -774,10 +781,11 @@ a {
   padding: 0 !important;
 }
 .body.fluid-container.for-user .selectOptions .btn h4 {
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
   justify-content: center;
   padding: 0;
+    letter-spacing: 0.25px;
 }
 .disabled .btn h4 {
   cursor: no-drop;
@@ -792,6 +800,7 @@ a {
 .selectOptions.ultra-small .btn svg {
   height: 32px;
 }
+
 .dashboard .head .main-ico:hover {
   background: var(--hover-color);
 }

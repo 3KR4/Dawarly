@@ -52,7 +52,16 @@ export const ENDPOINTS = {
     GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
     GET_ALL: () => `/ads/all`,
     GET_ONE_AD: (id) => `/ads/${id}`,
-    GET_USER_ADS: (id) => `/ads/profile/${id}`,
+    GET_USER_ADS: (id, status, search, page, limit) => {
+      const params = new URLSearchParams();
+
+      if (status) params.append("status", status);
+      if (search) params.append("search", search);
+      if (page) params.append("page", page);
+      if (limit) params.append("limit", limit);
+
+      return `/ads/profile/${id}?${params.toString()}`;
+    },
     CREATE: () => `/ads/create`,
     UPDATE: (id) => `/ads/update/${id}`,
     DELETE: (id) => `/ads/delete/${id}`,

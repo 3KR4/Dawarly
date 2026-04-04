@@ -15,6 +15,7 @@ function SelectOptions({
   onChange,
   type,
   disabled = false,
+  hiddenIco = false,
   error,
   required = false,
 }) {
@@ -106,6 +107,7 @@ function SelectOptions({
     <div
       className={`box forInput ${disabled ? "disabled" : ""}`}
       ref={selectRef}
+      style={{ background: value?.bg }}
     >
       {label && (
         <label>
@@ -115,7 +117,11 @@ function SelectOptions({
 
       <div className={`selectOptions ${size}`}>
         <div className={`btn ${error ? "error-border" : ""}`}>
-          <h4 className="ellipsis" onClick={toggle}>
+          <h4
+            className="ellipsis"
+            onClick={toggle}
+            style={{ color: value?.tx }}
+          >
             {active ? (
               <input
                 autoFocus
@@ -130,11 +136,18 @@ function SelectOptions({
               placeholder
             )}
           </h4>
-
           {active ? (
-            <IoMdClose className="main-ico" onClick={toggle} />
+            <IoMdClose
+              className="main-ico"
+              onClick={toggle}
+              style={{ visibility: hiddenIco ? "hidden" : "visible" }}
+            />
           ) : (
-            <IoIosArrowDown className="main-ico" onClick={toggle} />
+            <IoIosArrowDown
+              className="main-ico"
+              onClick={toggle}
+              style={{ visibility: hiddenIco ? "hidden" : "visible" }}
+            />
           )}
         </div>
 

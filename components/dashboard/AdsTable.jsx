@@ -26,11 +26,17 @@ export default function AdsTable({
   removeAd,
   changeStatus,
   page = "dashboard",
+  statusChanger = "admin",
 }) {
   const { screenSize, locale } = useContext(settings);
   const t = useTranslate();
   const { addNotification } = useNotification();
 
+  const filteredStatuses = AdStatuses.filter((status) =>
+    statusChanger !== "admin"
+      ? status.id !== "PENDING" && status.id !== "REJECTED"
+      : status.id === "PENDING" || status.id === "REJECTED",
+  );
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
       <div
@@ -87,204 +93,196 @@ export default function AdsTable({
               <p>{activeAds ? "no data found" : "no more pending ads"} </p>
             </div>
           ) : (
-            ads?.map((item) => (
-              <div key={item?.id} className={`table-item ${item?.status}`}>
-                <div className="holder">
-                  <Link href={`/`} className="item-image">
-                    <Image
-                      src={item?.image[0]?.secure_url}
-                      alt={item?.name}
-                      fill
-                      className="product-image"
-                    />
-                  </Link>
-
-                  <div className="item-details">
-                    <Link href={`/market/${item?.id}`} className="item-name">
-                      {item?.title}
+            ads?.map((item) => {
+              const curentStatus = AdStatuses.find((s) => s.id == item?.status);
+              return (
+                <div key={item?.id} className={`table-item ${item?.status}`}>
+                  <div className="holder">
+                    <Link href={`/`} className="item-image">
+                      <Image
+                        src={item?.image[0]?.secure_url}
+                        alt={item?.name}
+                        fill
+                        className="product-image"
+                      />
                     </Link>
-                    <div className="item-location nisted">
-                      <Link
-                        href={`/market?gov=${item?.governorate?.id}`}
-                        className="link"
-                      >
-                        {item?.governorate?.[`name_${locale}`]} /
-                      </Link>
 
-                      <Link
-                        href={`/market?city=${item?.city?.id}`}
-                        className="link"
-                      >
-                        {item?.city?.[`name_${locale}`]}
+                    <div className="item-details">
+                      <Link href={`/market/${item?.id}`} className="item-name">
+                        {item?.title}
                       </Link>
+                      <div className="item-location nisted">
+                        <Link
+                          href={`/market?gov=${item?.governorate?.id}`}
+                          className="link"
+                        >
+                          {item?.governorate?.[`name_${locale}`]} /
+                        </Link>
+
+                        <Link
+                          href={`/market?city=${item?.city?.id}`}
+                          className="link"
+                        >
+                          {item?.city?.[`name_${locale}`]}
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {screenSize === "small" || screenSize === "ultra-small" ? (
-                  <>
-                    <div className="item-categories nisted">
-                      <Link
-                        href={`/market?cat=${item?.Categories?.id}`}
-                        className="link"
-                      >
-                        {item?.Categories?.[`name_${locale}`]} /
-                      </Link>
+                  {screenSize === "small" || screenSize === "ultra-small" ? (
+                    <>
+                      <div className="item-categories nisted">
+                        <Link
+                          href={`/market?cat=${item?.Categories?.id}`}
+                          className="link"
+                        >
+                          {item?.Categories?.[`name_${locale}`]} /
+                        </Link>
 
-                      <Link
-                        href={`/market?subcat=${item?.SubCategories?.id}`}
-                        className="link"
-                      >
-                        {item?.SubCategories?.[`name_${locale}`]}
-                      </Link>
-                    </div>
+                        <Link
+                          href={`/market?subcat=${item?.SubCategories?.id}`}
+                          className="link"
+                        >
+                          {item?.SubCategories?.[`name_${locale}`]}
+                        </Link>
+                      </div>
 
-                    <div className="item-price" style={{ lineHeight: `1.3` }}>
-                      {formatCurrency(
-                        item?.rent_amount,
-                        item?.rent_currency,
-                        locale,
+                      <div className="item-price" style={{ lineHeight: `1.3` }}>
+                        {formatCurrency(
+                          item?.rent_amount,
+                          item?.rent_currency,
+                          locale,
+                        )}
+                      </div>
+                      {!activeAds && (
+                        <div
+                          className="item-price"
+                          style={{ lineHeight: `1.3` }}
+                        >
+                          {formatCurrency(
+                            item?.deposit_amount,
+                            item?.rent_currency,
+                            locale,
+                          )}
+                        </div>
                       )}
-                    </div>
-                    {!activeAds && (
+                    </>
+                  ) : (
+                    <>
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
                         {formatCurrency(
-                          item?.deposit_amount,
+                          item?.rent_amount,
                           item?.rent_currency,
                           locale,
-                        )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="item-price" style={{ lineHeight: `1.3` }}>
-                      {formatCurrency(
-                        item?.rent_amount,
-                        item?.rent_currency,
-                        locale,
-                      )}{" "}
-                      {
-                        RentFrequencies?.find(
-                          (x) => x.id == item?.rent_frequency,
-                        )?.[`name_${locale}`]
-                      }
-                    </div>
-                    {!activeAds && (
-                      <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(
-                          item?.deposit_amount,
-                          item?.rent_currency,
-                          locale,
-                        )}
-                      </div>
-                    )}
-
-                    <div className="item-categories nisted">
-                      <Link
-                        href={`/market?cat=${item?.Categories?.id}`}
-                        className="link"
-                      >
-                        {item?.Categories?.[`name_${locale}`]} /
-                      </Link>
-
-                      <Link
-                        href={`/market?subcat=${item?.SubCategories?.id}`}
-                        className="link"
-                      >
-                        {item?.SubCategories?.[`name_${locale}`]}
-                      </Link>
-                    </div>
-                  </>
-                )}
-
-                <p className="date">
-                  {formatRelativeDate(item?.created_at, locale, "detailed")}
-                </p>
-                {activeAds && (
-                  <div className="item-overview onlyOne">
-                    <h4
-                      style={{
-                        background: AdStatuses.find((x) => x.id == item?.status)
-                          ?.bg,
-                        color: AdStatuses.find((x) => x.id == item?.status)?.tx,
-                      }}
-                    >
-                      {item?.status}
-                    </h4>
-                  </div>
-                )}
-                {page === "user" || !activeAds ? (
-                  <div className="item-status">
-                    <SelectOptions
-                      size="ultra-small"
-                      options={[
+                        )}{" "}
                         {
-                          id: "ACTIVE",
-                          name_en: "Active",
-                          name_ar: "نشط",
-                          bg: "#E6F9F0",
-                          tx: "#0F9D58",
-                        },
-                        {
-                          id: "REJECTED",
-                          name_en: "Rejected",
-                          name_ar: "مرفوض",
-                          bg: "#FDECEA",
-                          tx: "#D93025",
-                        },
-                      ]}
-                      value={
-                        AdStatuses.find((s) => s.id === item?.status)?.[
-                          `name_${locale}`
-                        ] || {
-                          id: "PENDING",
-                          name_en: "Pending",
-                          name_ar: "قيد المراجعة",
-                          bg: "#FFF4E5",
-                          tx: "#F59E0B",
+                          RentFrequencies?.find(
+                            (x) => x.id == item?.rent_frequency,
+                          )?.[`name_${locale}`]
                         }
+                      </div>
+                      {!activeAds && (
+                        <div
+                          className="item-price"
+                          style={{ lineHeight: `1.3` }}
+                        >
+                          {formatCurrency(
+                            item?.deposit_amount,
+                            item?.rent_currency,
+                            locale,
+                          )}
+                        </div>
+                      )}
+
+                      <div className="item-categories nisted">
+                        <Link
+                          href={`/market?cat=${item?.Categories?.id}`}
+                          className="link"
+                        >
+                          {item?.Categories?.[`name_${locale}`]} /
+                        </Link>
+
+                        <Link
+                          href={`/market?subcat=${item?.SubCategories?.id}`}
+                          className="link"
+                        >
+                          {item?.SubCategories?.[`name_${locale}`]}
+                        </Link>
+                      </div>
+                    </>
+                  )}
+
+                  <p className="date">
+                    {formatRelativeDate(item?.created_at, locale, "detailed")}
+                  </p>
+                  {activeAds && (
+                    <div className="item-overview onlyOne">
+                      <h4
+                        style={{
+                          background: AdStatuses.find(
+                            (x) => x.id == item?.status,
+                          )?.bg,
+                          color: AdStatuses.find((x) => x.id == item?.status)
+                            ?.tx,
+                        }}
+                      >
+                        {item?.status}
+                      </h4>
+                    </div>
+                  )}
+                  {page === "user" || !activeAds ? (
+                    <div
+                      className="item-status"
+                    >
+                      <SelectOptions
+                        size="ultra-small"
+                        options={filteredStatuses}
+                        value={curentStatus}
+                        disabled={page === "user" && curentStatus.id == "PENDING"}
+                        hiddenIco={page === "user" && curentStatus.id == "PENDING"}
+                        locale={locale}
+                        onChange={(selected) =>
+                          changeStatus(item?.id, selected)
+                        }
+                      />
+                    </div>
+                  ) : (
+                    activeAds && (
+                      <div className="item-overview">
+                        <h4>
+                          {151} <FaEye />
+                        </h4>
+                        <h4 className="green">
+                          {50505} <BiSolidPurchaseTagAlt />
+                        </h4>
+                      </div>
+                    )
+                  )}
+
+                  <div className="actions">
+                    <Link href={`/market/${item?.id}`}>
+                      <FaEye className="view" />
+                    </Link>
+                    <hr />
+                    <Link
+                      href={
+                        page == "dashboard"
+                          ? `/dashboard/ads/form?id=${item?.id}`
+                          : `/mylisting/form/${item?.id}`
                       }
-                      locale={locale}
-                      onChange={(selected) => changeStatus(item.id, selected)}
+                    >
+                      <MdEdit className="edit" />
+                    </Link>
+
+                    <hr />
+                    <FaTrashAlt
+                      className="delete"
+                      onClick={() => removeAd(item?.id)}
                     />
                   </div>
-                ) : (
-                  activeAds && (
-                    <div className="item-overview">
-                      <h4>
-                        {151} <FaEye />
-                      </h4>
-                      <h4 className="green">
-                        {50505} <BiSolidPurchaseTagAlt />
-                      </h4>
-                    </div>
-                  )
-                )}
-
-                <div className="actions">
-                  <Link href={`/market/${item?.id}`}>
-                    <FaEye className="view" />
-                  </Link>
-                  <hr />
-                  <Link
-                    href={
-                      page == "dashboard"
-                        ? `/dashboard/ads/form?id=${item?.id}`
-                        : `/mylisting/form/${item?.id}`
-                    }
-                  >
-                    <MdEdit className="edit" />
-                  </Link>
-
-                  <hr />
-                  <FaTrashAlt
-                    className="delete"
-                    onClick={() => removeAd(item?.id)}
-                  />
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

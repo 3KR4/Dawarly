@@ -307,7 +307,7 @@ export default function UsersForm({ params }) {
             ? updates.ads_limit
             : prev.subscription_ads_limit,
       }));
-      redirectAfterLogin();
+      window.location.href = "/";
     } catch (err) {
       addNotification({
         type: "warning",

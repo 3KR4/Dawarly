@@ -180,6 +180,8 @@ export default function ActiveAds() {
         removeAd={handleDeleteAd}
         activeAds={true}
         limit={adsData?.pagination.limit}
+        statusChanger={"admin"}
+
       />
 
       {/* ================= PAGINATION ================= */}

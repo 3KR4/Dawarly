@@ -135,6 +135,7 @@ export default function ActiveAds() {
         changeStatus={handelChangeStatus}
         activeAds={false}
         limit={adsData?.pagination.limit}
+        statusChanger={"admin"}
       />
 
       {/* ================= PAGINATION ================= */}

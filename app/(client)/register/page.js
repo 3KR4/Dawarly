@@ -102,25 +102,25 @@ export default function Register() {
     { id: 12, name_en: "Dec", name_ar: "ديسمبر" },
   ];
 
-const days = useMemo(() => {
-  // 👇 أول تحميلة (قبل اختيار السنة والشهر)
-  if (!additionalData.birthYear || !additionalData.birthMonth) {
-    return Array.from({ length: 30 }, (_, i) => ({
+  const days = useMemo(() => {
+    // 👇 أول تحميلة (قبل اختيار السنة والشهر)
+    if (!additionalData.birthYear || !additionalData.birthMonth) {
+      return Array.from({ length: 30 }, (_, i) => ({
+        id: i + 1,
+        name: i + 1,
+      }));
+    }
+
+    const year = additionalData.birthYear.id;
+    const month = additionalData.birthMonth.id;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, i) => ({
       id: i + 1,
       name: i + 1,
     }));
-  }
-
-  const year = additionalData.birthYear.id;
-  const month = additionalData.birthMonth.id;
-
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  return Array.from({ length: daysInMonth }, (_, i) => ({
-    id: i + 1,
-    name: i + 1,
-  }));
-}, [additionalData.birthYear, additionalData.birthMonth]);
+  }, [additionalData.birthYear, additionalData.birthMonth]);
 
   useEffect(() => {
     if (!additionalData.birthDay || !days.length) return;
@@ -212,7 +212,6 @@ const days = useMemo(() => {
 
         const res = await loginUser(payload);
         console.log(res);
-        
 
         login({
           user: res.data.user,
@@ -396,11 +395,19 @@ const days = useMemo(() => {
         return;
       }
     } catch (err) {
-      console.log("Err",err);
+      console.log("Err", err);
       addNotification({
         type: "warning",
         message: err?.response?.data?.message,
       });
+      if (
+        err?.response?.data?.message ==
+        "Email not verified. Verification code sent again."
+      ) {
+        await handleResend();
+
+        setStep(STEPS.EMAIL_VERIFY);
+      }
     } finally {
       setLoadings((prev) => ({ ...prev, submit: false }));
     }
@@ -410,7 +417,7 @@ const days = useMemo(() => {
   const handleOtpSubmit = async (code) => {
     try {
       const res = await verifyUserOtp({
-        email: getValues("email"),
+        email: getValues("email") || getValues("emailPhoneLogin"),
         code,
       });
 
@@ -435,7 +442,7 @@ const days = useMemo(() => {
   const handleResend = async () => {
     try {
       await resendEmailOtp({
-        email: getValues("email"), // خلي نفس القيمة المستخدمة
+        email: getValues("email") || getValues("emailPhoneLogin"), // خلي نفس القيمة المستخدمة
       });
 
       addNotification({

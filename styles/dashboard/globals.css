@@ -168,7 +168,7 @@ header .actions-btns .userMenu .top {
   grid-template-columns: 1fr 0.2fr 0.2fr;
 }
 .dash-holder.for-client .top {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr;
 }
 .dash-holder.for-client .top > * {
@@ -305,6 +305,10 @@ header .actions-btns .userMenu .top {
 }
 .table-container .item-status {
   padding: 0 12px;
+}
+.dash-holder.for-client .table-container .item-status {
+  padding: 0;
+  border-radius: 8px;
 }
 .table-container .item-status .selectOptions .btn {
   border: none !important;

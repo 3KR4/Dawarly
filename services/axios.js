@@ -57,7 +57,14 @@ const refreshToken = async () => {
 
 // -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
-  // 👇 أهم سطر
+  // لو مفيش توكن → حاول تجيبه
+  if (!accessToken) {
+    try {
+      await refreshToken();
+    } catch (err) {
+      return config; // سيبه يكمل بدون توكن
+    }
+  }
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -65,7 +72,6 @@ api.interceptors.request.use(async (config) => {
 
   return config;
 });
-
 // -------------------- RESPONSE INTERCEPTOR --------------------
 api.interceptors.response.use(
   (response) => response,
