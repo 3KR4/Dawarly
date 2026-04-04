@@ -2034,7 +2034,7 @@ export const dashboardRoutes = {
       en: "Ads",
       ar: "الإعلانات",
     },
-    defaultPath: "active",
+    defaultPath: "all",
     canCreate: true,
   },
   bookings: {

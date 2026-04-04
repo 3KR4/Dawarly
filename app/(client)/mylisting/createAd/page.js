@@ -11,12 +11,7 @@ import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
-import {
-  crateAd,
-  updateAd,
-  getOneAd,
-  assignAdmin,
-} from "@/services/ads/ads.service";
+import { crateAd } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import { Amenities, Currencies, RentFrequencies } from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
@@ -27,6 +22,7 @@ import { getAllUsers } from "@/services/auth/auth.service";
 import { deleteImage, uploadImages } from "@/services/images/images.service";
 import { FaArrowLeft } from "react-icons/fa";
 import CatCard from "@/components/home/CatCard";
+import { IoChatbubblesOutline } from "react-icons/io5";
 
 export default function CreateAd() {
   const { locale } = useContext(settings);
@@ -50,7 +46,6 @@ export default function CreateAd() {
 
   // ======= FORM STATES =======
   const [adData, setAdData] = useState(null);
-  const [isEditable, setIsEditable] = useState(true);
   const [allAdmins, setAllAdmins] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -92,12 +87,11 @@ export default function CreateAd() {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm();
 
   const METHODS = [
-    { key: "email", label: t.ad.contact_via_email, icon: Mail },
     { key: "phone", label: t.ad.contact_via_phone, icon: Phone },
+    { key: "chat", label: t.ad.contact_via_email, icon: IoChatbubblesOutline },
   ];
 
   const handleErrors = (type, value) => {
@@ -110,8 +104,8 @@ export default function CreateAd() {
   const buildPayload = (data) => ({
     title: data.adTitle,
     description: data.description || "",
-    categoryId: selectedCats.cat?.id,
-    subCategoryId: selectedCats.subCat?.id,
+    categoryId: selectedCats.cat,
+    subCategoryId: selectedCats.subCat,
     display_phone: selectedContactMethods.phone,
     display_whatsapp: selectedContactMethods.chat,
     display_dawaarly_contact: selectedMediatorMethod?.id === 2,
@@ -195,16 +189,19 @@ export default function CreateAd() {
       setIsSubmitted(true);
 
       const isFormValid =
-        data.adTitle &&
-        selectedLocations.gov &&
-        selectedLocations.city &&
-        images.length !== 0;
+        !!data.adTitle &&
+        !!selectedLocations.gov &&
+        !!selectedLocations.city &&
+        images.length > 0;
 
       const errors = {
-        gov: !userAddress.gov ? t.ad.errors.governorate : "",
-        city: !userAddress.city ? t.ad.errors.city : "",
+        gov: !selectedLocations.gov ? t.ad.errors.governorate : "",
+        city: !selectedLocations.city ? t.ad.errors.city : "",
       };
 
+      Object.entries(errors).forEach(([key, value]) => {
+        handleErrors(key, value);
+      });
       if (!isFormValid) {
         return;
       }
@@ -213,16 +210,20 @@ export default function CreateAd() {
     }
 
     if (step === STEPS.ALL_DETAILS) {
-      const isValid = additionalData.currency && additionalData.frequency;
-      if (!isValid) {
+      setIsSubmitted(true);
+
+      const isFormValid = !!data.bedrooms && !!data.bathrooms && !!data.level;
+
+      if (!isFormValid) {
         return;
       }
+
       setStep(STEPS.CONTACT);
       return;
     }
 
     if (step === STEPS.CONTACT) {
-      const hasSelectedContact = Object.values(selectedContact).some(
+      const hasSelectedContact = Object.values(selectedContactMethods).some(
         (v) => v === true,
       );
       if (!hasSelectedContact) {
@@ -242,13 +243,12 @@ export default function CreateAd() {
 
           addNotification({
             type: "success",
-            message: adId ? t.ad.ad_updated : t.ad.ad_created,
+            message: finalAdId ? t.ad.ad_updated : t.ad.ad_created,
           });
           redirectAfterLogin("/mylisting");
         } catch (err) {
           console.error("Error:", err);
           let message = "An error occurred";
-          // 🔥 لو فيه validation errors
           if (err.response?.data?.errors) {
             const backendErrors = err.response.data.errors;
 
@@ -290,7 +290,6 @@ export default function CreateAd() {
                   <input
                     type="date"
                     value={rentAvailability.from}
-                    disabled={!isEditable}
                     onChange={(e) =>
                       setRentAvailability((prev) => ({
                         ...prev,
@@ -312,7 +311,6 @@ export default function CreateAd() {
                     type="date"
                     value={rentAvailability.to}
                     min={rentAvailability.from}
-                    disabled={!isEditable}
                     onChange={(e) =>
                       setRentAvailability((prev) => ({
                         ...prev,
@@ -340,19 +338,10 @@ export default function CreateAd() {
                   <input
                     type="number"
                     min={1}
-                    disabled={!isEditable}
-                    {...register("rentalDuration", {
-                      required: t.ad.errors.rentalDuration,
-                    })}
+                    {...register("rentalDuration")}
                     placeholder={t.ad.durationValuePlaceholder}
                   />
                 </div>
-                {errors.rentalDuration && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.rentalDuration.message}
-                  </span>
-                )}
               </div>
             </div>
 
@@ -361,8 +350,6 @@ export default function CreateAd() {
               placeholder={t.ad.select}
               options={RentFrequencies}
               value={additionalData.minRentalUnit}
-              required={true}
-              disabled={!isEditable}
               onChange={(item) =>
                 setAdditionalData((prev) => ({
                   ...prev,
@@ -430,7 +417,7 @@ export default function CreateAd() {
                 data={cat}
                 position={`when-create-ad`}
                 type={`cat`}
-                activeClass={cat?.id == category}
+                activeClass={cat?.id == selectedCats.cat}
                 onSelect={() => {
                   setSelectedCats({ cat: cat?.id, subCat: null });
                   setStep(STEPS.SUB_CATEGORIES);
@@ -444,14 +431,14 @@ export default function CreateAd() {
         {step === STEPS.SUB_CATEGORIES && (
           <div className="options-grid verfiyMethod">
             {subCategories
-              ?.filter((x) => x?.category_id == category)
+              ?.filter((x) => x?.category_id == selectedCats.cat)
               ?.map((subCat) => (
                 <CatCard
                   key={subCat?.id}
                   data={subCat}
                   position={`when-create-ad`}
                   type={`sub-cat`}
-                  activeClass={subCat?.id == subCategory}
+                  activeClass={subCat?.id == selectedCats.subCat}
                   onSelect={() => {
                     setSelectedCats((prev) => ({
                       ...prev,
@@ -496,7 +483,10 @@ export default function CreateAd() {
               <h2 className="section-title">{t.dashboard.tables.location}</h2>
               <div
                 className="row-holder"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                }}
               >
                 <SelectOptions
                   label={t.location.yourGovernorate}
@@ -565,99 +555,108 @@ export default function CreateAd() {
                 />
               </div>
             </div>
-            <div className="box forInput">
-              <label>
-                {category == 2 ? t.ad.rentPrice : t.dashboard.forms.price}
-
-                <span className="required">*</span>
-              </label>
-
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("price", {
-                      required: t.dashboard.forms.errors.priceRequired,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.priceMin,
-                      },
-                    })}
-                    placeholder={
-                      category == 2
-                        ? t.ad.rentPricePlaceholder
-                        : t.dashboard.forms.pricePlaceholder
-                    }
-                  />
+            {/* === تفاصيل التسعير === */}
+            <div className="form-section">
+              <h2 className="section-title">
+                {t.dashboard.tables.pricing_details}
+              </h2>
+              <div
+                className="row-holder"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                }}
+              >
+                <div className="box forInput">
+                  <label>
+                    {t.ad.rentPrice} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("rentAmount", {
+                          required: t.dashboard.forms.errors.priceRequired,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.priceMin,
+                          },
+                        })}
+                        placeholder={t.ad.rentPricePlaceholder}
+                      />
+                    </div>
+                    {errors.rentAmount && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.rentAmount.message}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {errors.price && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.price.message}
-                  </span>
-                )}
+                <div className="box forInput">
+                  <label>
+                    {t.ad.deposit_amount} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("deposit_amount", {
+                          required:
+                            t.dashboard.forms.errors.deposit_amount_reqire,
+                          min: {
+                            value: 1,
+                            message:
+                              t.dashboard.forms.errors.deposit_amount_Min,
+                          },
+                        })}
+                        placeholder={t.ad.deposit_amount_Placeholder}
+                      />
+                    </div>
+                    {errors.deposit_amount && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.deposit_amount.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <SelectOptions
+                  label={t.enum.currencies}
+                  placeholder={t.location.select_currency}
+                  options={Currencies}
+                  value={additionalData?.currency || null}
+                  onChange={(item) => {
+                    handleErrors("currency", null);
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      currency: item,
+                    }));
+                  }}
+                  error={fieldErrors.currency}
+                  required={true}
+                />
+
+                <SelectOptions
+                  label={t.enum.frequency}
+                  placeholder={t.location.select_frequency}
+                  options={RentFrequencies}
+                  value={additionalData?.frequency || null}
+                  onChange={(item) => {
+                    handleErrors("frequency", null);
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      frequency: item,
+                    }));
+                  }}
+                  error={fieldErrors.frequency}
+                  required={true}
+                />
               </div>
             </div>
-            {category === 2 && (
-              <RenderRentAvailability
-                t={t}
-                rentAvailability={rentAvailability}
-                setRentAvailability={setRentAvailability}
-                isEditable={true} // أو أي شرط عندك
-              />
-            )}
-            {category == 2 && (
-              <div className="form-section">
-                <h2 className="section-title" style={{ fontSize: "17px" }}>
-                  {t.ad.minimumRentalDuration}
-                </h2>
 
-                <div className="row-holder for-dates">
-                  {/* الرقم */}
-                  <div className="box forInput">
-                    <label>
-                      {t.ad.durationValue} <span className="required">*</span>
-                    </label>
-
-                    <div className="inputHolder">
-                      <div className="holder">
-                        <input
-                          type="number"
-                          min={1}
-                          value={minRentalDuration.value}
-                          onChange={(e) =>
-                            setMinRentalDuration((prev) => ({
-                              ...prev,
-                              value: e.target.value,
-                            }))
-                          }
-                          placeholder={t.ad.durationValuePlaceholder}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* الوحدة باستخدام SelectOptions */}
-                  <SelectOptions
-                    label={t.ad.durationUnit}
-                    placeholder={t.ad.select}
-                    options={RENT_DURATION_UNITS}
-                    value={minRentalDuration.unit}
-                    tPath="ad" // 👈 مهم
-                    required={true}
-                    locale={locale}
-                    t={t}
-                    onChange={(item) =>
-                      setMinRentalDuration((prev) => ({
-                        ...prev,
-                        unit: item,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            )}
             <Images
               images={images}
               setImages={setImages}
@@ -669,280 +668,234 @@ export default function CreateAd() {
         {/* ================= ALL_DETAILS STEP 4 ================= */}
         {step === STEPS.ALL_DETAILS && (
           <>
-            {/* ========== الحقول الديناميكية من dynamicFilters ========== */}
-            {dynamicFilters.map((field) => {
-              /* ========== INPUT (المساحة، السعر، إلخ) ========== */
-              if (field.uiType === "input") {
-                return (
-                  <div className="box forInput" key={field.key}>
-                    <label>
-                      {field.label}
-                      {field.required ? (
-                        <span className="required">*</span>
-                      ) : (
-                        <span>({t.auth.optional})</span>
-                      )}
-                    </label>
-                    <div className="inputHolder">
-                      <div className="holder">
-                        <input
-                          type={field.inputType || "text"}
-                          value={dynamicValues[field.key] || ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            handleDynamicChange(field.key, value);
+            <div className="form-section">
+              <h2 className="section-title">
+                {t.dashboard.tables.property_details}
+              </h2>
+              <div
+                className="row-holder"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                }}
+              >
+                <div className="box forInput">
+                  <label>
+                    {t.ad.bedrooms} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("bedrooms", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        placeholder={t.ad.bedroomsPlaceholder}
+                      />
+                    </div>
+                    {errors.bedrooms && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.bedrooms.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                            if (field.validation?.pattern && value) {
-                              const pattern = field.validation.pattern.value;
-                              const message = field.validation.pattern.message;
+                <div className="box forInput">
+                  <label>
+                    {t.ad.bathrooms} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("bathrooms", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        placeholder={t.ad.bathroomsPlaceholder}
+                      />
+                    </div>
+                    {errors.bathrooms && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.bathrooms.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                              if (!pattern.test(value)) {
-                                setFieldErrors((prev) => ({
-                                  ...prev,
-                                  [field.key]: message,
-                                }));
-                              } else if (fieldErrors[field.key]) {
-                                setFieldErrors((prev) => {
-                                  const newErrors = { ...prev };
-                                  delete newErrors[field.key];
-                                  return newErrors;
-                                });
-                              }
-                            }
-                          }}
-                          onBlur={(e) => {
-                            const value = e.target.value;
-                            if (field.required && !value) {
-                              setFieldErrors((prev) => ({
+                <div className="box forInput">
+                  <label>
+                    {t.ad.level} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("level", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 0,
+                            message: t.dashboard.forms.errors.minZero,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        placeholder={t.ad.levelPlaceholder}
+                      />
+                    </div>
+                    {errors.level && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.level.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <RenderRentAvailability />
+            <div className="form-section">
+              <h2 className="section-title">
+                {t.dashboard.tables.guest_capacity}
+              </h2>
+              <div
+                className="row-holder"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                }}
+              >
+                <div className="box forInput">
+                  <label>
+                    {t.ad.childMax} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("child_no_max", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 0,
+                            message: t.dashboard.forms.errors.minZero,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        placeholder={t.ad.childMaxPlaceholder}
+                      />
+                    </div>
+                    {errors.child_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.child_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>
+                    {t.ad.adultMax} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("adult_no_max", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        placeholder={t.ad.adultMaxPlaceholder}
+                      />
+                    </div>
+                    {errors.adult_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.adult_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="form-section">
+              <h2 className="section-title">{t.ad.amenities}</h2>
+              <div className="dynamicFilters-holder">
+                <div className="box forInput">
+                  <div className="options-grid flex">
+                    {Amenities.map((option) => {
+                      const displayLabel =
+                        locale === "ar" ? option.name_ar : option.name_en;
+                      const isActive = selectedAmenities.includes(option.id);
+
+                      return (
+                        <div
+                          key={option.id}
+                          className={`option-box small ${isActive ? "active" : ""}`}
+                          onClick={() => {
+                            if (isActive) {
+                              setSelectedAmenities((prev) =>
+                                prev.filter((v) => v !== option.id),
+                              );
+                            } else {
+                              setSelectedAmenities((prev) => [
                                 ...prev,
-                                [field.key]: field.requiredMessage,
-                              }));
+                                option.id,
+                              ]);
                             }
                           }}
-                          placeholder={field.placeholder}
-                        />
-                      </div>
-                      {fieldErrors[field.key] && (
-                        <span className="error">
-                          <CircleAlert />
-                          {fieldErrors[field.key]}
-                        </span>
-                      )}
-                    </div>
+                        >
+                          {displayLabel}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              }
-
-              /* ========== SELECT ========== */
-              if (field.uiType === "select") {
-                return (
-                  <SelectOptions
-                    key={field.key}
-                    label={field.label}
-                    placeholder={field.placeholder || field.label}
-                    options={field.options}
-                    value={dynamicValues[field.key] || ""}
-                    tPath={field.tPath}
-                    noTranslate={field.noTranslate}
-                    required={field.required}
-                    error={fieldErrors[field.key]}
-                    locale={locale}
-                    t={t}
-                    onChange={(item) => handleDynamicChange(field.key, item)}
-                  />
-                );
-              }
-
-              /* ========== RADIO ========== */
-              if (field.uiType === "radio") {
-                return (
-                  <div className="box forInput" key={field.key}>
-                    <label>
-                      {field.label}
-                      {` `}
-                      {field.required ? (
-                        <span className="required">*</span>
-                      ) : (
-                        <span>({t.auth.optional})</span>
-                      )}
-                    </label>
-                    <div className="options-grid flex">
-                      {field.options.map((option) => {
-                        const displayLabel = option.label || option.value;
-                        const isSelected =
-                          dynamicValues[field.key]?.value === option.value;
-
-                        return (
-                          <div
-                            key={option.id || option.value}
-                            className={`option-box small ${
-                              isSelected ? "active" : ""
-                            } ${fieldErrors[field.key] ? "error-border" : ""}`}
-                            onClick={() =>
-                              handleDynamicChange(field.key, option)
-                            }
-                          >
-                            {displayLabel}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {fieldErrors[field.key] && (
-                      <span className="error">
-                        <CircleAlert />
-                        {fieldErrors[field.key]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }
-
-              /* ========== BOOLEAN ========== */
-              if (field.uiType === "boolean") {
-                return (
-                  <div className="box forInput" key={field.key}>
-                    <label>
-                      {field.label}
-                      {` `}
-                      {field.required ? (
-                        <span className="required">*</span>
-                      ) : (
-                        <span>({t.auth.optional})</span>
-                      )}
-                    </label>
-                    <div className="options-grid flex">
-                      {field.options?.map((option) => {
-                        const displayLabel =
-                          option.label || (option.value ? t.ad.yes : t.ad.no);
-                        const isSelected =
-                          dynamicValues[field.key] === option.value;
-
-                        return (
-                          <div
-                            key={option.value.toString()}
-                            className={`option-box small ${
-                              isSelected ? "active" : ""
-                            } ${fieldErrors[field.key] ? "error-border" : ""}`}
-                            onClick={() =>
-                              handleDynamicChange(field.key, option.value)
-                            }
-                          >
-                            {displayLabel}
-                          </div>
-                        );
-                      }) || (
-                        <>
-                          <div
-                            className={`option-box small ${
-                              dynamicValues[field.key] === true ? "active" : ""
-                            }`}
-                            onClick={() => handleDynamicChange(field.key, true)}
-                          >
-                            {t.ad.yes}
-                          </div>
-                          <div
-                            className={`option-box small ${
-                              dynamicValues[field.key] === false ? "active" : ""
-                            }`}
-                            onClick={() =>
-                              handleDynamicChange(field.key, false)
-                            }
-                          >
-                            {t.ad.no}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    {fieldErrors[field.key] && (
-                      <span className="error">
-                        <CircleAlert />
-                        {fieldErrors[field.key]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }
-
-              /* ========== MULTI SELECT ========== */
-              if (field.uiType === "multiSelect") {
-                const selectedValues = dynamicValues[field.key] || [];
-
-                return (
-                  <div className="box forInput" key={field.key}>
-                    <label>
-                      {field.label}
-                      {` `}
-                      {field.required ? (
-                        <span className="required">*</span>
-                      ) : (
-                        <span>({t.auth.optional})</span>
-                      )}
-                    </label>
-                    <div className="options-grid flex">
-                      {field.options.map((option) => {
-                        const displayLabel = option.label || option.value;
-                        const isActive = selectedValues.includes(option.value);
-
-                        return (
-                          <div
-                            key={option.id || option.value}
-                            className={`option-box small ${
-                              isActive ? "active" : ""
-                            } ${fieldErrors[field.key] ? "error-border" : ""}`}
-                            onClick={() => {
-                              if (isActive) {
-                                handleDynamicChange(
-                                  field.key,
-                                  selectedValues.filter(
-                                    (v) => v !== option.value,
-                                  ),
-                                );
-                              } else {
-                                handleDynamicChange(field.key, [
-                                  ...selectedValues,
-                                  option.value,
-                                ]);
-                              }
-                            }}
-                          >
-                            {displayLabel}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {fieldErrors[field.key] && (
-                      <span className="error">
-                        <CircleAlert />
-                        {fieldErrors[field.key]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }
-
-              return null;
-            })}
-
-            <Tags />
-
-            {/* ========== DESCRIPTION ========== */}
+                </div>
+              </div>
+            </div>
             <div className="box forInput">
-              <label>
-                {t.dashboard.forms.description} <span>({t.auth.optional})</span>
-              </label>
+              <label>{t.dashboard.forms.description}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <textarea
-                    value={dynamicValues.description || ""}
-                    onChange={(e) =>
-                      handleDynamicChange("description", e.target.value)
-                    }
+                    {...register("description")}
                     placeholder={t.dashboard.forms.descriptionPlaceholder}
                     rows={4}
                   />
                 </div>
               </div>
             </div>
+            <Tags />
           </>
         )}
 
@@ -951,30 +904,19 @@ export default function CreateAd() {
           <>
             <div className="options-grid verfiyMethod">
               {METHODS.map(({ key, label, icon: Icon }) => {
-                const isDisabled = !availableMethod[key];
-                const isActive = selectedContact[key];
+                const isActive = selectedContactMethods[key];
 
                 return (
                   <div
                     key={key}
                     className={`option-box ${
-                      isDisabled ? "disable" : isActive ? "active" : ""
+                      isActive ? "active" : ""
                     } ${fieldErrors.contact ? "error-border" : ""}`}
                     onClick={() => {
-                      if (isDisabled) return;
-
-                      setSelectedContact((prev) => ({
+                      setSelectedContactMethods((prev) => ({
                         ...prev,
                         [key]: !prev[key],
                       }));
-
-                      if (fieldErrors.contact) {
-                        setFieldErrors((prev) => {
-                          const newErrors = { ...prev };
-                          delete newErrors.contact;
-                          return newErrors;
-                        });
-                      }
                     }}
                   >
                     <Icon className="cat-icon" />
@@ -982,15 +924,15 @@ export default function CreateAd() {
                   </div>
                 );
               })}
+              {fieldErrors.contact && (
+                <div className="box forInput">
+                  <span className="error">
+                    <CircleAlert />
+                    {fieldErrors.contact}
+                  </span>
+                </div>
+              )}
             </div>
-            {fieldErrors.contact && (
-              <div className="box forInput">
-                <span className="error">
-                  <CircleAlert />
-                  {fieldErrors.contact}
-                </span>
-              </div>
-            )}
           </>
         )}
 
@@ -1004,3 +946,107 @@ export default function CreateAd() {
     </div>
   );
 }
+
+// if (field.uiType === "boolean") {
+//   return (
+//     <div className="box forInput" key={field.key}>
+//       <label>
+//         {field.label}
+//         {` `}
+//         {field.required ? (
+//           <span className="required">*</span>
+//         ) : (
+//           <span>({t.auth.optional})</span>
+//         )}
+//       </label>
+//       <div className="options-grid flex">
+//         {field.options?.map((option) => {
+//           const displayLabel =
+//             option.label || (option.value ? t.ad.yes : t.ad.no);
+//           const isSelected =
+//             dynamicValues[field.key] === option.value;
+
+//           return (
+//             <div
+//               key={option.value.toString()}
+//               className={`option-box small ${
+//                 isSelected ? "active" : ""
+//               } ${fieldErrors[field.key] ? "error-border" : ""}`}
+//               onClick={() =>
+//                 handleDynamicChange(field.key, option.value)
+//               }
+//             >
+//               {displayLabel}
+//             </div>
+//           );
+//         }) || (
+//           <>
+//             <div
+//               className={`option-box small ${
+//                 dynamicValues[field.key] === true ? "active" : ""
+//               }`}
+//               onClick={() => handleDynamicChange(field.key, true)}
+//             >
+//               {t.ad.yes}
+//             </div>
+//             <div
+//               className={`option-box small ${
+//                 dynamicValues[field.key] === false ? "active" : ""
+//               }`}
+//               onClick={() =>
+//                 handleDynamicChange(field.key, false)
+//               }
+//             >
+//               {t.ad.no}
+//             </div>
+//           </>
+//         )}
+//       </div>
+//       {fieldErrors[field.key] && (
+//         <span className="error">
+//           <CircleAlert />
+//           {fieldErrors[field.key]}
+//         </span>
+//       )}
+//     </div>
+//   );
+// }
+
+//                   <div className="box forInput" key={field.key}>
+//       <label>
+//         {field.label}
+//         {` `}
+//         {field.required ? (
+//           <span className="required">*</span>
+//         ) : (
+//           <span>({t.auth.optional})</span>
+//         )}
+//       </label>
+//       <div className="options-grid flex">
+//         {field.options.map((option) => {
+//           const displayLabel = option.label || option.value;
+//           const isSelected =
+//             dynamicValues[field.key]?.value === option.value;
+
+//           return (
+//             <div
+//               key={option.id || option.value}
+//               className={`option-box small ${
+//                 isSelected ? "active" : ""
+//               } ${fieldErrors[field.key] ? "error-border" : ""}`}
+//               onClick={() =>
+//                 handleDynamicChange(field.key, option)
+//               }
+//             >
+//               {displayLabel}
+//             </div>
+//           );
+//         })}
+//       </div>
+//       {fieldErrors[field.key] && (
+//         <span className="error">
+//           <CircleAlert />
+//           {fieldErrors[field.key]}
+//         </span>
+//       )}
+//     </div>

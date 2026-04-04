@@ -4,9 +4,6 @@ import { useParams } from "next/navigation";
 import "@/styles/client/pages/singel-details.css";
 import Image from "next/image";
 import Link from "next/link";
-import { IoLocationOutline } from "react-icons/io5";
-import { FaCircleCheck } from "react-icons/fa6";
-import Rating from "@mui/material/Rating";
 import Navigations from "@/components/Tools/Navigations";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { TbBrandWhatsappFilled } from "react-icons/tb";
@@ -19,32 +16,23 @@ import {
   FaAngleRight,
   FaAngleLeft,
   FaArrowRight,
-  FaWhatsapp,
   FaRegHeart,
   FaPhone,
   FaEye,
 } from "react-icons/fa";
+
 import useTranslate from "@/Contexts/useTranslation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import {
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-  ads,
-} from "@/data";
-import { FiShare2 } from "react-icons/fi";
 
-import { FiPhone } from "react-icons/fi";
+import { FiShare2 } from "react-icons/fi";
 
 import { settings } from "@/Contexts/settings";
 import { formatCurrency } from "@/utils/formatCurrency";
 import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 import { specsConfig } from "@/Contexts/specsConfig";
-import BookingCalendar from "@/components/Tools/data-collector/BookingCalendar";
 import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
 export default function AdDetails() {
@@ -75,7 +63,7 @@ export default function AdDetails() {
     screenSize === "ultra-small" ? 4 : screenSize === "small" ? 5 : 6;
   const space = screenSize === "large" ? 7 : 6;
 
-  const showThumbNav = ad?.images?.length > slidesView;
+  const showThumbNav = ad?.image?.length > slidesView;
 
   const bookedRanges = [
     { start: "2026-02-10", end: "2026-02-12" },
@@ -100,20 +88,23 @@ export default function AdDetails() {
   const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return "";
 
-    let cleaned = phone.replace(/\D/g, ""); // نشيل أي حاجة مش رقم
-
-    // لو الرقم 10 أرقام وبيبدأ بـ 0 → مصري
+    let cleaned = phone.replace(/\D/g, "");
     if (cleaned.startsWith("0")) {
       cleaned = "20" + cleaned.slice(1);
     }
 
-    // لو بيبدأ بـ +20 (اتشالت الـ +)
     if (cleaned.startsWith("20")) {
       return cleaned;
     }
-
     return cleaned;
   };
+
+  const locationParts = [
+    ad?.area?.[`name_${locale}`],
+    ad?.city?.[`name_${locale}`],
+    ad?.governorate?.[`name_${locale}`],
+    ad?.compound?.[`name_${locale}`],
+  ].filter(Boolean);
   return (
     <>
       <div className="single-page container for-product">
@@ -135,23 +126,23 @@ export default function AdDetails() {
 
         <div className="holder big-holder">
           <div className="images-holder">
-            {ad?.images?.[currentImg] && (
+            {ad?.image?.[currentImg] && (
               <div className="img">
                 <Image
                   className="main-img"
                   fill
-                  src={ad?.images[currentImg]?.secure_url}
+                  src={ad?.image[currentImg]?.secure_url}
                   alt={ad.title}
                 />
                 <Image
                   className="back-img"
-                  src={ad?.images[currentImg]?.secure_url}
+                  src={ad?.image[currentImg]?.secure_url}
                   alt={ad?.title}
                   fill
                 />
               </div>
             )}
-            {ad?.images?.length > 1 && (
+            {ad?.image?.length > 1 && (
               <div
                 className={`imgs-swiper-wrapper ${screenSize == "large" ? "vertical" : "horizontal"}`}
               >
@@ -178,7 +169,7 @@ export default function AdDetails() {
                   }
                   className="imgs-swiper"
                 >
-                  {ad?.images?.map((x, index) => (
+                  {ad?.image?.map((x, index) => (
                     <SwiperSlide key={index}>
                       <div
                         className={`img ${index === currentImg ? "active" : ""}`}
@@ -211,15 +202,30 @@ export default function AdDetails() {
                   <h3>{ad?.title}</h3>
                   {!screenSize.includes("small") && (
                     <div className="btns">
-                      <FiShare2 /> <FaRegHeart />
+                      <FiShare2 />{" "}
+                      {ad?.isFavorite ? <FaHeart /> : <FaRegHeart />}
                     </div>
                   )}
                 </div>
                 <div className="row">
-                  <h5 className="price">
-                    {formatCurrency(ad?.rent_amount, ad?.rent_currency, locale)}{" "}
-                    / {ad?.rent_frequency}
-                  </h5>
+                  <div className="column-holder">
+                    <h5 className="price">
+                      {formatCurrency(
+                        ad?.rent_amount,
+                        ad?.rent_currency,
+                        locale,
+                      )}
+                      / {ad?.rent_frequency}
+                    </h5>
+                    <h6 className="price-dep">
+                      {t.ad.deposit}:{" "}
+                      {formatCurrency(
+                        ad?.deposit_amount,
+                        ad?.rent_currency,
+                        locale,
+                      )}
+                    </h6>
+                  </div>
                   <div className="row stats">
                     <span>
                       <FaEye /> {ad?.views_count}
@@ -232,12 +238,11 @@ export default function AdDetails() {
 
                 <div className="row">
                   <div className="area">
-                    <FaLocationDot /> {ad?.governorate?.[`name_${locale}`]},
-                    {` `}
-                    {ad?.city?.[`name_${locale}`]}
+                    <FaLocationDot />
+                    <span>{locationParts.join("، ")}</span>
                   </div>
                   <p className="time">
-                    uploaded since:{" "}
+                    {t.dashboard.tables.published_at}:{" "}
                     {formatRelativeDate(ad?.created_at, locale)}{" "}
                   </p>
                 </div>
@@ -248,8 +253,45 @@ export default function AdDetails() {
                   </div>
                 )}
               </div>
+
+              <div className="specifecs card">
+                <h4>{t.ad.specifecs}</h4>
+                <ul>
+                  {Object.entries(ad?.details || {}).map(([key, value]) => {
+                    const config = getSpecConfig(key);
+                    const Icon = config?.icon;
+
+                    return (
+                      <li key={key} className="spec-item">
+                        {/* الأيقونة تظهر بس لو موجودة */}
+                        {Icon && <Icon className="spec-icon" />}
+
+                        <span className="spec-key">{config?.label ?? key}</span>
+
+                        <span className="spec-value">
+                          : {value}
+                          {config?.suffix && ` ${config.suffix}`}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              <div className="amenities card">
+                <h4>{t.ad.amenities}</h4>
+                <ul>
+                  {Object.entries(ad?.amenities || {})
+                    .filter(([_, value]) => value) // بس اللي قيمته true
+                    .map(([key]) => (
+                      <li className="amenitie-item" key={key}>
+                        {key}
+                      </li>
+                    ))}
+                </ul>
+              </div>
               <div className="card rent-details">
-                <h4>conditions</h4>
+                <h4>{t.ad.conditions}</h4>
                 <ul className="list">
                   {ad?.deposit_amount && (
                     <li>
@@ -280,41 +322,6 @@ export default function AdDetails() {
                       {t.ad.max_children || "max children"}: {ad.child_no_max}
                     </li>
                   )}
-                </ul>
-              </div>
-              <div className="specifecs card">
-                <h4>{t.ad.specifecs}</h4>
-                <ul>
-                  {Object.entries(ad?.details || {}).map(([key, value]) => {
-                    const config = getSpecConfig(key);
-                    const Icon = config?.icon;
-
-                    return (
-                      <li key={key} className="spec-item">
-                        {/* الأيقونة تظهر بس لو موجودة */}
-                        {Icon && <Icon className="spec-icon" />}
-
-                        <span className="spec-key">{config?.label ?? key}</span>
-
-                        <span className="spec-value">
-                          : {value}
-                          {config?.suffix && ` ${config.suffix}`}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-              <div className="amenities card">
-                <h4>{t.ad.amenities}</h4>
-                <ul>
-                  {Object.entries(ad?.amenities || {})
-                    .filter(([_, value]) => value) // بس اللي قيمته true
-                    .map(([key]) => (
-                      <li className="amenitie-item" key={key}>
-                        {key}
-                      </li>
-                    ))}
                 </ul>
               </div>
               <div className="description card">

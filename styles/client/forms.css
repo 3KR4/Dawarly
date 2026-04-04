@@ -43,7 +43,7 @@ body:has(.form-holder.register) {
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  width: 600px;
+    width: 820px;
   max-width: 95%;
   height: fit-content;
   padding: 20px 26px;
@@ -62,7 +62,7 @@ body:has(.form-holder.register) {
 .form-holder form .row-holder {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 7px;
 }
 .form-holder form .row-holder .left {
   display: flex;

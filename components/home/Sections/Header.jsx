@@ -175,13 +175,13 @@ function Header() {
                             </Link>
                           </li>
                           <li>
-                            <Link href={`/createAd`} className="btn">
+                            <Link href={`/mylisting/createAd`} className="btn">
                               <MdPostAdd style={{ fontSize: "17px" }} />
                               {t.actions.postAd}
                             </Link>
                           </li>
                           <li>
-                            <Link href={`/mylisting/${user?.id}`} className="btn">
+                            <Link href={`/mylisting/`} className="btn">
                               <FaListUl />
                               {t.actions.viewAdsListing}
                             </Link>

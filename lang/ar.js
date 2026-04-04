@@ -93,10 +93,14 @@ const ar = {
     month: "شهر",
     rentPrice: "سعر الإيجار",
     rentPricePlaceholder: "مثال: 1500",
+    deposit: "التأمين",
+
     deposit_amount: "التأمين المدفوع",
     deposit_amount_Placeholder: "مثال: 5000",
 
     // Property details
+    conditions: "الشروط",
+
     bedrooms: "عدد غرف النوم",
     bedroomsPlaceholder: "عدد غرف النوم",
     bathrooms: "عدد دورات المياه",
@@ -351,6 +355,8 @@ const ar = {
       location: "الموقع",
       property_details: "تفاصيل العقار",
       pricing_details: "تفاصيل التسعير",
+      guest_capacity: "سعت الضيوف",
+
       actions: "الاجرائات",
       slide_details: "تفاصيل الشريحة",
       link: "الرابط",

@@ -175,7 +175,7 @@ export default function MyAdsListing() {
           </span>
         </div>
         <Link
-          href="/createAd"
+          href="/mylisting/createAd"
           className="main-button"
           style={{ height: "35px" }}
         >

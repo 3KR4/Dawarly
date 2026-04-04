@@ -122,10 +122,15 @@ export default function AdForm({ type = "client", adId }) {
   };
   const fetchAdmins = async () => {
     try {
-      const res = await getAllUsers("ADMIN", "CHANGE_ADS_STATUS", 1, 10000);
+      const res = await getAllUsers("", "ADMIN", "CHANGE_ADS_STATUS", 1, 10000);
       const admins = res?.data.users;
       if (!admins) return alert(t.ad.fetch_error);
-      setAllAdmins(admins);
+
+      const userExists = admins.some((admin) => admin.id === user.id);
+
+      const updatedAdmins = userExists ? admins : [...admins, user];
+
+      setAllAdmins(updatedAdmins);
     } catch (error) {
       console.log(error);
 

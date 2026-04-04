@@ -98,10 +98,12 @@ const en = {
     month: "Month",
     rentPrice: "Rent amount",
     rentPricePlaceholder: "e.g. 1500",
+    deposit: "Deposit",
     deposit_amount: "Deposit Amount",
     deposit_amount_Placeholder: "e.g. 5000",
 
     // Property details
+    conditions: "conditions",
     bedrooms: "Bedrooms",
     bedroomsPlaceholder: "Number of bedrooms",
     bathrooms: "Bathrooms",
@@ -348,6 +350,7 @@ const en = {
       location: "Location",
       property_details: "Property Details",
       pricing_details: "Pricing Details",
+      guest_capacity: "Guest Capacity",
       actions: "actions",
       slide_details: "slide details",
       link: "link",
