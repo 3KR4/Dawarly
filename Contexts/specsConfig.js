@@ -6,7 +6,6 @@ import { RiStairsLine } from "react-icons/ri";
 export const specsConfig = {
   bedrooms: { icon: MdOutlineKingBed, showInMini: true },
   bathrooms: { icon: PiBathtubBold, showInMini: true },
-  area: { icon: TbMeterSquare, label: "area", showInMini: true },
   level: { icon: RiStairsLine },
 
   // battery_health: {

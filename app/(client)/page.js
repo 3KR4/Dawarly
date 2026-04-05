@@ -12,7 +12,12 @@ export default function Home() {
       <SearchSection />
       <CategoriesSwiper type={`cat`} />
       {/* <CategoriesSwiper type={`sub-cat`} catId={3} /> */}
-      <AdsSwiper type={`newly_added`} />
+
+
+      <AdsSwiper type={`governorate`} id={1} />
+
+
+      {/* <AdsSwiper type={`newly_added`} />
       <AdsSwiper type={`cat`} id={1} />
       <AdsSwiper type={`cat`} id={2} />
       <AdsSwiper type={`cat`} id={3} />
@@ -23,7 +28,7 @@ export default function Home() {
       <AdsSwiper type={`cat`} id={9} />
       <AdsSwiper type={`cat`} id={10} />
       <AdsSwiper type={`cat`} id={11} />
-      <AdsSwiper type={`cat`} id={12} />
+      <AdsSwiper type={`cat`} id={12} /> */}
       {/* <AdsSwiper type={`sub-cat`} id={11} />
       <AdsSwiper type={`sub-cat`} id={14} />
       <AdsSwiper type={`sub-cat`} id={21} /> */}

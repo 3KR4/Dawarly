@@ -152,7 +152,7 @@
   align-items: center;
   padding: 14px;
   display: flex;
-  gap: 4px;
+  gap: 25px;
 }
 .ad-card .date-area:empty {
   display: none;

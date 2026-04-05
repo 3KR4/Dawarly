@@ -49,7 +49,7 @@ export const ENDPOINTS = {
   // },
 
   ADS: {
-    GET_BY_SUB: (cat, subId) => `/${cat}/subCategory/${subId}`,
+    GET_SECTIONS_ADS: (type, id, page, limit) => `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
     GET_ALL: () => `/ads/all`,
     GET_ONE_AD: (id) => `/ads/${id}`,
     GET_USER_ADS: (id, status, search, page, limit) => {

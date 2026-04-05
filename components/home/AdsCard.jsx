@@ -12,11 +12,12 @@ import useTranslate from "@/Contexts/useTranslation";
 import { specsConfig } from "@/Contexts/specsConfig";
 import { subcategoriesEn, subcategoriesAr } from "@/data";
 import { FaEye } from "react-icons/fa";
+import { RentFrequencies } from "@/data/enums";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
-  const [isFavorite, setIsFavorite] = useState(data?.id == 102);
+  const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
 
   const arabic = isArabic(data?.title);
 
@@ -38,33 +39,26 @@ export default function CardItem({ data }) {
 
   const [subcategories, setSubcategories] = useState([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
-    };
-    fetchCategories();
-  }, [locale]);
-
-  const adSubCat = subcategories?.find((x) => x.id == data?.sub_category);
   const getSpecConfig = (key) => specsConfig[key];
-
+  const locationParts = [
+    data?.area?.[`name_${locale}`],
+    data?.city?.[`name_${locale}`],
+    data?.governorate?.[`name_${locale}`],
+    data?.compound?.[`name_${locale}`],
+  ].filter(Boolean);
   return (
     <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
-        <Image className="main" fill src={data?.images[0]} alt={data?.title} />
+        <Image
+          className="main"
+          fill
+          src={data?.image[0]?.secure_url}
+          alt={data?.title}
+        />
         <Image
           className="cover"
           fill
-          src={data?.images[0]}
+          src={data?.image[0]?.secure_url}
           alt={`${data?.title}-cover`}
         />
         <div className="top">
@@ -75,6 +69,7 @@ export default function CardItem({ data }) {
               isFavorite ? "Remove from favorites" : "Add to favorites"
             }
           >
+            {data?.favoritesCount > 0 && data?.favoritesCount}
             {isFavorite ? <FaHeart /> : <FaRegHeart />}
           </button>
         </div>
@@ -88,18 +83,23 @@ export default function CardItem({ data }) {
             {data?.title}
           </h4>
           <Link
-            href={`/market?subcat=${adSubCat?.id}`}
+            href={`/market?subcat=${data?.SubCategories?.id}`}
             className={`category ellipsis`}
           >
-            {adSubCat?.name?.endsWith("s")
-              ? adSubCat.name.slice(0, -1)
-              : adSubCat?.name}
+            {data?.SubCategories?.[`name_${locale}`]}
           </Link>
         </div>
         <div className="row-holder">
-          <h3>{formatCurrency(data?.price, "EGP", locale)}</h3>
-          <span className={`status`}>{data?.status}</span>
-          <span className={`condition`}>{data?.condition}</span>
+          <h3>
+            {formatCurrency(data?.rent_amount, data?.rent_currency, locale)}
+          </h3>
+          <span className={`status`}>
+            {
+              RentFrequencies.find((x) => x.id == data?.rent_frequency)?.[
+                `name_${locale}`
+              ]
+            }
+          </span>
         </div>
       </div>
       <div className="date-area">
@@ -128,11 +128,9 @@ export default function CardItem({ data }) {
       </div>
 
       <div className="date-area">
-        <p className="area">
-          {data?.area.governorate[locale]}, {data?.area.city[locale]}
-        </p>
-        <p className="date">
-          {formatRelativeDate(data?.creation_date, locale)}
+        <p className="area ellipsis">{locationParts.join("، ")}</p>
+        <p className="date" style={{ minWidth: "max-content" }}>
+          {formatRelativeDate(data?.created_at, locale)}
         </p>
       </div>
     </Link>
