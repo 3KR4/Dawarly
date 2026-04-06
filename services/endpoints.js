@@ -49,7 +49,8 @@ export const ENDPOINTS = {
   // },
 
   ADS: {
-    GET_SECTIONS_ADS: (type, id, page, limit) => `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
+    GET_SECTIONS_ADS: (type, id, page, limit) =>
+      `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
     GET_ALL: () => `/ads/all`,
     GET_ONE_AD: (id) => `/ads/${id}`,
     GET_USER_ADS: (id, status, search, page, limit) => {
@@ -67,6 +68,10 @@ export const ENDPOINTS = {
     DELETE: (id) => `/ads/delete/${id}`,
     ASSIGN_ADMIN: (ad) => `/ads/assign-admin/${ad}`,
     SHANGE_STATUS: (ad) => `/ads/update/${ad}/status`,
+  },
+  FAVORITES: {
+    TOGGLE_FAVORITES: (id) => `/favorites/${id}`,
+    GET_FAVORITES: (page, limit) => `/favorites?page=${page}&limit=${limit}`,
   },
   IMAGES: {
     ADD: (entity_type, entity_id) => `/images/${entity_type}/${entity_id}`,

@@ -226,7 +226,6 @@ export default function MyAdsListing() {
         removeAd={handleDeleteAd}
         changeStatus={handelChangeStatus}
         activeAds={false}
-        limit={adsData?.pagination.limit}
         page={`user`}
         statusChanger={"client"}
       />

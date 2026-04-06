@@ -68,8 +68,13 @@ export const ImageEntityTypes = [
 ];
 
 export const AdStatuses = [
-  { id: "PENDING", name_en: "Pending", name_ar: "قيد المراجعة", bg: "#FFF4E5", tx: "#F59E0B" },
-
+  {
+    id: "PENDING",
+    name_en: "Pending",
+    name_ar: "قيد المراجعة",
+    bg: "#FFF4E5",
+    tx: "#F59E0B",
+  },
   {
     id: "ACTIVE",
     name_en: "Active",
@@ -83,20 +88,6 @@ export const AdStatuses = [
     name_ar: "مرفوض",
     bg: "#FDECEA",
     tx: "#D93025",
-  },
-  {
-    id: "SOLD",
-    name_en: "Sold",
-    name_ar: "تم البيع",
-    bg: "#F3E8FF",
-    tx: "#7E22CE",
-  },
-  {
-    id: "BOOKED",
-    name_en: "Booked",
-    name_ar: "محجوز",
-    bg: "#E8F0FE",
-    tx: "#1A73E8",
   },
   {
     id: "DISABLED",

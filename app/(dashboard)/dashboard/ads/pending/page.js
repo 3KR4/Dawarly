@@ -134,8 +134,7 @@ export default function ActiveAds() {
         removeAd={handleDeleteAd}
         changeStatus={handelChangeStatus}
         activeAds={false}
-        limit={adsData?.pagination.limit}
-        statusChanger={"admin"}
+        statusChanger={"aprover"}
       />
 
       {/* ================= PAGINATION ================= */}
@@ -151,3 +150,24 @@ export default function ActiveAds() {
     </div>
   );
 }
+
+
+
+      // <AdsTable
+      //   activeAds={true}
+      //   statusChanger={"admin"}
+
+      // />
+
+
+      // <AdsTable
+      //   changeStatus={handelChangeStatus}
+      //   activeAds={false}
+      //   statusChanger={"client"}
+      // />
+
+      // <AdsTable
+      //   changeStatus={handelChangeStatus}
+      //   activeAds={false}
+      //   statusChanger={"admin"}
+      // />;

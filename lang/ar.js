@@ -7,13 +7,13 @@ const ar = {
   },
   home: {
     home: "الصفحة الرئيسية",
-
     seeMore: "رؤية المزيد",
     categories: "الفئات",
     subCategories: "الفئات الفرعية",
     browseCategories: "تصفح التصنيفات",
     browseSubCategories: "اختر من التصنيفات الفرعية",
     newly_added: "المضاف حديثا",
+    PropertiesIn : "العقارات في",
   },
   market: {
     all_ads: "كل الاعلانات",

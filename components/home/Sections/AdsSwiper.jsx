@@ -14,132 +14,119 @@ import AdsCard from "@/components/home/AdsCard";
 import useTranslate from "@/Contexts/useTranslation";
 import { getSectionsAds } from "@/services/ads/ads.service";
 
-export default function AdsSwiper({ type, id }) {
+export default function AdsSwiper({ type, value }) {
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
+  const id = value?.id;
+  const swiperRef = useRef(null);
 
   // ================= STATES =================
   const [ads, setAds] = useState([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 6,
-    count: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(6);
+  const [total, setTotal] = useState(0);
 
-  const page = 1;
-  const limit = 6;
+  const [loading, setLoading] = useState(false);
 
-  // ================= FETCH =================
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        setLoading(true);
-
-        const res = await getSectionsAds(type, id, page, limit);
-
-        setAds(res.data?.data || []);
-        setPagination(res.data?.pagination || {});
-      } catch (err) {
-        console.error("Fetch Ads Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAds();
-  }, [type, id]);
-
-  // ================= SWIPER =================
-  const swiperRef = useRef(null);
-
-  const TOTAL_ADS = ads.length;
-
-  const [visibleCount, setVisibleCount] = useState(8);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [slidesPerView, setSlidesPerView] = useState(4);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
 
+  // ================= BREAKPOINT =================
   const breakpoints = {
-    0: { slidesPerView: 1.4, slidesPerGroup: 1, spaceBetween: 8 },
-    500: { slidesPerView: 1.5, slidesPerGroup: 1, spaceBetween: 8 },
-    620: { slidesPerView: 2.2, slidesPerGroup: 1, spaceBetween: 10 },
-    768: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 10 },
-    1000: { slidesPerView: 3, slidesPerGroup: 2, spaceBetween: 12 },
-    1350: { slidesPerView: 4, slidesPerGroup: 2, spaceBetween: 12 },
+    0: { slidesPerView: 1.4 },
+    500: { slidesPerView: 1.5 },
+    620: { slidesPerView: 2.2 },
+    768: { slidesPerView: 2 },
+    1000: { slidesPerView: 3 },
+    1350: { slidesPerView: 4 },
   };
 
   const maxSlides = Math.max(
-    ...Object.values(breakpoints).map((b) => b.slidesPerView)
+    ...Object.values(breakpoints).map((b) => b.slidesPerView),
   );
 
-  const showNav =
-    ads.length > maxSlides &&
-    !screenSize.includes("small") &&
-    screenSize !== "xs";
+  // ================= HELPERS =================
+  const hasMore = ads.length < total;
 
-  // ================= LOAD MORE =================
-  const handleSlideChange = (swiper) => {
-    const currentSlidesPerView = swiper.params.slidesPerView || 4;
+  // ================= FETCH =================
+  const fetchAds = async (newPage = 1, append = false) => {
+    try {
+      setLoading(true);
 
-    setSlidesPerView(currentSlidesPerView);
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
+      const res = await getSectionsAds(type, id, newPage, limit);
+      const newAds = res.data.data || [];
 
-    const currentIndex = swiper.activeIndex + 1;
-    setActiveIndex(currentIndex);
+      setAds((prev) => {
+        const updated = append ? [...prev, ...newAds] : newAds;
 
-    const remaining = visibleCount - currentIndex;
+        // 🔥 مهم جداً عشان Swiper يعرف إن في slides جديدة
+        setTimeout(() => {
+          swiperRef.current?.update();
+        }, 0);
 
-    if (remaining <= 2 && visibleCount < TOTAL_ADS) {
-      setVisibleCount((prev) =>
-        Math.min(prev + 3, TOTAL_ADS)
-      );
+        return updated;
+      });
+
+      setTotal(res.data.pagination?.total || 0);
+      setPage(newPage);
+    } catch (err) {
+      console.error("Fetch Ads Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // ================= INITIAL LOAD =================
+  useEffect(() => {
+    setAds([]);
+    setPage(1);
+    setTotal(0);
+    fetchAds(1, false);
+  }, [type, id]);
+
+  // ================= SWIPER =================
   const handleSwiperInit = (swiper) => {
     swiperRef.current = swiper;
     setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
+    setIsEnd(swiper.isEnd && !hasMore);
+  };
+  useEffect(() => {
+    if (swiperRef.current) {
+      swiperRef.current.update(); // مهم عشان Swiper يعرف عدد slides الجديد
+      setIsBeginning(swiperRef.current.isBeginning);
+      setIsEnd(swiperRef.current.isEnd && !hasMore);
+    }
+  }, [ads, hasMore]);
+  const handleSlideChange = (swiper) => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd && !hasMore);
+
+    // 🔥 load more لما نقرب من الآخر
+    if (
+      swiper.activeIndex + swiper.params.slidesPerView >= ads.length - 1 &&
+      hasMore &&
+      !loading
+    ) {
+      fetchAds(page + 1, true);
+    }
   };
 
-  // ================= RESPONSIVE =================
-  useEffect(() => {
-    let initial = 8;
-
-    if (screenSize === "large") initial = 8;
-    else if (screenSize === "med") initial = 6;
-    else initial = 4;
-
-    setVisibleCount(Math.min(initial, TOTAL_ADS));
-
-    if (swiperRef.current) {
-      swiperRef.current.slideTo(0, 0);
-    }
-  }, [screenSize, TOTAL_ADS, type, id]);
+  // ================= NAVIGATION =================
+  const showNav =
+    total > maxSlides && !screenSize.includes("small") && screenSize !== "xs";
 
   // ================= LOADING =================
-  if (loading) {
+  if (ads.length === 0 && loading) {
     return <p style={{ padding: "20px" }}>Loading...</p>;
-  }
-
-  // ================= EMPTY =================
-  if (TOTAL_ADS === 0) {
-    return (
-      <div className="swiper-section for-ads container">
-        <h3>{type}</h3>
-        <p>{t.home.noAdsFound}</p>
-      </div>
-    );
   }
 
   // ================= UI =================
   return (
     <div className="swiper-section for-ads container">
       <div className="top">
-        <h3 className="title">{type}</h3>
+        <h3 className="title">
+          {t.home.PropertiesIn} {value?.[`name_${locale}`]}
+        </h3>
 
         {showNav && (
           <Link
@@ -147,8 +134,8 @@ export default function AdsSwiper({ type, id }) {
               type === "cat"
                 ? `/category/${id}`
                 : type === "sub-cat"
-                ? `/category?subcat=${id}`
-                : "/ads"
+                  ? `/category?subcat=${id}`
+                  : "/ads"
             }
             className="link"
           >
@@ -176,8 +163,9 @@ export default function AdsSwiper({ type, id }) {
           onSlideChange={handleSlideChange}
           dir={locale === "ar" ? "rtl" : "ltr"}
           breakpoints={breakpoints}
+          spaceBetween={10}
         >
-          {ads.slice(0, visibleCount).map((ad) => (
+          {ads.map((ad) => (
             <SwiperSlide key={ad.id}>
               <AdsCard data={ad} />
             </SwiperSlide>

@@ -83,16 +83,13 @@ export default function ActiveAds() {
         message: "Ad deleted successfully ✅",
       });
 
-      // 1️⃣ نحسب كم عنصر باقي بعد الحذف
       const remainingItems = adsData.ads.length - 1;
 
-      // 2️⃣ نقرر الصفحة الجديدة
       const newPage =
         remainingItems === 0 && adsData.pagination.page > 1
           ? adsData.pagination.page - 1
           : adsData.pagination.page;
 
-      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
       fetchAds(newPage);
     } catch (error) {
       console.error(error);
@@ -179,9 +176,7 @@ export default function ActiveAds() {
         loadingContent={loadingContent}
         removeAd={handleDeleteAd}
         activeAds={true}
-        limit={adsData?.pagination.limit}
         statusChanger={"admin"}
-
       />
 
       {/* ================= PAGINATION ================= */}

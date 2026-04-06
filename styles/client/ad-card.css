@@ -36,9 +36,13 @@
 }
 .ad-card .image-holder .top .fav-btn {
   background: #fff;
-  border-radius: 51%;
-  width: 33px;
+  border-radius: 30px;
+  width: fit-content;
   height: 33px;
+  padding: 0 8px;
+  font-weight: 800;
+  color: var(--main-color);
+  gap: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,8 +67,18 @@
 .ad-card .image-holder .top .fav-btn:not(.active):hover {
   background: var(--main-color);
 }
-.ad-card .image-holder .top .fav-btn:not(.active):hover svg {
+.ad-card .image-holder .top .fav-btn:not(.active):hover svg,
+.ad-card .image-holder .top .fav-btn:not(.active):hover {
   color: white;
+}
+.ad-card .image-holder .top .fav-btn:not(.active):hover .loader {
+  border-color: white !important;
+  border-bottom-color: #0000 !important;
+
+}
+.ad-card .image-holder .top button:hover .loader {
+  border-color: var(--main-color) !important;
+  border-bottom-color: #0000 !important;
 }
 .ad-card:hover .image-holder .top .fav-btn {
   transform: translateY(0px);

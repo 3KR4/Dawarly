@@ -16,6 +16,7 @@ const en = {
     browseCategories: "browse categories",
     browseSubCategories: "browse subcategories",
     newly_added: "Newly added",
+    PropertiesIn: "Properties In",
   },
   market: {
     all_ads: "all ads",

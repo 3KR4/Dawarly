@@ -33,9 +33,11 @@ export default function AdsTable({
   const { addNotification } = useNotification();
 
   const filteredStatuses = AdStatuses.filter((status) =>
-    statusChanger !== "admin"
-      ? status.id !== "PENDING" && status.id !== "REJECTED"
-      : status.id === "PENDING" || status.id === "REJECTED",
+    statusChanger == "client"
+      ? status.id === "ACTIVE" && status.id !== "DISABLED"
+      : statusChanger == "admin"
+        ? status.id !== "PENDING"
+        : status.id === "ACTIVE" || status.id === "REJECTED",
   );
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
@@ -59,13 +61,12 @@ export default function AdsTable({
                   ? t.dashboard.tables.created_at
                   : t.dashboard.tables.published_at}
               </div>
-              <div className="header-item">{t.dashboard.tables.status}</div>
-
               {activeAds && (
                 <>
                   <div className="header-item">{t.dashboard.tables.reach}</div>
                 </>
               )}
+              <div className="header-item">{t.dashboard.tables.status}</div>
 
               <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
@@ -216,48 +217,28 @@ export default function AdsTable({
                     {formatRelativeDate(item?.created_at, locale, "detailed")}
                   </p>
                   {activeAds && (
-                    <div className="item-overview onlyOne">
-                      <h4
-                        style={{
-                          background: AdStatuses.find(
-                            (x) => x.id == item?.status,
-                          )?.bg,
-                          color: AdStatuses.find((x) => x.id == item?.status)
-                            ?.tx,
-                        }}
-                      >
-                        {item?.status}
+                    <div className="item-overview">
+                      <h4>
+                        {item?.views_count} <FaEye />
+                      </h4>
+                      <h4 className="green">
+                        {item?.reach_count} <BiSolidPurchaseTagAlt />
                       </h4>
                     </div>
                   )}
-                  {page === "user" || !activeAds ? (
-                    <div
-                      className="item-status"
-                    >
-                      <SelectOptions
-                        size="ultra-small"
-                        options={filteredStatuses}
-                        value={curentStatus}
-                        disabled={page === "user" && curentStatus.id == "PENDING"}
-                        hiddenIco={page === "user" && curentStatus.id == "PENDING"}
-                        locale={locale}
-                        onChange={(selected) =>
-                          changeStatus(item?.id, selected)
-                        }
-                      />
-                    </div>
-                  ) : (
-                    activeAds && (
-                      <div className="item-overview">
-                        <h4>
-                          {151} <FaEye />
-                        </h4>
-                        <h4 className="green">
-                          {50505} <BiSolidPurchaseTagAlt />
-                        </h4>
-                      </div>
-                    )
-                  )}
+                  <div className="item-status">
+                    <SelectOptions
+                      size="ultra-small"
+                      options={filteredStatuses}
+                      value={curentStatus}
+                      disabled={page === "user" && curentStatus.id == "PENDING"}
+                      hiddenIco={
+                        page === "user" && curentStatus.id == "PENDING"
+                      }
+                      locale={locale}
+                      onChange={(selected) => changeStatus(item?.id, selected)}
+                    />
+                  </div>
 
                   <div className="actions">
                     <Link href={`/market/${item?.id}`}>

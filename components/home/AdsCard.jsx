@@ -13,31 +13,42 @@ import { specsConfig } from "@/Contexts/specsConfig";
 import { subcategoriesEn, subcategoriesAr } from "@/data";
 import { FaEye } from "react-icons/fa";
 import { RentFrequencies } from "@/data/enums";
+import { toggleFavorite } from "@/services/favorites/favorites.service";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
   const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
+  const [favoritesCount, setFavoritesCount] = useState(
+    data?.favoritesCount || 0,
+  );
+  const [loading, setLoading] = useState(false);
 
   const arabic = isArabic(data?.title);
 
-  const handleFavoriteClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleFavoriteClick = async (id) => {
+    if (loading) return; // يمنع spam
+    setLoading(true);
+    const wasFavorite = isFavorite;
 
-    setIsFavorite(!isFavorite);
+    try {
+      await toggleFavorite(id);
+      setIsFavorite(!wasFavorite);
+      setFavoritesCount((prev) =>
+        wasFavorite ? Math.max(prev - 1, 0) : prev + 1,
+      );
+    } catch (err) {
+      console.error("toggleFavorite err", err);
 
-    // API call example:
-    // fetch(`/api/favorites/${data?.id}`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ isFavorite: !isFavorite })
-    // })
+      // ❌ rollback لو فشل
+      setIsFavorite(wasFavorite);
+      setFavoritesCount((prev) =>
+        wasFavorite ? prev + 1 : Math.max(prev - 1, 0),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const [subcategories, setSubcategories] = useState([]);
 
   const getSpecConfig = (key) => specsConfig[key];
   const locationParts = [
@@ -63,14 +74,26 @@ export default function CardItem({ data }) {
         />
         <div className="top">
           <button
-            className={`fav-btn ${isFavorite ? "active" : ""}`}
-            onClick={handleFavoriteClick}
+            className={`fav-btn ${isFavorite || favoritesCount > 0 ? "active" : ""}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleFavoriteClick(data?.id);
+            }}
             aria-label={
               isFavorite ? "Remove from favorites" : "Add to favorites"
             }
           >
-            {data?.favoritesCount > 0 && data?.favoritesCount}
-            {isFavorite ? <FaHeart /> : <FaRegHeart />}
+            {loading ? (
+              <span className="loader"></span>
+            ) : isFavorite ? (
+              <FaHeart />
+            ) : (
+              <FaRegHeart />
+            )}
+            {favoritesCount > 0 && (
+              <span className="count">{favoritesCount}</span>
+            )}
           </button>
         </div>
       </div>
@@ -103,7 +126,7 @@ export default function CardItem({ data }) {
         </div>
       </div>
       <div className="date-area">
-        {Object.entries(data?.specifecs || {})
+        {Object.entries(data?.details || {})
           .filter(([key]) => {
             const config = getSpecConfig(key);
             return config?.showInMini;

@@ -1,20 +1,15 @@
 "use client";
-import Rating from "@mui/material/Rating";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { formatCurrency } from "@/utils/formatCurrency";
 
 import Image from "next/image";
 import "@/styles/dashboard/tables.css";
-import { FaTrashAlt, FaEye } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import Link from "next/link";
-import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
-import { FaRegWindowClose } from "react-icons/fa";
-import { IoMdCloseCircle } from "react-icons/io";
 
-import { sliedsAr, slidesEn, slidesAr } from "@/data";
+import { slidesEn, slidesAr } from "@/data";
 import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 
