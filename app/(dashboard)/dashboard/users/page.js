@@ -67,7 +67,7 @@ export default function ActiveAds() {
       console.error(err);
       addNotification({
         type: "warning",
-        message: "Failed to fetch users from server ❌",
+        message: err.response.data.message || "Failed to fetch users from server ❌",
       });
     } finally {
       setLoadingContent(false);

@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Cairo } from "next/font/google";
 
 import SideNav from "@/components/dashboard/SideNav";
@@ -10,42 +14,34 @@ import { SelectorsProvider } from "@/Contexts/selectors";
 import { DataProvider } from "@/Contexts/DataContext";
 import { NotificationProvider } from "@/Contexts/NotificationContext";
 import NotificationHolder from "@/components/Tools/NotificationHolder";
-import { AuthProvider } from "@/Contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/Contexts/AuthContext";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
   weight: ["200", "300", "400", "500", "700", "800", "900"],
   display: "swap",
 });
-export const metadata = {
-  title: "Dawaarly",
-  description:
-    "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
 
-  openGraph: {
-    title: "Dawaarly",
-    description:
-      "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
-    url: "https://Dawaarly.vercel.app/",
-    siteName: "Dawaarly",
-    images: [
-      {
-        url: "/logo.png",
-        width: 1000,
-        height: 1000,
-        alt: "Dawaarly-logo",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  icons: {
-    icon: "/full-logo.jpg",
-    shortcut: "/full-logo.jpg",
-    apple: "/full-logo.jpg",
-  },
+
+// ---------------- PROTECTED DASHBOARD ----------------
+const ProtectedDashboard = ({ children }) => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user && user?.user_type !== "ADMIN") {
+      router.replace("/register"); // لو مش مسجل → رجع على register
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return <div>Loading...</div>; // ممكن تحط Spinner بدل Loading
+  }
+
+  return children;
 };
 
+// ---------------- ROOT LAYOUT ----------------
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={cairo.className}>
@@ -56,14 +52,16 @@ export default function RootLayout({ children }) {
               <FiltersProvider>
                 <SelectorsProvider>
                   <DataProvider>
-                    <div className="dashboard">
-                      <SideNav />
-                      <div className="holder">
-                        <Head />
-                        {children}
+                    <ProtectedDashboard>
+                      <div className="dashboard">
+                        <SideNav />
+                        <div className="holder">
+                          <Head />
+                          {children}
+                        </div>
+                        <NotificationHolder />
                       </div>
-                      <NotificationHolder />
-                    </div>
+                    </ProtectedDashboard>
                   </DataProvider>
                 </SelectorsProvider>
               </FiltersProvider>

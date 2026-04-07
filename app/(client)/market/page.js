@@ -6,7 +6,7 @@ import ActiveFiltersBar from "@/components/home/ActiveFiltersBar";
 import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
 import Pagination from "@/components/Tools/Pagination";
 import "@/styles/client/pages/market.css";
-import { ads, propertiesFiltersEn, propertiesFiltersAr } from "@/data";
+import { dynamicFilters } from "@/data";
 import { settings } from "@/Contexts/settings";
 import { useSearchParams } from "next/navigation";
 import { IoFilterSharp } from "react-icons/io5";
@@ -16,6 +16,8 @@ import { IoGrid } from "react-icons/io5";
 import { CiBoxList } from "react-icons/ci";
 import { IoGridOutline } from "react-icons/io5";
 import { BsGridFill } from "react-icons/bs";
+import { getAllAds } from "@/services/ads/ads.service";
+import { TbListSearch } from "react-icons/tb";
 
 export default function Marketplace() {
   const defaultOptions = [
@@ -47,29 +49,53 @@ export default function Marketplace() {
   const { screenSize, locale } = useContext(settings);
   const searchParams = useSearchParams();
 
-  const [data] = useState(ads);
+  const [adsData, setAdsData] = useState({
+    ads: [],
+    pagination: {
+      page: 1,
+      totalPages: 1,
+      limit: 10,
+      total: 0,
+    },
+  });
+    const [loadingContent, setLoadingContent] = useState(false);
+
+
+      const fetchAds = async (page = 1, search) => {
+        try {
+          setLoadingContent(true);
+    
+          const res = await getAllAds({
+            page,
+            limit: adsData.pagination.limit,
+          });
+    
+          setAdsData({
+            ads: res.data.data || [],
+            pagination: res.data.pagination || adsData.pagination,
+          });
+        } catch (err) {
+          console.error(err);
+          addNotification({
+            type: "warning",
+            message: "Failed to fetch ads from server ❌",
+          });
+        } finally {
+          setLoadingContent(false);
+        }
+      };
+    
+      // ================= INITIAL FETCH =================
+      useEffect(() => {
+          fetchAds(1);
+      }, []);
+
+        const handlePageChange = (newPage) => {
+    fetchAds(newPage);
+  };
+
   const [openFilters, setOpenFilters] = useState(false);
   const [listGridOption, setListGridOption] = useState("grid");
-
-  const [dynamicFilters, setDynamicFilters] = useState([]);
-
-  useEffect(() => {
-    const fetchdynamicFilters = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setDynamicFilters(
-        locale == "en" ? propertiesFiltersEn : propertiesFiltersAr,
-      );
-    };
-    fetchdynamicFilters();
-  }, [locale]);
 
   const handleListGridOption = (type) => {
     setListGridOption((prev) => (prev == type ? "" : type));
@@ -93,7 +119,6 @@ export default function Marketplace() {
   const [orderBy, setOrderBy] = useState(defaultOptions[0]); // الافتراضي الأحدث
   const [orderOpen, setOrderOpen] = useState(false);
 
-  // ✅ تحديث الفلترات عند تغيير URL
   useEffect(() => {
     setSelectedCategory({
       cat: catParam ? { id: parseInt(catParam) } : null,
@@ -101,10 +126,8 @@ export default function Marketplace() {
     });
   }, [catParam, subcatParam]);
 
-  // ✅ تحقق إذا كان هناك فئة مختارة
   const hasSelectedCategory = selectedCategory.cat || selectedCategory.subCat;
 
-  // ✅ التعامل مع اختيار الفئة
   const handleCategorySelect = (type, item) => {
     if (type === "cat") {
       setSelectedCategory({
@@ -119,7 +142,6 @@ export default function Marketplace() {
     }
   };
 
-  // ✅ إزالة فلتر الفئة
   const handleRemoveCategory = (type) => {
     if (type === "cat") {
       setSelectedCategory({ cat: null, subCat: null });
@@ -128,7 +150,6 @@ export default function Marketplace() {
     }
   };
 
-  // ✅ فلترات الديناميك
   const handleDynamicFilterChange = useCallback((key, value) => {
     setAllFilters((prev) => {
       const newFilters = {
@@ -213,7 +234,7 @@ export default function Marketplace() {
           <DynamicFilters
             dynamicFilters={dynamicFilters}
             selectedFilters={allFilters.dynamicFilters}
-            setSelectedFilters={handleDynamicFilterChange}
+            setSelectedFilters={handleDynamicFilterChange}  
             screenSize={screenSize}
             active={openFilters}
             setActive={setOpenFilters}
@@ -286,18 +307,37 @@ export default function Marketplace() {
               </div>
             </div>
 
-            <div className="grid-holder">
-              {data.map((item, index) => (
+            <div className="grid-holder"           style={{
+            position: "relative",
+            opacity: loadingContent ? "0.6" : "1",
+          }}>
+                      {loadingContent && (
+            <div className="loading-content cover">
+              <span
+                className="loader"
+                style={{ opacity: loadingContent ? "1" : "0" }}
+              ></span>
+            </div>
+          )}
+                    {!adsData?.ads?.length && !loadingContent ? (
+                      <div className="no-data-found">
+                        <TbListSearch />
+                        <p>{"no data found"} </p>
+                      </div>
+                    ) : (adsData?.ads?.map((item, index) => (
                 <AdsCard key={item.id || index} data={item} />
-              ))}
+              )))}
             </div>
 
-            {/* ✅ الترقيم */}
-            <Pagination
-              pageCount={50}
-              screenSize={screenSize}
-              onPageChange={() => {}}
-            />
+      {adsData?.pagination?.totalPages > 1 && (
+        <Pagination
+          pageCount={adsData?.pagination.totalPages}
+          screenSize={screenSize}
+          isDashBoard={true}
+          currentPage={adsData?.pagination.page}
+          onPageChange={handlePageChange}
+        />
+      )}
           </div>
         </div>
       </div>

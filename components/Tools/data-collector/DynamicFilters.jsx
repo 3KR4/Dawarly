@@ -19,16 +19,15 @@ const DynamicFilters = ({
   const [localState, setLocalState] = useState({});
   const t = useTranslate();
 
+  // sync local state with parent selectedFilters
   useEffect(() => {
     setLocalState(selectedFilters);
   }, [selectedFilters]);
 
   const updateFilter = useCallback(
     (fieldKey, value) => {
-      // تحديث local state
       setLocalState((prev) => {
         const newState = { ...prev };
-
         const shouldDelete =
           value === null ||
           value === undefined ||
@@ -45,24 +44,22 @@ const DynamicFilters = ({
         return newState;
       });
 
-      // تحديث الأب خارج render
+      // تحديث الأب
       setSelectedFilters(fieldKey, value);
     },
     [setSelectedFilters]
   );
 
+  // Range Slider
   const renderNumberFilter = (field) => {
     const value = Array.isArray(localState[field.key])
       ? localState[field.key]
       : [field.min || 0, field.max || 10000];
 
-    const handleSliderChange = (_, newValue) =>
-      updateFilter(field.key, newValue);
-
     return (
       <div className="filter-field" key={field.key}>
         <div className="filter-header">
-          <h4>{field.label}</h4>
+          <h4>{field.label[locale]}</h4>
         </div>
 
         <div className="price-input">
@@ -78,7 +75,7 @@ const DynamicFilters = ({
 
         <Slider
           value={value}
-          onChange={handleSliderChange}
+          onChange={(_, newValue) => updateFilter(field.key, newValue)}
           min={field.min || 0}
           max={field.max || 10000}
           className="price-slider"
@@ -87,24 +84,23 @@ const DynamicFilters = ({
     );
   };
 
+  // Select / Radio / MultiSelect / Boolean
   const renderFilterField = (field) => {
     const value = localState[field.key];
 
-    if (field.inputType === "number") return renderNumberFilter(field);
+    // Range filters
+    if (field.uiType === "range") return renderNumberFilter(field);
 
     switch (field.uiType) {
       case "select":
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label}</h4>
+              <h4>{field.label[locale]}</h4>
             </div>
             <div className="select-options">
               {field.options.map((option) => {
-                const displayName =
-                  typeof option.name === "object"
-                    ? option.name
-                    : option.name;
+                const displayName = option.label[locale] || option.value;
                 const isSelected = value?.id === option.id;
                 return (
                   <button
@@ -122,69 +118,16 @@ const DynamicFilters = ({
           </div>
         );
 
-      case "radio":
-        return (
-          <div className="filter-field" key={field.key}>
-            <div className="filter-header">
-              <h4>{field.label}</h4>
-            </div>
-            <div className="radio-options">
-              {field.options.map((option) => {
-                const displayLabel = option.label || option.value;
-                const isSelected = value?.value === option.value;
-                return (
-                  <button
-                    key={option.id || option.value}
-                    className={`filter-option ${isSelected ? "active" : ""}`}
-                    onClick={() =>
-                      updateFilter(field.key, isSelected ? null : option)
-                    }
-                  >
-                    {displayLabel}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        );
-
-      case "boolean":
-        return (
-          <div className="filter-field" key={field.key}>
-            <div className="filter-header">
-              <h4>{field.label}</h4>
-            </div>
-            <div className="boolean-options">
-              <button
-                className={`filter-option ${value === true ? "active" : ""}`}
-                onClick={() =>
-                  updateFilter(field.key, value === true ? null : true)
-                }
-              >
-                {t.ad.yes}
-              </button>
-              <button
-                className={`filter-option ${value === false ? "active" : ""}`}
-                onClick={() =>
-                  updateFilter(field.key, value === false ? null : false)
-                }
-              >
-                {t.ad.no}
-              </button>
-            </div>
-          </div>
-        );
-
       case "multiSelect":
         const currentValues = Array.isArray(value) ? value : [];
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
-              <h4>{field.label}</h4>
+              <h4>{field.label[locale]}</h4>
             </div>
             <div className="multiselect-options">
               {field.options.map((option) => {
-                const displayLabel = option.label || option.value;
+                const displayLabel = option.label[locale] || option.value;
                 const isSelected = currentValues.includes(option.value);
                 return (
                   <button
@@ -208,13 +151,40 @@ const DynamicFilters = ({
           </div>
         );
 
+      case "boolean":
+        return (
+          <div className="filter-field" key={field.key}>
+            <div className="filter-header">
+              <h4>{field.label[locale]}</h4>
+            </div>
+            <div className="boolean-options">
+              <button
+                className={`filter-option ${value === true ? "active" : ""}`}
+                onClick={() =>
+                  updateFilter(field.key, value === true ? null : true)
+                }
+              >
+                {t.ad.yes}
+              </button>
+              <button
+                className={`filter-option ${value === false ? "active" : ""}`}
+                onClick={() =>
+                  updateFilter(field.key, value === false ? null : false)
+                }
+              >
+                {t.ad.no}
+              </button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className={`filters dynamic-filters ${active ? "active" : ""} `}>
+    <div className={`filters dynamic-filters ${active ? "active" : ""}`}>
       {screenSize !== "large" && (
         <IoIosClose className="close" onClick={() => setActive(false)} />
       )}
