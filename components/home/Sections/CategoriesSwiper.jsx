@@ -5,15 +5,21 @@ import "swiper/css";
 import "@/styles/client/sections/ads-swiper.css";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import useTranslate from "@/Contexts/useTranslation";
-import {
-  categoriesEn,
-  subcategoriesEn,
-  categoriesAr,
-  subcategoriesAr,
-} from "@/data";
 import CatCard from "@/components/home/CatCard";
 import { settings } from "@/Contexts/settings";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAppData } from "@/Contexts/DataContext";
+import { IoStorefront } from "react-icons/io5";
+import { MdVilla } from "react-icons/md";
+import { PiBuildingApartmentFill } from "react-icons/pi";
+import { BsFillBuildingsFill } from "react-icons/bs";
+
+const categoryIcons = {
+  1: PiBuildingApartmentFill,
+  2: MdVilla,
+  3: IoStorefront,
+  4: BsFillBuildingsFill,
+};
 
 export default function CategoriesSwiper({
   type,
@@ -21,6 +27,8 @@ export default function CategoriesSwiper({
   onSelect,
   showControls = true,
 }) {
+  const { categories, subCategories } = useAppData();
+
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
   const router = useRouter();
@@ -31,27 +39,6 @@ export default function CategoriesSwiper({
   const [isEnd, setIsEnd] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
-    };
-    fetchCategories();
-  }, [locale]);
-
-  // ✅ قراءة الـ URL عند التحميل
   useEffect(() => {
     if (type === "cat") {
       const catParam = searchParams.get("cat");
@@ -64,7 +51,7 @@ export default function CategoriesSwiper({
     } else if (type === "sub-cat") {
       const subcatParam = searchParams.get("subcat");
       if (subcatParam) {
-        const selectedSubcat = subcategories.find(
+        const selectedSubcat = subCategories.find(
           (sub) => sub.id == subcatParam,
         );
         if (selectedSubcat) {
@@ -77,7 +64,7 @@ export default function CategoriesSwiper({
   const data =
     type === "cat"
       ? categories
-      : subcategories.filter((x) => x.categoryId === catId);
+      : subCategories.filter((x) => x.category_id === catId);
 
   const title =
     type === "cat" ? t.home.browseCategories : t.home.browseSubCategories;
@@ -110,18 +97,15 @@ export default function CategoriesSwiper({
 
     router.push(`?${params.toString()}`);
 
-    // ✅ استدعاء callback إذا كان موجود
     if (onSelect) {
       onSelect(isAlreadySelected ? null : item);
     }
   };
 
-  // ✅ التحقق إذا كانت الفئة لديها subcategories
   const hasSubcategories = (catId) => {
-    return subcategories.some((sub) => sub.categoryId === catId);
+    return subCategories.some((sub) => sub.category_id === catId);
   };
 
-  // breakpoints بالأرقام اللي انت حددتها
   const breakpoints = {
     0: { slidesPerView: Math.min(data.length, 2.2) },
     500: { slidesPerView: Math.min(data.length, 3.2) },
@@ -131,12 +115,10 @@ export default function CategoriesSwiper({
     1400: { slidesPerView: Math.min(data.length, 7) },
   };
 
-  // 👇 نحسب أكبر قيمة من slidesPerView في أي breakpoint
   const maxSlides = Math.max(
     ...Object.values(breakpoints).map((b) => b.slidesPerView),
   );
 
-  // 👇 نظهر الـ navigation بس لو عدد العناصر أكبر من maxSlides
   const showNav =
     data.length > maxSlides && !screenSize.includes("small") && showControls;
 
@@ -180,11 +162,18 @@ export default function CategoriesSwiper({
           {data.map((item) => {
             const isSelected = selectedItem == item.id;
             const hasSubcats = type === "cat" && hasSubcategories(item.id);
+            const itemWithIcon =
+              type === "cat"
+                ? {
+                    ...item,
+                    icon: categoryIcons[item.id], // ممكن تبقى undefined لو مش موجود
+                  }
+                : item;
 
             return (
               <SwiperSlide key={item.id} className="category-slide">
                 <CatCard
-                  data={item}
+                  data={itemWithIcon}
                   type={type}
                   activeClass={isSelected}
                   onSelect={() => handleSelect(item)}

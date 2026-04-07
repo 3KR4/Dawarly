@@ -125,7 +125,7 @@ export default function CardItem({ data }) {
           </span>
         </div>
       </div>
-      <div className="date-area">
+      <div className="specs-holder">
         {Object.entries(data?.details || {})
           .filter(([key]) => {
             const config = getSpecConfig(key);

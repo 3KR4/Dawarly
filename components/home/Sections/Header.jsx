@@ -24,7 +24,6 @@ import { MdLogout } from "react-icons/md";
 import useTranslate from "@/Contexts/useTranslation";
 import SelectLocation from "@/components/Tools/data-collector/selectLocation";
 import useClickOutside from "@/Contexts/useClickOutside";
-import { ImPower } from "react-icons/im";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useAppData } from "@/Contexts/DataContext";
 
@@ -116,11 +115,11 @@ function Header() {
                 <>
                   {!screenSize.includes("small") && (
                     <>
-                      <div className="icon-holder fav">
+                      <Link href={`/favorites`} className="icon-holder fav">
                         <FaRegHeart className="main" />
                         <FaHeart className="hover" />
                         <span>3</span>
-                      </div>
+                      </Link>
                       <div className="icon-holder msg">
                         <LuMessageSquare className="main" />
                         <FaMessage className="hover" />

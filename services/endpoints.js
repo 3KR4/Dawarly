@@ -47,7 +47,6 @@ export const ENDPOINTS = {
   //     `/subCategory/filter/options/translations/${id}`,
   //   DELETE_OPTION: (id) => `/subCategory/filter/options/${id}`,
   // },
-
   ADS: {
     GET_SECTIONS_ADS: (type, id, page, limit) =>
       `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
@@ -68,6 +67,13 @@ export const ENDPOINTS = {
     DELETE: (id) => `/ads/delete/${id}`,
     ASSIGN_ADMIN: (ad) => `/ads/assign-admin/${ad}`,
     SHANGE_STATUS: (ad) => `/ads/update/${ad}/status`,
+  },
+  SLIDERS: {
+    GET_ALL: (page, limit) => `/sliders?page=${page}&limit=${limit}`,
+    GET_ONE: (id) => `/sliders/${id}`,
+    CREATE: () => `/sliders`,
+    UPDATE: (id) => `/sliders/${id}`,
+    DELETE: (id) => `/sliders/${id}`,
   },
   FAVORITES: {
     TOGGLE_FAVORITES: (id) => `/favorites/${id}`,

@@ -323,11 +323,22 @@ header .actions-btns .userMenu .top {
   align-items: center;
   justify-content: center;
 }
+.table-container .specs-holder {
+  border: none;
+}
+.table-container .specs-holder .spec {
+  align-items: center;
+  background: transparent;
+  height: unset;
+}
 .table-container .actions {
   align-items: center;
   display: flex;
   justify-content: center;
   gap: 3px;
+}
+.table-container .actions a {
+  display: flex;
 }
 .table-container .actions svg {
   width: 33px;

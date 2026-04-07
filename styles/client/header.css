@@ -179,11 +179,7 @@ header .top .account .user:has(.menu.active) .holder {
 [theme="dark"] header .top .account .user .holder:hover > * {
   color: var(--title-color2);
 }
-[lang="ar"] header .top .account .user .holder {
-  padding-right: 0;
-  padding-left: 6px;
-  border-radius: 20px 50px 50px 20px;
-}
+
 header .top .account .user svg {
   color: var(--paragraph);
 }

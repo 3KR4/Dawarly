@@ -785,7 +785,7 @@ a {
   text-align: center;
   justify-content: center;
   padding: 0;
-    letter-spacing: 0.25px;
+  letter-spacing: 0.25px;
 }
 .disabled .btn h4 {
   cursor: no-drop;
@@ -1127,6 +1127,47 @@ svg.main-ico {
 .birth-date-selects .error {
   margin-top: -7px !important;
 }
+
+.specs-holder {
+  border-top: 1px solid var(--border-color);
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  padding: 14px;
+  display: flex;
+}
+.specs-holder .spec {
+  background: var(--hover-color);
+  text-align: center;
+  border-radius: 7px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  height: 31px;
+  min-width: max-content;
+  padding: 0 6px;
+  display: flex;
+}
+.specs-holder .spec svg {
+  font-size: 16px;
+}
+.specs-holder .spec svg.area_m2 {
+  font-size: 19px;
+}
+
+.specs-holder .spec svg.km,
+.specs-holder .spec svg.engine_cc,
+.specs-holder .spec svg.color {
+  font-size: 18px;
+}
+.specs-holder .spec svg.km {
+  transform: translateY(1px);
+}
+.specs-holder .spec span {
+  font-size: 13px;
+  font-weight: 700;
+}
 @media (max-width: 1300px) {
   .hero-image-holder .details h3 {
     font-size: 42px;
@@ -1284,6 +1325,26 @@ svg.main-ico {
   .navigations a,
   .navigations .active {
     font-size: 14px;
+  }
+
+  .specs-holder .spec {
+    height: 26px;
+  }
+  .specs-holder .spec svg {
+    font-size: 14px;
+  }
+  .specs-holder .spec svg.bedrooms {
+    font-size: 18px;
+  }
+  .specs-holder .spec span {
+    font-size: 12px;
+  }
+  .specs-holder .spec svg.km,
+  .specs-holder .spec svg.engine_cc {
+    font-size: 16px;
+  }
+  .specs-holder .spec svg.model_year {
+    font-size: 15px;
   }
 }
 @media (max-width: 400px) {

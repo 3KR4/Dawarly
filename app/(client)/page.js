@@ -15,7 +15,7 @@ export default function Home() {
       <HeroSwiper />
       <SearchSection />
       <CategoriesSwiper type={`cat`} />
-      {/* <CategoriesSwiper type={`sub-cat`} catId={3} /> */}
+      {/* <CategoriesSwiper type={`sub-cat`} catId={2} /> */}
 
       <AdsSwiper
         type={`governorate`}

@@ -1,194 +1,176 @@
 "use client";
-
 import "@/styles/client/forms.css";
-import { useSearchParams } from "next/navigation";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
-import governoratesEn from "@/data/governoratesEn.json";
-import governoratesAr from "@/data/governoratesAr.json";
-import cities from "@/data/cities.json";
-import {
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-  propertiesFiltersEn,
-  propertiesFiltersAr,
-  users,
-  ads,
-  slidesEn,
-  slidesAr,
-} from "@/data";
-import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import { FaArrowLeft } from "react-icons/fa6";
 import Images from "@/components/Tools/data-collector/Images";
-import { Mail, Phone, CircleAlert } from "lucide-react";
-import { BsChatDots } from "react-icons/bs";
-import { settings } from "@/Contexts/settings";
-import { FiUsers } from "react-icons/fi";
-import { LuUserCog } from "react-icons/lu";
-import Tags from "@/components/Tools/data-collector/Tags";
-import { useParams } from "next/navigation";
+import { CircleAlert } from "lucide-react";
+
+import { useNotification } from "@/Contexts/NotificationContext";
+import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
+import { deleteImage, uploadImages } from "@/services/images/images.service";
 
 export default function CreateAd() {
-  const { locale } = useContext(settings);
   const t = useTranslate();
-  const { slug } = useParams();
 
-  // State للبيانات الديناميكية
+  const searchParams = useSearchParams();
+  const { addNotification } = useNotification();
+  const redirectAfterLogin = useRedirectAfterLogin();
 
-  // State لبيانات الإعلان
-  const [slied, setSlied] = useState(null);
-  const [slieds, setSlieds] = useState(null);
-
-  // State للبيانات الأساسية
-  const [images, setImages] = useState([]);
-
-  // State للتواصل
-
-  // State للحقول الديناميكية
-
-  const [fieldErrors, setFieldErrors] = useState({});
+  // ======= FORM STATES =======
+  const [sliderData, setSliderData] = useState(null);
+  const [loadingContent, setLoadingContnet] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [images, setImages] = useState([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    trigger,
     setValue,
-    reset,
   } = useForm();
 
-  // useEffect لتحديث الإعلان بعد تحميل البيانات
+  // ======= FETCH AD DATA IF EDITING =======
   useEffect(() => {
-    if (slug) {
-      fetchAdData();
-    }
-  }, [slug, locale]);
+    if (sliderId) fetchAdData();
+  }, [sliderId]);
 
   const fetchAdData = async () => {
-    setIsLoading(true);
+    setLoadingContnet(true);
     try {
-      // استدعاء API
-      // const response = await getService.getAdById(slug);
-      // const ad = response.data;
-
-      // بيانات وهمية
-
-      const mockAdData = slieds?.find((x) => x.id == slug);
-
-      if (!mockAdData) {
-        alert("الإعلان غير موجود");
-        return;
-      }
-
-      setSlied(mockAdData);
-
-      // ملء الفورم
-      fillFormWithAdData(mockAdData);
+      const res = await getOneAd(sliderId);
+      const slider = res?.data;
+      if (!slider) return alert(t.ad.fetch_error);
+      setSliderData(slider);
+      fillFormWithAdData(slider);
     } catch (error) {
       console.error("Error fetching ad data:", error);
-      alert(t.ad.fetch_error || "حدث خطأ أثناء جلب بيانات الإعلان");
+      addNotification({
+        type: "error",
+        message: t.ad.fetch_error,
+      });
     } finally {
-      setIsLoading(false);
+      setLoadingContnet(false);
     }
   };
 
-  const fillFormWithAdData = (ad) => {
-    // ملء حقول العنوان والسعر والوصف
-    setValue("adTitle", ad.title);
-    setValue("link", ad.link);
-    setValue("description", ad.description || "");
-    if (ad.image) setImages([ad.image]);
+  const fillFormWithAdData = (x) => {
+    setValue("title", x.title);
+    setValue("description", x.description);
+    setValue("link", x.link);
+    setImages(x.image);
   };
 
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
 
-    if (images.length === 0) {
-      newErrors.images = t.ad.images.errors.required;
+    if (!selectedCats.cat) {
+      newErrors.cat = t.ad.errors.category;
       hasErrors = true;
     }
-
-    // التحقق من أن الصورة ليست كبيرة جداً
-    images.forEach((image, index) => {
-      if (typeof image !== "string" && image.size > 5 * 1024 * 1024) {
-        // 5MB
-        newErrors[`image_${index}`] = "حجم الصورة كبير جداً (الحد الأقصى 5MB)";
-        hasErrors = true;
-      }
-    });
+    if (!selectedCats.subCat) {
+      newErrors.subCat = t.ad.errors.subCategory;
+      hasErrors = true;
+    }
 
     if (hasErrors) {
       setFieldErrors(newErrors);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return false;
     }
-
     setFieldErrors({});
     return true;
   };
 
-  // معالجة إرسال النموذج
-  const onSubmit = async (data) => {
-    // التحقق من صحة الحقول الأساسية
-    const isCustomValid = validateForm();
+  const buildPayload = (data) => ({
+    title: data.title,
+    description: data.description,
+    link: data.link,
+  });
 
-    if (!isCustomValid) return;
+  const submitAd = async (payload) =>
+    sliderId ? updateAd(sliderId, payload) : crateAd(payload);
 
-    // تحضير البيانات للإرسال
-    const finalData = {
-      title: data.adTitle,
-      link: data.link,
-      description: data.description || "",
-      images: images,
-    };
-    console.log("FINAL REQUEST", finalData);
-    if (slug) {
-      // تحديث الإعلان
-      alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
-      // try {
-      //   const response = await putService.updateAd(slug, finalData);
-      //   console.log("Ad updated successfully:", response);
-      //   alert(t.ad.update_success || "تم تحديث الإعلان بنجاح!");
-      // } catch (error) {
-      //   console.error("Error updating ad:", error);
-      //   alert(t.ad.update_error || "حدث خطأ أثناء تحديث الإعلان");
-      // }
-    } else {
-      // إنشاء إعلان جديد
-      alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
-      // try {
-      //   const response = await postService.createAd(finalData);
-      //   console.log("Ad created successfully:", response);
-      //   alert(t.ad.submission_success || "تم إنشاء الإعلان بنجاح!");
-      // } catch (error) {
-      //   console.error("Error creating ad:", error);
-      //   alert(t.ad.submission_error || "حدث خطأ أثناء إنشاء الإعلان");
-      // }
+  const uploadNewImages = async (sliderId) => {
+    const newImages = images.filter((img) => img instanceof File);
+
+    if (newImages.length === 0) return;
+
+    const formData = new FormData();
+
+    newImages.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    await uploadImages("SLIDER", sliderId, formData);
+  };
+  const handleDeletedImages = async (sliderId) => {
+    const deletedImages = originalImages.filter(
+      (oldImg) => !images.find((img) => img.id === oldImg.id),
+    );
+
+    for (let img of deletedImages) {
+      await deleteImage("SLIDER", sliderId, img.id);
     }
   };
+  const fieldErrorMap = {
+    title: "title",
+    description: "description",
+    link: "link",
+  };
+  const onSubmit = async (data) => {
+    if (!validateForm()) return;
+    const payload = buildPayload(data);
+    setLoadingSubmit(true);
+    try {
+      const res = await submitAd(payload);
+      const finalsliderId = sliderId || res.data.sliderId;
+      await uploadNewImages(finalsliderId);
+      if (sliderId) {
+        await handleDeletedImages(finalsliderId);
+      }
+      if (selectedAdmin) {
+        await assignAdmin(sliderId, { admin_id: selectedAdmin.id });
+      }
 
-  if (isLoading) {
-    return (
-      <div className="form-holder create-ad admin-create-ad">
-        <div className="loading-state">
-          <p>{t.ad.loading || "جاري تحميل البيانات..."}</p>
-        </div>
-      </div>
-    );
-  }
+      addNotification({
+        type: "success",
+        message: sliderId ? t.ad.ad_updated : t.ad.ad_created,
+      });
+      redirectAfterLogin("/dashboard/ads/all");
+    } catch (err) {
+      console.error("Error:", err);
+      let message = "An error occurred";
+      // 🔥 لو فيه validation errors
+      if (err.response?.data?.errors) {
+        const backendErrors = err.response.data.errors;
 
+        const translatedErrors = backendErrors.map((e) => {
+          const key = fieldErrorMap[e.field];
+          return key ? t.ad.errors[key] : e.message;
+        });
+
+        message = translatedErrors.join(" \n ");
+      } else {
+        message =
+          err.response?.data?.message || err.message || "An error occurred";
+      }
+
+      addNotification({
+        type: "error",
+        message,
+      });
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
   return (
     <div className={`form-holder create-ad `}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* === معلومات أساسية === */}
-
-        {/* عنوان الإعلان */}
         <div className="row-holder">
           <div className="box forInput">
             <label>
@@ -275,16 +257,13 @@ export default function CreateAd() {
           </div>
         </div>
 
-        {/* === زر الإرسال === */}
         <div className="form-section submit-section">
           <button
             type="submit"
-            className={`main-button ${
-              slug ? "update-button" : "create-button"
-            }`}
+            className={`main-button ${id ? "update-button" : "create-button"}`}
             onClick={() => setIsSubmitted(true)}
           >
-            {slug
+            {id
               ? t.dashboard.forms.update_slide
               : t.dashboard.forms.create_slide}
           </button>

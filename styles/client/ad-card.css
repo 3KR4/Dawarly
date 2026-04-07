@@ -74,7 +74,6 @@
 .ad-card .image-holder .top .fav-btn:not(.active):hover .loader {
   border-color: white !important;
   border-bottom-color: #0000 !important;
-
 }
 .ad-card .image-holder .top button:hover .loader {
   border-color: var(--main-color) !important;
@@ -179,37 +178,7 @@
   font-weight: 700;
   color: var(--paragraph);
 }
-.ad-card .date-area .spec {
-  background: var(--hover-color);
-  text-align: center;
-  border-radius: 7px;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  gap: 3px;
-  height: 31px;
-  min-width: max-content;
-  padding: 0 6px;
-  display: flex;
-}
-.ad-card .date-area .spec svg {
-  font-size: 16px;
-}
-.ad-card .date-area .spec svg.area_m2 {
-  font-size: 19px;
-}
 
-.ad-card .date-area .spec svg.km,
-.ad-card .date-area .spec svg.engine_cc,
-.ad-card .date-area .spec svg.color {
-  font-size: 18px;
-}
-.ad-card .date-area .spec svg.km {
-  transform: translateY(1px);
-}
-.ad-card .date-area .spec span {
-  font-size: 13px;
-}
 @media (max-width: 500px) {
   .ad-card .body h4 {
     font-size: 15px;
@@ -227,23 +196,23 @@
   .ad-card .image-holder .top {
     padding: 8px 12px;
   }
-  .ad-card .date-area .spec {
+  .specs-holder .spec {
     height: 26px;
   }
-  .ad-card .date-area .spec svg {
+  .specs-holder .spec svg {
     font-size: 14px;
   }
-  .ad-card .date-area .spec svg.bedrooms {
+  .specs-holder .spec svg.bedrooms {
     font-size: 18px;
   }
-  .ad-card .date-area .spec span {
+  .specs-holder .spec span {
     font-size: 12px;
   }
-  .ad-card .date-area .spec svg.km,
-  .ad-card .date-area .spec svg.engine_cc {
+  .specs-holder .spec svg.km,
+  .specs-holder .spec svg.engine_cc {
     font-size: 16px;
   }
-  .ad-card .date-area .spec svg.model_year {
+  .specs-holder .spec svg.model_year {
     font-size: 15px;
   }
   .ad-card .date-area {

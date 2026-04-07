@@ -10,6 +10,7 @@ import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
+import { specsConfig } from "@/Contexts/specsConfig";
 
 import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
@@ -39,6 +40,8 @@ export default function AdsTable({
         ? status.id !== "PENDING"
         : status.id === "ACTIVE" || status.id === "REJECTED",
   );
+  const getSpecConfig = (key) => specsConfig[key];
+
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
       <div
@@ -66,7 +69,11 @@ export default function AdsTable({
                   <div className="header-item">{t.dashboard.tables.reach}</div>
                 </>
               )}
-              <div className="header-item">{t.dashboard.tables.status}</div>
+              {statusChanger == "favoriet" ? (
+                <div className="header-item">{t.dashboard.tables.specifics}</div>
+              ) : (
+                <div className="header-item">{t.dashboard.tables.status}</div>
+              )}
 
               <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
@@ -226,36 +233,74 @@ export default function AdsTable({
                       </h4>
                     </div>
                   )}
-                  <div className="item-status">
-                    <SelectOptions
-                      size="ultra-small"
-                      options={filteredStatuses}
-                      value={curentStatus}
-                      disabled={page === "user" && curentStatus.id == "PENDING"}
-                      hiddenIco={
-                        page === "user" && curentStatus.id == "PENDING"
-                      }
-                      locale={locale}
-                      onChange={(selected) => changeStatus(item?.id, selected)}
-                    />
-                  </div>
+                  {statusChanger == "favoriet" ? (
+                    <div className="specs-holder">
+                      {Object.entries(item?.details || {})
+                        .filter(([key]) => {
+                          const config = getSpecConfig(key);
+                          return config?.showInMini;
+                        })
+                        .map(([key, value]) => {
+                          const config = getSpecConfig(key);
+                          const Icon = config?.icon;
+
+                          const displayValue =
+                            typeof value === "object"
+                              ? (value.label ?? value.value)
+                              : value;
+
+                          return (
+                            <div key={key} className="spec">
+                              {Icon && <Icon className="spec-icon" />}
+                              <span>
+                                {displayValue}
+                                {config?.suffix && ` ${config.suffix}`}
+                              </span>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ) : (
+                    <div className="item-status">
+                      <SelectOptions
+                        size="ultra-small"
+                        options={filteredStatuses}
+                        value={curentStatus}
+                        disabled={
+                          page === "user" && curentStatus.id == "PENDING"
+                        }
+                        hiddenIco={
+                          page === "user" && curentStatus.id == "PENDING"
+                        }
+                        locale={locale}
+                        onChange={(selected) =>
+                          changeStatus(item?.id, selected)
+                        }
+                      />
+                    </div>
+                  )}
 
                   <div className="actions">
                     <Link href={`/market/${item?.id}`}>
                       <FaEye className="view" />
                     </Link>
                     <hr />
-                    <Link
-                      href={
-                        page == "dashboard"
-                          ? `/dashboard/ads/form?id=${item?.id}`
-                          : `/mylisting/form/${item?.id}`
-                      }
-                    >
-                      <MdEdit className="edit" />
-                    </Link>
+                    {statusChanger !== "favoriet" && (
+                      <>
+                        <Link
+                          href={
+                            page == "dashboard"
+                              ? `/dashboard/ads/form?id=${item?.id}`
+                              : `/mylisting/form/${item?.id}`
+                          }
+                        >
+                          <MdEdit className="edit" />
+                        </Link>
 
-                    <hr />
+                        <hr />
+                      </>
+                    )}
+
                     <FaTrashAlt
                       className="delete"
                       onClick={() => removeAd(item?.id)}

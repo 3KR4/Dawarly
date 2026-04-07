@@ -7,18 +7,15 @@ import { useContext } from "react";
 function CatCard({ data, type, position, activeClass, onSelect }) {
   const { locale } = useContext(settings);
 
-  // نختار الاسم حسب اللغة
-  const name = locale === "ar" ? data?.name_ar : data?.name_en;
-
   const link =
     type === "cat" ? `/market?cat=${data?.id}` : `/market?subcat=${data?.id}`;
 
-  const Icon = data?.icon; // لو فيه icon
+  const Icon = data?.icon;
 
   const Content = (
     <>
       {Icon && <Icon className="cat-icon" />}
-      <h4 className="cat-name">{name}</h4>
+      <h4 className="cat-name">{data?.[`name_${locale}`]}</h4>
     </>
   );
 

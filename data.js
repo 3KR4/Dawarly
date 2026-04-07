@@ -2064,7 +2064,7 @@ export const dashboardRoutes = {
     },
     canCreate: true,
   },
-  slieds: {
+  sliders: {
     label: {
       en: "Slides",
       ar: "الشرائح",

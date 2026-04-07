@@ -113,8 +113,8 @@ function SideNav() {
 
         {/* Slides */}
         <Link
-          href="/dashboard/slieds"
-          className={isActive("/dashboard/slieds") ? "active a" : "a"}
+          href="/dashboard/sliders"
+          className={isActive("/dashboard/sliders") ? "active a" : "a"}
         >
           <div className="hold">
             <h4>{t.sideNav.slides}</h4>

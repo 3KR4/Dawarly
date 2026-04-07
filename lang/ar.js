@@ -13,7 +13,8 @@ const ar = {
     browseCategories: "تصفح التصنيفات",
     browseSubCategories: "اختر من التصنيفات الفرعية",
     newly_added: "المضاف حديثا",
-    PropertiesIn : "العقارات في",
+    PropertiesIn: "العقارات في",
+    yourFavoriteList: "قائمة تفضيلاتك",
   },
   market: {
     all_ads: "كل الاعلانات",
@@ -343,7 +344,7 @@ const ar = {
         googleMapsIframeInvalid: "الرجاء إدخال رابط التضمين صحيح",
 
         saleMax: "نسبة الخصم لا يمكن أن تتجاوز 90%",
-
+        specifics: "التفاصيل",
         governorateNameRequired: "اسم المحافظة مطلوب",
         governorateNameMinLength: "اسم المحافظة يجب أن يكون على الأقل 3 أحرف",
       },

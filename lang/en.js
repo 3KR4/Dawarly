@@ -17,6 +17,7 @@ const en = {
     browseSubCategories: "browse subcategories",
     newly_added: "Newly added",
     PropertiesIn: "Properties In",
+    yourFavoriteList: "your Favorite List",
   },
   market: {
     all_ads: "all ads",
@@ -358,6 +359,7 @@ const en = {
       invalidLink: "Please enter a valid link.",
       published_at: "published at",
       created_at: "created at",
+      specifics: "specifics",
     },
   },
   sideNav: {
