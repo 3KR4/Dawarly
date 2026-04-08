@@ -4,7 +4,7 @@ import "@/styles/dashboard/tables.css";
 import React, { useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
-import { getAllAds, deleteAd } from "@/services/ads/ads.service";
+import { getAllAds, deleteAd, changeStatus } from "@/services/ads/ads.service";
 import { settings } from "@/Contexts/settings";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -74,7 +74,35 @@ export default function ActiveAds() {
   const handlePageChange = (newPage) => {
     fetchAds(newPage);
   };
+  const handelChangeStatus = async (id, status) => {
+    console.log("status:", status);
 
+    try {
+      const res = await changeStatus(id, { status: status.id });
+
+      addNotification({
+        type: "success",
+        message: res?.data?.message,
+      });
+
+      const remainingItems = adsData.ads.length - 1;
+
+      // 2️⃣ نقرر الصفحة الجديدة
+      const newPage =
+        remainingItems === 0 && adsData.pagination.page > 1
+          ? adsData.pagination.page - 1
+          : adsData.pagination.page;
+
+      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
+      fetchAds(newPage);
+    } catch (error) {
+      console.error(error);
+      addNotification({
+        type: "warning",
+        message: error.response?.data?.message || "Something went wrong ❌",
+      });
+    }
+  };
   const handleDeleteAd = async (id) => {
     try {
       await deleteAd(id);
@@ -175,6 +203,7 @@ export default function ActiveAds() {
         ads={adsData?.ads}
         loadingContent={loadingContent}
         removeAd={handleDeleteAd}
+        changeStatus={handelChangeStatus}
         activeAds={true}
         statusChanger={"admin"}
       />

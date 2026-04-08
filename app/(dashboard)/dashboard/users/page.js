@@ -174,7 +174,7 @@ export default function ActiveAds() {
         />
         <SelectOptions
           size="small"
-          placeholder={t.ad.status.label}
+          placeholder={t.dashboard.tables.permetionsPlaceHolder}
           options={Permissions}
           value={selectedPermissions.length ? selectedPermissions : null} // مصفوفة العناصر المختارة
           multi={true}

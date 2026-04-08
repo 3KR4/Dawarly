@@ -325,6 +325,9 @@ header .actions-btns .userMenu .top {
 }
 .table-container .specs-holder {
   border: none;
+  background: var(--hover-color);
+  border-radius: 34px;
+  padding: 10px;
 }
 .table-container .specs-holder .spec {
   align-items: center;

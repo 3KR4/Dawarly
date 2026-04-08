@@ -349,6 +349,7 @@ const en = {
       ad_details: "ad details",
       reach: "reach",
       status: "status",
+      permetionsPlaceHolder: "Filter by permetions",
       location: "Location",
       property_details: "Property Details",
       pricing_details: "Pricing Details",

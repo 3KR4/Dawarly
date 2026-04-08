@@ -35,9 +35,9 @@ export default function AdsTable({
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
-      ? status.id === "ACTIVE" && status.id !== "DISABLED"
+      ? status.id == "ACTIVE" || status.id == "DISABLED"
       : statusChanger == "admin"
-        ? status.id !== "PENDING"
+        ? status.id !== "PENDING" && status.id !== "REJECTED"
         : status.id === "ACTIVE" || status.id === "REJECTED",
   );
   const getSpecConfig = (key) => specsConfig[key];
@@ -70,7 +70,9 @@ export default function AdsTable({
                 </>
               )}
               {statusChanger == "favoriet" ? (
-                <div className="header-item">{t.dashboard.tables.specifics}</div>
+                <div className="header-item">
+                  {t.dashboard.tables.specifics}
+                </div>
               ) : (
                 <div className="header-item">{t.dashboard.tables.status}</div>
               )}
@@ -264,6 +266,7 @@ export default function AdsTable({
                     <div className="item-status">
                       <SelectOptions
                         size="ultra-small"
+                        className={"centerd"}
                         options={filteredStatuses}
                         value={curentStatus}
                         disabled={

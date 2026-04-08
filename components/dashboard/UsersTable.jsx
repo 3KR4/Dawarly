@@ -154,7 +154,10 @@ export default function UsersTable({
                     style={{ gap: `3px 4px` }}
                   >
                     {type.id === "SUBUSER" ? (
-                      <span style={{color: type?.tx}}>{user.subscription_ads_limit} active ads</span>
+                      <span style={{ color: type?.tx }}>
+                        {user.subscription_ads_limit > 0 ?
+                          `${user.subscription_ads_limit} active ads` : "-"}
+                      </span>
                     ) : user.permissions?.length ? (
                       <>
                         {user.permissions.slice(0, 4).map((p, index) => {
@@ -193,7 +196,15 @@ export default function UsersTable({
 
                   {/* 📊 Active Ads */}
                   <div className="item-overview onlyOne">
-                    <h4 style={{ background: type?.bg, color: type?.tx }}>
+                    <h4
+                      style={{
+                        background:
+                          type.id !== "USER" && user.active_ads_count > 0
+                            ? type?.bg
+                            : "transparent",
+                        color: type?.tx,
+                      }}
+                    >
                       {user.active_ads_count > 0 ? user.active_ads_count : "-"}
                     </h4>
                   </div>

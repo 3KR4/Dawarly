@@ -353,6 +353,7 @@ const ar = {
       ad_details: "تفاصيل الاعلان",
       reach: "الاحصائيات",
       status: "الحالة",
+      permetionsPlaceHolder: "التصفية بالصلاحيات",
       location: "الموقع",
       property_details: "تفاصيل العقار",
       pricing_details: "تفاصيل التسعير",

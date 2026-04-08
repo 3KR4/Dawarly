@@ -11,6 +11,7 @@ function SelectOptions({
   placeholder,
   options = [],
   value,
+  className,
   multi = false,
   onChange,
   type,
@@ -107,7 +108,7 @@ function SelectOptions({
     <div
       className={`box forInput ${disabled ? "disabled" : ""}`}
       ref={selectRef}
-      style={{ background: value?.bg }}
+      style={{ background: value?.bg && !label && value?.bg }}
     >
       {label && (
         <label>
@@ -115,7 +116,7 @@ function SelectOptions({
         </label>
       )}
 
-      <div className={`selectOptions ${size}`}>
+      <div className={`selectOptions ${size} ${className}`}>
         <div className={`btn ${error ? "error-border" : ""}`}>
           <h4
             className="ellipsis"
