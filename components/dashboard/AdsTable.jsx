@@ -19,6 +19,8 @@ import { useNotification } from "@/Contexts/NotificationContext";
 import { deleteAd } from "@/services/ads/ads.service";
 import { TbListSearch } from "react-icons/tb";
 import { AdStatuses, RentFrequencies } from "@/data/enums";
+import DeleteConfirm from "@/components/Tools/DeleteConfirm";
+import DynamicMenu from "@/components/Tools/DynamicMenu";
 
 export default function AdsTable({
   ads,
@@ -32,6 +34,10 @@ export default function AdsTable({
   const { screenSize, locale } = useContext(settings);
   const t = useTranslate();
   const { addNotification } = useNotification();
+  const [menuType, setMenuType] = useState(null); // form | delete
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [target, setTarget] = useState(null);
+  const [rejectInput, setRejectInput] = useState("");
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
@@ -41,6 +47,26 @@ export default function AdsTable({
         : status.id === "ACTIVE" || status.id === "REJECTED",
   );
   const getSpecConfig = (key) => specsConfig[key];
+
+  const closeMenu = () => {
+    setMenuType(null);
+    setRejectInput("");
+    setLoadingSubmit(false)
+  };
+
+  const confirmDelete = (rejectInput) => {
+    setLoadingSubmit(true);
+    if (rejectInput) {
+      changeStatus(target, { id: "REJECTED" }, rejectInput);
+    } else {
+      removeAd(target)
+        .then(() => {
+          closeMenu();
+        })
+        .catch(console.error)
+        .finaly(setLoadingSubmit(false));
+    }
+  };
 
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
@@ -276,9 +302,14 @@ export default function AdsTable({
                           page === "user" && curentStatus.id == "PENDING"
                         }
                         locale={locale}
-                        onChange={(selected) =>
-                          changeStatus(item?.id, selected)
-                        }
+                        onChange={(selected) => {
+                          if (selected.id == "REJECTED") {
+                            setMenuType("reject");
+                            setTarget(item?.id);
+                          } else {
+                            changeStatus(item?.id, selected);
+                          }
+                        }}
                       />
                     </div>
                   )}
@@ -306,7 +337,10 @@ export default function AdsTable({
 
                     <FaTrashAlt
                       className="delete"
-                      onClick={() => removeAd(item?.id)}
+                      onClick={() => {
+                        setMenuType("delete");
+                        setTarget(item?.id);
+                      }}
                     />
                   </div>
                 </div>
@@ -315,6 +349,20 @@ export default function AdsTable({
           )}
         </div>
       </div>
+      <DynamicMenu
+        open={!!menuType}
+        title={menuType == "delete" ? "Confirm Delete" : "reject reason"}
+        onClose={closeMenu}
+      >
+        <DeleteConfirm
+          menuType={menuType}
+          rejectInput={rejectInput}
+          setRejectInput={setRejectInput}
+          onConfirm={confirmDelete}
+          onCancel={closeMenu}
+          loading={loadingSubmit}
+        />
+      </DynamicMenu>
     </div>
   );
 }

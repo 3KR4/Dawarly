@@ -126,7 +126,31 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 10px;
+}
+.single-page .details-holder .card.conditions ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.single-page .details-holder .card.conditions li {
+  background: var(--hover-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  align-items: center;
+  min-width: max-content;
+  height: 33px;
+  padding: 6px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+.single-page .details-holder .card.booking .availability,
+.single-page .details-holder .card.booking p span {
+  color: var(--main-color);
+  font-weight: 700;
 }
 .single-page .details-holder .card.description {
   gap: 6px;
@@ -399,7 +423,12 @@
   color: var(--main-color);
   font-size: 28px;
   font-weight: 700;
-  margin: 7px 0 5px;
+}
+.single-page .details-holder .column-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 10px;
 }
 .single-page .details-holder .price-dep {
   font-size: 19px;
@@ -458,6 +487,7 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 .single-page .details-holder .right .user-info .row-holder {
   margin-bottom: 4px;
@@ -469,7 +499,17 @@
   font-weight: 600;
   font-size: 14px;
 }
-
+.single-page .details-holder .right .user-info .row-holder a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--main-color);
+  font-weight: 700;
+}
+.single-page .details-holder .right .user-info .row-holder a:hover {
+  text-decoration: underline;
+}
 .single-page .details-holder .main-button,
 .single-page .details-holder .main-button > * {
   color: var(--paragraph);
@@ -670,14 +710,22 @@
     height: 30px;
   }
   .single-page .details-holder h3 {
-    font-size: 20px;
+    font-size: 18px;
+    line-height: 1.4;
   }
   .single-page .details-holder .price {
     font-size: 25px;
     margin: 3px 0px 0px;
   }
+  .single-page .details-holder .card .row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .single-page .details-holder .card .row:has(.area) {
-    margin: 3px 0px 0px;
+    margin: 3px 0 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   .single-page .details-holder .card .area svg {
     font-size: 12px;

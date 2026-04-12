@@ -319,7 +319,7 @@ export default function UsersForm({ params }) {
   };
 
   return (
-    <div className={`form-holder create-ad`}>
+    <div className={`form-holder user-account`}>
       <form
         className="container"
         onSubmit={handleSubmit(onSubmit)}

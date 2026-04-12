@@ -57,6 +57,11 @@ export const RentFrequencies = [
   { id: "WEEK", name_en: "Per Week", name_ar: "أسبوعي" },
   { id: "MONTH", name_en: "Per Month", name_ar: "شهري" },
 ];
+export const RentPeriodUnit = [
+  { id: "DAY", name_en: "Day", name_ar: "يوم" },
+  { id: "WEEK", name_en: "Week", name_ar: "اسبوع" },
+  { id: "MONTH", name_en: "Month", name_ar: "شهر" },
+];
 
 export const ImageEntityTypes = [
   { id: "AD", name_en: "Ad", name_ar: "إعلان" },

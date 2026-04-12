@@ -1,8 +1,8 @@
 // services/api.js
 import axios from "axios";
 
-// -------------------- BASE CONFIG --------------------
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+// -------------------- BASE CONFIG    https://back.dawaarly.com/api   --------------------
+const BASE_URL = "http://localhost:5000/api";
 
 // Instance بدون interceptors (للـ refresh فقط)
 export const plainApi = axios.create({
@@ -78,32 +78,32 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-if (
-  error.response?.status === 401 &&
-  !original._retry &&
-  !original.url.includes("/auth/refresh-token") &&
-  accessToken
-) {
-  original._retry = true;
+    if (
+      error.response?.status === 401 &&
+      !original._retry &&
+      !original.url.includes("/auth/refresh-token") &&
+      accessToken
+    ) {
+      original._retry = true;
 
-  try {
-    await refreshToken();
+      try {
+        await refreshToken();
 
-    // نحط التوكن الجديد ونعيد الطلب
-    original.headers.Authorization = `Bearer ${accessToken}`;
-    return api(original);
-  } catch (err) {
-    // logout / redirect
-    if (typeof window !== "undefined") {
-      const currentPath = window.location.pathname;
+        // نحط التوكن الجديد ونعيد الطلب
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      } catch (err) {
+        // logout / redirect
+        if (typeof window !== "undefined") {
+          const currentPath = window.location.pathname;
 
-      if (!currentPath.includes("/register")) {
-        window.location.href = "/register";
+          if (!currentPath.includes("/register")) {
+            window.location.href = "/register";
+          }
+        }
+        return Promise.reject(err);
       }
     }
-    return Promise.reject(err);
-  }
-}
 
     return Promise.reject(error);
   },

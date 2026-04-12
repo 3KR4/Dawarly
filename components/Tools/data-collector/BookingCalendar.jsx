@@ -1,59 +1,98 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useMemo, useContext } from "react";
 import { DateRange } from "react-date-range";
 import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+
 import { settings } from "@/Contexts/settings";
 import { ar, enUS } from "date-fns/locale";
-export default function BookingRange({ disabledDates = [] }) {
+
+export default function BookingRange({ data }) {
   const { locale } = useContext(settings);
 
+  // =========================
+  // FORMAT RANGE STATE
+  // =========================
   const [range, setRange] = useState([
     {
       startDate: new Date(),
-      endDate: addDays(new Date(), 1),
+      endDate: new Date(),
       key: "selection",
     },
   ]);
 
-  // ===== Date Formatter (Short & Clean) =====
+  // =========================
+  // ALLOWED RANGE (FROM API)
+  // =========================
+  const allowed_range = useMemo(() => {
+    return {
+      start: data?.available_from ? new Date(data.available_from) : new Date(),
+      end: data?.available_to
+        ? new Date(data.available_to)
+        : addDays(new Date(), 30),
+    };
+  }, [data]);
+
+  // =========================
+  // DISABLED DATES (BOOKINGS)
+  // =========================
+  const disabledDates = useMemo(() => {
+    if (!data?.Booking) return [];
+
+    const dates = [];
+
+    data.Booking.forEach((b) => {
+      if (b.status === "CANCELLED") return;
+
+      let current = new Date(b.from_date);
+      const end = new Date(b.to_date);
+
+      while (current <= end) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    return dates;
+  }, [data]);
+
+  // =========================
+  // LOCALES
+  // =========================
+  const localesMap = {
+    ar: ar,
+    en: enUS,
+  };
+
+  const isSameDay = (d1, d2) =>
+    d1 && d2 && d1.toDateString() === d2.toDateString();
+
   const formatShortDate = (date) => {
     if (!date) return "";
-
     return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
       month: "short",
       day: "numeric",
     });
   };
-  const localesMap = {
-    ar: ar,
-    en: enUS,
-  };
-  const isSameDay = (d1, d2) =>
-    d1 && d2 && d1.toDateString() === d2.toDateString();
-
-  const ALLOWED_RANGE = {
-    start: new Date(2026, 0, 30), // فبراير = 1
-    end: new Date(2026, 1, 26),
-  };
+  const hasSelected = range[0].startDate !== range[0].endDate;
   return (
     <div className="booking-range">
       <DateRange
         ranges={range}
         onChange={(item) => setRange([item.selection])}
-        minDate={ALLOWED_RANGE.start}
-        maxDate={ALLOWED_RANGE.end}
+        minDate={allowed_range.start}
+        maxDate={allowed_range.end}
         disabledDates={disabledDates}
         rangeColors={["#7c5cff"]}
         locale={localesMap[locale]}
-        showSelectionPreview
-        showPreview
+        showSelectionPreview={false}
+        moveRangeOnFirstSelection={false}
       />
 
-      <button className="main-button" disabled={!range[0].startDate}>
-        {!range[0].startDate ? (
+      <button className="main-button" disabled={!hasSelected}>
+        {!hasSelected ? (
           locale === "ar" ? (
             "اختر تاريخ الحجز"
           ) : (

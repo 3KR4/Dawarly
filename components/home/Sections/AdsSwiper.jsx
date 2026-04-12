@@ -13,11 +13,24 @@ import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import AdsCard from "@/components/home/AdsCard";
 import useTranslate from "@/Contexts/useTranslation";
 import { getSectionsAds } from "@/services/ads/ads.service";
+import { useAppData } from "@/Contexts/DataContext";
 
-export default function AdsSwiper({ type, value }) {
+export default function AdsSwiper({ type, id }) {
+  const { categories, subCategories, governorates, cities, compounds } = useAppData();
+
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
-  const id = value?.id;
+  const value =
+    type == "governorate"
+      ? governorates.find((x) => x.id == id)
+      : type == "category"
+        ? categories.find((x) => x.id == id)
+        : type == "subCategory"
+          ? subCategories.find((x) => x.id == id)
+          : type == "city"
+            ? cities.find((x) => x.id == id)
+            : compounds.find((x) => x.id == id);
+
   const swiperRef = useRef(null);
 
   // ================= STATES =================
@@ -114,11 +127,6 @@ export default function AdsSwiper({ type, value }) {
   // ================= NAVIGATION =================
   const showNav =
     total > maxSlides && !screenSize.includes("small") && screenSize !== "xs";
-
-  // ================= LOADING =================
-  if (ads.length === 0 && loading) {
-    return <p style={{ padding: "20px" }}>Loading...</p>;
-  }
 
   // ================= UI =================
   return (

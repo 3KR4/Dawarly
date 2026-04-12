@@ -6,5 +6,9 @@ import { useParams } from "next/navigation";
 export default function CreateAd() {
   const { slug } = useParams();
   const adId = slug;
-  return <AdForm type="client" adId={adId} />;
+  return (
+    <div className="dashboard container">
+      <AdForm type="client" adId={adId} />
+    </div>
+  );
 }

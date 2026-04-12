@@ -26,6 +26,7 @@ import SelectLocation from "@/components/Tools/data-collector/selectLocation";
 import useClickOutside from "@/Contexts/useClickOutside";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useAppData } from "@/Contexts/DataContext";
+import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 
 function Header() {
   const t = useTranslate();
@@ -83,7 +84,7 @@ function Header() {
         <div className="container">
           <div className="top">
             <Link href="/" className="logo">
-              <Image src={`/logo3.png`} fill alt="Dawaarly" />
+              <Image src={`/logo.png`} fill alt="Dawaarly" />
               {t.header.awaarly}
             </Link>
             <div className="search">
@@ -167,6 +168,18 @@ function Header() {
                         }`}
                       >
                         <ul className="user-menu">
+                          {user?.user_type == "ADMIN" && (
+                            <li>
+                              <Link
+                                href={`/dashboard`}
+                                className="btn"
+                              >
+                                <TbDeviceDesktopAnalytics style={{fontSize: "16px"}} />
+                                {t.actions.openDashBoard}
+                              </Link>
+                            </li>
+                          )}
+
                           <li>
                             <Link href={`/account/${user?.id}`} className="btn">
                               <FaRegUser />
@@ -179,12 +192,14 @@ function Header() {
                               {t.actions.postAd}
                             </Link>
                           </li>
-                          <li>
-                            <Link href={`/mylisting`} className="btn">
-                              <FaListUl />
-                              {t.actions.viewAdsListing}
-                            </Link>
-                          </li>
+                          {user?.user_type !== "USER" && (
+                            <li>
+                              <Link href={`/mylisting`} className="btn">
+                                <FaListUl />
+                                {t.actions.viewAdsListing}
+                              </Link>
+                            </li>
+                          )}
 
                           {screenSize.includes("small") && (
                             <>

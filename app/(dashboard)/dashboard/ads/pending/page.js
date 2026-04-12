@@ -68,21 +68,14 @@ export default function ActiveAds() {
   const handleDeleteAd = async (id) => {
     try {
       await deleteAd(id);
-      addNotification({
-        type: "success",
-        message: "Ad deleted successfully ✅",
-      });
 
-      // 1️⃣ نحسب كم عنصر باقي بعد الحذف
       const remainingItems = adsData.ads.length - 1;
 
-      // 2️⃣ نقرر الصفحة الجديدة
       const newPage =
         remainingItems === 0 && adsData.pagination.page > 1
           ? adsData.pagination.page - 1
           : adsData.pagination.page;
 
-      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
       fetchAds(newPage);
     } catch (error) {
       console.error(error);
@@ -92,25 +85,17 @@ export default function ActiveAds() {
       });
     }
   };
-  const handelChangeStatus = async (id, status) => {
-    console.log("status:", status);
-
+  const handelChangeStatus = async (id, status, reason) => {
     try {
-      await changeStatus(id, { status: status.id });
-      addNotification({
-        type: "success",
-        message: "ad approved Successfuly",
-      });
+      await changeStatus(id, { status: status.id, reason });
 
       const remainingItems = adsData.ads.length - 1;
 
-      // 2️⃣ نقرر الصفحة الجديدة
       const newPage =
         remainingItems === 0 && adsData.pagination.page > 1
           ? adsData.pagination.page - 1
           : adsData.pagination.page;
 
-      // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
       fetchAds(newPage);
     } catch (error) {
       console.error(error);
@@ -151,23 +136,20 @@ export default function ActiveAds() {
   );
 }
 
+// <AdsTable
+//   activeAds={true}
+//   statusChanger={"admin"}
 
+// />
 
-      // <AdsTable
-      //   activeAds={true}
-      //   statusChanger={"admin"}
+// <AdsTable
+//   changeStatus={handelChangeStatus}
+//   activeAds={false}
+//   statusChanger={"client"}
+// />
 
-      // />
-
-
-      // <AdsTable
-      //   changeStatus={handelChangeStatus}
-      //   activeAds={false}
-      //   statusChanger={"client"}
-      // />
-
-      // <AdsTable
-      //   changeStatus={handelChangeStatus}
-      //   activeAds={false}
-      //   statusChanger={"admin"}
-      // />;
+// <AdsTable
+//   changeStatus={handelChangeStatus}
+//   activeAds={false}
+//   statusChanger={"admin"}
+// />;

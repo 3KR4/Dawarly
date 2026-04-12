@@ -58,7 +58,6 @@ export default function Register() {
     FORGET_PASS_REQUEST: 6, // ارسال الايميل
     FORGET_PASS_OTP: 7, // ادخال OTP
     FORGET_PASS_RESET: 8, // ادخال باسورد جديد
-    PASS_CHANGED: 9, // نجاح تغيير الباسورد
   };
   const [additionalData, setAdditionalData] = useState({
     gov: null,
@@ -156,6 +155,7 @@ export default function Register() {
     clearErrors,
     trigger,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -300,13 +300,8 @@ export default function Register() {
             type: "warning",
             message: msg,
           });
-          if (msg === "Email already exists") {
-            await handleResend();
 
-            setStep(STEPS.EMAIL_VERIFY);
-          } else {
-            setStep(STEPS.ACCOUNT);
-          }
+          setStep(STEPS.ACCOUNT);
         }
         return;
       }
@@ -379,7 +374,8 @@ export default function Register() {
             type: "success",
             message: "Password reset successfully",
           });
-          setStep(STEPS.PASS_CHANGED);
+          setStep(STEPS.LOGIN);
+          setValue("loginPassword" , new_password)
         } catch (err) {
           addNotification({
             type: "warning",
@@ -388,10 +384,6 @@ export default function Register() {
           setOtp(Array(OTP_LENGTH).fill(""));
         }
 
-        return;
-      }
-      if (step === STEPS.PASS_CHANGED) {
-        setStep(STEPS.LOGIN);
         return;
       }
     } catch (err) {
@@ -440,6 +432,8 @@ export default function Register() {
 
   // ---------------- HANDLE RESEND ----------------
   const handleResend = async () => {
+    setLoadings((prev) => ({ ...prev, resend: true }));
+
     try {
       await resendEmailOtp({
         email: getValues("email") || getValues("emailPhoneLogin"), // خلي نفس القيمة المستخدمة
@@ -453,11 +447,6 @@ export default function Register() {
       return true; // رجع نجاح
     } catch (err) {
       if (err.response?.data?.message == "Email already verified") {
-        addNotification({
-          type: "warning",
-          message:
-            "This account is already registered. You can log in directly.",
-        });
         // setStep(STEPS.LOGIN);
       } else {
         addNotification({
@@ -467,6 +456,8 @@ export default function Register() {
       }
 
       throw err; // لازم ترميه لبرا عشان الكود اللي بعد await ما يكملش
+    } finally {
+      setLoadings((prev) => ({ ...prev, resend: false }));
     }
   };
   const handleForgetPass = async () => {
@@ -493,7 +484,6 @@ export default function Register() {
     [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
     [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
     [STEPS.FORGET_PASS_RESET]: "Create New Password",
-    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
     [STEPS.ADDRESS]: auth.chooseAddress,
     [STEPS.INTERESTS]: auth.chooseInterests,
   };
@@ -503,7 +493,6 @@ export default function Register() {
     [STEPS.LOGIN]: auth.accountDescription || "",
     [STEPS.PHONE_VERIFY]: auth.phoneDescription,
     [STEPS.EMAIL_VERIFY]: auth.emailDescription,
-    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
 
     [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
     [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
@@ -518,7 +507,6 @@ export default function Register() {
     [STEPS.LOGIN]: auth.login,
     [STEPS.PHONE_VERIFY]: auth.verifyPhoneBtn,
     [STEPS.EMAIL_VERIFY]: auth.verifyEmailBtn,
-    [STEPS.PASS_CHANGED]: "Password Changed Successfully",
 
     [STEPS.FORGET_PASS_REQUEST]: "Enter Verification Code",
     [STEPS.FORGET_PASS_OTP]: "Enter Verification Code",
@@ -939,7 +927,8 @@ export default function Register() {
               disabled={cooldown > 0}
               onClick={handleResend}
             >
-              {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
+
+              {loadings.resend ? <span className="loader"></span> : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
             </button>
           </>
         )}

@@ -168,10 +168,10 @@ header .actions-btns .userMenu .top {
   grid-template-columns: 1fr 0.2fr 0.2fr;
 }
 .dash-holder.for-client .top {
-  margin-bottom: 10px;
+  margin-bottom: 3px;
   grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr;
 }
-.dash-holder.for-client .top > * {
+.dash-holder.for-client > .top > * {
   width: 100% !important;
 }
 .table-container {

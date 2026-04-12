@@ -7,8 +7,8 @@ input:-webkit-autofill:focus {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-body:has(.form-holder) header,
-body:has(.form-holder) footer {
+body:has(.dashboard) header,
+body:has(.dashboard) footer {
   display: none;
 }
 
@@ -21,6 +21,9 @@ body:has(.form-holder) footer {
   flex: 1;
   margin: 20px 0;
 }
+.form-holder.user-account {
+  margin: 50px 0;
+}
 body:has(.form-holder) footer {
   margin-top: 0;
 }
@@ -29,26 +32,28 @@ body:has(.form-holder) footer {
 }
 .form-holder.register {
   margin: 0;
+  padding: 50px 0;
 }
-body:has(.form-holder.register) {
-  background: linear-gradient(
-    13deg,
-    var(--main-color) -60%,
-    var(--body-color) 100%
-  );
-}
+
 .form-holder form {
   background: var(--body-color);
   border-radius: 28px;
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-    width: 820px;
+  width: 820px;
   max-width: 95%;
   height: fit-content;
   padding: 20px 26px;
   display: flex;
   box-shadow: 0 1px 10px #00000023;
+}
+.dashboard .form-holder.create-ad form {
+  box-shadow: 0 1px 10px #00000023 !important;
+  padding: 20px 26px;
+}
+.form-holder.register form {
+  width: 725px !important;
 }
 .form-holder form.container {
   width: 1340px;
@@ -184,7 +189,7 @@ p.have-problem {
 
 .body.fluid-container.for-user .table-container .table-header,
 .body.fluid-container.for-user .table-container .table-item {
-  grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1fr 1.15fr 0.8fr;
+  grid-template-columns: 1.25fr 0.5fr 0.5fr 1fr 1fr 0.8fr 0.8fr;
 }
 .form-holder .options-grid {
   display: flex;
@@ -234,8 +239,8 @@ p.have-problem {
 }
 .form-holder form.container .option-box {
   font-size: 13px;
-      min-width: 14%;
-    height: 42px;
+  min-width: 14%;
+  height: 42px;
 }
 .form-holder .option-box:not(.disabled):hover {
   background: var(--hover-color);
@@ -318,6 +323,11 @@ p.have-problem {
   height: 160px;
 }
 
+@media (max-width: 1000px) {
+  .form-holder form.container .option-box {
+    min-width: 24%;
+  }
+}
 @media (max-width: 992px) {
   .form-holder form {
     box-shadow: unset;
@@ -362,9 +372,18 @@ p.have-problem {
     margin-bottom: 7px;
     font-size: 26px;
   }
+  .form-holder form.container .option-box {
+    min-width: 27%;
+  }
+  .form-holder.user-account {
+  margin: 30px 0;
+}
 }
 @media (max-width: 470px) {
   .form-holder .options-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .form-holder form.container .option-box {
+    min-width: 33%;
   }
 }

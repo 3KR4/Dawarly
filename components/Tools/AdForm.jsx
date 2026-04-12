@@ -10,6 +10,8 @@ import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
+import { IoChatbubblesOutline } from "react-icons/io5";
+
 import Tags from "@/components/Tools/data-collector/Tags";
 import {
   crateAd,
@@ -41,7 +43,9 @@ export default function AdForm({ type = "client", adId }) {
   const [adData, setAdData] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
   const [allAdmins, setAllAdmins] = useState([]);
-  const canAssignAdmin = user?.permissions?.includes("ASSIGN_RESPONSIBILITY") || user?.is_super_admin;
+  const canAssignAdmin =
+    user?.permissions?.includes("ASSIGN_RESPONSIBILITY") ||
+    user?.is_super_admin;
   const [loadingContent, setLoadingContnet] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -201,8 +205,8 @@ export default function AdForm({ type = "client", adId }) {
       setSelectedMediatorMethod({ id: 2, name: t.ad.userToAdmin });
     }
     setSelectedContactMethods({
-      chat: ad.display_phone,
-      phone: ad.display_whatsapp,
+      phone: ad.display_phone,
+      chat: ad.display_whatsapp,
     });
   };
 
@@ -212,8 +216,8 @@ export default function AdForm({ type = "client", adId }) {
   ];
 
   const METHODS = [
-    { key: "email", label: t.ad.contact_via_email, icon: Mail },
     { key: "phone", label: t.ad.contact_via_phone, icon: Phone },
+    { key: "chat", label: t.ad.contact_via_chat, icon: IoChatbubblesOutline },
   ];
 
   const handleErrors = (type, value) => {
@@ -370,7 +374,9 @@ export default function AdForm({ type = "client", adId }) {
         type: "success",
         message: adId ? t.ad.ad_updated : t.ad.ad_created,
       });
-      redirectAfterLogin("/dashboard/ads/all");
+      redirectAfterLogin(
+        type == "client" ? "/mylisting" : "/dashboard/ads/all",
+      );
     } catch (err) {
       console.error("Error:", err);
       let message = "An error occurred";
@@ -1056,44 +1062,43 @@ export default function AdForm({ type = "client", adId }) {
 
         <Tags disabled={!isEditable} />
 
-        {(adData?.subuser && adData?.admin && adData?.admin !== user.id) ||
-          (type == "client" && (
-            <div className="form-section">
-              <h2 className="section-title">{t.ad.theContactMethod}</h2>
-              <div className="options-grid verfiyMethod">
-                {METHODS.map(({ key, label, icon: Icon }) => {
-                  const isActive = selectedContactMethods[key];
+        {((type === "admin" && !!adData?.subuser) || type === "client") && (
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.theContactMethod}</h2>
+            <div className="options-grid verfiyMethod">
+              {METHODS.map(({ key, label, icon: Icon }) => {
+                const isActive = selectedContactMethods[key];
 
-                  return (
-                    <div
-                      key={key}
-                      className={`option-box ${isActive ? "active" : ""} ${
-                        fieldErrors.contact ? "error-border" : ""
-                      }`}
-                      onClick={() => {
-                        setSelectedContactMethods((prev) => ({
-                          ...prev,
-                          [key]: !prev[key],
-                        }));
-                        handleErrors("contact", null);
-                      }}
-                    >
-                      <Icon className="cat-icon" />
-                      <span>{label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              {fieldErrors.contact && (
-                <div className="box forInput">
-                  <span className="error">
-                    <CircleAlert />
-                    {fieldErrors.contact}
-                  </span>
-                </div>
-              )}
+                return (
+                  <div
+                    key={key}
+                    className={`option-box ${isActive ? "active" : ""} ${
+                      fieldErrors.contact ? "error-border" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedContactMethods((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }));
+                      handleErrors("contact", null);
+                    }}
+                  >
+                    <Icon className="cat-icon" />
+                    <span>{label}</span>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+            {fieldErrors.contact && (
+              <div className="box forInput">
+                <span className="error">
+                  <CircleAlert />
+                  {fieldErrors.contact}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* === زر الإرسال === */}
         <div className="form-section submit-section">

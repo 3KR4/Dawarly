@@ -45,8 +45,7 @@ export default function CreateAd() {
   const [step, setStep] = useState(STEPS.CATEGORIES);
 
   // ======= FORM STATES =======
-  const [adData, setAdData] = useState(null);
-  const [allAdmins, setAllAdmins] = useState([]);
+
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -192,11 +191,15 @@ export default function CreateAd() {
         !!data.adTitle &&
         !!selectedLocations.gov &&
         !!selectedLocations.city &&
+        !!additionalData?.currency &&
+        !!additionalData?.frequency &&
         images.length > 0;
 
       const errors = {
         gov: !selectedLocations.gov ? t.ad.errors.governorate : "",
         city: !selectedLocations.city ? t.ad.errors.city : "",
+        currency: !additionalData?.currency ? t.ad.errors.currency : "",
+        frequency: !additionalData?.frequency ? t.ad.errors.frequency : "",
       };
 
       Object.entries(errors).forEach(([key, value]) => {
@@ -380,7 +383,7 @@ export default function CreateAd() {
   };
 
   return (
-    <div className="form-holder create-ad">
+    <div className="form-holder create-ad user-account">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="top">
           <h1>{titles[step]}</h1>
@@ -629,11 +632,11 @@ export default function CreateAd() {
                   options={Currencies}
                   value={additionalData?.currency || null}
                   onChange={(item) => {
-                    handleErrors("currency", null);
                     setAdditionalData((prev) => ({
                       ...prev,
                       currency: item,
                     }));
+                    handleErrors("currency", null);
                   }}
                   error={fieldErrors.currency}
                   required={true}
@@ -645,11 +648,11 @@ export default function CreateAd() {
                   options={RentFrequencies}
                   value={additionalData?.frequency || null}
                   onChange={(item) => {
-                    handleErrors("frequency", null);
                     setAdditionalData((prev) => ({
                       ...prev,
                       frequency: item,
                     }));
+                    handleErrors("frequency", null);
                   }}
                   error={fieldErrors.frequency}
                   required={true}
@@ -939,7 +942,15 @@ export default function CreateAd() {
         {/* ================= BUTTON ================= */}
         {step !== STEPS.CATEGORIES && step !== STEPS.SUB_CATEGORIES && (
           <button type="submit" className="main-button">
-            {step === STEPS.CONTACT ? t.ad.create_your_ad : t.actions.next}
+            {step === STEPS.CONTACT ? (
+              loadingSubmit ? (
+                <span className="loader"></span>
+              ) : (
+                t.ad.create_your_ad
+              )
+            ) : (
+              t.actions.next
+            )}
           </button>
         )}
       </form>

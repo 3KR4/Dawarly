@@ -32,11 +32,10 @@ export default function ActiveAds() {
 
   const [loadingContent, setLoadingContent] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searchActive, setSearchActive] = useState(false); // تتحكم بالـ active class
-  const [searchConfirmed, setSearchConfirmed] = useState(false); // هل ضغط البحث؟
+  const [searchActive, setSearchActive] = useState(false); 
+  const [searchConfirmed, setSearchConfirmed] = useState(false); 
   const [selectedStatus, setSelectedStatus] = useState(null);
 
-  // ================= FETCH ADS =================
   const fetchAds = async (page = 1, search) => {
     try {
       setLoadingContent(true);
@@ -63,13 +62,11 @@ export default function ActiveAds() {
     }
   };
 
-  // ================= INITIAL FETCH =================
   useEffect(() => {
     if (!loading) {
       fetchAds(1);
     }
   }, [loading, selectedStatus]);
-  // ================= HANDLERS =================
 
   const handlePageChange = (newPage) => {
     fetchAds(newPage);
@@ -130,9 +127,7 @@ export default function ActiveAds() {
 
   return (
     <div className="dash-holder">
-      {/* ================= TOP FILTERS ================= */}
       <div className="top">
-        {/* 🔍 Search */}
         <div className="filters-header">
           <input
             type="text"
@@ -140,8 +135,8 @@ export default function ActiveAds() {
             value={searchText}
             onChange={(e) => {
               setSearchText(e.target.value);
-              setSearchActive(!!e.target.value); // أي نص => active
-              setSearchConfirmed(false); // الكتابة الجديدة تلغي التأكيد
+              setSearchActive(!!e.target.value);
+              setSearchConfirmed(false);
             }}
           />
 
@@ -159,7 +154,6 @@ export default function ActiveAds() {
               <IoCloseSharp style={{ padding: "7px" }} />
             </span>
           ) : (
-            // 🔍 Search عادي
             <span
               style={{
                 display: "flex",
@@ -167,7 +161,7 @@ export default function ActiveAds() {
               }}
               className={`filters-count ${searchActive ? "active" : ""}`}
               onClick={() => {
-                if (searchText) setSearchConfirmed(true); // اضغط بحث => يتحول لـ X
+                if (searchText) setSearchConfirmed(true); 
                 fetchAds(1);
               }}
             >
@@ -176,7 +170,6 @@ export default function ActiveAds() {
           )}
         </div>
 
-        {/* 🎯 Status Filter */}
         <SelectOptions
           size="small"
           placeholder={t.ad.status.label}
@@ -189,7 +182,6 @@ export default function ActiveAds() {
           }}
         />
 
-        {/* ⚙️ Filters UI */}
         <div className="filters-header">
           {t.actions.filterations}
           <span className="filters-count" style={{ display: "flex" }}>

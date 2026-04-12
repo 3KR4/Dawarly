@@ -20,7 +20,7 @@ export default function CardItem({ data }) {
   const t = useTranslate();
   const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
   const [favoritesCount, setFavoritesCount] = useState(
-    data?.favoritesCount || 0,
+    data?.favorites_count || 0,
   );
   const [loading, setLoading] = useState(false);
 

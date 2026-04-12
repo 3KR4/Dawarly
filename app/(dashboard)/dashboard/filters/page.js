@@ -1,374 +1,373 @@
-"use client";
+// "use client";
 
-import React, { useState, useEffect, useContext } from "react";
-import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
-import { MdEdit } from "react-icons/md";
-import { TiPlus } from "react-icons/ti";
-import { IoIosClose } from "react-icons/io";
-import { CircleAlert } from "lucide-react";
-import { RxComponentBoolean } from "react-icons/rx";
-import { IoMdRadioButtonOn } from "react-icons/io";
+// import React, { useState, useEffect, useContext } from "react";
+// import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
+// import { MdEdit } from "react-icons/md";
+// import { TiPlus } from "react-icons/ti";
+// import { IoIosClose } from "react-icons/io";
+// import { CircleAlert } from "lucide-react";
+// import { RxComponentBoolean } from "react-icons/rx";
+// import { IoMdRadioButtonOn } from "react-icons/io";
 
-import DynamicMenu from "@/components/Tools/DynamicMenu";
-import DeleteConfirm from "@/components/Tools/DeleteConfirm";
-import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
-import CatCard from "@/components/home/CatCard";
+// import DynamicMenu from "@/components/Tools/DynamicMenu";
+// import DeleteConfirm from "@/components/Tools/DeleteConfirm";
+// import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
+// import CatCard from "@/components/home/CatCard";
 
-import { settings } from "@/Contexts/settings";
-import useTranslate from "@/Contexts/useTranslation";
-import { specsConfig } from "@/Contexts/specsConfig";
-import { categoriesEn, categoriesAr } from "@/data";
-import {
-  getAllFilter,
-  getOneFilter,
-  createFilter,
-  updateFilter,
-  updateFilterLang,
-  deleteFilter,
-  createOption,
-  updateOption,
-  updateOptionLang,
-  deleteOption,
-  getFilterOptions,
-} from "@/services/filters/filters.service";
-import { getAllSubCats } from "@/services/subCategories/subCats.service";
-import { FaBarsStaggered } from "react-icons/fa6";
+// import { settings } from "@/Contexts/settings";
+// import useTranslate from "@/Contexts/useTranslation";
+// import { specsConfig } from "@/Contexts/specsConfig";
+// import { categoriesEn, categoriesAr } from "@/data";
+// import {
+//   getAllFilter,
+//   getOneFilter,
+//   createFilter,
+//   updateFilter,
+//   updateFilterLang,
+//   deleteFilter,
+//   createOption,
+//   updateOption,
+//   updateOptionLang,
+//   deleteOption,
+//   getFilterOptions,
+// } from "@/services/filters/filters.service";
+// import { getAllSubCats } from "@/services/subCategories/subCats.service";
+// import { FaBarsStaggered } from "react-icons/fa6";
 
-import "@/styles/client/forms.css";
-import "@/styles/dashboard/forms.css";
-import "@/styles/dashboard/pages/filters.css";
+// import "@/styles/client/forms.css";
+// import "@/styles/dashboard/forms.css";
+// import "@/styles/dashboard/pages/filters.css";
 
 export default function FiltersPage() {
-  const { locale, setOnCreate } = useContext(settings);
-  const t = useTranslate();
+  //   const { locale, setOnCreate } = useContext(settings);
+  //   const t = useTranslate();
 
-  const [filters, setFilters] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
-  const [category, setCategory] = useState(null);
-  const [subCategory, setSubCategory] = useState(null);
+  //   const [filters, setFilters] = useState({});
+  //   const [categories, setCategories] = useState([]);
+  //   const [subCategories, setSubCategories] = useState([]);
+  //   const [category, setCategory] = useState(null);
+  //   const [subCategory, setSubCategory] = useState(null);
 
-  const STEPS = { CATEGORIES: 1, SUB_CATEGORIES: 2, FORM: 3 };
-  const [step, setStep] = useState(STEPS.CATEGORIES);
+  //   const STEPS = { CATEGORIES: 1, SUB_CATEGORIES: 2, FORM: 3 };
+  //   const [step, setStep] = useState(STEPS.CATEGORIES);
 
-  const titles = {
-    [STEPS.CATEGORIES]: t.ad.choose_category,
-    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
-    [STEPS.FORM]: t.ad.filter_form,
-  };
-  const descriptions = {
-    [STEPS.CATEGORIES]: t.ad.choose_category_description,
-    [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category_description,
-    [STEPS.FORM]: t.ad.filter_form_description,
-  };
+  //   const titles = {
+  //     [STEPS.CATEGORIES]: t.ad.choose_category,
+  //     [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
+  //     [STEPS.FORM]: t.ad.filter_form,
+  //   };
+  //   const descriptions = {
+  //     [STEPS.CATEGORIES]: t.ad.choose_category_description,
+  //     [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category_description,
+  //     [STEPS.FORM]: t.ad.filter_form_description,
+  //   };
 
-  const [mode, setMode] = useState(null); // create | edit
-  const [menuType, setMenuType] = useState(null); // form | delete
-  const [editingFilter, setEditingFilter] = useState(null);
-  const [originalData, setOriginalData] = useState(null);
-  const [curentCreateLocale, setCurentCreateLocale] = useState(locale);
-  const [loading, setLoading] = useState(false);
+  //   const [mode, setMode] = useState(null); // create | edit
+  //   const [menuType, setMenuType] = useState(null); // form | delete
+  //   const [editingFilter, setEditingFilter] = useState(null);
+  //   const [originalData, setOriginalData] = useState(null);
+  //   const [curentCreateLocale, setCurentCreateLocale] = useState(locale);
+  //   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    control,
-    watch,
-    handleSubmit,
-    reset,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      key: "",
-      type: "",
-      label: { en: "", ar: "" },
-      required: true,
-      filterable: true,
-      options: [{ value: "", translations: { en: "", ar: "" } }],
-    },
-  });
+  //   const {
+  //     register,
+  //     control,
+  //     watch,
+  //     handleSubmit,
+  //     reset,
+  //     setValue,
+  //     getValues,
+  //     formState: { errors },
+  //   } = useForm({
+  //     defaultValues: {
+  //       key: "",
+  //       type: "",
+  //       label: { en: "", ar: "" },
+  //       required: true,
+  //       filterable: true,
+  //       options: [{ value: "", translations: { en: "", ar: "" } }],
+  //     },
+  //   });
 
-  const uiType = watch("type");
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "options",
-  });
+  //   const uiType = watch("type");
+  //   const { fields, append, remove } = useFieldArray({
+  //     control,
+  //     name: "options",
+  //   });
 
-  const options = useWatch({
-    control,
-    name: "options",
-    defaultValue: [],
-  });
+  //   const options = useWatch({
+  //     control,
+  //     name: "options",
+  //     defaultValue: [],
+  //   });
 
-  useEffect(() => {
-    setCategories(locale === "en" ? categoriesEn : categoriesAr);
-    getAllSubCats(locale)
-      .then((res) => setSubCategories(res.data.data))
-      .catch(console.error);
-    getAllFilter(locale)
-      .then((res) => setFilters(res.data.data))
-      .catch(console.error);
-  }, [locale]);
+  //   useEffect(() => {
+  //     setCategories(locale === "en" ? categoriesEn : categoriesAr);
+  //     getAllSubCats(locale)
+  //       .then((res) => setSubCategories(res.data.data))
+  //       .catch(console.error);
+  //     getAllFilter(locale)
+  //       .then((res) => setFilters(res.data.data))
+  //       .catch(console.error);
+  //   }, [locale]);
 
-  useEffect(() => {
-    setOnCreate(() => openCreate);
+  //   useEffect(() => {
+  //     setOnCreate(() => openCreate);
 
-    return () => setOnCreate(null); // cleanup مهم
-  }, []);
+  //     return () => setOnCreate(null); // cleanup مهم
+  //   }, []);
 
-  const openCreate = () => {
-    setMode("create");
-    setMenuType("form");
-    setEditingFilter(null);
-    setOriginalData(null);
-    setStep(STEPS.CATEGORIES);
-    reset({
-      key: "",
-      type: "",
-      label: { en: "", ar: "" },
-      required: true,
-      filterable: true,
-      options: [{ value: "", translations: { en: "", ar: "" } }],
-    });
-  };
+  //   const openCreate = () => {
+  //     setMode("create");
+  //     setMenuType("form");
+  //     setEditingFilter(null);
+  //     setOriginalData(null);
+  //     setStep(STEPS.CATEGORIES);
+  //     reset({
+  //       key: "",
+  //       type: "",
+  //       label: { en: "", ar: "" },
+  //       required: true,
+  //       filterable: true,
+  //       options: [{ value: "", translations: { en: "", ar: "" } }],
+  //     });
+  //   };
 
-const openEdit = async (filter) => {
-  setMode("edit");
-  setMenuType("form");
-  setStep(STEPS.FORM);
-  setEditingFilter(filter);
+  // const openEdit = async (filter) => {
+  //   setMode("edit");
+  //   setMenuType("form");
+  //   setStep(STEPS.FORM);
+  //   setEditingFilter(filter);
 
-  try {
-    /* ===== 1. GET FILTER ===== */
-    const filterRes = await getOneFilter(filter.id);
-    const data = filterRes.data.data;
+  //   try {
+  //     /* ===== 1. GET FILTER ===== */
+  //     const filterRes = await getOneFilter(filter.id);
+  //     const data = filterRes.data.data;
 
-    /* ===== 2. FILTER LABEL TRANSLATIONS ===== */
-    const labelTranslations = { en: "", ar: "" };
-    data.translations.forEach((t) => {
-      labelTranslations[t.lang] = t.label;
-    });
+  //     /* ===== 2. FILTER LABEL TRANSLATIONS ===== */
+  //     const labelTranslations = { en: "", ar: "" };
+  //     data.translations.forEach((t) => {
+  //       labelTranslations[t.lang] = t.label;
+  //     });
 
-    /* ===== 3. GET OPTIONS (EN & AR) ===== */
-    const [optionsEn, optionsAr] = await Promise.all([
-      getFilterOptions(filter.id, "en"),
-      getFilterOptions(filter.id, "ar"),
-    ]);
+  //     /* ===== 3. GET OPTIONS (EN & AR) ===== */
+  //     const [optionsEn, optionsAr] = await Promise.all([
+  //       getFilterOptions(filter.id, "en"),
+  //       getFilterOptions(filter.id, "ar"),
+  //     ]);
 
-    /* ===== 4. MERGE OPTIONS ===== */
-    const optionsMap = {};
+  //     /* ===== 4. MERGE OPTIONS ===== */
+  //     const optionsMap = {};
 
-    // EN
-    optionsEn.data.data.forEach((opt) => {
-      optionsMap[opt.id] = {
-        id: opt.id,
-        value: opt.value,
-        translations: {
-          en: {
-            id: opt.translations[0].id,
-            label: opt.label,
-          },
-          ar: {
-            id: null,
-            label: "",
-          },
-        },
-      };
-    });
+  //     // EN
+  //     optionsEn.data.data.forEach((opt) => {
+  //       optionsMap[opt.id] = {
+  //         id: opt.id,
+  //         value: opt.value,
+  //         translations: {
+  //           en: {
+  //             id: opt.translations[0].id,
+  //             label: opt.label,
+  //           },
+  //           ar: {
+  //             id: null,
+  //             label: "",
+  //           },
+  //         },
+  //       };
+  //     });
 
-    // AR
-    optionsAr.data.data.forEach((opt) => {
-      if (!optionsMap[opt.id]) {
-        optionsMap[opt.id] = {
-          id: opt.id,
-          value: opt.value,
-          translations: {
-            en: { id: null, label: "" },
-            ar: {
-              id: opt.translations[0].id,
-              label: opt.label,
-            },
-          },
-        };
-      } else {
-        optionsMap[opt.id].translations.ar = {
-          id: opt.translations[0].id,
-          label: opt.label,
-        };
-      }
-    });
+  //     // AR
+  //     optionsAr.data.data.forEach((opt) => {
+  //       if (!optionsMap[opt.id]) {
+  //         optionsMap[opt.id] = {
+  //           id: opt.id,
+  //           value: opt.value,
+  //           translations: {
+  //             en: { id: null, label: "" },
+  //             ar: {
+  //               id: opt.translations[0].id,
+  //               label: opt.label,
+  //             },
+  //           },
+  //         };
+  //       } else {
+  //         optionsMap[opt.id].translations.ar = {
+  //           id: opt.translations[0].id,
+  //           label: opt.label,
+  //         };
+  //       }
+  //     });
 
-    const mergedOptions = Object.values(optionsMap);
+  //     const mergedOptions = Object.values(optionsMap);
 
-    /* ===== 5. RESET FORM ===== */
-    reset({
-      key: data.key,
-      type: { value: data.type, label: data.type },
-      label: labelTranslations,
-      required: data.required,
-      filterable: data.filterable,
-      options:
-        mergedOptions.length > 0
-          ? mergedOptions
-          : [
-              {
-                value: "",
-                translations: {
-                  en: { id: null, label: "" },
-                  ar: { id: null, label: "" },
-                },
-              },
-            ],
-    });
+  //     /* ===== 5. RESET FORM ===== */
+  //     reset({
+  //       key: data.key,
+  //       type: { value: data.type, label: data.type },
+  //       label: labelTranslations,
+  //       required: data.required,
+  //       filterable: data.filterable,
+  //       options:
+  //         mergedOptions.length > 0
+  //           ? mergedOptions
+  //           : [
+  //               {
+  //                 value: "",
+  //                 translations: {
+  //                   en: { id: null, label: "" },
+  //                   ar: { id: null, label: "" },
+  //                 },
+  //               },
+  //             ],
+  //     });
 
-    // مهم جدًا للمقارنة
-    setOriginalData({
-      ...data,
-      options: mergedOptions,
-    });
-  } catch (err) {
-    console.error(err);
-  }
-};
+  //     // مهم جدًا للمقارنة
+  //     setOriginalData({
+  //       ...data,
+  //       options: mergedOptions,
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
+  //   const closeMenu = () => {
+  //     setMenuType(null);
+  //     setMode(null);
+  //     setEditingFilter(null);
+  //     setOriginalData(null);
+  //     reset();
+  //     setStep(STEPS.CATEGORIES);
+  //     setCategory(null);
+  //     setSubCategory(null);
+  //   };
 
-  const closeMenu = () => {
-    setMenuType(null);
-    setMode(null);
-    setEditingFilter(null);
-    setOriginalData(null);
-    reset();
-    setStep(STEPS.CATEGORIES);
-    setCategory(null);
-    setSubCategory(null);
-  };
+  //   const onSubmit = async (data) => {
+  //     if (loading) return;
+  //     setLoading(true);
 
-  const onSubmit = async (data) => {
-    if (loading) return;
-    setLoading(true);
+  //     try {
+  //       /* ===== CREATE ===== */
+  //       if (mode === "create") {
+  //         const payload = {
+  //           key: data.key,
+  //           type: data.type.value, // أو data.type حسب SelectOptions
+  //           required: data.required,
+  //           filterable: data.filterable,
+  //           translations: [
+  //             { lang: "en", label: data.label.en },
+  //             { lang: "ar", label: data.label.ar },
+  //           ],
+  //           options:
+  //             data.type.value !== "input"
+  //               ? data.options.map((opt) => ({
+  //                   value: opt.value,
+  //                   translations: [
+  //                     { lang: "en", label: opt.translations.en },
+  //                     { lang: "ar", label: opt.translations.ar },
+  //                   ],
+  //                 }))
+  //               : [],
+  //         };
 
-    try {
-      /* ===== CREATE ===== */
-      if (mode === "create") {
-        const payload = {
-          key: data.key,
-          type: data.type.value, // أو data.type حسب SelectOptions
-          required: data.required,
-          filterable: data.filterable,
-          translations: [
-            { lang: "en", label: data.label.en },
-            { lang: "ar", label: data.label.ar },
-          ],
-          options:
-            data.type.value !== "input"
-              ? data.options.map((opt) => ({
-                  value: opt.value,
-                  translations: [
-                    { lang: "en", label: opt.translations.en },
-                    { lang: "ar", label: opt.translations.ar },
-                  ],
-                }))
-              : [],
-        };
+  //         const res = await createFilter(subCategory, payload);
 
-        const res = await createFilter(subCategory, payload);
+  //         setFilters((prev) => {
+  //           const updated = { ...prev };
+  //           if (!updated[subCategory]) updated[subCategory] = [];
+  //           updated[subCategory].push(res.data.data);
+  //           return updated;
+  //         });
 
-        setFilters((prev) => {
-          const updated = { ...prev };
-          if (!updated[subCategory]) updated[subCategory] = [];
-          updated[subCategory].push(res.data.data);
-          return updated;
-        });
+  //         closeMenu();
+  //       }
+  //       /* ===== EDIT ===== */
+  // if (mode === "edit") {
+  //   /* ===== 1. UPDATE FILTER BASE ===== */
+  //   await updateFilter(editingFilter.id, {
+  //     key: data.key,
+  //     type: data.type.value,
+  //     required: data.required,
+  //     filterable: data.filterable,
+  //   });
 
-        closeMenu();
-      }
-      /* ===== EDIT ===== */
-if (mode === "edit") {
-  /* ===== 1. UPDATE FILTER BASE ===== */
-  await updateFilter(editingFilter.id, {
-    key: data.key,
-    type: data.type.value,
-    required: data.required,
-    filterable: data.filterable,
-  });
+  //   /* ===== 2. UPDATE FILTER TRANSLATIONS ===== */
+  //   for (const trans of editingFilter.translations) {
+  //     const newLabel = data.label[trans.lang];
+  //     if (newLabel !== trans.label) {
+  //       await updateFilterLang(trans.id, { label: newLabel });
+  //     }
+  //   }
 
-  /* ===== 2. UPDATE FILTER TRANSLATIONS ===== */
-  for (const trans of editingFilter.translations) {
-    const newLabel = data.label[trans.lang];
-    if (newLabel !== trans.label) {
-      await updateFilterLang(trans.id, { label: newLabel });
-    }
-  }
+  //   /* ===== 3. OPTIONS ===== */
+  //   for (const opt of data.options) {
+  //     /* --- NEW OPTION --- */
+  //     if (!opt.id) {
+  //       await createOption(editingFilter.id, {
+  //         value: opt.value,
+  //         translations: [
+  //           { lang: "en", label: opt.translations.en.label },
+  //           { lang: "ar", label: opt.translations.ar.label },
+  //         ],
+  //       });
+  //       continue;
+  //     }
 
-  /* ===== 3. OPTIONS ===== */
-  for (const opt of data.options) {
-    /* --- NEW OPTION --- */
-    if (!opt.id) {
-      await createOption(editingFilter.id, {
-        value: opt.value,
-        translations: [
-          { lang: "en", label: opt.translations.en.label },
-          { lang: "ar", label: opt.translations.ar.label },
-        ],
-      });
-      continue;
-    }
+  //     const originalOpt = originalData.options.find((o) => o.id === opt.id);
 
-    const originalOpt = originalData.options.find((o) => o.id === opt.id);
+  //     /* --- UPDATE VALUE --- */
+  //     if (originalOpt.value !== opt.value) {
+  //       await updateOption(opt.id, { value: opt.value });
+  //     }
 
-    /* --- UPDATE VALUE --- */
-    if (originalOpt.value !== opt.value) {
-      await updateOption(opt.id, { value: opt.value });
-    }
+  //     /* --- UPDATE TRANSLATIONS --- */
+  //     for (const lang of ["en", "ar"]) {
+  //       const oldLabel = originalOpt.translations[lang]?.label;
+  //       const newLabel = opt.translations[lang]?.label;
+  //       const transId = opt.translations[lang]?.id;
 
-    /* --- UPDATE TRANSLATIONS --- */
-    for (const lang of ["en", "ar"]) {
-      const oldLabel = originalOpt.translations[lang]?.label;
-      const newLabel = opt.translations[lang]?.label;
-      const transId = opt.translations[lang]?.id;
+  //       if (newLabel !== oldLabel && transId) {
+  //         await updateOptionLang(transId, { label: newLabel });
+  //       }
+  //     }
+  //   }
 
-      if (newLabel !== oldLabel && transId) {
-        await updateOptionLang(transId, { label: newLabel });
-      }
-    }
-  }
+  //   closeMenu();
+  // }
 
-  closeMenu();
-}
+  //     } catch (err) {
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const confirmDelete = async () => {
-    setLoading(true);
-    try {
-      await deleteFilter(editingFilter.id);
-      setFilters((prev) => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach((subCat) => {
-          updated[subCat] = updated[subCat].filter(
-            (f) => f.id !== editingFilter.id,
-          );
-        });
-        return updated;
-      });
-      closeMenu();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   const confirmDelete = async () => {
+  //     setLoading(true);
+  //     try {
+  //       await deleteFilter(editingFilter.id);
+  //       setFilters((prev) => {
+  //         const updated = { ...prev };
+  //         Object.keys(updated).forEach((subCat) => {
+  //           updated[subCat] = updated[subCat].filter(
+  //             (f) => f.id !== editingFilter.id,
+  //           );
+  //         });
+  //         return updated;
+  //       });
+  //       closeMenu();
+  //     } catch (err) {
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
   /* ================= RENDER ================= */
   return (
     <div className="dash-holder for-filters">
-      <div className="body">
+      {/* <div className="body">
         <div className="filters-holder">
           {Object.entries(filters).map(([subCat, filtersList]) => (
             <div key={subCat} className="sub-category-group">
@@ -417,9 +416,9 @@ if (mode === "edit") {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
-      <DynamicMenu
+      {/* <DynamicMenu
         open={!!menuType}
         title={titles[step]}
         descriptions={descriptions[step]}
@@ -429,7 +428,6 @@ if (mode === "edit") {
       >
         {menuType === "form" && (
           <>
-            {/* Steps Holder */}
             {mode !== "edit" && (
               <div className="steps-holder">
                 {Object.values(STEPS).map((s, i, arr) => (
@@ -447,7 +445,6 @@ if (mode === "edit") {
               </div>
             )}
 
-            {/* Step 1: Categories */}
             {mode !== "edit" && step === STEPS.CATEGORIES && (
               <div className="options-grid">
                 {categories.map((cat) => (
@@ -466,7 +463,6 @@ if (mode === "edit") {
               </div>
             )}
 
-            {/* Step 2: Sub Categories */}
             {mode !== "edit" && step === STEPS.SUB_CATEGORIES && (
               <div className="options-grid">
                 {subCategories
@@ -487,10 +483,8 @@ if (mode === "edit") {
               </div>
             )}
 
-            {/* Step 3: Form */}
             {step === STEPS.FORM && (
               <form className="builder" onSubmit={handleSubmit(onSubmit)}>
-                {/* Lang switch */}
                 <div className="lang-switch">
                   {["en", "ar"].map((lng) => (
                     <button
@@ -504,7 +498,6 @@ if (mode === "edit") {
                   ))}
                 </div>
 
-                {/* Key */}
                 <div className="box forInput">
                   <label>{t.dashboard.forms.filterKey}</label>
                   <div className="inputHolder">
@@ -522,7 +515,6 @@ if (mode === "edit") {
                   )}
                 </div>
 
-                {/* Label */}
                 <div className="box forInput">
                   <label>
                     Name ({curentCreateLocale.toUpperCase()}){" "}
@@ -554,7 +546,6 @@ if (mode === "edit") {
                   )}
                 </div>
 
-                {/* UI Type */}
                 <Controller
                   name="type"
                   control={control}
@@ -575,7 +566,6 @@ if (mode === "edit") {
                   )}
                 />
 
-                {/* Required */}
                 <div className="form-holder">
                   <div className="box forInput ">
                     <label>Required</label>
@@ -595,7 +585,6 @@ if (mode === "edit") {
                   </div>
                 </div>
 
-                {/* Filterable */}
                 <div className="form-holder">
                   <div className="box forInput ">
                     <label>Filterable</label>
@@ -617,8 +606,7 @@ if (mode === "edit") {
                   </div>
                 </div>
 
-                {/* Options */}
-                {/* Options */}
+   
                 {uiType !== "input" && (
                   <div className="options">
                     <div className="top-holder">
@@ -658,7 +646,6 @@ if (mode === "edit") {
                         <label>{`Option ${index + 1}`}</label>
                         <div className="inputHolder">
                           <div className="holder">
-                            {/* Input Value */}
                             <input
                               type="text"
                               placeholder="Value"
@@ -673,7 +660,6 @@ if (mode === "edit") {
                             )}
                           </div>
                           <div className="holder">
-                            {/* Input Label للغة الحالية */}
                             <input
                               type="text"
                               placeholder={`Label (${curentCreateLocale.toUpperCase()})`}
@@ -755,7 +741,7 @@ if (mode === "edit") {
             onConfirm={confirmDelete}
           />
         )}
-      </DynamicMenu>
+      </DynamicMenu> */}
     </div>
   );
 }

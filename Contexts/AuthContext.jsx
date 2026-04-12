@@ -22,15 +22,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await api.post("/auth/logout");
+      setUser(null);
+      setAccessToken(null);
+      localStorage.removeItem("user");
+
+      window.location.href = "/";
     } catch (err) {
       console.error(err);
     }
-
-    setUser(null);
-    setAccessToken(null);
-    localStorage.removeItem("user"); // ✅ clear cache
-
-    window.location.href = "/";
   };
 
   // ================= FETCH USER =================
@@ -48,19 +47,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ================= REFRESH TOKEN =================
-const refreshAuth = async () => {
-  try {
-    const res = await plainApi.post("/auth/refresh-token"); // ✅
-    setAccessToken(res.data.accessToken);
+  const refreshAuth = async () => {
+    try {
+      const res = await plainApi.post("/auth/refresh-token"); // ✅
+      setAccessToken(res.data.accessToken);
 
-    await fetchUser();
-  } catch (err) {
-    setUser(null);
-    localStorage.removeItem("user");
-  }
+      await fetchUser();
+    } catch (err) {
+      setUser(null);
+      localStorage.removeItem("user");
+    }
 
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   // ================= INIT =================
   useEffect(() => {

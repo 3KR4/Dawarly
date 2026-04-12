@@ -25,6 +25,7 @@ import { useSearchParams } from "next/navigation";
 import { UserTypes, Permissions } from "@/data/enums";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useNotification } from "@/Contexts/NotificationContext";
+import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 
 const superAdminOption = {
   id: "SUPER", // قيمة مميزة
@@ -38,6 +39,7 @@ export default function UsersForm() {
   const { governorates, cities } = useAppData();
   const { user } = useAuth();
   const { addNotification } = useNotification();
+  const redirectAfterLogin = useRedirectAfterLogin();
 
   const [originalData, setOriginalData] = useState(null);
 
@@ -168,10 +170,13 @@ export default function UsersForm() {
     }
 
     // ------------------ 3) Permissions ------------------
-    const selectedPermsIds = selectedPermissions.map((p) => p.id).sort();
-    const originalPerms = [...originalData.permissions].sort();
+    const selectedPermsIds = [...selectedPermissions].map((p) => p.id).sort();
 
-    const permsChanged = selectedPermsIds.join(",") !== originalPerms.join(",");
+    const originalPerms = [...(originalData.permissions || [])].sort();
+
+    const permsChanged =
+      selectedPermsIds.length !== originalPerms.length ||
+      selectedPermsIds.some((id, i) => id !== originalPerms[i]);
 
     if (permsChanged) {
       updates.permissions = selectedPermsIds;
@@ -185,6 +190,8 @@ export default function UsersForm() {
     if (selectedType?.id === "SUPER") {
       newRole = "ADMIN";
       makeSuper = true;
+    } else {
+      makeSuper = false;
     }
 
     // 👇 لو رجع من SUPER لـ ADMIN
@@ -192,12 +199,14 @@ export default function UsersForm() {
       makeSuper = false;
     }
 
-    const roleChanged = newRole !== originalData.user_type;
-    const superChanged = makeSuper !== originalData.is_super_admin;
+    const roleChanged =
+      newRole !== originalData.user_type && selectedType?.id !== "SUPER"; // 👈 مهم
 
     if (roleChanged) {
       updates.role = newRole;
     }
+
+    const superChanged = makeSuper !== originalData.is_super_admin;
 
     if (superChanged) {
       updates.suber_admin = makeSuper;
@@ -206,6 +215,12 @@ export default function UsersForm() {
     // ------------------ 5) Ads Limit ------------------
     const adsLimitChanged =
       data.subscription_ads_limit !== originalData.subscription_ads_limit;
+    console.log("adsLimitChanged:", adsLimitChanged);
+    console.log("data.subscription_ads_limit:", data.subscription_ads_limit);
+    console.log(
+      "originalData.subscription_ads_limit:",
+      originalData.subscription_ads_limit,
+    );
 
     if (adsLimitChanged) {
       updates.ads_limit = data.subscription_ads_limit;
@@ -213,57 +228,55 @@ export default function UsersForm() {
 
     // ------------------ 6) تنفيذ الريكوستات ------------------
     try {
+      const messages = [];
+
       if (updates.profile) {
-        await updateUserProfile(updates.profile);
+        const res = await updateUserProfile(updates.profile);
+        if (res?.data?.message) messages.push(res.data.message);
       }
 
       if (updates.subscriber) {
-        await updateSubscriperProfile(updates.subscriber);
-      }
-
-      if (updates.role) {
-        await updateRole(userId, { user_type: updates.role });
+        const res = await updateSubscriperProfile(updates.subscriber);
+        if (res?.data?.message) messages.push(res.data.message);
       }
 
       if (updates.suber_admin !== undefined) {
-        await make_suber_admin(userId, {
+        const res = await make_suber_admin(userId, {
           makeSuper: updates.suber_admin,
         });
+        if (res?.data?.message) messages.push(res.data.message);
+      }
+
+      if (updates.role) {
+        const res = await updateRole(userId, { user_type: updates.role });
+        if (res?.data?.message) messages.push(res.data.message);
       }
 
       if (updates.permissions) {
-        await updatePermissions(userId, {
+        const res = await updatePermissions(userId, {
           permissions: updates.permissions,
         });
+        if (res?.data?.message) messages.push(res.data.message);
       }
 
       if (updates.ads_limit !== undefined) {
-        await change_ads_limit(userId, {
+        const res = await change_ads_limit(userId, {
           subscription_ads_limit: updates.ads_limit,
         });
+        if (res?.data?.message) messages.push(res.data.message);
       }
 
-      alert("User updated successfully!");
-
-      // ------------------ 7) تحديث originalData ------------------
-      setOriginalData((prev) => ({
-        ...prev,
-        ...updates.profile,
-        ...updates.subscriber,
-        permissions: updates.permissions || prev.permissions,
-        user_type: updates.role || prev.user_type,
-        is_super_admin:
-          updates.suber_admin !== undefined
-            ? updates.suber_admin
-            : prev.is_super_admin,
-        subscription_ads_limit:
-          updates.ads_limit !== undefined
-            ? updates.ads_limit
-            : prev.subscription_ads_limit,
-      }));
+      addNotification({
+        type: "success",
+        message: messages.join(" | ") || "Updated successfully",
+      });
+      redirectAfterLogin("/dashboard/users");
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || "Something went wrong!");
+      addNotification({
+        type: "warning",
+        message: err?.response?.data?.message || "Something went wrong!",
+      });
     } finally {
       setLoadingSubmit(false);
     }
@@ -492,7 +505,9 @@ export default function UsersForm() {
               options={[...UserTypes, superAdminOption]}
               value={selectedType}
               onChange={(selected) => {
-                setSelectedType((prev) => (prev == selected ? null : selected));
+                setSelectedType((prev) =>
+                  prev?.id === selected.id ? null : selected,
+                );
               }}
             />
             {/* TikTok */}
@@ -534,11 +549,13 @@ export default function UsersForm() {
                 multi={true}
                 onChange={(selected) => {
                   setSelectedPermissions((prev) => {
-                    if (prev?.find((item) => item.id === selected.id)) {
+                    const exists = prev.some((item) => item.id === selected.id);
+
+                    if (exists) {
                       return prev.filter((item) => item.id !== selected.id);
-                    } else {
-                      return [...prev, selected];
                     }
+
+                    return [...prev, selected];
                   });
                 }}
               />

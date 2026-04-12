@@ -18,30 +18,58 @@ const cairo = Cairo({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://www.dawaarly.com"),
+
   title: "Dawaarly",
   description:
-    "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
+    "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
+
+  keywords: [
+    "vacation rentals Egypt",
+    "short term rentals",
+    "holiday homes Egypt",
+    "rent apartment Egypt",
+  ],
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+
   openGraph: {
     title: "Dawaarly",
     description:
-      "Explore hidden gems, exciting night spots, and real Egyptian culture with Dawaarly. Your journey starts here — fun, local, and unforgettable.",
-    url: "https://Dawaarly.vercel.app/",
+      "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
+    url: "https://www.dawaarly.com",
     siteName: "Dawaarly",
     images: [
       {
         url: "/logo.png",
-        width: 1000,
-        height: 1000,
-        alt: "Dawaarly-logo",
+        width: 1200,
+        height: 630,
+        alt: "Dawaarly logo",
       },
     ],
     locale: "en_US",
     type: "website",
   },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Dawaarly",
+    description:
+      "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
+    images: ["/logo.png"],
+  },
+
   icons: {
-    icon: "/full-logo.jpg",
-    shortcut: "/full-logo.jpg",
-    apple: "/full-logo.jpg",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
@@ -58,7 +86,7 @@ export default function RootLayout({ children }) {
                     <Header />
                     {children}
                     <Footer />
-                    <NotificationHolder />;
+                    <NotificationHolder />
                   </DataProvider>
                 </SelectorsProvider>
               </FiltersProvider>
