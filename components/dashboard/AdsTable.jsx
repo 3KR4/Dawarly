@@ -51,7 +51,7 @@ export default function AdsTable({
   const closeMenu = () => {
     setMenuType(null);
     setRejectInput("");
-    setLoadingSubmit(false)
+    setLoadingSubmit(false);
   };
 
   const confirmDelete = (rejectInput) => {
@@ -126,7 +126,13 @@ export default function AdsTable({
           {!ads?.length && !loadingContent ? (
             <div className="no-data-found">
               <TbListSearch />
-              <p>{activeAds ? "no data found" : "no more pending ads"} </p>
+              <p>
+                {activeAds
+                  ? "no data found"
+                  : page === "user"
+                    ? "you didnt post ads yet"
+                    : "no more pending ads"}
+              </p>
             </div>
           ) : (
             ads?.map((item) => {
