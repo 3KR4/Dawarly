@@ -129,7 +129,7 @@ export default function Register() {
     }
   }, [days]);
 
-  const [step, setStep] = useState(STEPS.ACCOUNT);
+  const [step, setStep] = useState(STEPS.LOGIN);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [verifyMethod, setVerifyMethod] = useState("");

@@ -14,21 +14,32 @@ import { subcategoriesEn, subcategoriesAr } from "@/data";
 import { FaEye } from "react-icons/fa";
 import { RentFrequencies } from "@/data/enums";
 import { toggleFavorite } from "@/services/favorites/favorites.service";
+import { useAuth } from "@/Contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import AdCardSkeleton from "../skeletons/AdCardSkeleton";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
+  const { user } = useAuth();
+const router = useRouter();
+
   const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
   const [favoritesCount, setFavoritesCount] = useState(
     data?.favorites_count || 0,
   );
-  const [loading, setLoading] = useState(false);
+  const [adLoading, setAdLoading] = useState(true);
+  const [favLoading, setfavLoading] = useState(false);
 
   const arabic = isArabic(data?.title);
 
   const handleFavoriteClick = async (id) => {
-    if (loading) return; // يمنع spam
-    setLoading(true);
+if (!user) {
+    router.push(`/register?redirect=/market/${id}`);
+  return;
+}
+    if (favLoading) return; // يمنع spam
+    setfavLoading(true);
     const wasFavorite = isFavorite;
 
     try {
@@ -46,7 +57,7 @@ export default function CardItem({ data }) {
         wasFavorite ? prev + 1 : Math.max(prev - 1, 0),
       );
     } finally {
-      setLoading(false);
+      setfavLoading(false);
     }
   };
 
@@ -57,19 +68,23 @@ export default function CardItem({ data }) {
     data?.governorate?.[`name_${locale}`],
     data?.compound?.[`name_${locale}`],
   ].filter(Boolean);
+
+
+if (true) return <AdCardSkeleton />;
+
   return (
     <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
         <Image
           className="main"
           fill
-          src={data?.image[0]?.secure_url}
+          src={data?.image?.[0]?.secure_url || "/apartment-mockup.webp"}
           alt={data?.title}
         />
         <Image
           className="cover"
           fill
-          src={data?.image[0]?.secure_url}
+          src={data?.image?.[0]?.secure_url || "/apartment-mockup.webp"}
           alt={`${data?.title}-cover`}
         />
         <div className="top">
@@ -84,7 +99,7 @@ export default function CardItem({ data }) {
               isFavorite ? "Remove from favorites" : "Add to favorites"
             }
           >
-            {loading ? (
+            {favLoading ? (
               <span className="loader"></span>
             ) : isFavorite ? (
               <FaHeart />

@@ -81,6 +81,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         isAuthenticated: !!user,
+        favorietsCount,
+        setFavorietsCount
       }}
     >
       {children}
