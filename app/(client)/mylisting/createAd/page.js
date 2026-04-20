@@ -145,7 +145,7 @@ export default function CreateAd() {
   const uploadNewImages = async (adId) => {
     const newImages = images.filter((img) => img instanceof File);
 
-    if (newImages.length === 0) return;
+    if (newImages?.length === 0) return;
 
     const formData = new FormData();
 
@@ -193,7 +193,7 @@ export default function CreateAd() {
         !!selectedLocations.city &&
         !!additionalData?.currency &&
         !!additionalData?.frequency &&
-        images.length > 0;
+        images?.length > 0;
 
       const errors = {
         gov: !selectedLocations.gov ? t.ad.errors.governorate : "",
@@ -544,11 +544,23 @@ export default function CreateAd() {
                   }}
                 />
 
+
                 <SelectOptions
                   label={t.location.yourCompound}
                   placeholder={t.location.selectCompound}
-                  options={compounds}
+                  options={compounds.filter((m) => {
+                    if (selectedLocations.area?.id) {
+                      return m.area_id === selectedLocations.area.id;
+                    }
+
+                    if (selectedLocations.city?.id) {
+                      return m.city_id === selectedLocations.city.id;
+                    }
+
+                    return false;
+                  })}
                   value={selectedLocations.compound}
+                  disabled={!selectedLocations.area && !selectedLocations.city}
                   onChange={(item) => {
                     setSelectedLocations((prev) => ({
                       ...prev,

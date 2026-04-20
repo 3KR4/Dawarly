@@ -685,7 +685,7 @@ export default function UsersForm({ params }) {
             </div>
           </div>
         </div>
-
+{/* 
         <div className="form-section ">
           <h2 className="section-title">{t.auth.your_interests}</h2>
           <div className="options-grid">
@@ -698,13 +698,12 @@ export default function UsersForm({ params }) {
                   className={`option-box ${active ? "active" : ""}`}
                   onClick={() => toggleCategory(cat.id)}
                 >
-                  {/* <Icon className="cat-icon" /> */}
                   <span>{cat[`name_${locale}`]}</span>
                 </div>
               );
             })}
           </div>
-        </div>
+        </div> */}
 
         <button
           type={"submit"}

@@ -142,7 +142,10 @@ export default function AdsTable({
                   <div className="holder">
                     <Link href={`/`} className="item-image">
                       <Image
-                        src={item?.image[0]?.secure_url}
+                        src={
+                          item?.images?.[0]?.secure_url ||
+                          "/apartment-mockup.avif"
+                        }
                         alt={item?.name}
                         fill
                         className="product-image"

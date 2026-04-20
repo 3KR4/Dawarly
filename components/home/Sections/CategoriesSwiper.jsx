@@ -15,10 +15,10 @@ import { PiBuildingApartmentFill } from "react-icons/pi";
 import { BsFillBuildingsFill } from "react-icons/bs";
 
 const categoryIcons = {
-  1: PiBuildingApartmentFill,
-  2: MdVilla,
-  3: IoStorefront,
-  4: BsFillBuildingsFill,
+  // 1: PiBuildingApartmentFill,
+  // 2: MdVilla,
+  // 3: IoStorefront,
+  // 4: BsFillBuildingsFill,
 };
 
 export default function CategoriesSwiper({

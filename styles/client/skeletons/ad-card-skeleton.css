@@ -1,71 +1,116 @@
 .skeleton-card {
-  display: flex;
   flex-direction: column;
   gap: 12px;
+  display: flex;
+  background: var(--body-color);
 }
-
+.skeleton-card.swiper-top {
+  width: 100%;
+  height: 30px;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.skeleton-card.swiper-top .element {
+  width: 150px;
+  height: 100%;
+}
+.skeleton-card .element {
+  position: relative;
+  overflow: hidden;
+  background: var(--border-color);
+  border-radius: 8px;
+}
+.skeleton-card .text {
+  height: 19px;
+}
 /* Image */
-.image-holder {
-  height: 180px;
+.skeleton-card .image-holder {
+  height: 250px;
 }
 
-.image {
+.skeleton-card .image {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
 }
 
 /* Body */
-.body .row {
+.skeleton-card .body {
+  padding: 16px;
+  gap: 18px;
+  border-radius: 35px 35px 0 0;
+  margin-top: -39px;
+}
+.skeleton-card .row {
   display: flex;
   justify-content: space-between;
   gap: 10px;
 }
 
-.title {
+.skeleton-card .title {
   width: 60%;
-  height: 16px;
 }
 
-.category {
+.skeleton-card .category {
   width: 30%;
-  height: 14px;
 }
 
-.price {
+.skeleton-card .price {
   width: 40%;
-  height: 18px;
 }
-
-.tag {
+.skeleton-card .tag {
   width: 25%;
-  height: 14px;
 }
 
 /* Specs */
-.specs {
-  display: flex;
-  gap: 8px;
+.skeleton-card .specs {
+  display: grid;
+  gap: 7px;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
-.spec {
-  width: 60px;
-  height: 20px;
+.skeleton-card .spec {
   border-radius: 20px;
+  height: 29px;
+  border-radius: 8px;
 }
 
 /* Footer */
-.footer {
+.skeleton-card .footer {
   display: flex;
   justify-content: space-between;
 }
 
-.location {
+.skeleton-card .location {
   width: 60%;
-  height: 14px;
 }
 
-.date {
+.skeleton-card .date {
   width: 25%;
-  height: 14px;
+}
+
+/* ✨ shimmer effect */
+.skeleton-card .element::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  height: 100%;
+  width: 150%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.362),
+    transparent
+  );
+
+  animation: shimmer 1.4s infinite;
+}
+
+/* animation */
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
 }

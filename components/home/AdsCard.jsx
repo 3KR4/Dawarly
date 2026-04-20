@@ -16,42 +16,58 @@ import { RentFrequencies } from "@/data/enums";
 import { toggleFavorite } from "@/services/favorites/favorites.service";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import AdCardSkeleton from "../skeletons/AdCardSkeleton";
+import { playSound } from "@/utils/sounds";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
-  const { user } = useAuth();
-const router = useRouter();
+  const { user, updateUserFavoritesCount } = useAuth();
+  const router = useRouter();
 
   const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
   const [favoritesCount, setFavoritesCount] = useState(
     data?.favorites_count || 0,
   );
-  const [adLoading, setAdLoading] = useState(true);
   const [favLoading, setfavLoading] = useState(false);
 
   const arabic = isArabic(data?.title);
 
   const handleFavoriteClick = async (id) => {
-if (!user) {
-    router.push(`/register?redirect=/market/${id}`);
-  return;
-}
-    if (favLoading) return; // يمنع spam
+    if (!user) {
+      router.push(`/register?redirect=/market/${id}`);
+      return;
+    }
+
+    if (favLoading) return;
+
     setfavLoading(true);
+
     const wasFavorite = isFavorite;
 
     try {
       await toggleFavorite(id);
+
+      const newCount = wasFavorite
+        ? Math.max(user.favorites_count - 1, 0)
+        : user.favorites_count + 1;
+
+      // ✅ update UI local
       setIsFavorite(!wasFavorite);
       setFavoritesCount((prev) =>
         wasFavorite ? Math.max(prev - 1, 0) : prev + 1,
       );
+
+      // ✅ update global user
+      updateUserFavoritesCount(newCount);
+      if (wasFavorite) {
+        playSound("favOff"); // ❌ remove
+      } else {
+        playSound("favOn"); // ✅ add
+      }
     } catch (err) {
       console.error("toggleFavorite err", err);
 
-      // ❌ rollback لو فشل
+      // rollback
       setIsFavorite(wasFavorite);
       setFavoritesCount((prev) =>
         wasFavorite ? prev + 1 : Math.max(prev - 1, 0),
@@ -69,22 +85,19 @@ if (!user) {
     data?.compound?.[`name_${locale}`],
   ].filter(Boolean);
 
-
-if (true) return <AdCardSkeleton />;
-
   return (
     <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
       <div className="image-holder">
         <Image
           className="main"
           fill
-          src={data?.image?.[0]?.secure_url || "/apartment-mockup.webp"}
+          src={data?.images?.[0]?.secure_url || "/apartment-mockup.avif"}
           alt={data?.title}
         />
         <Image
           className="cover"
           fill
-          src={data?.image?.[0]?.secure_url || "/apartment-mockup.webp"}
+          src={data?.images?.[0]?.secure_url || "/apartment-mockup.avif"}
           alt={`${data?.title}-cover`}
         />
         <div className="top">

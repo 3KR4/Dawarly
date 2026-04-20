@@ -119,14 +119,14 @@ function Header() {
                       <Link href={`/favorites`} className="icon-holder fav">
                         <FaRegHeart className="main" />
                         <FaHeart className="hover" />
-                        <span>3</span>
+                        <span>{user?.favorites_count || 0}</span>
                       </Link>
-                      <div className="icon-holder msg">
+                      {/* <div className="icon-holder msg">
                         <LuMessageSquare className="main" />
                         <FaMessage className="hover" />
                         <span>6</span>
-                      </div>
-                      <hr />
+                      </div> */}
+                      {/* <hr /> */}
                     </>
                   )}
 
@@ -170,11 +170,10 @@ function Header() {
                         <ul className="user-menu">
                           {user?.user_type == "ADMIN" && (
                             <li>
-                              <Link
-                                href={`/dashboard`}
-                                className="btn"
-                              >
-                                <TbDeviceDesktopAnalytics style={{fontSize: "16px"}} />
+                              <Link href={`/dashboard`} className="btn">
+                                <TbDeviceDesktopAnalytics
+                                  style={{ fontSize: "16px" }}
+                                />
                                 {t.actions.openDashBoard}
                               </Link>
                             </li>
@@ -209,12 +208,12 @@ function Header() {
                                   {t.actions.favorietList}
                                 </Link>
                               </li>
-                              <li>
+                              {/* <li>
                                 <Link href={`/`} className="btn">
                                   <LuMessageSquare />
                                   {t.actions.adsChat}
                                 </Link>
-                              </li>
+                              </li> */}
                               <li className="theme" onClick={toggleTheme}>
                                 {theme === "light" ? (
                                   <Link href={`/`} className="btn">

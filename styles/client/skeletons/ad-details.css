@@ -1,0 +1,173 @@
+.skeleton-details .element {
+  background: var(--border-color);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* shimmer */
+.skeleton-details .element::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+/* IMAGE */
+.skeleton-details .main-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+}
+
+.skeleton-details .thumbs {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.skeleton-details .thumb {
+  width: 110px;
+  height: 105px;
+}
+
+/* TEXT */
+.skeleton-details .text {
+  height: 18px;
+}
+.skeleton-details > .title {
+  margin: 15px 0 -9px;
+  width: 37% !important;
+}
+.skeleton-details .title {
+  width: 60%;
+  height: 30px;
+}
+
+.skeleton-details .price {
+  width: 40%;
+  height: 30px;
+}
+
+.skeleton-details .location {
+  width: 30%;
+  height: 23px;
+}
+.skeleton-details .love {
+  width: 16%;
+  height: 23px;
+}
+.skeleton-details .small {
+  width: 22%;
+  height: 23px;
+}
+
+/* SECTIONS */
+.skeleton-details .section-title {
+  width: 20%;
+  height: 23px;
+  margin-bottom: 5px;
+}
+.skeleton-details .specs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.skeleton-details .spec {
+  height: 33px;
+  width: 120px;
+}
+
+.skeleton-details .amenity {
+  height: 25px;
+}
+
+.skeleton-details .paragraph {
+  height: 12px;
+  margin-bottom: 6px;
+}
+
+.skeleton-details .calendar {
+  height: 200px;
+}
+
+/* RIGHT */
+.skeleton-details .right .section-title {
+  width: 60%;
+}
+.skeleton-details .right .love {
+  width: 33%;
+}
+.skeleton-details .right .small {
+  width: 33%;
+  height: 20px;
+}
+.skeleton-details .right .row:has(.btns) {
+  gap: 8px;
+}
+.skeleton-details .right .btns {
+  width: 50%;
+  height: 38px !important;
+}
+.skeleton-details .right .btn {
+  width: 100%;
+  height: 38px !important;
+  margin: 0 !important;
+}
+.skeleton-details .user .btn {
+  height: 40px;
+  margin-top: 10px;
+}
+
+.skeleton-details .line {
+  width: 90%;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 1250px) {
+  .single-page .details-holder {
+    grid-template-columns: none;
+  }
+}
+@media (max-width: 995px) {
+  .single-page .images-holder {
+    aspect-ratio: unset !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  .single-page .images-holder .main-image {
+    height: 600px;
+  }
+  .single-page .skeleton-details .thumbs {
+    display: grid;
+    margin-top: 10px;
+
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0;
+  }
+  .single-page .skeleton-details .thumbs > * {
+    width: 100%;
+    height: 140px;
+  }
+}
+@media (max-width: 768px) {
+  .single-page .skeleton-details .thumbs > * {
+    width: 100%;
+    height: 112px;
+  }
+}

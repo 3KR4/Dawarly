@@ -6,34 +6,34 @@ export default function AdCardSkeleton() {
     <div className="ad-card skeleton-card">
       {/* Image */}
       <div className="image-holder">
-        <Skeleton className="image" />
+        <Skeleton className="image element" />
       </div>
 
       {/* Body */}
       <div className="body">
         <div className="row">
-          <Skeleton className="title" />
-          <Skeleton className="category" />
+          <Skeleton className="title element text" />
+          <Skeleton className="category element text" />
         </div>
 
         <div className="row">
-          <Skeleton className="price" />
-          <Skeleton className="tag" />
+          <Skeleton className="price element text" />
+          <Skeleton className="tag element text" />
+        </div>
+        <div className="specs">
+          <Skeleton className="spec element" />
+          <Skeleton className="spec element" />
+          <Skeleton className="spec element" />
+        </div>
+
+        {/* Footer */}
+        <div className="row">
+          <Skeleton className="location element text" />
+          <Skeleton className="date element text" />
         </div>
       </div>
 
       {/* Specs */}
-      <div className="specs">
-        <Skeleton className="spec" />
-        <Skeleton className="spec" />
-        <Skeleton className="spec" />
-      </div>
-
-      {/* Footer */}
-      <div className="footer">
-        <Skeleton className="location" />
-        <Skeleton className="date" />
-      </div>
     </div>
   );
 }

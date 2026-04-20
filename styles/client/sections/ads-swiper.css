@@ -2,7 +2,7 @@
   padding: var(--sections-padding);
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 12px;
 }
 
 .swiper-section .top {
@@ -12,7 +12,7 @@
   align-items: flex-end;
 }
 .swiper-section .top h3 {
-  font-size: 18px;
+  font-size: 20px;
 }
 .swiper-section.for-ads .top h3 {
   font-size: 20px;
@@ -88,7 +88,7 @@
 }
 @media (min-width: 768px) {
   .swiper-section:not(:has(.nav-btn)) {
-    padding: 25px;
+    padding: 30 45px;
   }
 }
 @media (max-width: 1030px) {
@@ -100,7 +100,7 @@
   .swiper-section {
     width: 100%;
     padding-left: 10px;
-    gap: 5px;
+    gap: 10px;
   }
   .swiper-section .top {
     padding: 0 10px;

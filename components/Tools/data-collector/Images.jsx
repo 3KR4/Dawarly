@@ -19,9 +19,9 @@ function Images({
 
   const [isDrag, setIsDrag] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const safeImages = images || [];
 
-  const isInvalid = images?.length === 0 && isSubmitted;
-
+  const isInvalid = safeImages.length === 0 && isSubmitted;
   const helperText =
     limit === 1 ? t.ad.images?.helperTextSingle : t.ad.images?.helperText;
 
@@ -30,7 +30,9 @@ function Images({
 
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-    if (images.length + imageFiles.length > limit) {
+    const safePrev = Array.isArray(images) ? images : [];
+
+    if (safePrev.length + imageFiles.length > limit) {
       setErrorMessage(t.ad.images?.errors.maxLimit?.replace("{limit}", limit));
       return;
     }
@@ -38,7 +40,10 @@ function Images({
     if (limit === 1 && imageFiles.length > 0) {
       setImages([imageFiles[0]]);
     } else {
-      setImages((prev) => [...prev, ...imageFiles]);
+      setImages((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        return [...safePrev, ...imageFiles];
+      });
     }
   };
 
@@ -53,11 +58,14 @@ function Images({
     e.target.value = "";
   };
 
-  const handleRemoveImage = (index) => {
-    const updated = [...images];
-    updated.splice(index, 1);
-    setImages(updated);
-  };
+const handleRemoveImage = (index) => {
+  const safePrev = Array.isArray(images) ? images : [];
+
+  const updated = [...safePrev];
+  updated.splice(index, 1);
+
+  setImages(updated);
+};
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
       <label>
@@ -70,12 +78,14 @@ function Images({
         <div
           className={`upload-label ${isDrag ? "active" : ""} ${limit}-image`}
           onClick={() =>
-            !disabled && images.length < limit && inputFileRef.current.click()
+            !disabled &&
+            safeImages.length < limit &&
+            inputFileRef.current.click()
           }
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
-            if (!disabled && images.length < limit) {
+            if (!disabled && safeImages.length < limit) {
               setIsDrag(true);
             }
           }}
@@ -91,7 +101,7 @@ function Images({
             <>
               <p>{helperText}</p>
 
-              {images.length < limit ? (
+              {safeImages.length < limit ? (
                 <h1>
                   {isDrag ? t.ad.images?.dropHere : t.ad.images?.clickHere}
                 </h1>
@@ -108,12 +118,12 @@ function Images({
           multiple={limit > 1}
           hidden
           ref={inputFileRef}
-          disabled={disabled || images.length >= limit}
+          disabled={disabled || safeImages.length >= limit}
           onChange={handleInputChange}
         />
 
         <div className={`imgHolder ${limit === 1 ? "single-image" : ""}`}>
-          {images?.map((image, index) => (
+          {safeImages?.map((image, index) => (
             <div className="uploaded" key={index}>
               <Image
                 src={

@@ -14,9 +14,11 @@ import AdsCard from "@/components/home/AdsCard";
 import useTranslate from "@/Contexts/useTranslation";
 import { getSectionsAds } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
+import AdCardSkeleton from "@/components/skeletons/AdCardSkeleton";
 
 export default function AdsSwiper({ type, id }) {
-  const { categories, subCategories, governorates, cities, compounds } = useAppData();
+  const { categories, subCategories, governorates, cities, compounds } =
+    useAppData();
 
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
@@ -129,27 +131,65 @@ export default function AdsSwiper({ type, id }) {
     total > maxSlides && !screenSize.includes("small") && screenSize !== "xs";
 
   // ================= UI =================
+
+  const getSkeletonCount = () => {
+    // أول تحميل
+    if (ads.length === 0 && loading) {
+      return Math.ceil(maxSlides);
+    }
+
+    // load more
+    if (ads.length > 0 && loading) {
+      return 2;
+    }
+
+    return 0;
+  };
+
+  const skeletonCount = getSkeletonCount();
+
+  const slides = [
+    ...ads,
+    ...Array.from({ length: skeletonCount }).map((_, i) => ({
+      id: `skeleton-${i}`,
+      isSkeleton: true,
+    })),
+  ];
+  const isEmpty = !loading && ads.length === 0;
+  if (isEmpty) {
+    return null; // أو ممكن Empty State UI
+  }
+
   return (
     <div className="swiper-section for-ads container">
       <div className="top">
-        <h3 className="title">
-          {t.home.PropertiesIn} {value?.[`name_${locale}`]}
-        </h3>
+        {!value ? (
+          <div className="skeleton-card swiper-top">
+            <div className="title-skeleton element"></div>
+            <div className="link-skeleton element"></div>
+          </div>
+        ) : (
+          <>
+            <h3 className="title">
+              {t.home.PropertiesIn} {value?.[`name_${locale}`]}
+            </h3>
 
-        {showNav && (
-          <Link
-            href={
-              type === "cat"
-                ? `/category/${id}`
-                : type === "sub-cat"
-                  ? `/category?subcat=${id}`
-                  : "/ads"
-            }
-            className="link"
-          >
-            {t.home.seeMore}
-            {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
-          </Link>
+            {total > maxSlides && (
+              <Link
+                href={
+                  type === "cat"
+                    ? `/category/${id}`
+                    : type === "sub-cat"
+                      ? `/category?subcat=${id}`
+                      : "/ads"
+                }
+                className="link"
+              >
+                {t.home.seeMore}
+                {locale === "en" ? <FaAngleRight /> : <FaAngleLeft />}
+              </Link>
+            )}
+          </>
         )}
       </div>
 
@@ -173,9 +213,9 @@ export default function AdsSwiper({ type, id }) {
           breakpoints={breakpoints}
           spaceBetween={10}
         >
-          {ads.map((ad) => (
-            <SwiperSlide key={ad.id}>
-              <AdsCard data={ad} />
+          {slides.map((item) => (
+            <SwiperSlide key={item.id}>
+              {item.isSkeleton ? <AdCardSkeleton /> : <AdsCard data={item} />}
             </SwiperSlide>
           ))}
         </Swiper>

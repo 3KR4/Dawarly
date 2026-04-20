@@ -175,8 +175,8 @@ export default function AdForm({ type = "client", adId }) {
       compound: ad.compound,
     });
 
-    setImages(ad.image);
-    setOriginalImages(ad.image);
+    setImages(ad.images);
+    setOriginalImages(ad.images);
     const formatDate = (date) => {
       if (!date) return "";
       return new Date(date).toISOString().slice(0, 10);
@@ -249,7 +249,7 @@ export default function AdForm({ type = "client", adId }) {
       newErrors.admin = t.ad.errors.admin;
       hasErrors = true;
     }
-    if (images.length === 0) {
+    if (images?.length === 0) {
       newErrors.images = t.ad.images.errors.required;
       hasErrors = true;
     }
@@ -318,7 +318,9 @@ export default function AdForm({ type = "client", adId }) {
     adId ? updateAd(adId, payload) : crateAd(payload);
 
   const uploadNewImages = async (adId) => {
-    const newImages = images.filter((img) => img instanceof File);
+    const safeImages = Array.isArray(images) ? images : [];
+
+    const newImages = safeImages.filter((img) => img instanceof File);
 
     if (newImages.length === 0) return;
 
@@ -331,11 +333,14 @@ export default function AdForm({ type = "client", adId }) {
     await uploadImages("AD", adId, formData);
   };
   const handleDeletedImages = async (adId) => {
-    const deletedImages = originalImages.filter(
-      (oldImg) => !images.find((img) => img.id === oldImg.id),
+    const safeOriginal = Array.isArray(originalImages) ? originalImages : [];
+    const safeImages = Array.isArray(images) ? images : [];
+
+    const deletedImages = safeOriginal.filter(
+      (oldImg) => !safeImages.some((img) => img?.id === oldImg?.id),
     );
 
-    for (let img of deletedImages) {
+    for (const img of deletedImages) {
       await deleteImage("AD", adId, img.id);
     }
   };
@@ -731,8 +736,19 @@ export default function AdForm({ type = "client", adId }) {
             <SelectOptions
               label={t.location.yourCompound}
               placeholder={t.location.selectCompound}
-              options={compounds}
+              options={compounds.filter((m) => {
+                if (selectedLocations.area?.id) {
+                  return m.area_id === selectedLocations.area.id;
+                }
+
+                if (selectedLocations.city?.id) {
+                  return m.city_id === selectedLocations.city.id;
+                }
+
+                return false;
+              })}
               value={selectedLocations.compound}
+              disabled={!selectedLocations.area && !selectedLocations.city}
               onChange={(item) => {
                 setSelectedLocations((prev) => ({
                   ...prev,

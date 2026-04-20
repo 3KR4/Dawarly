@@ -36,6 +36,7 @@ import { specsConfig } from "@/Contexts/specsConfig";
 import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
 import { RentFrequencies, RentPeriodUnit } from "@/data/enums";
+import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
 export default function AdDetails() {
   const t = useTranslate();
   const { slug } = useParams();
@@ -54,7 +55,8 @@ export default function AdDetails() {
         console.log("res", res.data);
         setAd(res.data);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, [slug]);
 
   const getSpecConfig = (key) => specsConfig[key];
@@ -66,12 +68,7 @@ export default function AdDetails() {
 
   const showThumbNav = ad?.image?.length > slidesView;
 
-  const bookedRanges = [
-    { start: "2026-02-10", end: "2026-02-12" },
-    { start: "2026-02-18", end: "2026-02-20" },
-  ];
-
-  const formatPhoneForWhatsApp = (phone) => {
+const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return "";
 
     let cleaned = phone.replace(/\D/g, "");
@@ -91,6 +88,10 @@ export default function AdDetails() {
     ad?.governorate?.[`name_${locale}`],
     ad?.compound?.[`name_${locale}`],
   ].filter(Boolean);
+
+  if (loading) {
+    return <AdDetailsSkeleton />;
+  }
 
   return (
     <>
@@ -113,17 +114,17 @@ export default function AdDetails() {
 
         <div className="holder big-holder">
           <div className="images-holder">
-            {ad?.image?.[currentImg] && (
+            {ad?.images?.[currentImg] && (
               <div className="img">
                 <Image
                   className="main-img"
                   fill
-                  src={ad?.image[currentImg]?.secure_url}
+                  src={ad?.images?.[currentImg]?.secure_url}
                   alt={ad.title}
                 />
                 <Image
                   className="back-img"
-                  src={ad?.image[currentImg]?.secure_url}
+                  src={ad?.images?.[currentImg]?.secure_url}
                   alt={ad?.title}
                   fill
                 />

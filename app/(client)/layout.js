@@ -10,6 +10,7 @@ import NotificationHolder from "@/components/Tools/NotificationHolder";
 import { DataProvider } from "@/Contexts/DataContext";
 
 import "@/styles/client/globals.css";
+import InitSounds from "@/components/Tools/InitSounds";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -86,6 +87,7 @@ export default function RootLayout({ children }) {
                     <Header />
                     {children}
                     <Footer />
+                    <InitSounds />
                     <NotificationHolder />
                   </DataProvider>
                 </SelectorsProvider>

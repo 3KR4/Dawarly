@@ -73,6 +73,22 @@ export const AuthProvider = ({ children }) => {
     refreshAuth();
   }, []);
 
+const updateUserFavoritesCount = (newCount) => {
+  setUser((prev) => {
+    if (!prev) return prev;
+
+    const updatedUser = {
+      ...prev,
+      favorites_count: newCount,
+    };
+
+    // ✅ sync مع localStorage
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    return updatedUser;
+  });
+};
+
   return (
     <AuthContext.Provider
       value={{
@@ -81,8 +97,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         isAuthenticated: !!user,
-        favorietsCount,
-        setFavorietsCount
+        updateUserFavoritesCount
       }}
     >
       {children}

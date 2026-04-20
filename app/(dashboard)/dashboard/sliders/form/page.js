@@ -98,7 +98,7 @@ export default function CreateAd() {
   const uploadNewImages = async (sliderId) => {
     const newImages = images.filter((img) => img instanceof File);
 
-    if (newImages.length === 0) return;
+    if (newimages?.length === 0) return;
 
     const formData = new FormData();
 

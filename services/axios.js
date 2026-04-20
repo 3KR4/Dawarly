@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // -------------------- BASE CONFIG    https://back.dawaarly.com/api   --------------------
-const BASE_URL = "http://localhost:5000/";
+const BASE_URL = "https://api.dawaarly.com/";
 
 // Instance بدون interceptors (للـ refresh فقط)
 export const plainApi = axios.create({
