@@ -23,16 +23,16 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllData = async () => {
+    const loadFromCache = () => {
       try {
         const cached = {
-          countries: localStorage.getItem("countries"),
-          governorates: localStorage.getItem("governorates"),
-          categories: localStorage.getItem("categories"),
-          subCategories: localStorage.getItem("subCategories"),
-          cities: localStorage.getItem("cities"),
-          areas: localStorage.getItem("areas"),
-          compounds: localStorage.getItem("compounds"),
+          countries: JSON.parse(localStorage.getItem("countries") || "null"),
+          governorates: JSON.parse(localStorage.getItem("governorates") || "null"),
+          categories: JSON.parse(localStorage.getItem("categories") || "null"),
+          subCategories: JSON.parse(localStorage.getItem("subCategories") || "null"),
+          cities: JSON.parse(localStorage.getItem("cities") || "null"),
+          areas: JSON.parse(localStorage.getItem("areas") || "null"),
+          compounds: JSON.parse(localStorage.getItem("compounds") || "null"),
         };
 
         if (
@@ -44,17 +44,24 @@ export const DataProvider = ({ children }) => {
           cached.areas &&
           cached.compounds
         ) {
-          setCountries(JSON.parse(cached.countries));
-          setGovernorates(JSON.parse(cached.governorates));
-          setCategories(JSON.parse(cached.categories));
-          setSubCategories(JSON.parse(cached.subCategories));
-          setCities(JSON.parse(cached.cities));
-          setAreas(JSON.parse(cached.areas));
-          setCompounds(JSON.parse(cached.compounds));
-          setLoading(false);
-          return;
+          setCountries(cached.countries);
+          setGovernorates(cached.governorates);
+          setCategories(cached.categories);
+          setSubCategories(cached.subCategories);
+          setCities(cached.cities);
+          setAreas(cached.areas);
+          setCompounds(cached.compounds);
+          return true;
         }
 
+        return false;
+      } catch {
+        return false;
+      }
+    };
+
+    const fetchFreshData = async () => {
+      try {
         const [
           countriesRes,
           govRes,
@@ -73,6 +80,7 @@ export const DataProvider = ({ children }) => {
           getCompounds(null),
         ]);
 
+        // 🔥 update UI مباشرة
         setCountries(countriesRes.data);
         setGovernorates(govRes.data);
         setCategories(catRes.data);
@@ -81,6 +89,7 @@ export const DataProvider = ({ children }) => {
         setAreas(areasRes.data);
         setCompounds(compoundsRes.data);
 
+        // 🔥 update cache
         localStorage.setItem("countries", JSON.stringify(countriesRes.data));
         localStorage.setItem("governorates", JSON.stringify(govRes.data));
         localStorage.setItem("categories", JSON.stringify(catRes.data));
@@ -90,12 +99,22 @@ export const DataProvider = ({ children }) => {
         localStorage.setItem("compounds", JSON.stringify(compoundsRes.data));
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchAllData();
+    const init = async () => {
+      const hasCache = loadFromCache();
+
+      // لو في كاش → اعرضه فورًا
+      setLoading(!hasCache);
+
+      // دايمًا هات أحدث داتا في الخلفية
+      await fetchFreshData();
+
+      setLoading(false);
+    };
+
+    init();
   }, []);
 
   return (
