@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic";
+
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import AdsCard from "@/components/home/AdsCard";
 import DynamicFilters from "@/components/Tools/data-collector/DynamicFilters";

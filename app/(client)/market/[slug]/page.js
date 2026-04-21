@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "next/navigation";
 import "@/styles/client/pages/singel-details.css";

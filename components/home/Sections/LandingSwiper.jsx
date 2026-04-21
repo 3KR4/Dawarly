@@ -14,6 +14,7 @@ export default function HeroSwiper() {
   const { locale } = useContext(settings);
   const swiperRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
+console.log("we are now in V6");
 
   // بيانات السلايدات
 
