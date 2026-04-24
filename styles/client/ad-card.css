@@ -118,7 +118,8 @@
   justify-content: space-between;
 }
 .ad-card .body span,
-.ad-card .body a {
+.ad-card .body a,
+.ad-card .body  .category {
   border-radius: 50px;
   font-size: 14px;
   letter-spacing: 0.3px;
@@ -129,17 +130,17 @@
 .ad-card .body span:empty {
   display: none;
 }
-.ad-card .body a.category {
+.ad-card .body .category {
   background: var(--lighter-main-color-2);
   padding: 5px 9px;
   font-size: 13px;
   color: var(--paragraph);
   transform: translateX(5px);
 }
-[lang="ar"] .ad-card .body a.category {
+[lang="ar"] .ad-card .body .category {
   transform: translateX(-5px);
 }
-.ad-card .body a.category:hover {
+.ad-card .body .category:hover {
   background: var(--main-color);
   color: white;
 }
@@ -183,7 +184,7 @@
   .ad-card .body h4 {
     font-size: 15px;
   }
-  .ad-card .body a.category {
+  .ad-card .body .category {
     font-size: 12px;
     min-width: unset;
   }

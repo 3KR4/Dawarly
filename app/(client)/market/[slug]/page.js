@@ -35,7 +35,7 @@ import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 import { specsConfig } from "@/Contexts/specsConfig";
 import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
-import { RentFrequencies, RentPeriodUnit } from "@/data/enums";
+import { Levels, RentFrequencies, RentPeriodUnit } from "@/data/enums";
 import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
 export default function AdDetails() {
   const t = useTranslate();
@@ -66,9 +66,9 @@ export default function AdDetails() {
     screenSize === "ultra-small" ? 4 : screenSize === "small" ? 5 : 6;
   const space = screenSize === "large" ? 7 : 6;
 
-  const showThumbNav = ad?.image?.length > slidesView;
+  const showThumbNav = ad?.images?.length > slidesView;
 
-const formatPhoneForWhatsApp = (phone) => {
+  const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return "";
 
     let cleaned = phone.replace(/\D/g, "");
@@ -88,6 +88,14 @@ const formatPhoneForWhatsApp = (phone) => {
     ad?.governorate?.[`name_${locale}`],
     ad?.compound?.[`name_${locale}`],
   ].filter(Boolean);
+
+  const getLevelLabel = (levelId) => {
+    const level = Levels.find((l) => l.id === levelId);
+
+    if (!level) return levelId;
+
+    return locale === "ar" ? level.name_ar : level.name_en;
+  };
 
   if (loading) {
     return <AdDetailsSkeleton />;
@@ -130,7 +138,7 @@ const formatPhoneForWhatsApp = (phone) => {
                 />
               </div>
             )}
-            {ad?.image?.length > 1 && (
+            {ad?.images?.length > 1 && (
               <div
                 className={`imgs-swiper-wrapper ${screenSize == "large" ? "vertical" : "horizontal"}`}
               >
@@ -157,7 +165,7 @@ const formatPhoneForWhatsApp = (phone) => {
                   }
                   className="imgs-swiper"
                 >
-                  {ad?.image?.map((x, index) => (
+                  {ad?.images?.map((x, index) => (
                     <SwiperSlide key={index}>
                       <div
                         className={`img ${index === currentImg ? "active" : ""}`}
@@ -237,7 +245,6 @@ const formatPhoneForWhatsApp = (phone) => {
                     <span>{locationParts.join("، ")}</span>
                   </div>
                   <p className="time">
-                    {t.dashboard.tables.published_at}:{" "}
                     {formatRelativeDate(ad?.created_at, locale)}{" "}
                   </p>
                 </div>
@@ -264,7 +271,7 @@ const formatPhoneForWhatsApp = (phone) => {
                         <span className="spec-key">{config?.label ?? key}</span>
 
                         <span className="spec-value">
-                          : {value}
+                          : {key === "level" ? getLevelLabel(value) : value}
                           {config?.suffix && ` ${config.suffix}`}
                         </span>
                       </li>
@@ -369,24 +376,24 @@ const formatPhoneForWhatsApp = (phone) => {
 
                 <div className="holder">
                   <div className="row">
-                    {ad?.display_phone && (
+                    {(!!ad?.admin || ad?.display_phone) && (
                       <button
                         onClick={() => setShowPhoneNumber(true)}
                         className="main-button"
                       >
                         <FaPhone />{" "}
                         {showPhoneNumber
-                          ? ad?.display_dawaarly_contact
+                          ? ad?.admin
                             ? ad?.admin?.phone
                             : ad?.subuser?.phone
                           : t.ad.phone_number}
                       </button>
                     )}
 
-                    {ad?.display_whatsapp && (
+                    {(!!ad?.admin || ad?.display_whatsapp) && (
                       <a
                         href={`https://wa.me/${formatPhoneForWhatsApp(
-                          ad?.display_dawaarly_contact
+                          ad?.admin
                             ? ad?.admin?.phone
                             : ad?.subuser?.phone,
                         )}`}
@@ -405,7 +412,6 @@ const formatPhoneForWhatsApp = (phone) => {
                 </div>
               </div>
 
-              {/* Safety يظهر فقط لو مش Admin */}
               {!ad?.admin && (
                 <div className="card safety">
                   <h4>{t.ad.safety_title}</h4>

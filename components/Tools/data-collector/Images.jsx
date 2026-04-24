@@ -12,7 +12,7 @@ function Images({
   setImages,
   isSubmitted,
   disabled = false,
-  limit = 10,
+  limit = 15,
 }) {
   const t = useTranslate();
   const inputFileRef = useRef(null);

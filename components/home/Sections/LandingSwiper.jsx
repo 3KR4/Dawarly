@@ -50,7 +50,7 @@ export default function HeroSwiper() {
           delay: 5000,
           disableOnInteraction: false,
         }}
-        loop={true}
+        loop={slieds.length > 3}
         onSlideChange={handleSlideChange}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         dir={locale === "ar" ? "rtl" : "ltr"}

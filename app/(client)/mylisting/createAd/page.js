@@ -13,26 +13,30 @@ import { settings } from "@/Contexts/settings";
 import Tags from "@/components/Tools/data-collector/Tags";
 import { crateAd } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
-import { Amenities, Currencies, RentFrequencies } from "@/data/enums";
+import { Amenities, Currencies, Levels, RentFrequencies } from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
 import { selectors } from "@/Contexts/selectors";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import { useAuth } from "@/Contexts/AuthContext";
-import { getAllUsers } from "@/services/auth/auth.service";
-import { deleteImage, uploadImages } from "@/services/images/images.service";
+import { uploadImages } from "@/services/images/images.service";
 import { FaArrowLeft } from "react-icons/fa";
 import CatCard from "@/components/home/CatCard";
 import { IoChatbubblesOutline } from "react-icons/io5";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/ar";
+import "dayjs/locale/en";
 
 export default function CreateAd() {
   const { locale } = useContext(settings);
   const t = useTranslate();
   const { governorates, categories, subCategories, cities, areas, compounds } =
     useAppData();
-  const { user } = useAuth();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
-  const { tags, setTags } = useContext(selectors);
+  const { tags } = useContext(selectors);
 
   const STEPS = {
     CATEGORIES: 1,
@@ -42,7 +46,7 @@ export default function CreateAd() {
     CONTACT: 5,
   };
 
-  const [step, setStep] = useState(STEPS.CATEGORIES);
+  const [step, setStep] = useState(STEPS.ALL_DETAILS);
 
   // ======= FORM STATES =======
 
@@ -72,9 +76,10 @@ export default function CreateAd() {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   const [additionalData, setAdditionalData] = useState({
-    currency: null,
+    currency: Currencies[0],
     frequency: null,
     minRentalUnit: null,
+    level: Levels[0],
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
@@ -127,7 +132,7 @@ export default function CreateAd() {
     compound_id: selectedLocations.compound?.id || null,
     bedrooms: Number(data.bedrooms),
     bathrooms: Number(data.bathrooms),
-    level: Number(data.level),
+    level: additionalData.level?.id,
     adult_no_max: Number(data.adult_no_max),
     child_no_max: Number(data.child_no_max),
     tags: tags,
@@ -215,7 +220,8 @@ export default function CreateAd() {
     if (step === STEPS.ALL_DETAILS) {
       setIsSubmitted(true);
 
-      const isFormValid = !!data.bedrooms && !!data.bathrooms && !!data.level;
+      const isFormValid =
+        !!data.bedrooms && !!data.bathrooms && !!additionalData?.level;
 
       if (!isFormValid) {
         return;
@@ -277,95 +283,6 @@ export default function CreateAd() {
     }
   };
 
-  const RenderRentAvailability = () => {
-    return (
-      <>
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.rental_period}</h2>
-
-          <div className="row-holder for-dates">
-            <div className="box forInput">
-              <label>
-                {t.ad.from} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="date"
-                    value={rentAvailability.from}
-                    onChange={(e) =>
-                      setRentAvailability((prev) => ({
-                        ...prev,
-                        from: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="box forInput right">
-              <label>
-                {t.ad.to} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="date"
-                    value={rentAvailability.to}
-                    min={rentAvailability.from}
-                    onChange={(e) =>
-                      setRentAvailability((prev) => ({
-                        ...prev,
-                        to: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
-
-          <div className="row-holder for-dates">
-            <div className="box forInput right">
-              <label>
-                {t.ad.durationValue} <span className="required">*</span>
-              </label>
-
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    min={1}
-                    {...register("rentalDuration")}
-                    placeholder={t.ad.durationValuePlaceholder}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <SelectOptions
-              label={t.ad.durationUnit}
-              placeholder={t.ad.select}
-              options={RentFrequencies}
-              value={additionalData.minRentalUnit}
-              onChange={(item) =>
-                setAdditionalData((prev) => ({
-                  ...prev,
-                  minRentalUnit: item,
-                }))
-              }
-            />
-          </div>
-        </div>
-      </>
-    );
-  };
-
   const titles = {
     [STEPS.CATEGORIES]: t.ad.choose_category,
     [STEPS.SUB_CATEGORIES]: t.ad.choose_sub_category,
@@ -382,590 +299,770 @@ export default function CreateAd() {
     [STEPS.CONTACT]: t.ad.contact_information_description,
   };
 
+  const datePickerTextFieldProps = {
+    fullWidth: true,
+    sx: {
+      "& .MuiInputBase-root": {
+        height: "42px",
+        borderRadius: "10px",
+        backgroundColor: "transparent",
+
+        // ❌ remove ALL states here
+        boxShadow: "none",
+      },
+
+      // 🔥 remove hover effect
+      "& .MuiInputBase-root:hover": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
+
+      // 🔥 remove focus effect
+      "& .MuiInputBase-root.Mui-focused": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
+
+      "& .MuiInputBase-root:focus-within": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
+
+      // ❌ remove fieldset completely (important)
+      "& fieldset": {
+        border: "none !important",
+      },
+
+      "& .MuiOutlinedInput-notchedOutline": {
+        border: "none !important",
+      },
+
+      // label
+      "& .MuiInputLabel-root": {
+        color: "var(--paragraph)",
+        fontSize: "14px",
+        fontWeight: 600,
+      },
+
+      "& .MuiInputLabel-root.Mui-focused": {
+        color: "var(--paragraph)",
+      },
+
+      "& .MuiPickersSectionList-root": {
+        height: "42.5px",
+        display: "flex",
+        alignItems: "center",
+        fontSize: "13px", // 👈 هنا حجم الخط
+        fontWeight: 500, // اختياري
+      },
+      // input
+      "& .MuiInputBase-input": {
+        height: "42.5px",
+        boxSizing: "border-box",
+      },
+
+      "& .MuiInputAdornment-root": {
+        height: "42px",
+        display: "flex",
+        alignItems: "center",
+      },
+
+      "& .MuiIconButton-root": {
+        height: "32px",
+        width: "32px",
+      },
+    },
+  };
+
   return (
     <div className="form-holder create-ad user-account">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="top">
-          <h1>{titles[step]}</h1>
-          <p>{descriptions[step]}</p>
-          {step !== 1 && (
-            <FaArrowLeft
-              className="arrow"
-              onClick={() => setStep((prev) => prev - 1)}
-            />
-          )}
-        </div>
-        <div className="steps-holder">
-          {Object.values(STEPS).map((stepItem, index, arr) => (
-            <div className="step-wrapper" key={stepItem}>
-              <div
-                className={`step 
+      <LocalizationProvider
+        dateAdapter={AdapterDayjs}
+        adapterLocale={locale}
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="top">
+            <h1>{titles[step]}</h1>
+            <p>{descriptions[step]}</p>
+            {step !== 1 && (
+              <FaArrowLeft
+                className="arrow"
+                onClick={() => setStep((prev) => prev - 1)}
+              />
+            )}
+          </div>
+          <div className="steps-holder">
+            {Object.values(STEPS).map((stepItem, index, arr) => (
+              <div className="step-wrapper" key={stepItem}>
+                <div
+                  className={`step 
                   ${step > stepItem ? "done" : ""} 
                   ${step === stepItem ? "current" : ""}
                 `}
-              >
-                {stepItem}
+                >
+                  {stepItem}
+                </div>
+                {index !== arr.length - 1 && <span className="bar"></span>}
               </div>
-              {index !== arr.length - 1 && <span className="bar"></span>}
-            </div>
-          ))}
-        </div>
-
-        {/* ================= CATEGORIES STEP 1 ================= */}
-        {step === STEPS.CATEGORIES && (
-          <div className="options-grid">
-            {categories.map((cat) => (
-              <CatCard
-                key={cat?.id}
-                data={cat}
-                position={`when-create-ad`}
-                type={`cat`}
-                activeClass={cat?.id == selectedCats.cat}
-                onSelect={() => {
-                  setSelectedCats({ cat: cat?.id, subCat: null });
-                  setStep(STEPS.SUB_CATEGORIES);
-                }}
-              />
             ))}
           </div>
-        )}
 
-        {/* ================= SUB_CATEGORIES STEP 2 ================= */}
-        {step === STEPS.SUB_CATEGORIES && (
-          <div className="options-grid verfiyMethod">
-            {subCategories
-              ?.filter((x) => x?.category_id == selectedCats.cat)
-              ?.map((subCat) => (
+          {/* ================= CATEGORIES STEP 1 ================= */}
+          {step === STEPS.CATEGORIES && (
+            <div className="options-grid">
+              {categories.map((cat) => (
                 <CatCard
-                  key={subCat?.id}
-                  data={subCat}
+                  key={cat?.id}
+                  data={cat}
                   position={`when-create-ad`}
-                  type={`sub-cat`}
-                  activeClass={subCat?.id == selectedCats.subCat}
+                  type={`cat`}
+                  activeClass={cat?.id == selectedCats.cat}
                   onSelect={() => {
-                    setSelectedCats((prev) => ({
-                      ...prev,
-                      subCat: subCat?.id,
-                    }));
-
-                    setStep(STEPS.BASICS);
+                    setSelectedCats({ cat: cat?.id, subCat: null });
+                    setStep(STEPS.SUB_CATEGORIES);
                   }}
                 />
               ))}
-          </div>
-        )}
-
-        {/* ================= BASICS STEP 3 ================= */}
-        {step === STEPS.BASICS && (
-          <>
-            <div className="box forInput">
-              <label>{t.ad.placeholders.adTitle}</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="text"
-                    {...register("adTitle", {
-                      required: t.ad.errors.adTitle,
-                      minLength: {
-                        value: 6,
-                        message: t.ad.errors.adTitleValidation,
-                      },
-                    })}
-                    placeholder={t.ad.placeholders.adTitle}
-                  />
-                </div>
-                {errors.adTitle && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.adTitle.message}
-                  </span>
-                )}
-              </div>
             </div>
-            <div className="form-section">
-              <h2 className="section-title">{t.dashboard.tables.location}</h2>
-              <div
-                className="row-holder"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                }}
-              >
-                <SelectOptions
-                  label={t.location.yourGovernorate}
-                  placeholder={t.location.selectGovernorate}
-                  options={governorates}
-                  value={selectedLocations.gov}
-                  onChange={(item) => {
-                    setSelectedLocations({
-                      gov: item,
-                      city: null,
-                      area: null,
-                      compound: null,
-                    });
-                    handleErrors("gov", null);
-                  }}
-                  error={fieldErrors.gov}
-                  required={true}
-                />
+          )}
 
-                <SelectOptions
-                  label={t.location.yourCity}
-                  placeholder={t.location.selectCity}
-                  options={cities.filter(
-                    (c) => c.governorate_id === selectedLocations.gov?.id,
-                  )}
-                  value={selectedLocations.city}
-                  disabled={!selectedLocations.gov}
-                  onChange={(item) => {
-                    setSelectedLocations((prev) => ({
-                      ...prev,
-                      city: item,
-                      area: null,
-                    }));
-                    handleErrors("city", null);
-                  }}
-                  error={fieldErrors.city}
-                />
-
-                <SelectOptions
-                  label={t.location.yourArea}
-                  placeholder={t.location.selectArea}
-                  options={areas.filter(
-                    (a) => a.city_id === selectedLocations.city?.id,
-                  )}
-                  value={selectedLocations.area}
-                  disabled={!selectedLocations.city}
-                  onChange={(item) => {
-                    setSelectedLocations((prev) => ({
-                      ...prev,
-                      area: item,
-                    }));
-                  }}
-                />
-
-
-                <SelectOptions
-                  label={t.location.yourCompound}
-                  placeholder={t.location.selectCompound}
-                  options={compounds.filter((m) => {
-                    if (selectedLocations.area?.id) {
-                      return m.area_id === selectedLocations.area.id;
-                    }
-
-                    if (selectedLocations.city?.id) {
-                      return m.city_id === selectedLocations.city.id;
-                    }
-
-                    return false;
-                  })}
-                  value={selectedLocations.compound}
-                  disabled={!selectedLocations.area && !selectedLocations.city}
-                  onChange={(item) => {
-                    setSelectedLocations((prev) => ({
-                      ...prev,
-                      compound: item,
-                    }));
-                  }}
-                />
-              </div>
-            </div>
-            {/* === تفاصيل التسعير === */}
-            <div className="form-section">
-              <h2 className="section-title">
-                {t.dashboard.tables.pricing_details}
-              </h2>
-              <div
-                className="row-holder"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                }}
-              >
-                <div className="box forInput">
-                  <label>
-                    {t.ad.rentPrice} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("rentAmount", {
-                          required: t.dashboard.forms.errors.priceRequired,
-                          min: {
-                            value: 1,
-                            message: t.dashboard.forms.errors.priceMin,
-                          },
-                        })}
-                        placeholder={t.ad.rentPricePlaceholder}
-                      />
-                    </div>
-                    {errors.rentAmount && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.rentAmount.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="box forInput">
-                  <label>
-                    {t.ad.deposit_amount} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("deposit_amount", {
-                          required:
-                            t.dashboard.forms.errors.deposit_amount_reqire,
-                          min: {
-                            value: 1,
-                            message:
-                              t.dashboard.forms.errors.deposit_amount_Min,
-                          },
-                        })}
-                        placeholder={t.ad.deposit_amount_Placeholder}
-                      />
-                    </div>
-                    {errors.deposit_amount && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.deposit_amount.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <SelectOptions
-                  label={t.enum.currencies}
-                  placeholder={t.location.select_currency}
-                  options={Currencies}
-                  value={additionalData?.currency || null}
-                  onChange={(item) => {
-                    setAdditionalData((prev) => ({
-                      ...prev,
-                      currency: item,
-                    }));
-                    handleErrors("currency", null);
-                  }}
-                  error={fieldErrors.currency}
-                  required={true}
-                />
-
-                <SelectOptions
-                  label={t.enum.frequency}
-                  placeholder={t.location.select_frequency}
-                  options={RentFrequencies}
-                  value={additionalData?.frequency || null}
-                  onChange={(item) => {
-                    setAdditionalData((prev) => ({
-                      ...prev,
-                      frequency: item,
-                    }));
-                    handleErrors("frequency", null);
-                  }}
-                  error={fieldErrors.frequency}
-                  required={true}
-                />
-              </div>
-            </div>
-
-            <Images
-              images={images}
-              setImages={setImages}
-              isSubmitted={isSubmitted}
-            />
-          </>
-        )}
-
-        {/* ================= ALL_DETAILS STEP 4 ================= */}
-        {step === STEPS.ALL_DETAILS && (
-          <>
-            <div className="form-section">
-              <h2 className="section-title">
-                {t.dashboard.tables.property_details}
-              </h2>
-              <div
-                className="row-holder"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                }}
-              >
-                <div className="box forInput">
-                  <label>
-                    {t.ad.bedrooms} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("bedrooms", {
-                          required: t.dashboard.forms.errors.required,
-                          min: {
-                            value: 1,
-                            message: t.dashboard.forms.errors.minOne,
-                          },
-                          max: {
-                            value: 100,
-                            message: t.ad.errors.maxHundred,
-                          },
-                        })}
-                        placeholder={t.ad.bedroomsPlaceholder}
-                      />
-                    </div>
-                    {errors.bedrooms && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.bedrooms.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="box forInput">
-                  <label>
-                    {t.ad.bathrooms} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("bathrooms", {
-                          required: t.dashboard.forms.errors.required,
-                          min: {
-                            value: 1,
-                            message: t.dashboard.forms.errors.minOne,
-                          },
-                          max: {
-                            value: 100,
-                            message: t.ad.errors.maxHundred,
-                          },
-                        })}
-                        placeholder={t.ad.bathroomsPlaceholder}
-                      />
-                    </div>
-                    {errors.bathrooms && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.bathrooms.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="box forInput">
-                  <label>
-                    {t.ad.level} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("level", {
-                          required: t.dashboard.forms.errors.required,
-                          min: {
-                            value: 0,
-                            message: t.dashboard.forms.errors.minZero,
-                          },
-                          max: {
-                            value: 100,
-                            message: t.ad.errors.maxHundred,
-                          },
-                        })}
-                        placeholder={t.ad.levelPlaceholder}
-                      />
-                    </div>
-                    {errors.level && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.level.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <RenderRentAvailability />
-            <div className="form-section">
-              <h2 className="section-title">
-                {t.dashboard.tables.guest_capacity}
-              </h2>
-              <div
-                className="row-holder"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                }}
-              >
-                <div className="box forInput">
-                  <label>
-                    {t.ad.childMax} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("child_no_max", {
-                          required: t.dashboard.forms.errors.required,
-                          min: {
-                            value: 0,
-                            message: t.dashboard.forms.errors.minZero,
-                          },
-                          max: {
-                            value: 100,
-                            message: t.ad.errors.maxHundred,
-                          },
-                        })}
-                        placeholder={t.ad.childMaxPlaceholder}
-                      />
-                    </div>
-                    {errors.child_no_max && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.child_no_max.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="box forInput">
-                  <label>
-                    {t.ad.adultMax} <span className="required">*</span>
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register("adult_no_max", {
-                          required: t.dashboard.forms.errors.required,
-                          min: {
-                            value: 1,
-                            message: t.dashboard.forms.errors.minOne,
-                          },
-                          max: {
-                            value: 100,
-                            message: t.ad.errors.maxHundred,
-                          },
-                        })}
-                        placeholder={t.ad.adultMaxPlaceholder}
-                      />
-                    </div>
-                    {errors.adult_no_max && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.adult_no_max.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="form-section">
-              <h2 className="section-title">{t.ad.amenities}</h2>
-              <div className="dynamicFilters-holder">
-                <div className="box forInput">
-                  <div className="options-grid flex">
-                    {Amenities.map((option) => {
-                      const displayLabel =
-                        locale === "ar" ? option.name_ar : option.name_en;
-                      const isActive = selectedAmenities.includes(option.id);
-
-                      return (
-                        <div
-                          key={option.id}
-                          className={`option-box small ${isActive ? "active" : ""}`}
-                          onClick={() => {
-                            if (isActive) {
-                              setSelectedAmenities((prev) =>
-                                prev.filter((v) => v !== option.id),
-                              );
-                            } else {
-                              setSelectedAmenities((prev) => [
-                                ...prev,
-                                option.id,
-                              ]);
-                            }
-                          }}
-                        >
-                          {displayLabel}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="box forInput">
-              <label>{t.dashboard.forms.description}</label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <textarea
-                    {...register("description")}
-                    placeholder={t.dashboard.forms.descriptionPlaceholder}
-                    rows={4}
-                  />
-                </div>
-              </div>
-            </div>
-            <Tags />
-          </>
-        )}
-
-        {/* ================= CONTACT STEP 5 ================= */}
-        {step === STEPS.CONTACT && (
-          <>
+          {/* ================= SUB_CATEGORIES STEP 2 ================= */}
+          {step === STEPS.SUB_CATEGORIES && (
             <div className="options-grid verfiyMethod">
-              {METHODS.map(({ key, label, icon: Icon }) => {
-                const isActive = selectedContactMethods[key];
-
-                return (
-                  <div
-                    key={key}
-                    className={`option-box ${
-                      isActive ? "active" : ""
-                    } ${fieldErrors.contact ? "error-border" : ""}`}
-                    onClick={() => {
-                      setSelectedContactMethods((prev) => ({
+              {subCategories
+                ?.filter((x) => x?.category_id == selectedCats.cat)
+                ?.map((subCat) => (
+                  <CatCard
+                    key={subCat?.id}
+                    data={subCat}
+                    position={`when-create-ad`}
+                    type={`sub-cat`}
+                    activeClass={subCat?.id == selectedCats.subCat}
+                    onSelect={() => {
+                      setSelectedCats((prev) => ({
                         ...prev,
-                        [key]: !prev[key],
+                        subCat: subCat?.id,
+                      }));
+
+                      setStep(STEPS.BASICS);
+                    }}
+                  />
+                ))}
+            </div>
+          )}
+
+          {/* ================= BASICS STEP 3 ================= */}
+          {step === STEPS.BASICS && (
+            <>
+              <div className="box forInput">
+                <label>{t.ad.placeholders.adTitle}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="text"
+                      {...register("adTitle", {
+                        required: t.ad.errors.adTitle,
+                        minLength: {
+                          value: 6,
+                          message: t.ad.errors.adTitleValidation,
+                        },
+                      })}
+                      placeholder={t.ad.placeholders.adTitle}
+                    />
+                  </div>
+                  {errors.adTitle && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.adTitle.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="form-section">
+                <h2 className="section-title">{t.dashboard.tables.location}</h2>
+                <div
+                  className="row-holder"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                  }}
+                >
+                  <SelectOptions
+                    label={t.location.yourGovernorate}
+                    placeholder={t.location.selectGovernorate}
+                    options={governorates}
+                    value={selectedLocations.gov}
+                    onChange={(item) => {
+                      setSelectedLocations({
+                        gov: item,
+                        city: null,
+                        area: null,
+                        compound: null,
+                      });
+                      handleErrors("gov", null);
+                    }}
+                    error={fieldErrors.gov}
+                    required={true}
+                  />
+
+                  <SelectOptions
+                    label={t.location.yourCity}
+                    placeholder={t.location.selectCity}
+                    options={cities.filter(
+                      (c) => c.governorate_id === selectedLocations.gov?.id,
+                    )}
+                    value={selectedLocations.city}
+                    disabled={!selectedLocations.gov}
+                    onChange={(item) => {
+                      setSelectedLocations((prev) => ({
+                        ...prev,
+                        city: item,
+                        area: null,
+                      }));
+                      handleErrors("city", null);
+                    }}
+                    error={fieldErrors.city}
+                  />
+
+                  <SelectOptions
+                    label={t.location.yourArea}
+                    placeholder={t.location.selectArea}
+                    options={areas.filter(
+                      (a) => a.city_id === selectedLocations.city?.id,
+                    )}
+                    value={selectedLocations.area}
+                    disabled={!selectedLocations.city}
+                    onChange={(item) => {
+                      setSelectedLocations((prev) => ({
+                        ...prev,
+                        area: item,
                       }));
                     }}
-                  >
-                    <Icon className="cat-icon" />
-                    <span>{label}</span>
-                  </div>
-                );
-              })}
-              {fieldErrors.contact && (
-                <div className="box forInput">
-                  <span className="error">
-                    <CircleAlert />
-                    {fieldErrors.contact}
-                  </span>
-                </div>
-              )}
-            </div>
-          </>
-        )}
+                  />
 
-        {/* ================= BUTTON ================= */}
-        {step !== STEPS.CATEGORIES && step !== STEPS.SUB_CATEGORIES && (
-          <button type="submit" className="main-button">
-            {step === STEPS.CONTACT ? (
-              loadingSubmit ? (
-                <span className="loader"></span>
+                  <SelectOptions
+                    label={t.location.yourCompound}
+                    placeholder={t.location.selectCompound}
+                    options={compounds.filter((m) => {
+                      if (selectedLocations.area?.id) {
+                        return m.area_id === selectedLocations.area.id;
+                      }
+
+                      if (selectedLocations.city?.id) {
+                        return m.city_id === selectedLocations.city.id;
+                      }
+
+                      return false;
+                    })}
+                    value={selectedLocations.compound}
+                    disabled={
+                      !selectedLocations.area && !selectedLocations.city
+                    }
+                    onChange={(item) => {
+                      setSelectedLocations((prev) => ({
+                        ...prev,
+                        compound: item,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+              {/* === تفاصيل التسعير === */}
+              <div className="form-section">
+                <h2 className="section-title">
+                  {t.dashboard.tables.pricing_details}
+                </h2>
+                <div
+                  className="row-holder"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                  }}
+                >
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.rentPrice} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("rentAmount", {
+                            required: t.dashboard.forms.errors.priceRequired,
+                            min: {
+                              value: 1,
+                              message: t.dashboard.forms.errors.priceMin,
+                            },
+                          })}
+                          placeholder={t.ad.rentPricePlaceholder}
+                        />
+                      </div>
+                      {errors.rentAmount && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.rentAmount.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.deposit_amount} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("deposit_amount", {
+                            required:
+                              t.dashboard.forms.errors.deposit_amount_reqire,
+                            min: {
+                              value: 1,
+                              message:
+                                t.dashboard.forms.errors.deposit_amount_Min,
+                            },
+                          })}
+                          placeholder={t.ad.deposit_amount_Placeholder}
+                        />
+                      </div>
+                      {errors.deposit_amount && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.deposit_amount.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <SelectOptions
+                    label={t.enum.currencies}
+                    placeholder={t.location.select_currency}
+                    options={Currencies}
+                    value={additionalData?.currency}
+                    onChange={(item) => {
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        currency: item,
+                      }));
+                      handleErrors("currency", null);
+                    }}
+                    error={fieldErrors.currency}
+                    required={true}
+                  />
+
+                  <SelectOptions
+                    label={t.enum.frequency}
+                    placeholder={t.location.select_frequency}
+                    options={RentFrequencies}
+                    value={additionalData?.frequency || null}
+                    onChange={(item) => {
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        frequency: item,
+                      }));
+                      handleErrors("frequency", null);
+                    }}
+                    error={fieldErrors.frequency}
+                    required={true}
+                  />
+                </div>
+              </div>
+
+              <Images
+                images={images}
+                setImages={setImages}
+                isSubmitted={isSubmitted}
+              />
+            </>
+          )}
+
+          {/* ================= ALL_DETAILS STEP 4 ================= */}
+          {step === STEPS.ALL_DETAILS && (
+            <>
+              <div className="form-section">
+                <h2 className="section-title">
+                  {t.dashboard.tables.property_details}
+                </h2>
+                <div
+                  className="row-holder"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                  }}
+                >
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.bedrooms} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("bedrooms", {
+                            required: t.dashboard.forms.errors.required,
+                            min: {
+                              value: 1,
+                              message: t.dashboard.forms.errors.minOne,
+                            },
+                            max: {
+                              value: 100,
+                              message: t.ad.errors.maxHundred,
+                            },
+                          })}
+                          placeholder={t.ad.bedroomsPlaceholder}
+                        />
+                      </div>
+                      {errors.bedrooms && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.bedrooms.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.bathrooms} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("bathrooms", {
+                            required: t.dashboard.forms.errors.required,
+                            min: {
+                              value: 1,
+                              message: t.dashboard.forms.errors.minOne,
+                            },
+                            max: {
+                              value: 100,
+                              message: t.ad.errors.maxHundred,
+                            },
+                          })}
+                          placeholder={t.ad.bathroomsPlaceholder}
+                        />
+                      </div>
+                      {errors.bathrooms && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.bathrooms.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <SelectOptions
+                    label={t.ad.level}
+                    placeholder={t.ad.levelPlaceholder}
+                    options={Levels}
+                    value={additionalData?.level}
+                    onChange={(item) => {
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        level: item,
+                      }));
+                      handleErrors("level", null);
+                    }}
+                    error={fieldErrors.level}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-section for-dates">
+                <h2 className="section-title">{t.ad.rental_period}</h2>
+
+                <div className="row-holder for-dates">
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.from} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          value={
+                            rentAvailability.from
+                              ? dayjs(rentAvailability.from)
+                              : null
+                          }
+                          onChange={(newValue) => {
+                            const formattedFrom = newValue
+                              ? newValue.format("YYYY-MM-DD")
+                              : "";
+
+                            setRentAvailability((prev) => {
+                              const shouldResetTo =
+                                formattedFrom &&
+                                prev.to &&
+                                dayjs(prev.to).isBefore(
+                                  dayjs(formattedFrom),
+                                  "day",
+                                );
+
+                              return {
+                                ...prev,
+                                from: formattedFrom,
+                                to: shouldResetTo ? "" : prev.to,
+                              };
+                            });
+                          }}
+                          slotProps={{
+                            textField: datePickerTextFieldProps,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="box forInput right">
+                    <label>
+                      {t.ad.to} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          value={
+                            rentAvailability.to
+                              ? dayjs(rentAvailability.to)
+                              : null
+                          }
+                          minDate={
+                            rentAvailability.from
+                              ? dayjs(rentAvailability.from)
+                              : undefined
+                          }
+                          onChange={(newValue) =>
+                            setRentAvailability((prev) => ({
+                              ...prev,
+                              to: newValue ? newValue.format("YYYY-MM-DD") : "",
+                            }))
+                          }
+                          slotProps={{
+                            textField: datePickerTextFieldProps,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
+
+                <div className="row-holder for-dates">
+                  <div className="box forInput right">
+                    <label>
+                      {t.ad.durationValue} <span className="required">*</span>
+                    </label>
+
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          min={1}
+                          {...register("rentalDuration")}
+                          placeholder={t.ad.durationValuePlaceholder}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <SelectOptions
+                    label={t.ad.durationUnit}
+                    placeholder={t.ad.select}
+                    options={RentFrequencies}
+                    value={additionalData.minRentalUnit}
+                    onChange={(item) =>
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        minRentalUnit: item,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="form-section">
+                <h2 className="section-title">
+                  {t.dashboard.tables.guest_capacity}
+                </h2>
+                <div
+                  className="row-holder"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                  }}
+                >
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.childMax} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("child_no_max", {
+                            required: t.dashboard.forms.errors.required,
+                            min: {
+                              value: 0,
+                              message: t.dashboard.forms.errors.minZero,
+                            },
+                            max: {
+                              value: 100,
+                              message: t.ad.errors.maxHundred,
+                            },
+                          })}
+                          placeholder={t.ad.childMaxPlaceholder}
+                        />
+                      </div>
+                      {errors.child_no_max && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.child_no_max.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.adultMax} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("adult_no_max", {
+                            required: t.dashboard.forms.errors.required,
+                            min: {
+                              value: 1,
+                              message: t.dashboard.forms.errors.minOne,
+                            },
+                            max: {
+                              value: 100,
+                              message: t.ad.errors.maxHundred,
+                            },
+                          })}
+                          placeholder={t.ad.adultMaxPlaceholder}
+                        />
+                      </div>
+                      {errors.adult_no_max && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.adult_no_max.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="form-section">
+                <h2 className="section-title">{t.ad.amenities}</h2>
+                <div className="dynamicFilters-holder">
+                  <div className="box forInput">
+                    <div className="options-grid flex">
+                      {Amenities.map((option) => {
+                        const displayLabel =
+                          locale === "ar" ? option.name_ar : option.name_en;
+                        const isActive = selectedAmenities.includes(option.id);
+
+                        return (
+                          <div
+                            key={option.id}
+                            className={`option-box small ${isActive ? "active" : ""}`}
+                            onClick={() => {
+                              if (isActive) {
+                                setSelectedAmenities((prev) =>
+                                  prev.filter((v) => v !== option.id),
+                                );
+                              } else {
+                                setSelectedAmenities((prev) => [
+                                  ...prev,
+                                  option.id,
+                                ]);
+                              }
+                            }}
+                          >
+                            {displayLabel}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="box forInput">
+                <label>{t.dashboard.forms.description}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <textarea
+                      {...register("description")}
+                      placeholder={t.dashboard.forms.descriptionPlaceholder}
+                      rows={4}
+                    />
+                  </div>
+                </div>
+              </div>
+              <Tags />
+            </>
+          )}
+
+          {/* ================= CONTACT STEP 5 ================= */}
+          {step === STEPS.CONTACT && (
+            <>
+              <div className="options-grid verfiyMethod">
+                {METHODS.map(({ key, label, icon: Icon }) => {
+                  const isActive = selectedContactMethods[key];
+
+                  return (
+                    <div
+                      key={key}
+                      className={`option-box ${
+                        isActive ? "active" : ""
+                      } ${fieldErrors.contact ? "error-border" : ""}`}
+                      onClick={() => {
+                        setSelectedContactMethods((prev) => ({
+                          ...prev,
+                          [key]: !prev[key],
+                        }));
+                      }}
+                    >
+                      <Icon className="cat-icon" />
+                      <span>{label}</span>
+                    </div>
+                  );
+                })}
+                {fieldErrors.contact && (
+                  <div className="box forInput">
+                    <span className="error">
+                      <CircleAlert />
+                      {fieldErrors.contact}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ================= BUTTON ================= */}
+          {step !== STEPS.CATEGORIES && step !== STEPS.SUB_CATEGORIES && (
+            <button type="submit" className="main-button">
+              {step === STEPS.CONTACT ? (
+                loadingSubmit ? (
+                  <span className="loader"></span>
+                ) : (
+                  t.ad.create_your_ad
+                )
               ) : (
-                t.ad.create_your_ad
-              )
-            ) : (
-              t.actions.next
-            )}
-          </button>
-        )}
-      </form>
+                t.actions.next
+              )}
+            </button>
+          )}
+        </form>
+      </LocalizationProvider>
     </div>
   );
 }

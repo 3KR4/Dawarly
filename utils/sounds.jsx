@@ -6,8 +6,8 @@ let sounds = {
 export const initSounds = () => {
   if (typeof window === "undefined") return;
 
-  sounds.favOn = new Audio("/sounds/fav-on.mp3");
-  sounds.favOff = new Audio("/sounds/fav-off.mp3");
+  sounds.favOn = new Audio("/public/sounds/fav-on.mp3");
+  sounds.favOff = new Audio("/public/sounds/fav-off.mp3");
 
   sounds.favOn.preload = "auto";
   sounds.favOff.preload = "auto";

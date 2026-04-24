@@ -49,7 +49,7 @@ export const metadata = {
     siteName: "Dawaarly",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo-favicon.png",
         width: 1200,
         height: 630,
         alt: "Dawaarly logo",
@@ -64,13 +64,13 @@ export const metadata = {
     title: "Dawaarly",
     description:
       "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
-    images: ["/logo.png"],
+    images: ["/logo-favicon.png"],
   },
 
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo-favicon.png",
+    shortcut: "/logo-favicon.png",
+    apple: "/logo-favicon.png",
   },
 };
 

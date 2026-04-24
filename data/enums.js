@@ -45,9 +45,9 @@ export const Genders = [
 ];
 
 export const Currencies = [
+  { id: "EGP", name_en: "Egyptian Pound", name_ar: "جنيه مصري" },
   { id: "USD", name_en: "US Dollar", name_ar: "دولار أمريكي" },
   { id: "EUR", name_en: "Euro", name_ar: "يورو" },
-  { id: "EGP", name_en: "Egyptian Pound", name_ar: "جنيه مصري" },
   { id: "SAR", name_en: "Saudi Riyal", name_ar: "ريال سعودي" },
   { id: "AED", name_en: "UAE Dirham", name_ar: "درهم إماراتي" },
 ];
@@ -151,4 +151,24 @@ export const months = [
   { id: 10, name_en: "Oct", name_ar: "أكتوبر" },
   { id: 11, name_en: "Nov", name_ar: "نوفمبر" },
   { id: 12, name_en: "Dec", name_ar: "ديسمبر" },
+];
+
+export const Levels = [
+  {
+    id: 0,
+    name_en: "Ground",
+    name_ar: "أرضي",
+  },
+
+  ...Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    name_en: `${i + 1}`,
+    name_ar: `${i + 1}`,
+  })),
+
+  {
+    id: 11,
+    name_en: "+10",
+    name_ar: "+10",
+  },
 ];

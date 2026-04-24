@@ -11,7 +11,8 @@ import Images from "@/components/Tools/data-collector/Images";
 import { Mail, Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
 import { IoChatbubblesOutline } from "react-icons/io5";
-
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Tags from "@/components/Tools/data-collector/Tags";
 import {
   crateAd,
@@ -20,14 +21,17 @@ import {
   assignAdmin,
 } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
-import { Amenities, Currencies, RentFrequencies } from "@/data/enums";
+import { Amenities, Currencies, Levels, RentFrequencies } from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
 import { selectors } from "@/Contexts/selectors";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import { useAuth } from "@/Contexts/AuthContext";
 import { getAllUsers } from "@/services/auth/auth.service";
 import { deleteImage, uploadImages } from "@/services/images/images.service";
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/ar";
+import "dayjs/locale/en";
 export default function AdForm({ type = "client", adId }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
@@ -74,9 +78,10 @@ export default function AdForm({ type = "client", adId }) {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   const [additionalData, setAdditionalData] = useState({
-    currency: null,
+    currency: Currencies[0],
     frequency: null,
     minRentalUnit: null,
+    level: Levels[0],
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
@@ -158,7 +163,6 @@ export default function AdForm({ type = "client", adId }) {
     setValue("description", ad.description || "");
     setValue("bedrooms", ad.details.bedrooms);
     setValue("bathrooms", ad.details.bathrooms);
-    setValue("level", ad.details.level);
     setValue("child_no_max", ad.child_no_max);
     setValue("adult_no_max", ad.adult_no_max);
     setValue("rentalDuration", ad.min_rent_period);
@@ -191,6 +195,7 @@ export default function AdForm({ type = "client", adId }) {
       minRentalUnit: RentFrequencies.find(
         (x) => x.id == ad.min_rent_period_unit,
       ),
+      level: Levels.find((x) => x.id == ad.details.level),
     });
 
     const activeAmenities = Amenities.filter(
@@ -299,7 +304,7 @@ export default function AdForm({ type = "client", adId }) {
     compound_id: selectedLocations.compound?.id || null,
     bedrooms: Number(data.bedrooms),
     bathrooms: Number(data.bathrooms),
-    level: Number(data.level),
+    level: additionalData.level?.id,
     adult_no_max: Number(data.adult_no_max),
     child_no_max: Number(data.child_no_max),
     tags: tags,
@@ -408,734 +413,810 @@ export default function AdForm({ type = "client", adId }) {
       setLoadingSubmit(false);
     }
   };
+  const datePickerTextFieldProps = {
+    fullWidth: true,
+    sx: {
+      "& .MuiInputBase-root": {
+        height: "42px",
+        borderRadius: "10px",
+        backgroundColor: "transparent",
 
-  const RenderRentAvailability = () => {
-    return (
-      <>
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.rental_period}</h2>
+        // ❌ remove ALL states here
+        boxShadow: "none",
+      },
 
-          <div className="row-holder for-dates">
-            <div className="box forInput">
-              <label>
-                {t.ad.from} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="date"
-                    value={rentAvailability.from}
-                    disabled={!isEditable}
-                    onChange={(e) =>
-                      setRentAvailability((prev) => ({
-                        ...prev,
-                        from: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+      // 🔥 remove hover effect
+      "& .MuiInputBase-root:hover": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
 
-            <div className="box forInput right">
-              <label>
-                {t.ad.to} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="date"
-                    value={rentAvailability.to}
-                    min={rentAvailability.from}
-                    disabled={!isEditable}
-                    onChange={(e) =>
-                      setRentAvailability((prev) => ({
-                        ...prev,
-                        to: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      // 🔥 remove focus effect
+      "& .MuiInputBase-root.Mui-focused": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
 
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
+      "& .MuiInputBase-root:focus-within": {
+        boxShadow: "none",
+        backgroundColor: "transparent",
+      },
 
-          <div className="row-holder for-dates">
-            <div className="box forInput right">
-              <label>
-                {t.ad.durationValue} <span className="required">*</span>
-              </label>
+      // ❌ remove fieldset completely (important)
+      "& fieldset": {
+        border: "none !important",
+      },
 
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    min={1}
-                    disabled={!isEditable}
-                    {...register("rentalDuration", {
-                      required: t.ad.errors.rentalDuration,
-                    })}
-                    placeholder={t.ad.durationValuePlaceholder}
-                  />
-                </div>
-                {errors.rentalDuration && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.rentalDuration.message}
-                  </span>
-                )}
-              </div>
-            </div>
+      "& .MuiOutlinedInput-notchedOutline": {
+        border: "none !important",
+      },
 
-            <SelectOptions
-              label={t.ad.durationUnit}
-              placeholder={t.ad.select}
-              options={RentFrequencies}
-              value={additionalData.minRentalUnit}
-              required={true}
-              disabled={!isEditable}
-              onChange={(item) =>
-                setAdditionalData((prev) => ({
-                  ...prev,
-                  minRentalUnit: item,
-                }))
-              }
-            />
-          </div>
-        </div>
-      </>
-    );
+      // label
+      "& .MuiInputLabel-root": {
+        color: "var(--paragraph)",
+        fontSize: "14px",
+        fontWeight: 600,
+      },
+
+      "& .MuiInputLabel-root.Mui-focused": {
+        color: "var(--paragraph)",
+      },
+
+      "& .MuiPickersSectionList-root": {
+        height: "42.5px",
+        display: "flex",
+        alignItems: "center",
+        fontSize: "13px", // 👈 هنا حجم الخط
+        fontWeight: 500, // اختياري
+      },
+      // input
+      "& .MuiInputBase-input": {
+        height: "42.5px",
+        boxSizing: "border-box",
+      },
+
+      "& .MuiInputAdornment-root": {
+        height: "42px",
+        display: "flex",
+        alignItems: "center",
+      },
+
+      "& .MuiIconButton-root": {
+        height: "32px",
+        width: "32px",
+      },
+    },
   };
-
   return (
-    <div
-      className={`form-holder create-ad ${
-        type == "client" ? "user-create-ad" : "admin-create-ad"
-      }`}
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={locale}
     >
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          position: "relative",
-          opacity: loadingContent ? "0.6" : "1",
-        }}
+      <div
+        className={`form-holder create-ad ${
+          type == "client" ? "user-create-ad" : "admin-create-ad"
+        }`}
       >
-        {loadingContent && (
-          <div className="loading-content cover">
-            <span
-              className="loader"
-              style={{ opacity: loadingContent ? "1" : "0" }}
-            ></span>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          style={{
+            position: "relative",
+            opacity: loadingContent ? "0.6" : "1",
+          }}
+        >
+          {loadingContent && (
+            <div className="loading-content cover">
+              <span
+                className="loader"
+                style={{ opacity: loadingContent ? "1" : "0" }}
+              ></span>
+            </div>
+          )}
+          {type == "admin" && adId && canAssignAdmin && allAdmins && (
+            <div className="form-section right">
+              <h2 className="section-title">{t.ad.admin_contact}</h2>
+              <div
+                className="row-holder"
+                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+              >
+                <SelectOptions
+                  label={t.ad.theContactMethod}
+                  placeholder={""}
+                  options={contactMethod}
+                  value={selectedMediatorMethod}
+                  required={false}
+                  onChange={(item) => {
+                    setSelectedMediatorMethod(item);
+                  }}
+                />
+                <SelectOptions
+                  label={t.ad.choose_admin}
+                  placeholder={t.ad.select_admin}
+                  options={allAdmins}
+                  type={"users"}
+                  value={selectedAdmin}
+                  required={true}
+                  error={fieldErrors.admin}
+                  disabled={selectedMediatorMethod?.id == 1}
+                  onChange={(item) => {
+                    setSelectedAdmin(item);
+                    handleErrors("admin", null);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          {/* === معلومات أساسية === */}
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.basic_info}</h2>
+
+            <div className="row-holder">
+              <div className="left">
+                <div className="box forInput">
+                  <label>
+                    {t.dashboard.forms.title || "Title"}{" "}
+                    <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("adTitle", {
+                          required: t.ad.errors.adTitle,
+                          minLength: {
+                            value: 6,
+                            message: t.ad.errors.adTitleValidation,
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={t.ad.placeholders.adTitle}
+                      />
+                    </div>
+                    {errors.adTitle && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.adTitle.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>{t.dashboard.forms.description}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <textarea
+                        {...register("description")}
+                        placeholder={t.dashboard.forms.descriptionPlaceholder}
+                        rows={4}
+                        disabled={!isEditable}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="right">
+                <Images
+                  images={images}
+                  setImages={setImages}
+                  isSubmitted={isSubmitted}
+                  isEditing={!!adId}
+                  disabled={!isEditable}
+                />
+              </div>
+            </div>
           </div>
-        )}
-        {type == "admin" && adId && canAssignAdmin && allAdmins && (
-          <div className="form-section right">
-            <h2 className="section-title">{t.ad.admin_contact}</h2>
+
+          {/* === الفئة والتصنيف === */}
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.category_info}</h2>
+
             <div
               className="row-holder"
               style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
             >
               <SelectOptions
-                label={t.ad.theContactMethod}
-                placeholder={""}
-                options={contactMethod}
-                value={selectedMediatorMethod}
-                required={false}
+                label={t.ad.choose_category}
+                placeholder={t.ad.select_category}
+                options={categories}
+                value={selectedCats.cat}
                 onChange={(item) => {
-                  setSelectedMediatorMethod(item);
+                  setSelectedCats({
+                    cat: item,
+                    subCat: null,
+                  });
+                  handleErrors("cat", null);
+                }}
+                error={fieldErrors.cat}
+                required={true}
+              />
+
+              <SelectOptions
+                label={t.ad.choose_sub_category}
+                placeholder={t.ad.select_sub_category}
+                options={subCategories.filter(
+                  (s) => s.category_id === selectedCats.cat?.id,
+                )}
+                value={selectedCats.subCat}
+                disabled={!selectedCats.cat}
+                onChange={(item) => {
+                  setSelectedCats((prev) => ({
+                    ...prev,
+                    subCat: item,
+                  }));
+                  handleErrors("subCat", null);
+                }}
+                error={fieldErrors.subCat}
+                required={true}
+              />
+            </div>
+          </div>
+
+          {/* === الموقع === */}
+          <div className="form-section">
+            <h2 className="section-title">{t.dashboard.tables.location}</h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
+            >
+              <SelectOptions
+                label={t.location.yourGovernorate}
+                placeholder={t.location.selectGovernorate}
+                options={governorates}
+                value={selectedLocations.gov}
+                onChange={(item) => {
+                  setSelectedLocations({
+                    gov: item,
+                    city: null,
+                    area: null,
+                    compound: null,
+                  });
+                  handleErrors("gov", null);
+                }}
+                error={fieldErrors.gov}
+                required={true}
+              />
+
+              <SelectOptions
+                label={t.location.yourCity}
+                placeholder={t.location.selectCity}
+                options={cities.filter(
+                  (c) => c.governorate_id === selectedLocations.gov?.id,
+                )}
+                value={selectedLocations.city}
+                disabled={!selectedLocations.gov}
+                onChange={(item) => {
+                  setSelectedLocations((prev) => ({
+                    ...prev,
+                    city: item,
+                    area: null,
+                  }));
+                  handleErrors("city", null);
+                }}
+                error={fieldErrors.city}
+              />
+
+              <SelectOptions
+                label={t.location.yourArea}
+                placeholder={t.location.selectArea}
+                options={areas.filter(
+                  (a) => a.city_id === selectedLocations.city?.id,
+                )}
+                value={selectedLocations.area}
+                disabled={!selectedLocations.city}
+                onChange={(item) => {
+                  setSelectedLocations((prev) => ({
+                    ...prev,
+                    area: item,
+                  }));
                 }}
               />
+
               <SelectOptions
-                label={t.ad.choose_admin}
-                placeholder={t.ad.select_admin}
-                options={allAdmins}
-                type={"users"}
-                value={selectedAdmin}
-                required={true}
-                error={fieldErrors.admin}
-                disabled={selectedMediatorMethod?.id == 1}
+                label={t.location.yourCompound}
+                placeholder={t.location.selectCompound}
+                options={compounds.filter((m) => {
+                  if (selectedLocations.area?.id) {
+                    return m.area_id === selectedLocations.area.id;
+                  }
+
+                  if (selectedLocations.city?.id) {
+                    return m.city_id === selectedLocations.city.id;
+                  }
+
+                  return false;
+                })}
+                value={selectedLocations.compound}
+                disabled={!selectedLocations.area && !selectedLocations.city}
                 onChange={(item) => {
-                  setSelectedAdmin(item);
-                  handleErrors("admin", null);
+                  setSelectedLocations((prev) => ({
+                    ...prev,
+                    compound: item,
+                  }));
                 }}
               />
             </div>
           </div>
-        )}
-        {/* === معلومات أساسية === */}
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.basic_info}</h2>
 
-          <div className="row-holder">
-            <div className="left">
+          {/* === تفاصيل العقار === */}
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.dashboard.tables.property_details}
+            </h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            >
               <div className="box forInput">
                 <label>
-                  {t.dashboard.forms.title || "Title"}{" "}
-                  <span className="required">*</span>
+                  {t.ad.bedrooms} <span className="required">*</span>
                 </label>
                 <div className="inputHolder">
                   <div className="holder">
                     <input
-                      type="text"
-                      {...register("adTitle", {
-                        required: t.ad.errors.adTitle,
-                        minLength: {
-                          value: 6,
-                          message: t.ad.errors.adTitleValidation,
+                      type="number"
+                      {...register("bedrooms", {
+                        required: t.dashboard.forms.errors.required,
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.minOne,
+                        },
+                        max: {
+                          value: 100,
+                          message: t.ad.errors.maxHundred,
                         },
                       })}
                       disabled={!isEditable}
-                      placeholder={t.ad.placeholders.adTitle}
+                      placeholder={t.ad.bedroomsPlaceholder}
                     />
                   </div>
-                  {errors.adTitle && (
+                  {errors.bedrooms && (
                     <span className="error">
                       <CircleAlert />
-                      {errors.adTitle.message}
+                      {errors.bedrooms.message}
                     </span>
                   )}
                 </div>
               </div>
 
               <div className="box forInput">
-                <label>{t.dashboard.forms.description}</label>
+                <label>
+                  {t.ad.bathrooms} <span className="required">*</span>
+                </label>
                 <div className="inputHolder">
                   <div className="holder">
-                    <textarea
-                      {...register("description")}
-                      placeholder={t.dashboard.forms.descriptionPlaceholder}
-                      rows={4}
+                    <input
+                      type="number"
+                      {...register("bathrooms", {
+                        required: t.dashboard.forms.errors.required,
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.minOne,
+                        },
+                        max: {
+                          value: 100,
+                          message: t.ad.errors.maxHundred,
+                        },
+                      })}
                       disabled={!isEditable}
+                      placeholder={t.ad.bathroomsPlaceholder}
+                    />
+                  </div>
+                  {errors.bathrooms && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.bathrooms.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <SelectOptions
+                label={t.ad.level}
+                placeholder={t.ad.levelPlaceholder}
+                options={Levels}
+                value={additionalData?.level}
+                onChange={(item) => {
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    level: item,
+                  }));
+                  handleErrors("level", null);
+                }}
+                error={fieldErrors.level}
+                required
+              />
+            </div>
+          </div>
+
+          {/* === تفاصيل التسعير === */}
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.dashboard.tables.pricing_details}
+            </h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            >
+              <div className="box forInput">
+                <label>
+                  {t.ad.rentPrice} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("rentAmount", {
+                        required: t.dashboard.forms.errors.priceRequired,
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.priceMin,
+                        },
+                      })}
+                      disabled={!isEditable}
+                      placeholder={t.ad.rentPricePlaceholder}
+                    />
+                  </div>
+                  {errors.rentAmount && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.rentAmount.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="box forInput">
+                <label>
+                  {t.ad.deposit_amount} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("deposit_amount", {
+                        required:
+                          t.dashboard.forms.errors.deposit_amount_reqire,
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.deposit_amount_Min,
+                        },
+                      })}
+                      disabled={!isEditable}
+                      placeholder={t.ad.deposit_amount_Placeholder}
+                    />
+                  </div>
+                  {errors.deposit_amount && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.deposit_amount.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <SelectOptions
+                label={t.enum.currencies}
+                placeholder={t.location.select_currency}
+                options={Currencies}
+                value={additionalData?.currency}
+                onChange={(item) => {
+                  handleErrors("currency", null);
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    currency: item,
+                  }));
+                }}
+                error={fieldErrors.currency}
+                required={true}
+              />
+
+              <SelectOptions
+                label={t.enum.frequency}
+                placeholder={t.location.select_frequency}
+                options={RentFrequencies}
+                value={additionalData?.frequency || null}
+                onChange={(item) => {
+                  handleErrors("frequency", null);
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    frequency: item,
+                  }));
+                }}
+                error={fieldErrors.frequency}
+                required={true}
+              />
+            </div>
+          </div>
+
+          <div className="form-section for-dates">
+            <h2 className="section-title">{t.ad.rental_period}</h2>
+
+            <div className="row-holder for-dates">
+              <div className="box forInput">
+                <label>
+                  {t.ad.from} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <DatePicker
+                      format="YYYY-MM-DD"
+                      value={
+                        rentAvailability.from
+                          ? dayjs(rentAvailability.from)
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        const formattedFrom = newValue
+                          ? newValue.format("YYYY-MM-DD")
+                          : "";
+
+                        setRentAvailability((prev) => {
+                          const shouldResetTo =
+                            formattedFrom &&
+                            prev.to &&
+                            dayjs(prev.to).isBefore(
+                              dayjs(formattedFrom),
+                              "day",
+                            );
+
+                          return {
+                            ...prev,
+                            from: formattedFrom,
+                            to: shouldResetTo ? "" : prev.to,
+                          };
+                        });
+                      }}
+                      slotProps={{
+                        textField: datePickerTextFieldProps,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="box forInput right">
+                <label>
+                  {t.ad.to} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <DatePicker
+                      format="YYYY-MM-DD"
+                      value={
+                        rentAvailability.to ? dayjs(rentAvailability.to) : null
+                      }
+                      minDate={
+                        rentAvailability.from
+                          ? dayjs(rentAvailability.from)
+                          : undefined
+                      }
+                      onChange={(newValue) =>
+                        setRentAvailability((prev) => ({
+                          ...prev,
+                          to: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        }))
+                      }
+                      slotProps={{
+                        textField: datePickerTextFieldProps,
+                      }}
                     />
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="right">
-              <Images
-                images={images}
-                setImages={setImages}
-                isSubmitted={isSubmitted}
-                isEditing={!!adId}
-                disabled={!isEditable}
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
+
+            <div className="row-holder for-dates">
+              <div className="box forInput right">
+                <label>
+                  {t.ad.durationValue} <span className="required">*</span>
+                </label>
+
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      min={1}
+                      {...register("rentalDuration")}
+                      placeholder={t.ad.durationValuePlaceholder}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <SelectOptions
+                label={t.ad.durationUnit}
+                placeholder={t.ad.select}
+                options={RentFrequencies}
+                value={additionalData.minRentalUnit}
+                onChange={(item) =>
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    minRentalUnit: item,
+                  }))
+                }
               />
             </div>
           </div>
-        </div>
 
-        {/* === الفئة والتصنيف === */}
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.category_info}</h2>
-
-          <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-          >
-            <SelectOptions
-              label={t.ad.choose_category}
-              placeholder={t.ad.select_category}
-              options={categories}
-              value={selectedCats.cat}
-              onChange={(item) => {
-                setSelectedCats({
-                  cat: item,
-                  subCat: null,
-                });
-                handleErrors("cat", null);
-              }}
-              error={fieldErrors.cat}
-              required={true}
-            />
-
-            <SelectOptions
-              label={t.ad.choose_sub_category}
-              placeholder={t.ad.select_sub_category}
-              options={subCategories.filter(
-                (s) => s.category_id === selectedCats.cat?.id,
-              )}
-              value={selectedCats.subCat}
-              disabled={!selectedCats.cat}
-              onChange={(item) => {
-                setSelectedCats((prev) => ({
-                  ...prev,
-                  subCat: item,
-                }));
-                handleErrors("subCat", null);
-              }}
-              error={fieldErrors.subCat}
-              required={true}
-            />
-          </div>
-        </div>
-
-        {/* === الموقع === */}
-        <div className="form-section">
-          <h2 className="section-title">{t.dashboard.tables.location}</h2>
-          <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
-          >
-            <SelectOptions
-              label={t.location.yourGovernorate}
-              placeholder={t.location.selectGovernorate}
-              options={governorates}
-              value={selectedLocations.gov}
-              onChange={(item) => {
-                setSelectedLocations({
-                  gov: item,
-                  city: null,
-                  area: null,
-                  compound: null,
-                });
-                handleErrors("gov", null);
-              }}
-              error={fieldErrors.gov}
-              required={true}
-            />
-
-            <SelectOptions
-              label={t.location.yourCity}
-              placeholder={t.location.selectCity}
-              options={cities.filter(
-                (c) => c.governorate_id === selectedLocations.gov?.id,
-              )}
-              value={selectedLocations.city}
-              disabled={!selectedLocations.gov}
-              onChange={(item) => {
-                setSelectedLocations((prev) => ({
-                  ...prev,
-                  city: item,
-                  area: null,
-                }));
-                handleErrors("city", null);
-              }}
-              error={fieldErrors.city}
-            />
-
-            <SelectOptions
-              label={t.location.yourArea}
-              placeholder={t.location.selectArea}
-              options={areas.filter(
-                (a) => a.city_id === selectedLocations.city?.id,
-              )}
-              value={selectedLocations.area}
-              disabled={!selectedLocations.city}
-              onChange={(item) => {
-                setSelectedLocations((prev) => ({
-                  ...prev,
-                  area: item,
-                }));
-              }}
-            />
-
-            <SelectOptions
-              label={t.location.yourCompound}
-              placeholder={t.location.selectCompound}
-              options={compounds.filter((m) => {
-                if (selectedLocations.area?.id) {
-                  return m.area_id === selectedLocations.area.id;
-                }
-
-                if (selectedLocations.city?.id) {
-                  return m.city_id === selectedLocations.city.id;
-                }
-
-                return false;
-              })}
-              value={selectedLocations.compound}
-              disabled={!selectedLocations.area && !selectedLocations.city}
-              onChange={(item) => {
-                setSelectedLocations((prev) => ({
-                  ...prev,
-                  compound: item,
-                }));
-              }}
-            />
-          </div>
-        </div>
-
-        {/* === تفاصيل العقار === */}
-        <div className="form-section">
-          <h2 className="section-title">
-            {t.dashboard.tables.property_details}
-          </h2>
-          <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
-            <div className="box forInput">
-              <label>
-                {t.ad.bedrooms} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("bedrooms", {
-                      required: t.dashboard.forms.errors.required,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.minOne,
-                      },
-                      max: {
-                        value: 100,
-                        message: t.ad.errors.maxHundred,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.bedroomsPlaceholder}
-                  />
+          {/* === سعة الضيوف === */}
+          <div className="form-section">
+            <h2 className="section-title">
+              {t.dashboard.tables.pricing_details || "Guest Capacity"}
+            </h2>
+            <div
+              className="row-holder"
+              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            >
+              <div className="box forInput">
+                <label>
+                  {t.ad.childMax} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("child_no_max", {
+                        required: t.dashboard.forms.errors.required,
+                        min: {
+                          value: 0,
+                          message: t.dashboard.forms.errors.minZero,
+                        },
+                        max: {
+                          value: 100,
+                          message: t.ad.errors.maxHundred,
+                        },
+                      })}
+                      disabled={!isEditable}
+                      placeholder={t.ad.childMaxPlaceholder}
+                    />
+                  </div>
+                  {errors.child_no_max && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.child_no_max.message}
+                    </span>
+                  )}
                 </div>
-                {errors.bedrooms && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.bedrooms.message}
-                  </span>
-                )}
               </div>
-            </div>
 
-            <div className="box forInput">
-              <label>
-                {t.ad.bathrooms} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("bathrooms", {
-                      required: t.dashboard.forms.errors.required,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.minOne,
-                      },
-                      max: {
-                        value: 100,
-                        message: t.ad.errors.maxHundred,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.bathroomsPlaceholder}
-                  />
+              <div className="box forInput">
+                <label>
+                  {t.ad.adultMax} <span className="required">*</span>
+                </label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("adult_no_max", {
+                        required: t.dashboard.forms.errors.required,
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.minOne,
+                        },
+                        max: {
+                          value: 100,
+                          message: t.ad.errors.maxHundred,
+                        },
+                      })}
+                      disabled={!isEditable}
+                      placeholder={t.ad.adultMaxPlaceholder}
+                    />
+                  </div>
+                  {errors.adult_no_max && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.adult_no_max.message}
+                    </span>
+                  )}
                 </div>
-                {errors.bathrooms && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.bathrooms.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="box forInput">
-              <label>
-                {t.ad.level} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("level", {
-                      required: t.dashboard.forms.errors.required,
-                      min: {
-                        value: 0,
-                        message: t.dashboard.forms.errors.minZero,
-                      },
-                      max: {
-                        value: 100,
-                        message: t.ad.errors.maxHundred,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.levelPlaceholder}
-                  />
-                </div>
-                {errors.level && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.level.message}
-                  </span>
-                )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* === تفاصيل التسعير === */}
-        <div className="form-section">
-          <h2 className="section-title">
-            {t.dashboard.tables.pricing_details}
-          </h2>
-          <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-          >
-            <div className="box forInput">
-              <label>
-                {t.ad.rentPrice} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("rentAmount", {
-                      required: t.dashboard.forms.errors.priceRequired,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.priceMin,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.rentPricePlaceholder}
-                  />
+          {/* === المميزات === */}
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.amenities}</h2>
+            <div className="dynamicFilters-holder">
+              <div className="box forInput">
+                <div className="options-grid flex">
+                  {Amenities.map((option) => {
+                    const displayLabel =
+                      locale === "ar" ? option.name_ar : option.name_en;
+                    const isActive = selectedAmenities.includes(option.id);
+
+                    return (
+                      <div
+                        key={option.id}
+                        className={`option-box small ${isActive ? "active" : ""}`}
+                        onClick={() => {
+                          if (isActive) {
+                            setSelectedAmenities((prev) =>
+                              prev.filter((v) => v !== option.id),
+                            );
+                          } else {
+                            setSelectedAmenities((prev) => [
+                              ...prev,
+                              option.id,
+                            ]);
+                          }
+                        }}
+                      >
+                        {displayLabel}
+                      </div>
+                    );
+                  })}
                 </div>
-                {errors.rentAmount && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.rentAmount.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="box forInput">
-              <label>
-                {t.ad.deposit_amount} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("deposit_amount", {
-                      required: t.dashboard.forms.errors.deposit_amount_reqire,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.deposit_amount_Min,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.deposit_amount_Placeholder}
-                  />
-                </div>
-                {errors.deposit_amount && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.deposit_amount.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <SelectOptions
-              label={t.enum.currencies}
-              placeholder={t.location.select_currency}
-              options={Currencies}
-              value={additionalData?.currency || null}
-              onChange={(item) => {
-                handleErrors("currency", null);
-                setAdditionalData((prev) => ({
-                  ...prev,
-                  currency: item,
-                }));
-              }}
-              error={fieldErrors.currency}
-              required={true}
-            />
-
-            <SelectOptions
-              label={t.enum.frequency}
-              placeholder={t.location.select_frequency}
-              options={RentFrequencies}
-              value={additionalData?.frequency || null}
-              onChange={(item) => {
-                handleErrors("frequency", null);
-                setAdditionalData((prev) => ({
-                  ...prev,
-                  frequency: item,
-                }));
-              }}
-              error={fieldErrors.frequency}
-              required={true}
-            />
-          </div>
-        </div>
-
-        <RenderRentAvailability />
-
-        {/* === سعة الضيوف === */}
-        <div className="form-section">
-          <h2 className="section-title">
-            {t.dashboard.tables.pricing_details || "Guest Capacity"}
-          </h2>
-          <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-          >
-            <div className="box forInput">
-              <label>
-                {t.ad.childMax} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("child_no_max", {
-                      required: t.dashboard.forms.errors.required,
-                      min: {
-                        value: 0,
-                        message: t.dashboard.forms.errors.minZero,
-                      },
-                      max: {
-                        value: 100,
-                        message: t.ad.errors.maxHundred,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.childMaxPlaceholder}
-                  />
-                </div>
-                {errors.child_no_max && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.child_no_max.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="box forInput">
-              <label>
-                {t.ad.adultMax} <span className="required">*</span>
-              </label>
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    type="number"
-                    {...register("adult_no_max", {
-                      required: t.dashboard.forms.errors.required,
-                      min: {
-                        value: 1,
-                        message: t.dashboard.forms.errors.minOne,
-                      },
-                      max: {
-                        value: 100,
-                        message: t.ad.errors.maxHundred,
-                      },
-                    })}
-                    disabled={!isEditable}
-                    placeholder={t.ad.adultMaxPlaceholder}
-                  />
-                </div>
-                {errors.adult_no_max && (
-                  <span className="error">
-                    <CircleAlert />
-                    {errors.adult_no_max.message}
-                  </span>
-                )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* === المميزات === */}
-        <div className="form-section">
-          <h2 className="section-title">{t.ad.amenities}</h2>
-          <div className="dynamicFilters-holder">
-            <div className="box forInput">
-              <div className="options-grid flex">
-                {Amenities.map((option) => {
-                  const displayLabel =
-                    locale === "ar" ? option.name_ar : option.name_en;
-                  const isActive = selectedAmenities.includes(option.id);
+          <Tags disabled={!isEditable} />
+
+          {((type === "admin" && !!adData?.subuser) || type === "client") && (
+            <div className="form-section">
+              <h2 className="section-title">{t.ad.theContactMethod}</h2>
+              <div className="options-grid verfiyMethod">
+                {METHODS.map(({ key, label, icon: Icon }) => {
+                  const isActive = selectedContactMethods[key];
 
                   return (
                     <div
-                      key={option.id}
-                      className={`option-box small ${isActive ? "active" : ""}`}
+                      key={key}
+                      className={`option-box ${isActive ? "active" : ""} ${
+                        fieldErrors.contact ? "error-border" : ""
+                      }`}
                       onClick={() => {
-                        if (isActive) {
-                          setSelectedAmenities((prev) =>
-                            prev.filter((v) => v !== option.id),
-                          );
-                        } else {
-                          setSelectedAmenities((prev) => [...prev, option.id]);
-                        }
+                        setSelectedContactMethods((prev) => ({
+                          ...prev,
+                          [key]: !prev[key],
+                        }));
+                        handleErrors("contact", null);
                       }}
                     >
-                      {displayLabel}
+                      <Icon className="cat-icon" />
+                      <span>{label}</span>
                     </div>
                   );
                 })}
               </div>
+              {fieldErrors.contact && (
+                <div className="box forInput">
+                  <span className="error">
+                    <CircleAlert />
+                    {fieldErrors.contact}
+                  </span>
+                </div>
+              )}
             </div>
+          )}
+
+          {/* === زر الإرسال === */}
+          <div className="form-section submit-section">
+            <button
+              type="submit"
+              className={`main-button ${
+                adId ? "update-button" : "create-button"
+              }`}
+              onClick={() => setIsSubmitted(true)}
+              disabled={loadingSubmit}
+            >
+              {loadingSubmit
+                ? locale === "ar"
+                  ? "جاري..."
+                  : "Loading..."
+                : adId
+                  ? t.ad.update_ad
+                  : t.ad.create_your_ad}
+            </button>
           </div>
-        </div>
-
-        <Tags disabled={!isEditable} />
-
-        {((type === "admin" && !!adData?.subuser) || type === "client") && (
-          <div className="form-section">
-            <h2 className="section-title">{t.ad.theContactMethod}</h2>
-            <div className="options-grid verfiyMethod">
-              {METHODS.map(({ key, label, icon: Icon }) => {
-                const isActive = selectedContactMethods[key];
-
-                return (
-                  <div
-                    key={key}
-                    className={`option-box ${isActive ? "active" : ""} ${
-                      fieldErrors.contact ? "error-border" : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedContactMethods((prev) => ({
-                        ...prev,
-                        [key]: !prev[key],
-                      }));
-                      handleErrors("contact", null);
-                    }}
-                  >
-                    <Icon className="cat-icon" />
-                    <span>{label}</span>
-                  </div>
-                );
-              })}
-            </div>
-            {fieldErrors.contact && (
-              <div className="box forInput">
-                <span className="error">
-                  <CircleAlert />
-                  {fieldErrors.contact}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* === زر الإرسال === */}
-        <div className="form-section submit-section">
-          <button
-            type="submit"
-            className={`main-button ${
-              adId ? "update-button" : "create-button"
-            }`}
-            onClick={() => setIsSubmitted(true)}
-            disabled={loadingSubmit}
-          >
-            {loadingSubmit
-              ? locale === "ar"
-                ? "جاري..."
-                : "Loading..."
-              : adId
-                ? t.ad.update_ad
-                : t.ad.create_your_ad}
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </LocalizationProvider>
   );
 }

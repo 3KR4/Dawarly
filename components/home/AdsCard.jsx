@@ -133,12 +133,15 @@ export default function CardItem({ data }) {
           >
             {data?.title}
           </h4>
-          <Link
-            href={`/market?subcat=${data?.SubCategories?.id}`}
+          <h5
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/market?subcat=${data?.SubCategories?.id}`);
+            }}
             className={`category ellipsis`}
           >
             {data?.SubCategories?.[`name_${locale}`]}
-          </Link>
+          </h5>
         </div>
         <div className="row-holder">
           <h3>

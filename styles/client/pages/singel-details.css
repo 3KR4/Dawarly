@@ -418,6 +418,7 @@
 .single-page .details-holder h3 {
   font-size: 25px;
   color: var(--paragraph);
+  line-height: 1.4;
 }
 .single-page .details-holder .price {
   color: var(--main-color);
@@ -540,7 +541,7 @@
 }
 .single-page .details-holder .right .user-info .row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 5px;
 }
 .single-page .details-holder .right .user-info .row button {
