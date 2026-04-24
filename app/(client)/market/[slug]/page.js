@@ -38,13 +38,13 @@ import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
 import { Levels, RentFrequencies, RentPeriodUnit } from "@/data/enums";
 import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
+
 export default function AdDetails() {
   const t = useTranslate();
   const { slug } = useParams();
   const { screenSize, locale } = useContext(settings);
 
   const [ad, setAd] = useState(null);
-  // const [productReviews, setProductReviews] = useState(null);
   const [currentImg, setCurrentImg] = useState(0);
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);

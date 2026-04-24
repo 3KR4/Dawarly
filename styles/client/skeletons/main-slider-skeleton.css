@@ -1,0 +1,108 @@
+.main-slider-skeleton {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 55px 55px !important;
+  overflow: hidden;
+
+  /* نفس خلفية الكارد */
+  background: var(--body-color);
+}
+
+/* نفس فكرة element */
+.main-slider-skeleton .element {
+  position: relative;
+  overflow: hidden;
+  background: var(--border-color);
+}
+.main-slider-skeleton .content .element {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.362);
+}
+
+/* shimmer نفس الكارد بالظبط */
+.main-slider-skeleton .element::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  height: 100%;
+  width: 150%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.362),
+    transparent
+  );
+
+  animation: shimmer 1.4s infinite;
+}
+
+/* الخلفية */
+.main-slider-skeleton .slider-bg {
+  width: 100%;
+  height: 100%;
+}
+
+/* النصوص */
+.main-slider-skeleton .content {
+  flex-direction: column;
+  gap: 15px;
+  display: flex;
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  padding: 0 38px;
+}
+
+/* title */
+.main-slider-skeleton .title {
+  width: 30%;
+  height: 40px;
+}
+
+/* description */
+.main-slider-skeleton .description {
+  width: 40%;
+
+  height: 30px;
+}
+
+/* نفس animation */
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-slider-skeleton .content {
+    gap: 10px;
+    bottom: 25px;
+  }
+  .main-slider-skeleton .title {
+    height: 30px;
+  }
+
+  /* description */
+  .main-slider-skeleton .description {
+
+    height: 25px;
+  }
+}
+@media (max-width: 700px) {
+
+  .main-slider-skeleton .title {
+    height: 30px;
+    width: 40%;
+  }
+
+  /* description */
+  .main-slider-skeleton .description {
+    width: 55%;
+
+    height: 25px;
+  }
+}

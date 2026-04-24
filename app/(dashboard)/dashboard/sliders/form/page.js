@@ -1,4 +1,5 @@
 "use client";
+
 import "@/styles/client/forms.css";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -6,218 +7,222 @@ import { useSearchParams } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
 import Images from "@/components/Tools/data-collector/Images";
 import { CircleAlert } from "lucide-react";
-
 import { useNotification } from "@/Contexts/NotificationContext";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
-import { deleteImage, uploadImages } from "@/services/images/images.service";
+import FormLangSwitch from "@/components/Tools/FormLangSwitch";
 
-export default function CreateAd() {
+import {
+  getOneSlider,
+  createSlider,
+  updateSlider,
+} from "@/services/sliders/sliders.service";
+
+import { uploadImages, deleteImage } from "@/services/images/images.service";
+
+export default function CreateSliderPage() {
   const t = useTranslate();
-
   const searchParams = useSearchParams();
+  const sliderId = searchParams.get("id");
+
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
 
-  // ======= FORM STATES =======
-  const [sliderData, setSliderData] = useState(null);
-  const [loadingContent, setLoadingContnet] = useState(false);
+  // ===== STATE =====
+  const [loadingContent, setLoadingContent] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [images, setImages] = useState([]);
+  const [originalImages, setOriginalImages] = useState([]);
 
+  const [currentLocale, setCurrentLocale] = useState("en");
+
+  // ===== FORM =====
   const {
     register,
     handleSubmit,
-    formState: { errors },
     setValue,
-  } = useForm();
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: { en: "", ar: "" },
+      description: { en: "", ar: "" },
+      link: "",
+    },
+  });
 
-  // ======= FETCH AD DATA IF EDITING =======
+  // ===== FETCH (EDIT MODE) =====
   useEffect(() => {
-    if (sliderId) fetchAdData();
+    if (sliderId) fetchSlider();
   }, [sliderId]);
 
-  const fetchAdData = async () => {
-    setLoadingContnet(true);
+  const fetchSlider = async () => {
+    setLoadingContent(true);
     try {
-      const res = await getOneAd(sliderId);
+      const res = await getOneSlider(sliderId);
       const slider = res?.data;
-      if (!slider) return alert(t.ad.fetch_error);
-      setSliderData(slider);
-      fillFormWithAdData(slider);
-    } catch (error) {
-      console.error("Error fetching ad data:", error);
+
+      setValue("title", slider.title);
+      setValue("description", slider.description);
+      setValue("link", slider.link);
+
+      const imgs = slider.image ? [slider.image] : [];
+      setImages(imgs);
+      setOriginalImages(imgs);
+    } catch (err) {
+      console.error(err);
       addNotification({
         type: "error",
-        message: t.ad.fetch_error,
+        message: t.ad.fetch_error || "Error fetching data",
       });
     } finally {
-      setLoadingContnet(false);
+      setLoadingContent(false);
     }
   };
 
-  const fillFormWithAdData = (x) => {
-    setValue("title", x.title);
-    setValue("description", x.description);
-    setValue("link", x.link);
-    setImages(x.image);
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    let hasErrors = false;
-
-    if (!selectedCats.cat) {
-      newErrors.cat = t.ad.errors.category;
-      hasErrors = true;
-    }
-    if (!selectedCats.subCat) {
-      newErrors.subCat = t.ad.errors.subCategory;
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      setFieldErrors(newErrors);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return false;
-    }
-    setFieldErrors({});
-    return true;
-  };
-
+  // ===== HELPERS =====
   const buildPayload = (data) => ({
     title: data.title,
     description: data.description,
     link: data.link,
+    is_active: true,
+    order: 1,
   });
 
-  const submitAd = async (payload) =>
-    sliderId ? updateAd(sliderId, payload) : crateAd(payload);
+  const submitSlider = (payload) =>
+    sliderId ? updateSlider(sliderId, payload) : createSlider(payload);
 
-  const uploadNewImages = async (sliderId) => {
+  const uploadNewImages = async (id) => {
     const newImages = images.filter((img) => img instanceof File);
-
-    if (newimages?.length === 0) return;
+    if (!newImages.length) return;
 
     const formData = new FormData();
-
     newImages.forEach((file) => {
       formData.append("files", file);
     });
 
-    await uploadImages("SLIDER", sliderId, formData);
+    await uploadImages("SLIDER", id, formData);
   };
-  const handleDeletedImages = async (sliderId) => {
-    const deletedImages = originalImages.filter(
-      (oldImg) => !images.find((img) => img.id === oldImg.id),
+
+  const handleDeletedImages = async (id) => {
+    const deleted = originalImages.filter(
+      (old) => !images.find((img) => img.id === old.id),
     );
 
-    for (let img of deletedImages) {
-      await deleteImage("SLIDER", sliderId, img.id);
+    for (let img of deleted) {
+      await deleteImage("SLIDER", id, img.id);
     }
   };
-  const fieldErrorMap = {
-    title: "title",
-    description: "description",
-    link: "link",
-  };
+
+  // ===== SUBMIT =====
   const onSubmit = async (data) => {
-    if (!validateForm()) return;
-    const payload = buildPayload(data);
+    setIsSubmitted(true);
     setLoadingSubmit(true);
+    if (!images.length) {
+      setLoadingSubmit(false);
+
+      addNotification({
+        type: "error",
+        message: "Image is required",
+      });
+
+      return;
+    }
     try {
-      const res = await submitAd(payload);
-      const finalsliderId = sliderId || res.data.sliderId;
-      await uploadNewImages(finalsliderId);
+      const payload = buildPayload(data);
+
+      const res = await submitSlider(payload);
+
+      const finalId = sliderId || res.data.id;
+
+      await uploadNewImages(finalId);
+
       if (sliderId) {
-        await handleDeletedImages(finalsliderId);
-      }
-      if (selectedAdmin) {
-        await assignAdmin(sliderId, { admin_id: selectedAdmin.id });
+        await handleDeletedImages(finalId);
       }
 
       addNotification({
         type: "success",
-        message: sliderId ? t.ad.ad_updated : t.ad.ad_created,
+        message: sliderId
+          ? t.dashboard.forms.update_slide
+          : t.dashboard.forms.create_slide,
       });
-      redirectAfterLogin("/dashboard/ads/all");
+
+      redirectAfterLogin("/dashboard/sliders");
     } catch (err) {
-      console.error("Error:", err);
-      let message = "An error occurred";
-      // 🔥 لو فيه validation errors
-      if (err.response?.data?.errors) {
-        const backendErrors = err.response.data.errors;
-
-        const translatedErrors = backendErrors.map((e) => {
-          const key = fieldErrorMap[e.field];
-          return key ? t.ad.errors[key] : e.message;
-        });
-
-        message = translatedErrors.join(" \n ");
-      } else {
-        message =
-          err.response?.data?.message || err.message || "An error occurred";
-      }
+      console.error(err);
 
       addNotification({
         type: "error",
-        message,
+        message:
+          err.response?.data?.message || err.message || "Something went wrong",
       });
     } finally {
       setLoadingSubmit(false);
     }
   };
+
+  // ===== UI =====
   return (
-    <div className={`form-holder create-ad `}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <div className="form-holder">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          position: "relative",
+          opacity: loadingContent ? "0.6" : "1",
+        }}
+      >
+        {loadingContent && (
+          <div className="loading-content ">
+            <span
+              className="loader"
+              style={{ opacity: loadingContent ? "1" : "0" }}
+            ></span>
+          </div>
+        )}
         <div className="row-holder">
-          <div className="box forInput">
-            <label>
-              {t.dashboard.forms.slied_title}{" "}
-              <span className="required">*</span>
-            </label>
-            <div className="inputHolder">
-              <div className="holder">
-                <input
-                  type="text"
-                  {...register("adTitle", {
-                    required: t.dashboard.forms.slied_title_required,
-                    minLength: {
-                      value: 6,
-                      message:
-                        t.dashboard.forms.adTitleValidation ||
-                        "Title must be at least 6 characters",
-                    },
-                  })}
-                  placeholder={t.ad.placeholders.adTitle}
-                />
+          <div className="column-holder">
+            <div className="box forInput">
+              <label>
+                {t.dashboard.forms.slied_title} - ({currentLocale}) *
+              </label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    key={currentLocale}
+                    {...register(`title.${currentLocale}`, {
+                      required: "Required",
+                      minLength: {
+                        value: 3,
+                        message: "Min 3 chars",
+                      },
+                    })}
+                    placeholder={`Title `}
+                  />
+                </div>
               </div>
-              {errors.adTitle && (
+              {errors?.title?.[currentLocale] && (
                 <span className="error">
                   <CircleAlert />
-                  {errors.adTitle.message}
+                  {errors.title[currentLocale].message}
                 </span>
               )}
             </div>
-          </div>
-          <div className="box forInput right">
-            <label>
-              {t.dashboard.tables.link} <span>({t.auth.optional})</span>
-            </label>
-            <div className="inputHolder">
-              <div className="holder">
-                <input
-                  type="text"
-                  {...register("link", {
-                    pattern: {
-                      value:
-                        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
-                      message: t.dashboard.tables.invalidLink,
-                    },
-                  })}
-                  placeholder={`https://example.com`}
-                />
+            <div className="box forInput">
+              <label>Link</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <input
+                    {...register("link", {
+                      pattern: {
+                        value:
+                          /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+                        message: "Invalid URL",
+                      },
+                    })}
+                    placeholder="https://example.com"
+                  />
+                </div>
               </div>
               {errors.link && (
                 <span className="error">
@@ -226,21 +231,21 @@ export default function CreateAd() {
                 </span>
               )}
             </div>
-          </div>
-        </div>
-        <div className="row-holder">
-          <div className="box forInput">
-            <label>{t.dashboard.forms.description}</label>
-            <div className="inputHolder">
-              <div className="holder">
-                <textarea
-                  {...register("description")}
-                  placeholder={t.dashboard.forms.descriptionPlaceholder}
-                  rows={4}
-                />
+            <div className="box forInput">
+              <label>Description - ({currentLocale})</label>
+              <div className="inputHolder">
+                <div className="holder">
+                  <textarea
+                    key={currentLocale}
+                    {...register(`description.${currentLocale}`)}
+                    rows={4}
+                    placeholder={`Description`}
+                  />
+                </div>
               </div>
             </div>
           </div>
+
           <div className="right">
             <Images
               images={images}
@@ -248,24 +253,30 @@ export default function CreateAd() {
               isSubmitted={isSubmitted}
               limit={1}
             />
-            {fieldErrors.images && (
-              <span className="error">
-                <CircleAlert />
-                {fieldErrors.images}
-              </span>
-            )}
           </div>
         </div>
 
-        <div className="form-section submit-section">
+        {/* SUBMIT */}
+        <div className="row-holder submit-section">
+          <FormLangSwitch
+            curentCreateLocale={currentLocale}
+            setCurentCreateLocale={setCurrentLocale}
+            loadingSubmit={loadingSubmit}
+            editId={sliderId}
+          />
           <button
             type="submit"
-            className={`main-button ${id ? "update-button" : "create-button"}`}
-            onClick={() => setIsSubmitted(true)}
+            className="main-button"
+            disabled={loadingSubmit}
+            style={{ opacity: loadingSubmit ? "0.6" : "1" }}
           >
-            {id
-              ? t.dashboard.forms.update_slide
-              : t.dashboard.forms.create_slide}
+            {loadingSubmit ? (
+              <span className="loader"></span>
+            ) : sliderId ? (
+              t.dashboard.forms.update_slide
+            ) : (
+              t.dashboard.forms.create_slide
+            )}
           </button>
         </div>
       </form>

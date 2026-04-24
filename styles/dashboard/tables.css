@@ -212,7 +212,7 @@
   }
   .table-container.slieds-tasble .table-header,
   .table-container.slieds-tasble .table-item {
-    grid-template-columns: 3.5fr 1fr 1fr 1fr;
+    grid-template-columns: 3.5fr 1fr 1fr 1fr  1fr;
   }
   .header-item {
     font-size: 14px;
@@ -274,7 +274,7 @@
   }
   .table-container.slieds-tasble .table-header,
   .table-container.slieds-tasble .table-item {
-    grid-template-columns: 3.5fr 1.5fr 1fr 0.8fr;
+    grid-template-columns: 3.5fr 1.5fr 1fr 1fr 0.8fr;
   }
   .table-container .item-details p {
     font-size: 13px;

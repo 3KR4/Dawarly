@@ -197,7 +197,7 @@ header .actions-btns .userMenu .top {
 }
 .table-container.slieds-tasble .table-header,
 .table-container.slieds-tasble .table-item {
-  grid-template-columns: 2.5fr 1fr 1fr 1fr;
+  grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr;
 }
 .table-container.for-users .table-header,
 .table-container.for-users .table-item {

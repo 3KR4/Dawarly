@@ -69,7 +69,18 @@ export const ENDPOINTS = {
     SHANGE_STATUS: (ad) => `/ads/update/${ad}/status`,
   },
   SLIDERS: {
-    GET_ALL: (page, limit) => `/sliders?page=${page}&limit=${limit}`,
+    GET_ALL: (page, limit, active_only) => {
+      const params = new URLSearchParams({
+        page,
+        limit,
+      });
+
+      if (active_only !== null && active_only !== undefined) {
+        params.append("active_only", active_only);
+      }
+
+      return `/sliders?${params.toString()}`;
+    },
     GET_ONE: (id) => `/sliders/${id}`,
     CREATE: () => `/sliders`,
     UPDATE: (id) => `/sliders/${id}`,

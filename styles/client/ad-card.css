@@ -136,6 +136,7 @@
   font-size: 13px;
   color: var(--paragraph);
   transform: translateX(5px);
+  transition: 0.3S;
 }
 [lang="ar"] .ad-card .body .category {
   transform: translateX(-5px);
