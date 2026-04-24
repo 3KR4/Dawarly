@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import useTranslate from "@/Contexts/useTranslation";
 import "@/styles/dashboard/tables.css";
 import "@/styles/dashboard/globals.css";

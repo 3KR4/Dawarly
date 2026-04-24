@@ -21,6 +21,27 @@ const nextConfig = {
       },
     ];
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.dawaarly.com",
+          },
+        ],
+        destination: "https://dawaarly.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
 };
 
 export default nextConfig;

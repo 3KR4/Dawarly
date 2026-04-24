@@ -1,8 +1,10 @@
 // services/api.js
 import axios from "axios";
+console.log("before url");
 
 // -------------------- BASE CONFIG    https://back.dawaarly.com/api   --------------------
-const BASE_URL = "https://api.dawaarly.com/";
+const BASE_URL = "https://api.dawaarly.com";
+console.log(BASE_URL);
 
 // Instance بدون interceptors (للـ refresh فقط)
 export const plainApi = axios.create({
@@ -54,6 +56,7 @@ const refreshToken = async () => {
 
   return refreshPromise;
 };
+console.log("after url");
 
 // -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
