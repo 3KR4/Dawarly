@@ -23,6 +23,41 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("countries", JSON.stringify(countries));
+  }, [countries, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("governorates", JSON.stringify(governorates));
+  }, [governorates, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("categories", JSON.stringify(categories));
+  }, [categories, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("subCategories", JSON.stringify(subCategories));
+  }, [subCategories, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("cities", JSON.stringify(cities));
+  }, [cities, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("areas", JSON.stringify(areas));
+  }, [areas, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("compounds", JSON.stringify(compounds));
+  }, [compounds, loading]);
+
+  useEffect(() => {
     const loadFromCache = () => {
       try {
         const cached = {
@@ -128,6 +163,13 @@ export const DataProvider = ({ children }) => {
         areas,
         compounds,
         loading,
+        setCountries,
+        setGovernorates,
+        setCategories,
+        setSubCategories,
+        setCities,
+        setAreas,
+        setCompounds
       }}
     >
       {children}

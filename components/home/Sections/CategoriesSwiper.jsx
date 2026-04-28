@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, useContext, useEffect } from "react";
+import React, { useRef, useState, useContext, useEffect, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "@/styles/client/sections/ads-swiper.css";
@@ -9,25 +9,30 @@ import CatCard from "@/components/home/CatCard";
 import { settings } from "@/Contexts/settings";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppData } from "@/Contexts/DataContext";
-import { IoStorefront } from "react-icons/io5";
-import { MdVilla } from "react-icons/md";
-import { PiBuildingApartmentFill } from "react-icons/pi";
-import { BsFillBuildingsFill } from "react-icons/bs";
+import { RELATIONS } from "@/data/enums";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
-const categoryIcons = {
-  // 1: PiBuildingApartmentFill,
-  // 2: MdVilla,
-  // 3: IoStorefront,
-  // 4: BsFillBuildingsFill,
-};
+const categoryIcons = {};
 
 export default function CategoriesSwiper({
+  viewType = "swiper",
   type,
-  catId,
-  onSelect,
+  target,
+  setTarget,
+  dashboard = false,
   showControls = true,
+  setItem,
+  handleHistory,
 }) {
-  const { categories, subCategories } = useAppData();
+  const {
+    countries,
+    governorates,
+    categories,
+    subCategories,
+    cities,
+    areas,
+    compounds,
+  } = useAppData();
 
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
@@ -39,80 +44,127 @@ export default function CategoriesSwiper({
   const [isEnd, setIsEnd] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  // ✅ pagination state
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // =========================
+  // DATA SOURCES
+  // =========================
+  const sources = {
+    categories,
+    subcategories: subCategories,
+    countries,
+    governorates,
+    cities,
+    areas,
+    compounds,
+  };
+
+  // =========================
+  // FILTER DATA
+  // =========================
+  let data = sources[type] || [];
+
+  if (target && RELATIONS[type]) {
+    const { parentKey } = RELATIONS[type];
+    data = data.filter((item) => item[parentKey] == target);
+  }
+
+  // ✅ sliced data (pagination)
+  const visibleData = useMemo(() => {
+    return data.slice(0, visibleCount);
+  }, [data, visibleCount]);
+
+  // =========================
+  // RESET pagination when data changes
+  // =========================
   useEffect(() => {
-    if (type === "cat") {
-      const catParam = searchParams.get("cat");
-      if (catParam) {
-        const selectedCat = categories.find((cat) => cat.id == catParam);
-        if (selectedCat) {
-          setSelectedItem(selectedCat.id);
-        }
-      }
-    } else if (type === "sub-cat") {
-      const subcatParam = searchParams.get("subcat");
-      if (subcatParam) {
-        const selectedSubcat = subCategories.find(
-          (sub) => sub.id == subcatParam,
-        );
-        if (selectedSubcat) {
-          setSelectedItem(selectedSubcat.id);
-        }
+    setVisibleCount(12);
+  }, [type, target]);
+
+  // =========================
+  // CURRENT TARGET NAME
+  // =========================
+  let curentTargetName = null;
+
+  if (target && RELATIONS[type]) {
+    const { parentSource } = RELATIONS[type];
+    const parentList = sources[parentSource];
+
+    const found = parentList?.find((x) => x.id == target);
+    if (found) {
+      curentTargetName = found[`name_${locale}`];
+    }
+  }
+
+  const title = t.home?.[type];
+
+  // =========================
+  // URL SYNC
+  // =========================
+  useEffect(() => {
+    const QUERY_KEYS = {
+      categories: "cat",
+      subcategories: "subcat",
+    };
+
+    const key = QUERY_KEYS[type];
+    if (!key) return;
+
+    const param = searchParams.get(key);
+    if (param) {
+      const list = sources[type] || [];
+      const found = list.find((item) => item.id == param);
+      if (found) {
+        setSelectedItem(found.id);
       }
     }
   }, [searchParams, type]);
 
-  const data =
-    type === "cat"
-      ? categories
-      : subCategories.filter((x) => x.category_id === catId);
-
-  const title =
-    type === "cat" ? t.home.browseCategories : t.home.browseSubCategories;
-
-  // ✅ التعامل مع اختيار الفئة
+  // =========================
+  // HANDLE SELECT
+  // =========================
   const handleSelect = (item) => {
     const isAlreadySelected = selectedItem === item.id;
     const newSelectedItem = isAlreadySelected ? null : item.id;
 
     setSelectedItem(newSelectedItem);
 
-    // ✅ تحديث URL
     const params = new URLSearchParams(searchParams.toString());
 
-    if (type === "cat") {
-      if (newSelectedItem) {
-        params.set("cat", newSelectedItem);
-        params.delete("subcat"); // إزالة subcat عند تغيير الفئة
-      } else {
-        params.delete("cat");
-        params.delete("subcat");
-      }
-    } else if (type === "sub-cat") {
-      if (newSelectedItem) {
-        params.set("subcat", newSelectedItem);
-      } else {
-        params.delete("subcat");
-      }
+    const QUERY_KEYS = {
+      categories: "cat",
+      subcategories: "subcat",
+    };
+
+    const key = QUERY_KEYS[type];
+
+    if (key) {
+      if (newSelectedItem) params.set(key, newSelectedItem);
+      else params.delete(key);
+    }
+
+    if (type === "categories") {
+      params.delete("subcat");
     }
 
     router.push(`?${params.toString()}`);
-
-    if (onSelect) {
-      onSelect(isAlreadySelected ? null : item);
-    }
   };
 
-  const hasSubcategories = (catId) => {
-    return subCategories.some((sub) => sub.category_id === catId);
+  const hasSubcategories = (id) => {
+    return subCategories.some((sub) => sub.category_id === id);
   };
 
+  // =========================
+  // SWIPER SETTINGS
+  // =========================
   const breakpoints = {
-    0: { slidesPerView: Math.min(data.length, 2.2) },
-    500: { slidesPerView: Math.min(data.length, 3.2) },
-    768: { slidesPerView: Math.min(data.length, 4) },
-    992: { slidesPerView: Math.min(data.length, 5) },
-    1200: { slidesPerView: Math.min(data.length, 6) },
-    1400: { slidesPerView: Math.min(data.length, 7) },
+    0: { slidesPerView: Math.min(visibleData.length, 2.2) },
+    500: { slidesPerView: Math.min(visibleData.length, 3.2) },
+    768: { slidesPerView: Math.min(visibleData.length, 4) },
+    992: { slidesPerView: Math.min(visibleData.length, 5) },
+    1200: { slidesPerView: Math.min(visibleData.length, 6) },
+    1400: { slidesPerView: Math.min(visibleData.length, 7) },
   };
 
   const maxSlides = Math.max(
@@ -120,80 +172,150 @@ export default function CategoriesSwiper({
   );
 
   const showNav =
-    data.length > maxSlides && !screenSize.includes("small") && showControls;
+    visibleData.length > maxSlides &&
+    !screenSize.includes("small") &&
+    showControls;
 
+  // =========================
+  // LOAD MORE
+  // =========================
+  const loadMore = () => {
+    if (viewType === "grid") {
+      // 🔥 grid → حمّل الكل مرة واحدة
+      setVisibleCount(data.length);
+    } else {
+      // 🔥 swiper → تدريجي
+      setVisibleCount((prev) => Math.min(prev + 10, data.length));
+    }
+  };
+
+  // =========================
+  // RENDER
+  // =========================
   return (
     <div
       className={`swiper-section container cats ${
-        type == "sub-cat" ? "sub-cat" : ""
+        type === "subcategories" ? "sub-cat" : ""
       }`}
     >
       <div className="top">
-        <h3 className="title">{title}</h3>
+        <h3 className="title">
+          {curentTargetName && dashboard && (
+            <IoMdArrowRoundBack onClick={handleHistory} />
+          )}
+          {title} {curentTargetName ? `in ${curentTargetName}` : ""}
+        </h3>
       </div>
 
-      <div className="swiper-holder">
-        {showNav && (
-          <button
-            className="nav-btn prev-btn"
-            onClick={() => swiperRef.current?.slidePrev()}
-            disabled={isBeginning}
-          >
-            <FaArrowLeft className="arrow" />
-          </button>
-        )}
+      {viewType == "swiper" ? (
+        <div className="swiper-holder">
+          {showNav && (
+            <button
+              className="nav-btn prev-btn"
+              onClick={() => swiperRef.current?.slidePrev()}
+              disabled={isBeginning}
+            >
+              <FaArrowLeft />
+            </button>
+          )}
 
-        <Swiper
-          key={`${type}-${catId}-${data.length}-${locale}`}
-          speed={500}
-          spaceBetween={8}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-            setIsBeginning(swiper.isBeginning);
-            setIsEnd(swiper.isEnd);
-          }}
-          onSlideChange={(swiper) => {
-            setIsBeginning(swiper.isBeginning);
-            setIsEnd(swiper.isEnd);
-          }}
-          dir={locale === "ar" ? "rtl" : "ltr"}
-          breakpoints={breakpoints}
-        >
-          {data.map((item) => {
+          <Swiper
+            key={`${type}-${target}-${visibleData.length}-${locale}`}
+            speed={500}
+            spaceBetween={8}
+            onReachEnd={loadMore} // ✅ هنا السحر
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+              setIsBeginning(swiper.isBeginning);
+              setIsEnd(swiper.isEnd);
+            }}
+            onSlideChange={(swiper) => {
+              setIsBeginning(swiper.isBeginning);
+              setIsEnd(swiper.isEnd);
+            }}
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            breakpoints={breakpoints}
+          >
+            {visibleData.map((item) => {
+              const isSelected = selectedItem == item.id;
+
+              const itemWithIcon =
+                type === "categories"
+                  ? { ...item, icon: categoryIcons[item.id] }
+                  : item;
+
+              return (
+                <SwiperSlide key={item.id}>
+                  <CatCard
+                    data={itemWithIcon}
+                    type={type}
+                    target={target}
+                    dashboard={dashboard}
+                    setTarget={setTarget}
+                    activeClass={isSelected}
+                    position={dashboard ? "when-create-ad" : null}
+                    onSelect={() => {
+                      if (dashboard) {
+                        setItem({ type, item });
+                      } else {
+                        handleSelect(item);
+                      }
+                    }}
+                    showSubcatIndicator={
+                      type === "categories" &&
+                      hasSubcategories(item.id) &&
+                      isSelected
+                    }
+                  />
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+
+          {showNav && (
+            <button
+              className="nav-btn next-btn"
+              onClick={() => swiperRef.current?.slideNext()}
+              disabled={isEnd}
+            >
+              <FaArrowRight />
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="data-grid">
+          {visibleData.map((item) => {
             const isSelected = selectedItem == item.id;
-            const hasSubcats = type === "cat" && hasSubcategories(item.id);
-            const itemWithIcon =
-              type === "cat"
-                ? {
-                    ...item,
-                    icon: categoryIcons[item.id], // ممكن تبقى undefined لو مش موجود
-                  }
-                : item;
 
             return (
-              <SwiperSlide key={item.id} className="category-slide">
-                <CatCard
-                  data={itemWithIcon}
-                  type={type}
-                  activeClass={isSelected}
-                  onSelect={() => handleSelect(item)}
-                  showSubcatIndicator={hasSubcats && isSelected}
-                />
-              </SwiperSlide>
+              <CatCard
+                key={item.id}
+                data={item}
+                target={target}
+                setTarget={setTarget}
+                dashboard={true}
+                type={type}
+                activeClass={isSelected}
+                position={dashboard ? "when-create-ad" : null}
+                onSelect={() => {
+                  if (dashboard) {
+                    setItem({ type, item });
+                  } else {
+                    handleSelect(item);
+                  }
+                }}
+              />
             );
           })}
-        </Swiper>
 
-        {showNav && (
-          <button
-            className="nav-btn next-btn"
-            onClick={() => swiperRef.current?.slideNext()}
-            disabled={isEnd}
-          >
-            <FaArrowRight className="arrow" />
-          </button>
-        )}
-      </div>
+          {/* زرار تحميل إضافي للـ grid */}
+          {visibleCount < data.length && (
+            <button className="load-more-btn" onClick={loadMore}>
+              Load More
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

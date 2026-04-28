@@ -1884,11 +1884,13 @@ export const dashboardRoutes = {
     },
     canCreate: false,
   },
-  subcategories: {
+  data: {
     label: {
-      en: "subcategories",
-      ar: "التصنيفات الفرعية",
+      en: "data",
+      ar: "جميع البيانات",
     },
+    canCreate: true,
+    module: true,
   },
   filters: {
     label: {

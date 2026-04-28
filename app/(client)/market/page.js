@@ -131,18 +131,20 @@ export default function Marketplace() {
   const hasSelectedCategory = selectedCategory.cat || selectedCategory.subCat;
 
   const handleCategorySelect = (type, item) => {
-    if (type === "cat") {
+    
+    if (type === "categories") {
       setSelectedCategory({
         cat: item,
         subCat: null, // إعادة تعيين الفئة الفرعية عند تغيير الفئة الرئيسية
       });
-    } else if (type === "sub-cat") {
+    } else if (type === "subcategories") {
       setSelectedCategory((prev) => ({
         ...prev,
         subCat: item,
       }));
     }
   };
+    console.log("selectedCategory", selectedCategory);
 
   const handleRemoveCategory = (type) => {
     if (type === "cat") {
@@ -213,21 +215,23 @@ export default function Marketplace() {
     (selectedCategory.cat ? 1 : 0) +
     (selectedCategory.subCat ? 1 : 0) +
     Object.keys(allFilters.dynamicFilters).length;
+      console.log(selectedCategory);
 
   return (
     <>
       {!hasSelectedCategory && (
         <CategoriesSwiper
-          type="cat"
-          onSelect={(item) => handleCategorySelect("cat", item)}
+          type="categories"
+          onSelect={(item) => handleCategorySelect("categories", item)}
           showControls={true}
         />
       )}
+      
       {selectedCategory.cat && !selectedCategory.subCat && (
         <CategoriesSwiper
-          type="sub-cat"
-          catId={selectedCategory.cat.id}
-          onSelect={(item) => handleCategorySelect("sub-cat", item)}
+          type="subcategories"
+          target={selectedCategory.cat.id}
+          onSelect={(item) => handleCategorySelect("subcategories", item)}
           showControls={true}
         />
       )}

@@ -11,6 +11,7 @@ export default function DynamicMenu({
   onClose,
   step,
   setStep,
+  backStep = true
 }) {
   if (!open) return null;
 
@@ -18,14 +19,17 @@ export default function DynamicMenu({
     <div className="dynamic-menu" onClick={onClose}>
       <div className="holder" onClick={(e) => e.stopPropagation()}>
         <div className="top">
-          <FaArrowLeft
-            className="arrow"
-            style={{
-              padding: "5px",
-              visibility: step > 1 ? "visible" : "hidden",
-            }}
-            onClick={() => setStep((prev) => prev - 1)}
-          />
+          {backStep && (
+            <FaArrowLeft
+              className="arrow"
+              style={{
+                padding: "5px",
+                visibility: step > 1 ? "visible" : "hidden",
+              }}
+              onClick={() => setStep((prev) => prev - 1)}
+            />
+          )}
+
           <h4 className="title">{title}</h4>
 
           <IoIosClose className="close" onClick={onClose} />

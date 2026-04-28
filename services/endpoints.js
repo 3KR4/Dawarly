@@ -107,28 +107,25 @@ export const ENDPOINTS = {
   },
   DATA: {
     GET_COUNTRIES: () => `data/countries`,
-
     GET_GOVERNRATES: (country_id) =>
       country_id
         ? `data/governorates?country_id=${country_id}`
         : `data/governorates`,
-
     GET_CITIES: (governorate_id) =>
       governorate_id
         ? `data/cities?governorate_id=${governorate_id}`
         : `data/cities`,
-
     GET_AREAS: (city_id) =>
       city_id ? `data/areas?city_id=${city_id}` : `data/areas`,
-
     GET_COMPOUNDS: (area_id) =>
       area_id ? `data/compounds?area_id=${area_id}` : `data/compounds`,
-
     GET_CATEGORIES: () => `data/categories`,
-
     GET_SUBCATEGORIES: (category_id) =>
       category_id
         ? `data/subcategories?category_id=${category_id}`
         : `data/subcategories`,
+    CREATE_MODEL: (model) => `data/${model}`,
+    UPDATE_MODEL: (model, id) => `data/${model}/${id}`,
+    DELETE_MODEL: (model, id) => `data/${model}/${id}`,
   },
 };

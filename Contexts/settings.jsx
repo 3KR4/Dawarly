@@ -8,7 +8,7 @@ export const SettingsProvider = ({ children }) => {
   const [screenSize, setScreenSize] = useState(null);
   const [isReady, setIsReady] = useState(false); // ← جديد
   const pathname = usePathname();
-  const [onCreate, setOnCreate] = useState(null);
+  const [menuType, setMenuType] = useState(null);
   useEffect(() => {
     function getScreenSize() {
       const width = window.innerWidth;
@@ -100,8 +100,8 @@ export const SettingsProvider = ({ children }) => {
         isNavOpen,
         setIsNavOpen,
         isMounted,
-        onCreate,
-        setOnCreate,
+        menuType,
+        setMenuType,
       }}
     >
       {children}

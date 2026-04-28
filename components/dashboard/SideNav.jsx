@@ -9,8 +9,9 @@ import { LuCalendarClock } from "react-icons/lu";
 import { LuCalendarCheck } from "react-icons/lu";
 import { LuGrid2X2Check } from "react-icons/lu";
 import { settings } from "@/Contexts/settings";
-import { FaFilter } from "react-icons/fa6";
 import { MdCategory } from "react-icons/md";
+import { TbCategory2 } from "react-icons/tb";
+import { BiCategory } from "react-icons/bi";
 
 import {
   FaUsers,
@@ -19,12 +20,13 @@ import {
   FaUser,
   FaAngleLeft,
   FaAngleRight,
+  FaDatabase
 } from "react-icons/fa";
-import { FaChartSimple, FaFileContract } from "react-icons/fa6";
+import { FaChartSimple, FaFileContract , FaFilter } from "react-icons/fa6";
 import { PiCardsFill } from "react-icons/pi";
 import { IoMenu, IoLanguage } from "react-icons/io5";
-import { MdLogout } from "react-icons/md";
 import { FiSun } from "react-icons/fi";
+import { MdOutlineHomeWork,MdLogout } from "react-icons/md";
 
 function SideNav() {
   const {
@@ -228,16 +230,53 @@ function SideNav() {
           </div>
         </div>
 
-        {/* Categories */}
-        <Link
-          href="/dashboard/subcategories"
-          className={isActive("/dashboard/subcategories") ? "active a" : "a"}
+        {/* All Data Accordion */}
+        <div
+          className={`a ${
+            isAccordionActive("/dashboard/data") ? "active" : ""
+          } ${openAccordion === "allData" ? "active" : ""}`}
+          onClick={() => toggleAccordion("allData")}
         >
           <div className="hold">
-            <h4>{t.sideNav.sub_categories}</h4>
-            <MdCategory />
+            <h4>{t.sideNav.allData}</h4>
+            <FaDatabase />
           </div>
-        </Link>
+
+          <div
+            ref={(el) => (accordionRefs.current.allData = el)}
+            className="according"
+            style={{
+              height:
+                openAccordion === "allData"
+                  ? `${accordionRefs.current.allData?.scrollHeight || 100}px`
+                  : "0px",
+            }}
+          >
+            <Link
+              href="/dashboard/data/places"
+              className={isActive("/dashboard/data/places") ? "active a" : "a"}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>Places</h4>
+                <MdOutlineHomeWork />
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/data/categories"
+              className={
+                isActive("/dashboard/data/categories") ? "active a" : "a"
+              }
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hold">
+                <h4>Categories</h4>
+                <BiCategory />
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Filters */}
         <Link
           href="/dashboard/filters"

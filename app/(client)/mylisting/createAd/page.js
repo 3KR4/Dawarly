@@ -46,7 +46,7 @@ export default function CreateAd() {
     CONTACT: 5,
   };
 
-  const [step, setStep] = useState(STEPS.ALL_DETAILS);
+  const [step, setStep] = useState(STEPS.CATEGORIES);
 
   // ======= FORM STATES =======
 

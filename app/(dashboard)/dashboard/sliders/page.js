@@ -185,7 +185,9 @@ export default function Slieds() {
                       </Link>
                       <div className="item-details">
                         <h4 className="item-name">{item?.title?.[locale]}</h4>
-                        <p>{item?.description?.[locale]}</p>
+                        <p className="ellipsis two">
+                          {item?.description?.[locale]}
+                        </p>
                       </div>
                     </div>
                     <Link href={item?.link || "/"} className="item-link">

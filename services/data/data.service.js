@@ -28,3 +28,14 @@ export const getCategories = () => {
 export const getSubCategories = (category_id) => {
   return api.get(ENDPOINTS.DATA.GET_SUBCATEGORIES(category_id));
 };
+
+export const createModel = (model,payload) => {
+  return api.post(ENDPOINTS.DATA.CREATE_MODEL(model), payload);
+};
+export const updateModel = (model, id, payload) => {
+  return api.put(ENDPOINTS.DATA.UPDATE_MODEL(model, id), payload);
+};
+export const deleteModel = (model, id ) => {
+  return api.delete(ENDPOINTS.DATA.DELETE_MODEL(model, id));
+};
+

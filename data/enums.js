@@ -172,3 +172,34 @@ export const Levels = [
     name_ar: "+10",
   },
 ];
+
+
+
+export  const RELATIONS = {
+  subcategories: {
+    parentKey: "category_id",
+    source: "subcategories",
+    parentSource: "categories",
+  },
+  governorates: {
+    parentKey: "country_id",
+    source: "governorates",
+    parentSource: "countries",
+  },
+  cities: {
+    parentKey: "governorate_id",
+    source: "cities",
+    parentSource: "governorates",
+  },
+  areas: {
+    parentKey: "city_id",
+    source: "areas",
+    parentSource: "cities",
+  },
+  compounds: {
+    parentKey: "area_id",
+    parentKey2: "city_id",
+    source: "compounds",
+    parentSource: "areas",
+  },
+};

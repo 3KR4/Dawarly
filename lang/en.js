@@ -13,6 +13,12 @@ const en = {
     seeMore: "see more",
     categories: "categories",
     subCategories: "sub categories",
+    subcategories: "sub categories",
+    countries: "countries",
+    governorates: "governorates",
+    cities: "cities",
+    areas: "areas",
+    compounds: "compounds",
     browseCategories: "browse categories",
     browseSubCategories: "browse subcategories",
     newly_added: "Newly added",
@@ -219,6 +225,7 @@ const en = {
     delete: "delete",
     AddOption: "Add Option",
     Create_Filter: "Create Filter",
+    create: "create"
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -379,7 +386,7 @@ const en = {
     activeBookings: "Active Bookings",
     pendingBookings: "Pending Bookings",
 
-    sub_categories: "sub categories",
+    allData: "all data",
     filters: "filters",
     support: "Support",
 
@@ -540,6 +547,9 @@ const en = {
     quickLinks: "Quick Links",
     forBuyers: "For Buyers",
     forSellers: "For Sellers",
+  },
+  data: {
+    data: "data",
   },
 };
 export default en;
