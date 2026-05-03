@@ -63,8 +63,8 @@ export const ENDPOINTS = {
     GET_ALL: (page, limit) => `/blogs?page=${page}&limit=${limit}`,
     GET_ONE: (slug) => `/blogs/${slug}`,
     CREATE: () => `/blogs`,
-    UPDATE: (id) => `/blogs/${id}`,
-    DELETE: (id) => `/blogs/${id}`,
+    UPDATE: (slug) => `/blogs/${slug}`,
+    DELETE: (slug) => `/blogs/${slug}`,
   },
   FAVORITES: {
     TOGGLE_FAVORITES: (id) => `/favorites/${id}`,

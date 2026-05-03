@@ -328,8 +328,7 @@ export default function UsersForm() {
             </div>
           </div>
           <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            className="row-holder two"
           >
             <div className="box forInput">
               <label>{t.auth.fullName}</label>
@@ -399,8 +398,7 @@ export default function UsersForm() {
 
         {/* ================= ADDRESS SELECTION ================= */}
         <div
-          className="row-holder"
-          style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+          className="row-holder two"
         >
           <SelectOptions
             disabled={!isMyProfile}
@@ -433,8 +431,7 @@ export default function UsersForm() {
           <div className="form-section ">
             <h2 className="section-title">{t.auth.SubscriptionDetails}</h2>
             <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+              className="row-holder two"
             >
               {/* Facebook */}
               <div className="box forInput">
@@ -496,8 +493,7 @@ export default function UsersForm() {
         <div className="form-section ">
           <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
           <div
-            className="row-holder"
-            style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+            className="row-holder two"
           >
             <SelectOptions
               label={t.auth.role}

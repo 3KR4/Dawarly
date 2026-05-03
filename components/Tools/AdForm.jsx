@@ -488,10 +488,7 @@ export default function AdForm({ type = "client", adId }) {
     },
   };
   return (
-    <LocalizationProvider
-      dateAdapter={AdapterDayjs}
-      adapterLocale={locale}
-    >
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <div
         className={`form-holder create-ad ${
           type == "client" ? "user-create-ad" : "admin-create-ad"
@@ -515,10 +512,7 @@ export default function AdForm({ type = "client", adId }) {
           {type == "admin" && adId && canAssignAdmin && allAdmins && (
             <div className="form-section right">
               <h2 className="section-title">{t.ad.admin_contact}</h2>
-              <div
-                className="row-holder"
-                style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
+              <div className="row-holder two">
                 <SelectOptions
                   label={t.ad.theContactMethod}
                   placeholder={""}
@@ -550,7 +544,7 @@ export default function AdForm({ type = "client", adId }) {
           <div className="form-section">
             <h2 className="section-title">{t.ad.basic_info}</h2>
 
-            <div className="row-holder">
+            <div className="row-holder two">
               <div className="left">
                 <div className="box forInput">
                   <label>
@@ -612,10 +606,7 @@ export default function AdForm({ type = "client", adId }) {
           <div className="form-section">
             <h2 className="section-title">{t.ad.category_info}</h2>
 
-            <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-            >
+            <div className="row-holder two">
               <SelectOptions
                 label={t.ad.choose_category}
                 placeholder={t.ad.select_category}
@@ -745,8 +736,7 @@ export default function AdForm({ type = "client", adId }) {
               {t.dashboard.tables.property_details}
             </h2>
             <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+              className="row-holder two"
             >
               <div className="box forInput">
                 <label>
@@ -835,10 +825,7 @@ export default function AdForm({ type = "client", adId }) {
             <h2 className="section-title">
               {t.dashboard.tables.pricing_details}
             </h2>
-            <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-            >
+            <div className="row-holder two">
               <div className="box forInput">
                 <label>
                   {t.ad.rentPrice} <span className="required">*</span>
@@ -933,7 +920,7 @@ export default function AdForm({ type = "client", adId }) {
           <div className="form-section for-dates">
             <h2 className="section-title">{t.ad.rental_period}</h2>
 
-            <div className="row-holder for-dates">
+            <div className="row-holder for-dates two">
               <div className="box forInput">
                 <label>
                   {t.ad.from} <span className="required">*</span>
@@ -1011,7 +998,7 @@ export default function AdForm({ type = "client", adId }) {
           <div className="form-section">
             <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
 
-            <div className="row-holder for-dates">
+            <div className="row-holder for-dates two">
               <div className="box forInput right">
                 <label>
                   {t.ad.durationValue} <span className="required">*</span>
@@ -1047,12 +1034,9 @@ export default function AdForm({ type = "client", adId }) {
           {/* === سعة الضيوف === */}
           <div className="form-section">
             <h2 className="section-title">
-              {t.dashboard.tables.pricing_details || "Guest Capacity"}
+              {"Guest Capacity"}
             </h2>
-            <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-            >
+            <div className="row-holder two">
               <div className="box forInput">
                 <label>
                   {t.ad.childMax} <span className="required">*</span>
