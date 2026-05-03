@@ -12,6 +12,8 @@ import { settings } from "@/Contexts/settings";
 import { MdCategory } from "react-icons/md";
 import { TbCategory2 } from "react-icons/tb";
 import { BiCategory } from "react-icons/bi";
+        import { LiaBlogSolid } from "react-icons/lia";
+import { RiArticleFill } from "react-icons/ri";
 
 import {
   FaUsers,
@@ -101,7 +103,6 @@ function SideNav() {
             <IoMenu style={{ fontSize: "25px" }} />
           )}
         </li>
-
         {/* Overview */}
         <Link
           href="/dashboard"
@@ -112,7 +113,6 @@ function SideNav() {
             <FaChartSimple />
           </div>
         </Link>
-
         {/* Slides */}
         <Link
           href="/dashboard/sliders"
@@ -123,7 +123,15 @@ function SideNav() {
             <PiCardsFill />
           </div>
         </Link>
-
+        <Link
+          href="/dashboard/blogs"
+          className={isActive("/dashboard/blogs") ? "active a" : "a"}
+        >
+          <div className="hold">
+            <h4>{t.sideNav.blogs}</h4>
+            <RiArticleFill />
+          </div>
+        </Link>
         {/* Users */}
         <Link
           href="/dashboard/users"
@@ -134,7 +142,6 @@ function SideNav() {
             <FaUsers />
           </div>
         </Link>
-
         {/* Ads */}
         <div
           className={`a ${
@@ -179,7 +186,6 @@ function SideNav() {
             </Link>
           </div>
         </div>
-
         {/* Bookings */}
         <div
           className={`a ${
@@ -229,7 +235,6 @@ function SideNav() {
             </Link>
           </div>
         </div>
-
         {/* All Data Accordion */}
         <div
           className={`a ${
@@ -276,7 +281,6 @@ function SideNav() {
             </Link>
           </div>
         </div>
-
         {/* Filters */}
         <Link
           href="/dashboard/filters"

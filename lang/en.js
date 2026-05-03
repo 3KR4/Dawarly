@@ -225,7 +225,7 @@ const en = {
     delete: "delete",
     AddOption: "Add Option",
     Create_Filter: "Create Filter",
-    create: "create"
+    create: "create",
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -376,6 +376,7 @@ const en = {
     menuRoutes: "menu routes",
     overview: "Overview",
     slides: "Slides",
+    blogs: "blogs",
     users: "Users",
 
     ads: "Ads",

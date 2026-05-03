@@ -1906,6 +1906,13 @@ export const dashboardRoutes = {
     },
     canCreate: true,
   },
+  blogs: {
+    label: {
+      en: "blogs",
+      ar: "المدونات",
+    },
+    canCreate: true,
+  },
   support: {
     label: {
       en: "Support",

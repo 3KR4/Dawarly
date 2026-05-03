@@ -382,6 +382,8 @@ const ar = {
     menuRoutes: "قائمة الصفحات",
     overview: "نظرة عامة",
     slides: "السلايدرز",
+    blogs: "المدونات",
+
     users: "المستخدمين",
 
     ads: "الإعلانات",
