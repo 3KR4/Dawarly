@@ -13,7 +13,7 @@ function Images({
   isSubmitted,
   disabled = false,
   limit = 15,
-
+  label = true,
   // ===== BLOG vs SECTION MODE =====
   sectionMode = false,
   sectionId = null,
@@ -30,28 +30,26 @@ function Images({
   const isInvalid = safeImages.length === 0 && isSubmitted;
 
   const helperText =
-    limit === 1
-      ? t.ad.images?.helperTextSingle
-      : t.ad.images?.helperText;
+    limit === 1 ? t.ad.images?.helperTextSingle : t.ad.images?.helperText;
 
   // ================= ADD FILES =================
-const handleFiles = (files) => {
-  setErrorMessage("");
+  const handleFiles = (files) => {
+    setErrorMessage("");
 
-  const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-  const safePrev = Array.isArray(images) ? images : [];
+    const safePrev = Array.isArray(images) ? images : [];
 
-  if (safePrev.length + imageFiles.length > limit) {
-    setErrorMessage(t.ad.images?.errors.maxLimit?.replace("{limit}", limit));
-    return;
-  }
+    if (safePrev.length + imageFiles.length > limit) {
+      setErrorMessage(t.ad.images?.errors.maxLimit?.replace("{limit}", limit));
+      return;
+    }
 
-  const newImages =
-    limit === 1 ? [imageFiles[0]] : [...safePrev, ...imageFiles];
+    const newImages =
+      limit === 1 ? [imageFiles[0]] : [...safePrev, ...imageFiles];
 
-  setImages(newImages);
-};
+    setImages(newImages);
+  };
 
   // ================= DROP =================
   const handleDrop = (e) => {
@@ -67,27 +65,25 @@ const handleFiles = (files) => {
   };
 
   // ================= REMOVE =================
-const handleRemoveImage = (index) => {
-  setImages((prev) => {
-    const safe = Array.isArray(prev) ? prev : [];
-    const updated = [...safe];
-    updated.splice(index, 1);
-    return updated;
-  });
-};
+  const handleRemoveImage = (index) => {
+    setImages((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
+      const updated = [...safe];
+      updated.splice(index, 1);
+      return updated;
+    });
+  };
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
-      <label>
-        {t.ad.images?.label}
-        {limit > 1 && ` (${limit} ${t.ad.images?.max})`}
-        {limit === 1 && ` (${t.ad.images?.single})`}
-      </label>
+      {label && (
+        <label>
+          {t.ad.images?.label}
+          {limit > 1 && ` (${limit} ${t.ad.images?.max})`}
+          {limit === 1 && ` (${t.ad.images?.single})`}
+        </label>
+      )}
 
-      <div
-        className={`images-uplouder ${
-          isInvalid ? "invalid" : ""
-        }`}
-      >
+      <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
         {/* ================= UPLOAD AREA ================= */}
         <div
           className={`upload-label ${isDrag ? "active" : ""}`}
@@ -115,14 +111,10 @@ const handleRemoveImage = (index) => {
 
               {safeImages.length < limit ? (
                 <h1>
-                  {isDrag
-                    ? t.ad.images?.dropHere
-                    : t.ad.images?.clickHere}
+                  {isDrag ? t.ad.images?.dropHere : t.ad.images?.clickHere}
                 </h1>
               ) : (
-                <h1 className="limit-reached">
-                  {t.ad.images?.limitReached}
-                </h1>
+                <h1 className="limit-reached">{t.ad.images?.limitReached}</h1>
               )}
             </>
           )}
@@ -140,11 +132,7 @@ const handleRemoveImage = (index) => {
         />
 
         {/* ================= PREVIEW ================= */}
-        <div
-          className={`imgHolder ${
-            limit === 1 ? "single-image" : ""
-          }`}
-        >
+        <div className={`imgHolder ${limit === 1 ? "single-image" : ""}`}>
           {/* ================= SECTION MODE PREVIEW ================= */}
           {sectionMode ? (
             safeImages.length === 0 ? null : (
@@ -158,37 +146,35 @@ const handleRemoveImage = (index) => {
                   width={150}
                   height={150}
                 />
-                {!disabled && (
-                  <IoClose
-                    onClick={() => handleRemoveImage(0)}
-                  />
-                )}
+                {!disabled && <IoClose onClick={() => handleRemoveImage(0)} />}
               </div>
             )
           ) : (
             // ================= BLOG MODE PREVIEW =================
-            safeImages.map((image, index) => (
-              <div className="uploaded" key={index}>
-                <Image
-                  src={
-                    image?.secure_url
-                      ? image.secure_url
-                      : URL.createObjectURL(image)
-                  }
-                  alt={`image-${index}`}
-                  width={150}
-                  height={150}
-                />
+            safeImages?.map((image, index) => {
+              console.log(image);
 
-                <p>{index + 1}</p>
-
-                {!disabled && (
-                  <IoClose
-                    onClick={() => handleRemoveImage(index)}
+              return (
+                <div className="uploaded" key={index}>
+                  <Image
+                    src={
+                      image?.secure_url
+                        ? image?.secure_url
+                        : URL.createObjectURL(image)
+                    }
+                    alt={`image-${index}`}
+                    width={150}
+                    height={150}
                   />
-                )}
-              </div>
-            ))
+
+                  <p>{index + 1}</p>
+
+                  {!disabled && (
+                    <IoClose onClick={() => handleRemoveImage(index)} />
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </div>

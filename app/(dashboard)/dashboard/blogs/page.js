@@ -21,10 +21,15 @@ import {
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
-export const SliedeStatuses = [
+import {
+  deleteBlog,
+  getAllSBlogs,
+  updateBlog,
+} from "@/services/blogs/blogs.service";
+export const BlogsStatuses = [
   {
     id: true,
-    name_en: "Active",
+    name_en: "Published",
     name_ar: "نشط",
     bg: "#E6F9F0",
     tx: "#0F9D58",
@@ -37,14 +42,14 @@ export const SliedeStatuses = [
     tx: "#5F6368",
   },
 ];
-export default function Slieds() {
+export default function Blogs() {
   const { screenSize, locale } = useContext(settings);
   const { addNotification } = useNotification();
   const [target, setTarget] = useState(null);
   const [menuType, setMenuType] = useState(null); // form | delete
 
   const t = useTranslate();
-  const [slieds, setSlieds] = useState({
+  const [blogs, setBlogs] = useState({
     data: [],
     pagination: {
       page: 1,
@@ -56,37 +61,37 @@ export default function Slieds() {
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
-  const fetchSliders = (page = slieds.pagination.page) => {
-    getAllSliders(page, slieds.pagination.limit, null)
+  const fetchBlogs = (page = blogs.pagination.page) => {
+    getAllSBlogs(page, blogs.pagination.limit, null)
       .then((res) => {
-        setSlieds(res.data);
+        setBlogs(res.data);
       })
       .catch(console.error)
       .finally(() => setLoadingContent(false));
   };
   useEffect(() => {
-    fetchSliders();
+    fetchBlogs();
   }, []);
 
   const handlePageChange = (newPage) => {
-    fetchSliders(newPage);
+    fetchBlogs(newPage);
   };
   const handelChangeStatus = async (id, status) => {
     try {
-      const res = await updateSlider(id, {
-        is_active: status,
+      const res = await updateBlog(id, {
+        is_published: status,
       });
 
-      const remainingItems = slieds.data.length - 1;
+      const remainingItems = blogs.data.length - 1;
 
       // 2️⃣ نقرر الصفحة الجديدة
       const newPage =
-        remainingItems === 0 && slieds.pagination.page > 1
-          ? slieds.pagination.page - 1
-          : slieds.pagination.page;
+        remainingItems === 0 && blogs.pagination.page > 1
+          ? blogs.pagination.page - 1
+          : blogs.pagination.page;
 
       // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
-      fetchSliders(newPage);
+      fetchBlogs(newPage);
 
       addNotification({
         type: "success",
@@ -101,22 +106,22 @@ export default function Slieds() {
     }
   };
 
-  const confirmDelete = (rejectInput) => {
+  const confirmDelete = () => {
     setLoadingSubmit(true);
 
-    deleteSlider(target)
+    deleteBlog(target)
       .then(() => {
         closeMenu();
-        const remainingItems = slieds.data.length - 1;
+        const remainingItems = blogs.data.length - 1;
 
         // 2️⃣ نقرر الصفحة الجديدة
         const newPage =
-          remainingItems === 0 && slieds.pagination.page > 1
-            ? slieds.pagination.page - 1
-            : slieds.pagination.page;
+          remainingItems === 0 && blogs.pagination.page > 1
+            ? blogs.pagination.page - 1
+            : blogs.pagination.page;
 
         // 3️⃣ نعمل fetch بنفس الصفحة والفلاتر
-        fetchSliders(newPage);
+        fetchBlogs(newPage);
       })
       .catch(console.error)
       .finaly(setLoadingSubmit(false));
@@ -130,7 +135,7 @@ export default function Slieds() {
   return (
     <div className="dash-holder">
       <div className="body">
-        <div className="table-container slieds-tasble">
+        <div className="table-container blogs-page">
           <div className="table-header">
             {!screenSize.includes("small") && (
               <>
@@ -162,15 +167,15 @@ export default function Slieds() {
                 ></span>
               </div>
             )}
-            {!slieds?.data?.length && !loadingContent ? (
+            {!blogs?.data?.length && !loadingContent ? (
               <div className="no-data-found">
                 <TbListSearch />
-                <p>you didnt create slieds yet</p>
+                <p>you didnt create blogs yet</p>
               </div>
             ) : (
-              slieds?.data?.map((item) => {
-                let isActive = SliedeStatuses.find(
-                  (x) => x.id == item?.is_active,
+              blogs?.data?.map((item) => {
+                let isActive = BlogsStatuses.find(
+                  (x) => x.id == item?.is_published,
                 );
                 return (
                   <div key={item?.id} className="table-item">
@@ -184,9 +189,11 @@ export default function Slieds() {
                         />
                       </Link>
                       <div className="item-details">
-                        <h4 className="item-name">{item?.title?.[locale]}</h4>
+                        <h4 className="item-name">
+                          {item?.[`title_${locale}`]}
+                        </h4>
                         <p className="ellipsis two">
-                          {item?.description?.[locale]}
+                          {item?.[`description_${locale}`]}
                         </p>
                       </div>
                     </div>
@@ -200,7 +207,7 @@ export default function Slieds() {
                       <SelectOptions
                         size="ultra-small"
                         className={"centerd"}
-                        options={SliedeStatuses}
+                        options={BlogsStatuses}
                         value={isActive}
                         locale={locale}
                         onChange={(selected) => {
@@ -227,12 +234,12 @@ export default function Slieds() {
             )}
           </div>
         </div>
-        {slieds?.pagination?.totalPages > 1 && (
+        {blogs?.pagination?.totalPages > 1 && (
           <Pagination
-            pageCount={slieds?.pagination.totalPages}
+            pageCount={blogs?.pagination.totalPages}
             screenSize={screenSize}
             isDashBoard={true}
-            currentPage={slieds?.pagination.page}
+            currentPage={blogs?.pagination.page}
             onPageChange={handlePageChange}
           />
         )}

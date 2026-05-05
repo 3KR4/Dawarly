@@ -12,11 +12,16 @@ import FormLangSwitch from "@/components/Tools/FormLangSwitch";
 import { selectors } from "@/Contexts/selectors";
 import { FaPlus } from "react-icons/fa6";
 
-import { createBlog, updateBlog } from "@/services/blogs/blogs.service";
+import {
+  createBlog,
+  getOneBlog,
+  updateBlog,
+} from "@/services/blogs/blogs.service";
 import Images from "@/components/Tools/data-collector/Images";
 import Tags from "@/components/Tools/data-collector/Tags";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { uploadImages } from "@/services/images/images.service";
+import { useSearchParams } from "next/navigation";
 
 const headingLevels = [
   { id: 1, name_en: "Main Title (H1)", name_ar: "العنوان الرئيسي (H1)" },
@@ -28,6 +33,10 @@ const headingLevels = [
 ];
 
 export default function CreateBlogPage() {
+  const searchParams = useSearchParams();
+
+  const blogSlug = searchParams.get("slug");
+
   const t = useTranslate();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
@@ -43,6 +52,7 @@ export default function CreateBlogPage() {
   const [images, setImages] = useState([]);
   const [sectionImages, setSectionImages] = useState({});
   const [sections, setSections] = useState([]);
+  const [blogId, setBlogId] = useState(null);
 
   // SEO sync flags
   const [seoEdited, setSeoEdited] = useState({
@@ -69,6 +79,85 @@ export default function CreateBlogPage() {
 
   const watchTitle = watch("title");
   const watchDescription = watch("description");
+
+  // ===== FETCH (EDIT MODE) =====
+  useEffect(() => {
+    if (blogSlug) fetchBlog();
+  }, [blogSlug]);
+
+  const fetchBlog = async () => {
+    setLoadingContent(true);
+    try {
+      const res = await getOneBlog(blogSlug);
+      const blog = res?.data;
+      setBlogId(blog.id);
+      // ===== FORM =====
+      setValue("title.en", blog.title_en);
+      setValue("title.ar", blog.title_ar);
+
+      setValue("description.en", blog.description_en);
+      setValue("description.ar", blog.description_ar);
+
+      setValue("meta_title.en", blog.meta_title_en);
+      setValue("meta_title.ar", blog.meta_title_ar);
+
+      setValue("meta_desc.en", blog.meta_desc_en);
+      setValue("meta_desc.ar", blog.meta_desc_ar);
+
+      setTags(blog.tags ? blog.tags.split(",").map((tag) => tag.trim()) : []);
+      // ===== SECTIONS =====
+      const mergedSections = blog.content_en.map((enSec, index) => {
+        const arSec = blog.content_ar[index];
+
+        return {
+          id: Date.now() + index,
+          type: enSec.type,
+
+          content: {
+            en: enSec.content || "",
+            ar: arSec?.content || "",
+          },
+
+          label: {
+            en: enSec.label || "",
+            ar: arSec?.label || "",
+          },
+
+          level: enSec.level || null,
+          link: enSec.link || "",
+          image_id: enSec.image_id || null,
+
+          image: enSec.image || null,
+        };
+      });
+
+      setSections(mergedSections);
+
+      // ===== COVER =====
+      if (blog.cover) {
+        setImages([blog.cover]);
+      }
+
+      // ===== SECTION IMAGES =====
+      const sectionImgs = {};
+
+      mergedSections.forEach((sec) => {
+        if (sec.type === "image" && sec.image) {
+          sectionImgs[sec.id] = [sec.image];
+        }
+      });
+
+      setSectionImages(sectionImgs);
+    } catch (err) {
+      console.error(err);
+      addNotification({
+        type: "error",
+        message: t.ad.fetch_error || "Error fetching data",
+      });
+    } finally {
+      setLoadingContent(false);
+    }
+  };
 
   // ================= SEO AUTO SYNC =================
   useEffect(() => {
@@ -203,92 +292,66 @@ export default function CreateBlogPage() {
     setLoadingSubmit(true);
 
     if (!sections.length) {
-      addNotification({
-        type: "error",
-        message: "Content is required",
-      });
+      addNotification({ type: "error", message: "Content is required" });
       setLoadingSubmit(false);
       return;
     }
 
     try {
-      const createRes = await createBlog({
-        title_en: data.title["en"],
-        title_ar: data.title["ar"],
-        description_en: data.description["en"],
-        description_ar: data.description["ar"],
-        meta_title_en: data.meta_title["en"],
-        meta_title_ar: data.meta_title["ar"],
-        meta_desc_en: data.meta_desc["en"],
-        meta_desc_ar: data.meta_desc["ar"],
-        tags: Array.isArray(tags) ? tags.join(",") : "",
-      });
+      let currentBlogId = blogId;
+      console.log(currentBlogId);
 
-      const blogId = createRes.data.id;
-
-      // ================= 2. UPLOAD MAIN IMAGES =================
-      let uploadedImages = [];
-
-      if (images.length) {
-        const formData = new FormData();
-        images.forEach((img) => {
-          formData.append("files", img);
+      // ===== CREATE ONLY IF NEW =====
+      if (!blogSlug) {
+        const createRes = await createBlog({
+          title_en: data.title.en,
+          title_ar: data.title.ar,
+          description_en: data.description.en,
+          description_ar: data.description.ar,
+          meta_title_en: data.meta_title.en,
+          meta_title_ar: data.meta_title.ar,
+          meta_desc_en: data.meta_desc.en,
+          meta_desc_ar: data.meta_desc.ar,
+          tags: tags.join(","),
         });
 
-        console.log(images);
-        console.log(formData);
-
-        const imageRes = await uploadImages("BLOG", blogId, formData);
-        uploadedImages = imageRes.data || [];
+        currentBlogId = createRes.data.id;
       }
 
-      let imageIndex = 0;
+      const isNewFile = (img) => img instanceof File;
 
-      const sectionsWithMainImages = sections.map((sec) => {
-        if (sec.type === "image") {
-          const img = uploadedImages[imageIndex];
-          imageIndex++;
-
-          return {
-            ...sec,
-            image_id: img?.id || null,
-          };
-        }
-        return sec;
-      });
-
-      // ================= 3. UPLOAD SECTION IMAGES =================
+      // ===== SECTION IMAGE UPLOAD =====
       const sectionImageMap = {};
 
-      for (const sec of sectionsWithMainImages) {
-        if (sec.type === "image") {
-          const files = sectionImages[sec.id] || [];
+      for (const sec of sections) {
+        if (sec.type !== "image") continue;
 
-          if (!files.length) continue;
+        const files = sectionImages[sec.id] || [];
+        const newFiles = files.filter(isNewFile);
 
-          const formData = new FormData();
-          files.forEach((img) => {
-            formData.append("files", img);
-          });
+        if (!newFiles.length) continue;
 
-          const res = await uploadImages("BLOG", blogId, formData);
+        const formData = new FormData();
+        newFiles.forEach((img) => formData.append("files", img));
 
-          sectionImageMap[sec.id] = res.data?.[0]?.id || null;
-        }
+        const res = await uploadImages("BLOG", currentBlogId, formData);
+
+        sectionImageMap[sec.id] = res.data?.[0]?.id;
       }
 
-      const finalSections = sectionsWithMainImages.map((sec) => ({
+      const finalSections = sections.map((sec) => ({
         ...sec,
         image_id: sectionImageMap[sec.id] || sec.image_id || null,
       }));
 
-      // ================= 4. UPDATE BLOG =================
-      await updateBlog(blogId, buildPayload(data, finalSections));
+      // ===== FINAL SUBMIT =====
+      await updateBlog(currentBlogId, buildPayload(data, finalSections));
 
-      // ================= SUCCESS =================
       addNotification({
         type: "success",
-        message: "Blog created successfully",
+        message: blogId
+          ? "Blog updated successfully"
+          : "Blog created successfully",
       });
 
       redirectAfterLogin("/dashboard/blogs");
@@ -311,6 +374,14 @@ export default function CreateBlogPage() {
           opacity: loadingContent ? "0.6" : "1",
         }}
       >
+        {loadingContent && (
+          <div className="loading-content ">
+            <span
+              className="loader"
+              style={{ opacity: loadingContent ? "1" : "0" }}
+            ></span>
+          </div>
+        )}
         {/* ================= BASIC ================= */}
         <div className="form-section">
           <h2 className="section-title">{"blog details"}</h2>
@@ -364,8 +435,6 @@ export default function CreateBlogPage() {
                 images={images}
                 setImages={setImages}
                 isSubmitted={isSubmitted}
-                isEditing={null}
-                disabled={null}
                 limit={1}
               />
             </div>
@@ -431,32 +500,50 @@ export default function CreateBlogPage() {
             </button>
           </div>
 
-        {/* ================= SECTIONS ================= */}
-        {sections.map((sec) => (
-          <div key={sec.id} className="box forInput">
-            <div className="top-label">
-              <label>{sec.type}</label>
-              <button type="button" onClick={() => removeSection(sec.id)}>
-                Delete
-              </button>
-            </div>
+          {/* ================= SECTIONS ================= */}
+          {sections.map((sec) => (
+            <div key={sec.id} className="box forInput">
+              <div className="top-label">
+                <label>{sec.type}</label>
+                <button type="button" onClick={() => removeSection(sec.id)}>
+                  Delete
+                </button>
+              </div>
 
-            {/* HEADING LEVEL */}
+              {/* HEADING LEVEL */}
 
-            {sec.type === "heading" && (
-              <>
-                <SelectOptions
-                  placeholder={"Choose heading level / اختر مستوى العنوان"}
-                  options={headingLevels}
-                  value={headingLevels.find((lvl) => lvl.id === sec.level)}
-                  onChange={(item) => updateSection(sec.id, "level", item.id)}
-                />
+              {sec.type === "heading" && (
+                <>
+                  <SelectOptions
+                    placeholder={"Choose heading level / اختر مستوى العنوان"}
+                    options={headingLevels}
+                    value={headingLevels.find((lvl) => lvl.id === sec.level)}
+                    onChange={(item) => updateSection(sec.id, "level", item.id)}
+                  />
 
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        value={sec.content?.[currentLocale] || ""}
+                        placeholder={"enter the heading"}
+                        onChange={(e) =>
+                          updateSectionContent(
+                            sec.id,
+                            currentLocale,
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              {sec.type === "paragraph" && (
                 <div className="inputHolder">
                   <div className="holder">
-                    <input
+                    <textarea
                       value={sec.content?.[currentLocale] || ""}
-                      placeholder={"enter the heading"}
+                      placeholder={"enter the paragraph"}
                       onChange={(e) =>
                         updateSectionContent(
                           sec.id,
@@ -467,59 +554,10 @@ export default function CreateBlogPage() {
                     />
                   </div>
                 </div>
-              </>
-            )}
-            {sec.type === "paragraph" && (
-              <div className="inputHolder">
-                <div className="holder">
-                  <textarea
-                    value={sec.content?.[currentLocale] || ""}
-                    placeholder={"enter the paragraph"}
-                    onChange={(e) =>
-                      updateSectionContent(
-                        sec.id,
-                        currentLocale,
-                        e.target.value,
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* LINK */}
-            {sec.type === "link" && (
-              <div className="inputHolder">
-                <div className="holder">
-                  <input
-                    placeholder="https://..."
-                    value={sec.link || ""}
-                    onChange={(e) =>
-                      updateSection(sec.id, "link", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-            )}
-            {/* button */}
-            {sec.type === "button" && (
-              <div className="row-holder two">
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      placeholder="button label"
-                      value={sec.label?.[currentLocale] || ""}
-                      onChange={(e) =>
-                        updateSectionLabel(
-                          sec.id,
-                          currentLocale,
-                          e.target.value,
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-
+              {/* LINK */}
+              {sec.type === "link" && (
                 <div className="inputHolder">
                   <div className="holder">
                     <input
@@ -531,29 +569,60 @@ export default function CreateBlogPage() {
                     />
                   </div>
                 </div>
-              </div>
-            )}
-            {sec.type === "image" && (
-              <Images
-                images={sectionImages[sec.id] || []}
-                setImages={(newImages) =>
-                  setSectionImages((prev) => ({
-                    ...prev,
-                    [sec.id]:
-                      typeof newImages === "function"
-                        ? newImages(prev[sec.id] || [])
-                        : newImages,
-                  }))
-                }
-                limit={1}
-                sectionMode={true}
-                sectionId={sec.id}
-              />
-            )}
-          </div>
-        ))}
-        </div>
+              )}
+              {/* button */}
+              {sec.type === "button" && (
+                <div className="row-holder two">
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        placeholder="button label"
+                        value={sec.label?.[currentLocale] || ""}
+                        onChange={(e) =>
+                          updateSectionLabel(
+                            sec.id,
+                            currentLocale,
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
 
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        placeholder="https://..."
+                        value={sec.link || ""}
+                        onChange={(e) =>
+                          updateSection(sec.id, "link", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              {sec.type === "image" && (
+                <Images
+                  images={sectionImages[sec.id] || []}
+                  setImages={(newImages) =>
+                    setSectionImages((prev) => ({
+                      ...prev,
+                      [sec.id]:
+                        typeof newImages === "function"
+                          ? newImages(prev[sec.id] || [])
+                          : newImages,
+                    }))
+                  }
+                  limit={1}
+                  label={false}
+                  sectionMode={true}
+                  sectionId={sec.id}
+                />
+              )}
+            </div>
+          ))}
+        </div>
 
         {/* ================= SUBMIT ================= */}
         <div className="row-holder submit-section two">
@@ -571,10 +640,10 @@ export default function CreateBlogPage() {
           >
             {loadingSubmit ? (
               <span className="loader"></span>
-            ) : null ? (
-              t.dashboard.forms.update_slide
+            ) : blogSlug ? (
+              t.dashboard.forms.update || "update blog"
             ) : (
-              t.dashboard.forms.create_slide
+              t.dashboard.forms.create || "create blog"
             )}
           </button>
         </div>
