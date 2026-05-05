@@ -191,6 +191,7 @@ p.have-problem {
 .body.fluid-container.for-user .table-container .table-item {
   grid-template-columns: 1.25fr 0.5fr 0.5fr 1fr 1fr 0.8fr 0.8fr;
 }
+
 .form-holder .options-grid {
   display: flex;
   gap: 7px;
@@ -376,8 +377,8 @@ p.have-problem {
     min-width: 27%;
   }
   .form-holder.user-account {
-  margin: 30px 0;
-}
+    margin: 30px 0;
+  }
 }
 @media (max-width: 470px) {
   .form-holder .options-grid {

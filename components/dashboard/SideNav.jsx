@@ -12,7 +12,7 @@ import { settings } from "@/Contexts/settings";
 import { MdCategory } from "react-icons/md";
 import { TbCategory2 } from "react-icons/tb";
 import { BiCategory } from "react-icons/bi";
-        import { LiaBlogSolid } from "react-icons/lia";
+import { LiaBlogSolid } from "react-icons/lia";
 import { RiArticleFill } from "react-icons/ri";
 
 import {
@@ -22,13 +22,13 @@ import {
   FaUser,
   FaAngleLeft,
   FaAngleRight,
-  FaDatabase
+  FaDatabase,
 } from "react-icons/fa";
-import { FaChartSimple, FaFileContract , FaFilter } from "react-icons/fa6";
+import { FaChartSimple, FaFileContract, FaFilter } from "react-icons/fa6";
 import { PiCardsFill } from "react-icons/pi";
 import { IoMenu, IoLanguage } from "react-icons/io5";
 import { FiSun } from "react-icons/fi";
-import { MdOutlineHomeWork,MdLogout } from "react-icons/md";
+import { MdOutlineHomeWork, MdLogout } from "react-icons/md";
 
 function SideNav() {
   const {
@@ -129,7 +129,7 @@ function SideNav() {
         >
           <div className="hold">
             <h4>{t.sideNav.blogs}</h4>
-            <RiArticleFill />
+            <LiaBlogSolid />
           </div>
         </Link>
         {/* Users */}

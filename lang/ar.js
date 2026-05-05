@@ -25,6 +25,9 @@ const ar = {
   market: {
     all_ads: "كل الاعلانات",
   },
+    blogs: {
+    blogs: "المنشورات",
+  },
   ad: {
     // Basic
     ad_details: "تفاصيل الإعلان",

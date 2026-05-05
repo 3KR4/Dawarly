@@ -1,0 +1,27 @@
+.blog-page {
+}
+.blog-page .navigations {
+  width: 100% !important;
+  padding: 0;
+  margin: 10px 0;
+}
+.blog-page .navigations a,
+.blog-page .navigations span {
+  font-size: 18px;
+}
+.blog-page > .holder.container {
+  flex-direction: column;
+  gap: 15px;
+  display: flex;
+  margin: 15px auto;
+  width: 95%;
+}
+.blog-page h1,h2,h3,h4,h5,h6 {
+    margin-bottom: 5px;
+}
+.blog-page .main-img {
+  position: relative !important;
+  border-radius: 0 0 50px 50px;
+}
+.blog-page {
+}

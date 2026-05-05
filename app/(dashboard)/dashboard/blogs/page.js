@@ -1,23 +1,17 @@
 "use client";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-
+import { IoSearchSharp } from "react-icons/io5";
 import Image from "next/image";
 import "@/styles/dashboard/tables.css";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaEye, FaTrashAlt } from "react-icons/fa";
 import Link from "next/link";
 import { MdEdit } from "react-icons/md";
 import React, { useContext, useState, useEffect } from "react";
 import { useNotification } from "@/Contexts/NotificationContext";
-
 import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { TbListSearch } from "react-icons/tb";
-import {
-  deleteSlider,
-  getAllSliders,
-  updateSlider,
-} from "@/services/sliders/sliders.service";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
@@ -26,16 +20,17 @@ import {
   getAllSBlogs,
   updateBlog,
 } from "@/services/blogs/blogs.service";
+import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 export const BlogsStatuses = [
   {
-    id: true,
+    id: "published",
     name_en: "Published",
     name_ar: "نشط",
     bg: "#E6F9F0",
     tx: "#0F9D58",
   },
   {
-    id: false,
+    id: "unpublished",
     name_en: "Disabled",
     name_ar: "معطل",
     bg: "#F1F3F4",
@@ -47,6 +42,12 @@ export default function Blogs() {
   const { addNotification } = useNotification();
   const [target, setTarget] = useState(null);
   const [menuType, setMenuType] = useState(null); // form | delete
+
+  const [searchText, setSearchText] = useState("");
+  const [searchActive, setSearchActive] = useState(false);
+  const [searchConfirmed, setSearchConfirmed] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  console.log(selectedStatus);
 
   const t = useTranslate();
   const [blogs, setBlogs] = useState({
@@ -61,8 +62,13 @@ export default function Blogs() {
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
-  const fetchBlogs = (page = blogs.pagination.page) => {
-    getAllSBlogs(page, blogs.pagination.limit, null)
+  const fetchBlogs = (page = blogs.pagination.page, search) => {
+    getAllSBlogs(
+      page,
+      blogs.pagination.limit,
+      selectedStatus?.id || null,
+      search !== undefined ? search : searchText,
+    )
       .then((res) => {
         setBlogs(res.data);
       })
@@ -70,8 +76,8 @@ export default function Blogs() {
       .finally(() => setLoadingContent(false));
   };
   useEffect(() => {
-    fetchBlogs();
-  }, []);
+    fetchBlogs(1, searchText);
+  }, [selectedStatus]);
 
   const handlePageChange = (newPage) => {
     fetchBlogs(newPage);
@@ -79,7 +85,7 @@ export default function Blogs() {
   const handelChangeStatus = async (id, status) => {
     try {
       const res = await updateBlog(id, {
-        is_published: status,
+        is_published: status == "published" ? true : false,
       });
 
       const remainingItems = blogs.data.length - 1;
@@ -134,18 +140,74 @@ export default function Blogs() {
 
   return (
     <div className="dash-holder">
-      <div className="body">
-        <div className="table-container blogs-page">
+      <div className="top two">
+        <div className="filters-header">
+          <input
+            type="text"
+            placeholder={t.placeholders.search}
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setSearchActive(!!e.target.value);
+              setSearchConfirmed(false);
+            }}
+          />
+
+          {searchConfirmed ? (
+            <span
+              style={{ display: "flex", cursor: "pointer" }}
+              className="filters-count delete"
+              onClick={() => {
+                setSearchText("");
+                setSearchActive(false);
+                setSearchConfirmed(false);
+                fetchAds(1, "");
+              }}
+            >
+              <IoCloseSharp style={{ padding: "7px" }} />
+            </span>
+          ) : (
+            <span
+              style={{
+                display: "flex",
+                cursor: searchActive ? "pointer" : "default",
+              }}
+              className={`filters-count ${searchActive ? "active" : ""}`}
+              onClick={() => {
+                if (searchText) setSearchConfirmed(true);
+                fetchAds(1);
+              }}
+            >
+              <IoSearchSharp style={{ padding: "7px" }} />
+            </span>
+          )}
+        </div>
+
+        <SelectOptions
+          size="small"
+          placeholder={t.ad.status.label}
+          options={BlogsStatuses}
+          value={selectedStatus}
+          locale={locale}
+          t={t}
+          onChange={(selected) => {
+            setSelectedStatus((prev) => (prev == selected ? null : selected));
+          }}
+        />
+      </div>
+      <div className="body for-blogs">
+        <div className="table-container ">
           <div className="table-header">
             {!screenSize.includes("small") && (
               <>
                 <div className="header-item details">
                   {t.dashboard.tables.slide_details}
                 </div>
-                <div className="header-item">{t.dashboard.tables.link}</div>
                 <div className="header-item">
                   {t.dashboard.tables.created_at}
                 </div>
+                <div className="header-item">{t.dashboard.tables.reach}</div>
+
                 <div className="header-item">{t.dashboard.tables.status}</div>
                 <div className="header-item">{t.dashboard.tables.actions}</div>
               </>
@@ -175,7 +237,8 @@ export default function Blogs() {
             ) : (
               blogs?.data?.map((item) => {
                 let isActive = BlogsStatuses.find(
-                  (x) => x.id == item?.is_published,
+                  (x) =>
+                    x.id === (item?.is_published ? "published" : "unpublished"),
                 );
                 return (
                   <div key={item?.id} className="table-item">
@@ -189,7 +252,7 @@ export default function Blogs() {
                         />
                       </Link>
                       <div className="item-details">
-                        <h4 className="item-name">
+                        <h4 className="item-name ellipsis">
                           {item?.[`title_${locale}`]}
                         </h4>
                         <p className="ellipsis two">
@@ -197,12 +260,18 @@ export default function Blogs() {
                         </p>
                       </div>
                     </div>
-                    <Link href={item?.link || "/"} className="item-link">
-                      {item?.link || "https://dawaarly.com/"}
-                    </Link>{" "}
+
                     <p className="date">
                       {formatRelativeDate(item?.created_at, locale, "detailed")}
                     </p>
+                    <div className="item-overview">
+                      <h4>
+                        {item?.views_count} <FaEye />
+                      </h4>
+                      <h4 className="green">
+                        {item?.reach_count} <BiSolidPurchaseTagAlt />
+                      </h4>
+                    </div>
                     <div className="item-status">
                       <SelectOptions
                         size="ultra-small"
@@ -216,7 +285,12 @@ export default function Blogs() {
                       />
                     </div>
                     <div className="actions">
-                      <Link href={`/dashboard/sliders/form?id=${item?.id}`}>
+                      <Link href={`/blogs/${item?.slug}`}>
+                        <FaEye className="view" />
+                      </Link>
+                      <hr />
+
+                      <Link href={`/dashboard/blogs/form?slug=${item?.slug}`}>
                         <MdEdit className="edit" />
                       </Link>
                       <hr />

@@ -167,6 +167,10 @@ header .actions-btns .userMenu .top {
   display: grid;
   grid-template-columns: 1fr 0.2fr 0.2fr;
 }
+.dash-holder .top.two {
+  grid-template-columns: 1fr 0.4fr;
+
+}
 .dash-holder.for-client .top {
   margin-bottom: 3px;
   grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr;
@@ -190,6 +194,10 @@ header .actions-btns .userMenu .top {
   grid-template-columns: 1fr 0.5fr 1.25fr 0.8fr 1fr 1.15fr 0.8fr;
   gap: 15px;
   padding: 0.42rem 1rem;
+}
+.body.for-blogs .table-container .table-header,
+.body.for-blogs .table-container .table-item {
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr !important;
 }
 .table-container.pending-ads .table-header,
 .table-container.pending-ads .table-item {
@@ -234,6 +242,10 @@ header .actions-btns .userMenu .top {
 .table-container.slieds-tasble .item-image .product-image {
   aspect-ratio: 3;
   height: 100px !important;
+}
+.for-blogs .table-container .item-image .product-image {
+      aspect-ratio: 16 / 9;
+    height: 115px !important;
 }
 .table-container .item-details {
   gap: 2px;

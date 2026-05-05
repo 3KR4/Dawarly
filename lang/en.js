@@ -28,6 +28,9 @@ const en = {
   market: {
     all_ads: "all ads",
   },
+  blogs: {
+    blogs: "blogs",
+  },
   ad: {
     // Basic
     ad_details: "Ad Details",

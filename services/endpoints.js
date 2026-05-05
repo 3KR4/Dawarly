@@ -60,7 +60,14 @@ export const ENDPOINTS = {
     DELETE: (id) => `/sliders/${id}`,
   },
   BLOGS: {
-    GET_ALL: (page, limit) => `/blogs?page=${page}&limit=${limit}`,
+    GET_ALL: (page, limit, status, search) => {
+      let url = `/blogs?page=${page}&limit=${limit}`;
+
+      if (status) url += `&status=${status}`;
+      if (search) url += `&search=${search}`;
+
+      return url;
+    },
     GET_ONE: (slug) => `/blogs/${slug}`,
     CREATE: () => `/blogs`,
     UPDATE: (slug) => `/blogs/${slug}`,
