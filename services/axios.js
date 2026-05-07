@@ -2,7 +2,7 @@
 import axios from "axios";
 console.log("before url");
 
-// -------------------- BASE CONFIG    http://localhost:5000   --------------------
+// -------------------- BASE CONFIG     http://localhost:5000   --------------------
 const BASE_URL = "https://api.dawaarly.com";
 console.log(BASE_URL);
 
@@ -63,7 +63,7 @@ api.interceptors.request.use(async (config) => {
   // لو مفيش توكن → حاول تجيبه
   if (!accessToken) {
     try {
-      await refreshToken();
+      return config;
     } catch (err) {
       return config; // سيبه يكمل بدون توكن
     }

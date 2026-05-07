@@ -312,7 +312,8 @@ export default function AdDetails() {
               </div>
 
               <div className="description card">
-                <h4>{t.ad.description}</h4> <p>{ad?.description}</p>
+                <h4>{t.ad.description}</h4>{" "}
+                <p style={{ whiteSpace: "pre-line" }}>{ad?.description}</p>
               </div>
               <div className="card booking" id="booknow">
                 <h4>{t.ad.book_now || "book now"}</h4>
@@ -394,9 +395,7 @@ export default function AdDetails() {
                     {(!!ad?.admin || ad?.display_whatsapp) && (
                       <a
                         href={`https://wa.me/${formatPhoneForWhatsApp(
-                          ad?.admin
-                            ? ad?.admin?.phone
-                            : ad?.subuser?.phone,
+                          ad?.admin ? ad?.admin?.phone : ad?.subuser?.phone,
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"

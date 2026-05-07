@@ -180,7 +180,7 @@ export default function CreateSliderPage() {
             ></span>
           </div>
         )}
-        <div className="row-holder">
+        <div className="row-holder two">
           <div className="column-holder">
             <div className="box forInput">
               <label>

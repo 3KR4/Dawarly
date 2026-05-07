@@ -9,7 +9,7 @@
 }
 :root {
   --body-color: #ffffff;
-  --section-color: #fafafa;
+  --section-color: #f7f7f7;
   --main-color: #8f59f2;
   --hover-color: #e9deff;
   --hover-color2: #f68d0f;
@@ -255,13 +255,12 @@ a {
 }
 .ellipsis {
   display: -webkit-box;
-  -webkit-line-clamp: 1;      /* عدد السطور */
+  -webkit-line-clamp: 1; /* عدد السطور */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .ellipsis.two {
-  -webkit-line-clamp: 2;      /* عدد السطور */
-
+  -webkit-line-clamp: 2; /* عدد السطور */
 }
 .hidden-element {
   visibility: hidden;
@@ -419,7 +418,7 @@ a {
 }
 .cat-card span {
   color: var(--lighter-main-color-2);
-  z-index: -1;
+  z-index: 0;
   font-size: 24px;
   font-weight: 800;
   transition: all 0.3s;
@@ -577,6 +576,21 @@ a {
   align-items: center;
   border: 1px solid var(--input-border-color);
   border-radius: 10px;
+}
+.for-list > .holder {
+  align-items: flex-start !important;
+  padding: 10px;
+  gap: 7px;
+}
+.for-list .holder button {
+  padding: 18px;
+  height: 100%;
+}
+.for-list .holder ul {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 .box.forInput .inputHolder:has(input:focus) .holder,
 .box.forInput .inputHolder:has(textarea:focus) .holder {

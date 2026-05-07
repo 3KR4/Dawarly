@@ -21,6 +21,11 @@ form .form-section {
   flex-direction: column;
   gap: 10px;
 }
+form .form-section.blog-content {
+  border: 1px solid var(--input-border-color);
+  padding: 14px;
+  border-radius: 10px;
+}
 form .form-section h2 {
   color: var(--title-color);
   font-size: 19px;
@@ -40,8 +45,8 @@ form .form-section .dynamicFilters-holder > * {
   gap: 10px;
   display: grid;
 }
-.dashboard form .row-holder:has(.right) {
-  grid-template-columns: repeat(2, 1fr);
+.dashboard form .row-holder.two {
+  grid-template-columns: repeat(2, 1fr) !important;
 }
 .dashboard form .row-holder .left {
   display: flex;
@@ -165,6 +170,68 @@ form .form-section .dynamicFilters-holder > * {
   background: var(--main-color);
 }
 
+.form-section .header {
+  justify-content: space-between;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  display: flex;
+}
+.form-section .header button {
+  background: var(--lighter-main-color);
+  border-radius: 10px;
+  flex: 1;
+  padding: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.form-section .header button:hover {
+  background: var(--lighter-main-color-2);
+}
+.form-section .header button svg {
+  font-size: 14px;
+}
+.form-section .header button span {
+  color: #fff;
+  background: var(--lighter-main-color-2);
+  border-radius: 36% 0 0 54%;
+  padding: 8px 11px 8px 14px;
+  font-size: 15px;
+  position: absolute;
+  top: 0;
+  transition: 0.3s;
+  right: 0;
+}
+.form-section .header button:hover span {
+  background: var(--main-color);
+}
+.box.forInput .top-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.box.forInput .top-label button {
+  color: var(--red-color);
+  font-weight: 600;
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.box.forInput .top-label button:hover {
+  background: var(--red-color);
+  font-size: 11px;
+  color: white;
+}
 .box.forInput .spec-list {
   border: 1px solid var(--input-border-color);
   border-radius: 11px;

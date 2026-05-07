@@ -28,6 +28,9 @@ const en = {
   market: {
     all_ads: "all ads",
   },
+  blogs: {
+    blogs: "blogs",
+  },
   ad: {
     // Basic
     ad_details: "Ad Details",
@@ -225,7 +228,7 @@ const en = {
     delete: "delete",
     AddOption: "Add Option",
     Create_Filter: "Create Filter",
-    create: "create"
+    create: "create",
   },
   location: {
     egyptGovernorates: "egypt governorates",
@@ -376,6 +379,7 @@ const en = {
     menuRoutes: "menu routes",
     overview: "Overview",
     slides: "Slides",
+    blogs: "blogs",
     users: "Users",
 
     ads: "Ads",

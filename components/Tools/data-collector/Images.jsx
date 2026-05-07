@@ -1,10 +1,13 @@
 "use client";
-import React, { useState, useRef } from "react";
+
+import React, { useState, useRef, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Image from "next/image";
+
 import "@/styles/dashboard/forms.css";
+
 import useTranslate from "@/Contexts/useTranslation";
 
 function Images({
@@ -13,18 +16,53 @@ function Images({
   isSubmitted,
   disabled = false,
   limit = 15,
+  label = true,
+
+  // ===== BLOG vs SECTION MODE =====
+  sectionMode = false,
 }) {
   const t = useTranslate();
+
   const inputFileRef = useRef(null);
 
   const [isDrag, setIsDrag] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const safeImages = images || [];
+
+  const safeImages = Array.isArray(images) ? images : [];
 
   const isInvalid = safeImages.length === 0 && isSubmitted;
+
   const helperText =
     limit === 1 ? t.ad.images?.helperTextSingle : t.ad.images?.helperText;
 
+  // ================= CLEANUP OBJECT URLS =================
+  useEffect(() => {
+    return () => {
+      safeImages.forEach((img) => {
+        if (img?.preview) {
+          URL.revokeObjectURL(img.preview);
+        }
+      });
+    };
+  }, []);
+
+  // ================= GET IMAGE SRC =================
+  const getImageSrc = (img) => {
+    if (!img) return "";
+
+    // uploaded image from backend
+    if (img.secure_url) return img.secure_url;
+
+    // processed local image
+    if (img.preview) return img.preview;
+
+    // string url
+    if (typeof img === "string") return img;
+
+    return "";
+  };
+
+  // ================= ADD FILES =================
   const handleFiles = (files) => {
     setErrorMessage("");
 
@@ -37,57 +75,82 @@ function Images({
       return;
     }
 
-    if (limit === 1 && imageFiles.length > 0) {
-      setImages([imageFiles[0]]);
-    } else {
-      setImages((prev) => {
-        const safePrev = Array.isArray(prev) ? prev : [];
-        return [...safePrev, ...imageFiles];
-      });
-    }
+    // ===== PROCESS FILES =====
+    const processedImages = imageFiles.map((file) => ({
+      id: `${file.name}-${file.lastModified}-${Math.random()}`,
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+    }));
+
+    const newImages =
+      limit === 1 ? [processedImages[0]] : [...safePrev, ...processedImages];
+
+    setImages(newImages);
   };
 
+  // ================= DROP =================
   const handleDrop = (e) => {
     e.preventDefault();
+
     setIsDrag(false);
+
     handleFiles(Array.from(e.dataTransfer.files));
   };
 
+  // ================= INPUT =================
   const handleInputChange = (e) => {
     handleFiles(Array.from(e.target.files));
+
     e.target.value = "";
   };
 
-const handleRemoveImage = (index) => {
-  const safePrev = Array.isArray(images) ? images : [];
+  // ================= REMOVE =================
+  const handleRemoveImage = (index) => {
+    setImages((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
 
-  const updated = [...safePrev];
-  updated.splice(index, 1);
+      const updated = [...safe];
 
-  setImages(updated);
-};
+      const removedImage = updated[index];
+
+      // cleanup preview memory
+      if (removedImage?.preview) {
+        URL.revokeObjectURL(removedImage.preview);
+      }
+
+      updated.splice(index, 1);
+
+      return updated;
+    });
+  };
+
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
-      <label>
-        {t.ad.images?.label}
-        {limit > 1 && ` (${limit} ${t.ad.images?.max})`}
-        {limit === 1 && ` (${t.ad.images?.single})`}
-      </label>
+      {label && (
+        <label>
+          {t.ad.images?.label}
+
+          {limit > 1 && ` (${limit} ${t.ad.images?.max})`}
+
+          {limit === 1 && ` (${t.ad.images?.single})`}
+        </label>
+      )}
 
       <div className={`images-uplouder ${isInvalid ? "invalid" : ""}`}>
+        {/* ================= UPLOAD AREA ================= */}
         <div
-          className={`upload-label ${isDrag ? "active" : ""} ${limit}-image`}
-          onClick={() =>
-            !disabled &&
-            safeImages.length < limit &&
-            inputFileRef.current.click()
-          }
+          className={`upload-label ${isDrag ? "active" : ""}`}
+          onClick={() => {
+            if (!disabled && safeImages.length < limit) {
+              inputFileRef.current?.click();
+            }
+          }}
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
-            if (!disabled && safeImages.length < limit) {
-              setIsDrag(true);
-            }
+
+            if (!disabled) setIsDrag(true);
           }}
           onDragLeave={() => setIsDrag(false)}
         >
@@ -112,30 +175,36 @@ const handleRemoveImage = (index) => {
           )}
         </div>
 
+        {/* ================= INPUT ================= */}
         <input
           type="file"
           accept="image/*"
-          multiple={limit > 1}
+          multiple={limit > 1 && !sectionMode}
           hidden
           ref={inputFileRef}
-          disabled={disabled || safeImages.length >= limit}
+          disabled={disabled}
           onChange={handleInputChange}
         />
 
+        {/* ================= PREVIEW ================= */}
         <div className={`imgHolder ${limit === 1 ? "single-image" : ""}`}>
           {safeImages?.map((image, index) => (
-            <div className="uploaded" key={index}>
+            <div
+              className="uploaded"
+              key={
+                image?.id || image?.secure_url || image?.preview || `${index}`
+              }
+            >
               <Image
-                src={
-                  image.secure_url
-                    ? image.secure_url
-                    : URL.createObjectURL(image)
-                }
+                src={getImageSrc(image)}
                 alt={`image-${index}`}
                 width={150}
                 height={150}
+                unoptimized
               />
-              <p>{index + 1}</p>
+
+              {!sectionMode && <p>{index + 1}</p>}
+
               {!disabled && (
                 <IoClose onClick={() => handleRemoveImage(index)} />
               )}
@@ -144,6 +213,7 @@ const handleRemoveImage = (index) => {
         </div>
       </div>
 
+      {/* ================= ERRORS ================= */}
       {errorMessage && (
         <span className="error">
           <CircleAlert />

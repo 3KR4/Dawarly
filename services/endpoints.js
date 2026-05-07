@@ -20,33 +20,6 @@ export const ENDPOINTS = {
     CHANGE_ADS_LIMIT: (id) => `/auth/${id}/subscription-limit`,
     UPDATE_ROLE: (id) => `/auth/${id}/role`,
   },
-  // SUBCATEGORIES: {
-  //   GETALL: (lang) => `/subCategory/all?lang=${lang}`,
-  //   GETBYId: (id) => `/subCategory/${id}`,
-  //   GETBYCAT: (id, lang) => `/subCategory/category/${id}?lang=${lang}`,
-  //   CREATE: () => `/subCategory/`,
-  //   UPDATE: (id) => `/subCategory/${id}`,
-  //   UPDATE_LANG: (id) => `/subCategory/${id}/Translation`,
-  //   DELETE: (id) => `/subCategory/${id}`,
-  // },
-  // FILTERS: {
-  //   //filters
-  //   GET_ALL_FILTERS: (lang) => `/subCategory/filters/all?lang=${lang}`,
-  //   GET_ONE_FILTER: (id) => `/subCategory/filters/${id}`,
-  //   GET_FILTERS_BY_SUB: (id, lang) => `/subCategory/${id}/filter?lang=${lang}`,
-  //   CREATE_FILTER: (id) => `/subCategory/${id}/filter`,
-  //   UPDATE_FILTER: (id) => `/subCategory/filter/${id}`,
-  //   UPDATE_FILTER_LANG: (id) => `/subCategory/filter/translations${id}`,
-  //   DELETE_FILTER: (id) => `/subCategory/filter/${id}/`,
-  //   //options
-  //   GET_OPTIONS: (id, lang) =>
-  //     `/subCategory/filter/${id}/options?lang=${lang}`,
-  //   CREATE_OPTION: (id) => `/subCategory/filter/${id}/options`,
-  //   UPDATE_OPTION: (id) => `/subCategory/filter/options/${id}`,
-  //   UPDATE_OPTION_LANG: (id) =>
-  //     `/subCategory/filter/options/translations/${id}`,
-  //   DELETE_OPTION: (id) => `/subCategory/filter/options/${id}`,
-  // },
   ADS: {
     GET_SECTIONS_ADS: (type, id, page, limit) =>
       `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
@@ -85,6 +58,20 @@ export const ENDPOINTS = {
     CREATE: () => `/sliders`,
     UPDATE: (id) => `/sliders/${id}`,
     DELETE: (id) => `/sliders/${id}`,
+  },
+  BLOGS: {
+    GET_ALL: (page, limit, status, search) => {
+      let url = `/blogs?page=${page}&limit=${limit}`;
+
+      if (status) url += `&status=${status}`;
+      if (search) url += `&search=${search}`;
+
+      return url;
+    },
+    GET_ONE: (slug) => `/blogs/${slug}`,
+    CREATE: () => `/blogs`,
+    UPDATE: (slug) => `/blogs/${slug}`,
+    DELETE: (slug) => `/blogs/${slug}`,
   },
   FAVORITES: {
     TOGGLE_FAVORITES: (id) => `/favorites/${id}`,
@@ -128,4 +115,22 @@ export const ENDPOINTS = {
     UPDATE_MODEL: (model, id) => `data/${model}/${id}`,
     DELETE_MODEL: (model, id) => `data/${model}/${id}`,
   },
+  // FILTERS: {
+  //   //filters
+  //   GET_ALL_FILTERS: (lang) => `/subCategory/filters/all?lang=${lang}`,
+  //   GET_ONE_FILTER: (id) => `/subCategory/filters/${id}`,
+  //   GET_FILTERS_BY_SUB: (id, lang) => `/subCategory/${id}/filter?lang=${lang}`,
+  //   CREATE_FILTER: (id) => `/subCategory/${id}/filter`,
+  //   UPDATE_FILTER: (id) => `/subCategory/filter/${id}`,
+  //   UPDATE_FILTER_LANG: (id) => `/subCategory/filter/translations${id}`,
+  //   DELETE_FILTER: (id) => `/subCategory/filter/${id}/`,
+  //   //options
+  //   GET_OPTIONS: (id, lang) =>
+  //     `/subCategory/filter/${id}/options?lang=${lang}`,
+  //   CREATE_OPTION: (id) => `/subCategory/filter/${id}/options`,
+  //   UPDATE_OPTION: (id) => `/subCategory/filter/options/${id}`,
+  //   UPDATE_OPTION_LANG: (id) =>
+  //     `/subCategory/filter/options/translations/${id}`,
+  //   DELETE_OPTION: (id) => `/subCategory/filter/options/${id}`,
+  // },
 };
