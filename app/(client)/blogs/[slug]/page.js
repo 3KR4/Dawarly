@@ -133,6 +133,14 @@ export default function Blog() {
                     height={500}
                   />
                 );
+              case "list":
+                return (
+                  <ul>
+                    {item.list.map((x) => (
+                      <li key={x.id}>{x.value}</li>
+                    ))}
+                  </ul>
+                );
 
               default:
                 return null;

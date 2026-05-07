@@ -637,12 +637,7 @@ export default function CreateBlogPage() {
               )}
               {sec.type === "list" && (
                 <div className="inputHolder for-list">
-                  <div
-                    className="holder"
-                    style={{
-                      alignItems: "flex-start",
-                    }}
-                  >
+                  <div className="holder">
                     <ul style={{ flex: 1 }}>
                       {(sec.items || []).map((item, index) => {
                         console.log("item:", sec.items);
