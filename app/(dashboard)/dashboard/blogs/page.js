@@ -17,7 +17,7 @@ import DynamicMenu from "@/components/Tools/DynamicMenu";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import {
   deleteBlog,
-  getAllSBlogs,
+  getAllBlogs,
   updateBlog,
 } from "@/services/blogs/blogs.service";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
@@ -55,7 +55,7 @@ export default function Blogs() {
     pagination: {
       page: 1,
       totalPages: 1,
-      limit: 7,
+      limit: 6,
       total: 0,
     },
   });
@@ -63,7 +63,7 @@ export default function Blogs() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const fetchBlogs = (page = blogs.pagination.page, search) => {
-    getAllSBlogs(
+    getAllBlogs(
       page,
       blogs.pagination.limit,
       selectedStatus?.id || null,

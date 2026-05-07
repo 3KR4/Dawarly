@@ -9,7 +9,7 @@
 }
 :root {
   --body-color: #ffffff;
-  --section-color: #fafafa;
+  --section-color: #f7f7f7;
   --main-color: #8f59f2;
   --hover-color: #e9deff;
   --hover-color2: #f68d0f;
@@ -419,7 +419,7 @@ a {
 }
 .cat-card span {
   color: var(--lighter-main-color-2);
-  z-index: -1;
+  z-index: 0;
   font-size: 24px;
   font-weight: 800;
   transition: all 0.3s;

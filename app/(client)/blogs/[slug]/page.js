@@ -5,8 +5,6 @@ import { useParams } from "next/navigation";
 import "@/styles/client/pages/blog-details.css";
 import Image from "next/image";
 import Link from "next/link";
-import Navigations from "@/components/Tools/Navigations";
-
 import useTranslate from "@/Contexts/useTranslation";
 
 import "swiper/css";
@@ -14,13 +12,13 @@ import "swiper/css/navigation";
 
 import { settings } from "@/Contexts/settings";
 
-import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
+import BlogDetailsSkelton from "@/components/skeletons/BlogDetailsSkelton";
 import { getOneBlog } from "@/services/blogs/blogs.service";
 
 export default function Blog() {
   const t = useTranslate();
   const { slug } = useParams();
-  const { screenSize, locale } = useContext(settings);
+  const { locale } = useContext(settings);
 
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +34,7 @@ export default function Blog() {
   }, [slug]);
 
   if (loading) {
-    return <AdDetailsSkeleton />;
+    return <BlogDetailsSkelton />;
   }
 
   return (
@@ -50,7 +48,6 @@ export default function Blog() {
         />
 
         <div className="holder container">
-
           <h1 className="title">{blog?.[`title_${locale}`]}</h1>
 
           {blog?.content_en?.map((item, index) => {
@@ -78,24 +75,63 @@ export default function Blog() {
                     </h2>
                   );
                 }
-
+                if (item.level === 3) {
+                  return (
+                    <h3 key={index} className="blog-h3">
+                      {item.content}
+                    </h3>
+                  );
+                }
+                if (item.level === 4) {
+                  return (
+                    <h4 key={index} className="blog-h4">
+                      {item.content}
+                    </h4>
+                  );
+                }
+                if (item.level === 5) {
+                  return (
+                    <h5 key={index} className="blog-h5">
+                      {item.content}
+                    </h5>
+                  );
+                }
+                if (item.level === 6) {
+                  return (
+                    <h6 key={index} className="blog-h6">
+                      {item.content}
+                    </h6>
+                  );
+                }
+                if (item.link === 6) {
+                  return (
+                    <h6 key={index} className="blog-h6">
+                      {item.content}
+                    </h6>
+                  );
+                }
+              case "link":
                 return (
-                  <h3 key={index} className="blog-h3">
-                    {item.content}
-                  </h3>
+                  <Link href={item.link} className="inline-link">
+                    {" "}
+                    {item.link}
+                  </Link>
+                );
+              case "button":
+                return (
+                  <Link href={item.link} className="main-button">
+                    {item.label}
+                  </Link>
                 );
 
               case "image":
                 return (
-                  <div key={index} className="blog-image-wrapper">
-                    <Image
-                      src={item.image?.secure_url}
-                      alt="blog image"
-                      width={800}
-                      height={500}
-                      className="blog-image"
-                    />
-                  </div>
+                  <Image
+                    src={item.image?.secure_url}
+                    alt="blog image"
+                    width={800}
+                    height={500}
+                  />
                 );
 
               default:

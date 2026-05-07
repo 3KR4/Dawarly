@@ -1,10 +1,13 @@
 "use client";
-import React, { useState, useRef } from "react";
+
+import React, { useState, useRef, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Image from "next/image";
+
 import "@/styles/dashboard/forms.css";
+
 import useTranslate from "@/Contexts/useTranslation";
 
 function Images({
@@ -14,12 +17,12 @@ function Images({
   disabled = false,
   limit = 15,
   label = true,
+
   // ===== BLOG vs SECTION MODE =====
   sectionMode = false,
-  sectionId = null,
-  setSections = null,
 }) {
   const t = useTranslate();
+
   const inputFileRef = useRef(null);
 
   const [isDrag, setIsDrag] = useState(false);
@@ -31,6 +34,33 @@ function Images({
 
   const helperText =
     limit === 1 ? t.ad.images?.helperTextSingle : t.ad.images?.helperText;
+
+  // ================= CLEANUP OBJECT URLS =================
+  useEffect(() => {
+    return () => {
+      safeImages.forEach((img) => {
+        if (img?.preview) {
+          URL.revokeObjectURL(img.preview);
+        }
+      });
+    };
+  }, []);
+
+  // ================= GET IMAGE SRC =================
+  const getImageSrc = (img) => {
+    if (!img) return "";
+
+    // uploaded image from backend
+    if (img.secure_url) return img.secure_url;
+
+    // processed local image
+    if (img.preview) return img.preview;
+
+    // string url
+    if (typeof img === "string") return img;
+
+    return "";
+  };
 
   // ================= ADD FILES =================
   const handleFiles = (files) => {
@@ -45,8 +75,16 @@ function Images({
       return;
     }
 
+    // ===== PROCESS FILES =====
+    const processedImages = imageFiles.map((file) => ({
+      id: `${file.name}-${file.lastModified}-${Math.random()}`,
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+    }));
+
     const newImages =
-      limit === 1 ? [imageFiles[0]] : [...safePrev, ...imageFiles];
+      limit === 1 ? [processedImages[0]] : [...safePrev, ...processedImages];
 
     setImages(newImages);
   };
@@ -54,13 +92,16 @@ function Images({
   // ================= DROP =================
   const handleDrop = (e) => {
     e.preventDefault();
+
     setIsDrag(false);
+
     handleFiles(Array.from(e.dataTransfer.files));
   };
 
   // ================= INPUT =================
   const handleInputChange = (e) => {
     handleFiles(Array.from(e.target.files));
+
     e.target.value = "";
   };
 
@@ -68,17 +109,30 @@ function Images({
   const handleRemoveImage = (index) => {
     setImages((prev) => {
       const safe = Array.isArray(prev) ? prev : [];
+
       const updated = [...safe];
+
+      const removedImage = updated[index];
+
+      // cleanup preview memory
+      if (removedImage?.preview) {
+        URL.revokeObjectURL(removedImage.preview);
+      }
+
       updated.splice(index, 1);
+
       return updated;
     });
   };
+
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>
       {label && (
         <label>
           {t.ad.images?.label}
+
           {limit > 1 && ` (${limit} ${t.ad.images?.max})`}
+
           {limit === 1 && ` (${t.ad.images?.single})`}
         </label>
       )}
@@ -95,6 +149,7 @@ function Images({
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
+
             if (!disabled) setIsDrag(true);
           }}
           onDragLeave={() => setIsDrag(false)}
@@ -133,49 +188,28 @@ function Images({
 
         {/* ================= PREVIEW ================= */}
         <div className={`imgHolder ${limit === 1 ? "single-image" : ""}`}>
-          {/* ================= SECTION MODE PREVIEW ================= */}
-          {sectionMode ? (
-            safeImages.length === 0 ? null : (
-              <div className="uploaded">
-                <Image
-                  src={
-                    safeImages[0]?.secure_url ||
-                    URL.createObjectURL(safeImages[0])
-                  }
-                  alt="section-image"
-                  width={150}
-                  height={150}
-                />
-                {!disabled && <IoClose onClick={() => handleRemoveImage(0)} />}
-              </div>
-            )
-          ) : (
-            // ================= BLOG MODE PREVIEW =================
-            safeImages?.map((image, index) => {
-              console.log(image);
+          {safeImages?.map((image, index) => (
+            <div
+              className="uploaded"
+              key={
+                image?.id || image?.secure_url || image?.preview || `${index}`
+              }
+            >
+              <Image
+                src={getImageSrc(image)}
+                alt={`image-${index}`}
+                width={150}
+                height={150}
+                unoptimized
+              />
 
-              return (
-                <div className="uploaded" key={index}>
-                  <Image
-                    src={
-                      image?.secure_url
-                        ? image?.secure_url
-                        : URL.createObjectURL(image)
-                    }
-                    alt={`image-${index}`}
-                    width={150}
-                    height={150}
-                  />
+              {!sectionMode && <p>{index + 1}</p>}
 
-                  <p>{index + 1}</p>
-
-                  {!disabled && (
-                    <IoClose onClick={() => handleRemoveImage(index)} />
-                  )}
-                </div>
-              );
-            })
-          )}
+              {!disabled && (
+                <IoClose onClick={() => handleRemoveImage(index)} />
+              )}
+            </div>
+          ))}
         </div>
       </div>
 

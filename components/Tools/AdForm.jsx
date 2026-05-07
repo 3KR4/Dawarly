@@ -166,6 +166,12 @@ export default function AdForm({ type = "client", adId }) {
     setValue("child_no_max", ad.child_no_max);
     setValue("adult_no_max", ad.adult_no_max);
     setValue("rentalDuration", ad.min_rent_period);
+    setValue("payment_no1", ad.payment_no1);
+    setValue("payment_no2", ad.payment_no2);
+    setValue("delivery_no1", ad.delivery_no1);
+    setValue("delivery_no2", ad.delivery_no2);
+    setValue("Owner_No1", ad.Owner_No1);
+    setValue("Owner_No2", ad.Owner_No2);
 
     setSelectedCats({
       cat: ad.Categories,
@@ -285,6 +291,12 @@ export default function AdForm({ type = "client", adId }) {
     display_phone: selectedContactMethods.phone,
     display_whatsapp: selectedContactMethods.chat,
     display_dawaarly_contact: selectedMediatorMethod?.id === 2,
+    payment_no1: data.payment_no1 ? Number(data.payment_no1) : null,
+    payment_no2: data.payment_no2 ? Number(data.payment_no2) : null,
+    Owner_No1: data.Owner_No1 ? Number(data.Owner_No1) : null,
+    Owner_No2: data.Owner_No2 ? Number(data.Owner_No2) : null,
+    delivery_no1: data.delivery_no1 ? Number(data.delivery_no1) : null,
+    delivery_no2: data.delivery_no2 ? Number(data.delivery_no2) : null,
     rent_amount: Number(data.rentAmount),
     rent_currency: additionalData.currency?.id,
     rent_frequency: additionalData.frequency?.id,
@@ -735,9 +747,7 @@ export default function AdForm({ type = "client", adId }) {
             <h2 className="section-title">
               {t.dashboard.tables.property_details}
             </h2>
-            <div
-              className="row-holder two"
-            >
+            <div className={`row-holder ${type == "client" ? "two" : ""}`}>
               <div className="box forInput">
                 <label>
                   {t.ad.bedrooms} <span className="required">*</span>
@@ -1033,9 +1043,7 @@ export default function AdForm({ type = "client", adId }) {
 
           {/* === سعة الضيوف === */}
           <div className="form-section">
-            <h2 className="section-title">
-              {"Guest Capacity"}
-            </h2>
+            <h2 className="section-title">{"Guest Capacity"}</h2>
             <div className="row-holder two">
               <div className="box forInput">
                 <label>
@@ -1096,6 +1104,147 @@ export default function AdForm({ type = "client", adId }) {
                     <span className="error">
                       <CircleAlert />
                       {errors.adult_no_max.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2 className="section-title">{"Current property data"}</h2>
+            <div className="row-holder two">
+              <div className="box forInput">
+                <label>{"Owner number 1 "}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("Owner_No1", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter Owner number 1"}
+                    />
+                  </div>
+                  {errors.Owner_No1 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.Owner_No1.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="box forInput">
+                <label>{"Owner number 2 "}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("Owner_No2", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter Owner number 2"}
+                    />
+                  </div>
+                  {errors.Owner_No2 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.Owner_No2.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="row-holder two">
+              <div className="box forInput">
+                <label>{"delivery number 1"}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("delivery_no1", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter delivery number 1"}
+                    />
+                  </div>
+                  {errors.delivery_no1 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.delivery_no1.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="box forInput">
+                <label>{"delivery number 2 "}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("delivery_no2", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter delivery number 2"}
+                    />
+                  </div>
+                  {errors.delivery_no2 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.delivery_no2.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="row-holder two">
+              <div className="box forInput">
+                <label>{"payment number 1"}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("payment_no1", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter payment number 1"}
+                    />
+                  </div>
+                  {errors.payment_no1 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.payment_no1.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="box forInput">
+                <label>{"payment number 2"}</label>
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("payment_no2", {
+                        required: t.dashboard.forms.errors.required,
+                      })}
+                      disabled={!isEditable}
+                      placeholder={"enter payment number 2"}
+                    />
+                  </div>
+                  {errors.payment_no2 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.payment_no2.message}
                     </span>
                   )}
                 </div>

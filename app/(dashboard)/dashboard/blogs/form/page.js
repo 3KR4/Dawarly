@@ -49,8 +49,11 @@ export default function CreateBlogPage() {
   const { tags, setTags } = useContext(selectors);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [images, setImages] = useState([]);
+  const [coverImage, setCoverImage] = useState([]);
   const [sectionImages, setSectionImages] = useState({});
+
+  console.log(sectionImages);
+
   const [sections, setSections] = useState([]);
   const [blogId, setBlogId] = useState(null);
 
@@ -128,6 +131,7 @@ export default function CreateBlogPage() {
           image_id: enSec.image_id || null,
 
           image: enSec.image || null,
+          items: enSec.list || arSec?.list || [],
         };
       });
 
@@ -135,7 +139,7 @@ export default function CreateBlogPage() {
 
       // ===== COVER =====
       if (blog.cover) {
-        setImages([blog.cover]);
+        setCoverImage([blog.cover]);
       }
 
       // ===== SECTION IMAGES =====
@@ -180,22 +184,60 @@ export default function CreateBlogPage() {
 
   // ================= SECTIONS =================
   const addSection = (type) => {
+    // ================= CHECK ONLY LAST SECTION =================
+    const lastSection = sections[sections.length - 1];
+
+    if (lastSection) {
+      const isLastEmpty = (() => {
+        switch (lastSection.type) {
+          case "heading":
+          case "paragraph":
+            return (
+              !lastSection.content?.en?.trim() &&
+              !lastSection.content?.ar?.trim()
+            );
+
+          case "link":
+            return !lastSection.link?.trim();
+
+          case "button":
+            return (
+              !lastSection.label?.en?.trim() && !lastSection.label?.ar?.trim()
+            );
+
+          case "image":
+            return (
+              !sectionImages?.[lastSection.id] ||
+              sectionImages[lastSection.id].length === 0
+            );
+
+          default:
+            return false;
+        }
+      })();
+
+      if (isLastEmpty) {
+        addNotification({
+          type: "error",
+          message:
+            "Please complete the current section before adding a new one",
+        });
+        return;
+      }
+    }
+
+    // ================= CREATE NEW SECTION =================
     const id = Date.now();
 
     const newSection = {
       id,
       type,
-
-      // multilingual content
       content: { en: "", ar: "" },
-
-      // multilingual label (for button only but safe for all)
       label: { en: "", ar: "" },
-
-      // fixed fields
       level: type === "heading" ? 1 : null,
       link: "",
       image_id: null,
+      items: type === "list" ? [] : undefined,
     };
 
     setSections((prev) => [...prev, newSection]);
@@ -269,6 +311,7 @@ export default function CreateBlogPage() {
         level: sec.level || null,
         link: sec.link || null,
         image_id: sec.image_id || null,
+        list: sec.type === "list" ? sec.items || [] : null,
       })),
 
       content_ar: sectionsWithImages.map((sec, index) => ({
@@ -288,6 +331,13 @@ export default function CreateBlogPage() {
     sections.filter((s) => s.type === type).length;
 
   const onSubmit = async (data) => {
+    if (!coverImage?.length) {
+      addNotification({
+        type: "error",
+        message: "Cover image is required",
+      });
+      return;
+    }
     setIsSubmitted(true);
     setLoadingSubmit(true);
 
@@ -299,9 +349,9 @@ export default function CreateBlogPage() {
 
     try {
       let currentBlogId = blogId;
-      console.log(currentBlogId);
+      let coverId = null;
 
-      // ===== CREATE ONLY IF NEW =====
+      // ================= CREATE BLOG =================
       if (!blogSlug) {
         const createRes = await createBlog({
           title_en: data.title.en,
@@ -312,40 +362,66 @@ export default function CreateBlogPage() {
           meta_title_ar: data.meta_title.ar,
           meta_desc_en: data.meta_desc.en,
           meta_desc_ar: data.meta_desc.ar,
-          tags: tags.join(","),
+          tags: tags?.join(",") || "",
         });
 
-        currentBlogId = createRes.data.id;
+        currentBlogId = createRes?.data?.id;
       }
 
-      const isNewFile = (img) => img instanceof File;
+      // ================= COVER IMAGE UPLOAD =================
+      const coverFile = coverImage?.[0]?.file;
 
-      // ===== SECTION IMAGE UPLOAD =====
+      if (coverFile instanceof File) {
+        const formData = new FormData();
+        formData.append("files", coverFile);
+        formData.append("is_cover", "true");
+        await uploadImages("BLOG", currentBlogId, formData);
+      }
+
+      // ================= SECTION IMAGES UPLOAD =================
       const sectionImageMap = {};
+
+      console.log("step: upload sections images");
 
       for (const sec of sections) {
         if (sec.type !== "image") continue;
 
-        const files = sectionImages[sec.id] || [];
-        const newFiles = files.filter(isNewFile);
+        const images = sectionImages?.[sec.id] || [];
+
+        const newFiles = images
+          .filter((img) => img?.file instanceof File)
+          .map((img) => img.file);
 
         if (!newFiles.length) continue;
 
         const formData = new FormData();
-        newFiles.forEach((img) => formData.append("files", img));
-
+        newFiles.forEach((file) => formData.append("files", file));
+        formData.append("is_cover", "false");
         const res = await uploadImages("BLOG", currentBlogId, formData);
 
-        sectionImageMap[sec.id] = res.data?.[0]?.id;
+        const uploadedId = res?.data?.[0]?.id ?? null;
+
+        sectionImageMap[sec.id] = uploadedId;
+
+        console.log("section uploaded:", uploadedId);
       }
 
+      // ================= MERGE SECTIONS =================
       const finalSections = sections.map((sec) => ({
         ...sec,
-        image_id: sectionImageMap[sec.id] || sec.image_id || null,
+        image_id: sectionImageMap?.[sec.id] ?? sec.image_id ?? null,
       }));
 
-      // ===== FINAL SUBMIT =====
-      await updateBlog(currentBlogId, buildPayload(data, finalSections));
+      // ================= BUILD PAYLOAD =================
+      const payload = buildPayload(data, finalSections);
+
+      // ================= ATTACH COVER =================
+      if (coverId) {
+        payload.cover_id = coverId;
+      }
+
+      // ================= UPDATE BLOG =================
+      await updateBlog(currentBlogId, payload);
 
       addNotification({
         type: "success",
@@ -358,12 +434,13 @@ export default function CreateBlogPage() {
     } catch (err) {
       addNotification({
         type: "error",
-        message: err.response?.data?.message || err.message,
+        message: err?.response?.data?.message || err?.message,
       });
     } finally {
       setLoadingSubmit(false);
     }
   };
+
   // ================= UI =================
   return (
     <div className="form-holder">
@@ -432,8 +509,8 @@ export default function CreateBlogPage() {
                 </div>
               </div>
               <Images
-                images={images}
-                setImages={setImages}
+                images={coverImage}
+                setImages={setCoverImage}
                 isSubmitted={isSubmitted}
                 limit={1}
               />
@@ -487,6 +564,9 @@ export default function CreateBlogPage() {
             <button type="button" onClick={() => addSection("paragraph")}>
               <FaPlus /> Paragraph{" "}
               <span>{getSectionCount("paragraph") || "0"}</span>
+            </button>
+            <button type="button" onClick={() => addSection("list")}>
+              <FaPlus /> list <span>{getSectionCount("list") || "0"}</span>
             </button>
             <button type="button" onClick={() => addSection("image")}>
               <FaPlus /> Image <span>{getSectionCount("image") || "0"}</span>
@@ -555,6 +635,83 @@ export default function CreateBlogPage() {
                   </div>
                 </div>
               )}
+              {sec.type === "list" && (
+                <div className="inputHolder for-list">
+                  <div
+                    className="holder"
+                    style={{
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <ul style={{ flex: 1 }}>
+                      {(sec.items || []).map((item, index) => {
+                        console.log("item:", sec.items);
+                        return (
+                          <li key={item.id}>
+                            <div className="inputHolder">
+                              <div className="holder">
+                                <input
+                                  value={item.value}
+                                  placeholder="list item..."
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    setSections((prev) =>
+                                      prev.map((s) => {
+                                        if (s.id !== sec.id) return s;
+
+                                        const updatedItems = [
+                                          ...(s.items || []),
+                                        ];
+                                        updatedItems[index].value = value;
+
+                                        return { ...s, items: updatedItems };
+                                      }),
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <button
+                      type="button"
+                      className="main-button"
+                      onClick={() => {
+                        setSections((prev) =>
+                          prev.map((s) => {
+                            if (s.id !== sec.id) return s;
+
+                            const items = s.items || [];
+
+                            // ================= VALIDATION =================
+                            const lastItem = items[items.length - 1];
+
+                            if (lastItem && !lastItem.value?.trim()) {
+                              addNotification({
+                                type: "error",
+                                message:
+                                  "Please fill last item before adding new one",
+                              });
+                              return s;
+                            }
+
+                            return {
+                              ...s,
+                              items: [...items, { id: Date.now(), value: "" }],
+                            };
+                          }),
+                        );
+                      }}
+                    >
+                      + Add new line
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* LINK */}
               {sec.type === "link" && (
@@ -615,9 +772,7 @@ export default function CreateBlogPage() {
                     }))
                   }
                   limit={1}
-                  label={false}
                   sectionMode={true}
-                  sectionId={sec.id}
                 />
               )}
             </div>

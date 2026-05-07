@@ -63,7 +63,7 @@ api.interceptors.request.use(async (config) => {
   // لو مفيش توكن → حاول تجيبه
   if (!accessToken) {
     try {
-      await refreshToken();
+      return config;
     } catch (err) {
       return config; // سيبه يكمل بدون توكن
     }

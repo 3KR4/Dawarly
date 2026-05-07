@@ -1,0 +1,75 @@
+.skeleton-details {
+  flex-direction: column;
+  margin: 0;
+}
+.skeleton-details .element {
+  background: var(--border-color);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+/* shimmer */
+.skeleton-details .element::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+/* IMAGE */
+.skeleton-details .main-image {
+  border-radius: 0 0 50px 50px;
+  width: 100%;
+  height: 720px;
+}
+.skeleton-details .card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-details .title {
+  height: 45px;
+  width: 60%;
+}
+
+.skeleton-details .description {
+  height: 30px;
+}
+.skeleton-details .description:first-child {
+  width: 50%;
+}
+
+.skeleton-details .description:nth-child(2) {
+  width: 70%;
+}
+.skeleton-details .description:last-child {
+  width: 55%;
+}
+@media (max-width: 995px) {
+  .single-page .images-holder {
+    aspect-ratio: unset !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  .single-page .images-holder .main-image {
+    height: 600px;
+  }
+}

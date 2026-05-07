@@ -1,7 +1,7 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
-export const getAllSBlogs = (page = 1, limit = 10, status, search) => {
+export const getAllBlogs = (page = 1, limit = 8, status, search) => {
   return api.get(ENDPOINTS.BLOGS.GET_ALL(page, limit, status, search));
 };
 export const getOneBlog = (slug) => {
