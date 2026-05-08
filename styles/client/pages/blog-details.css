@@ -12,7 +12,7 @@
 }
 .blog-page > .holder.container {
   flex-direction: column;
-  gap: 3px;
+  gap: 15px;
   width: 100%;
   margin: 8px auto;
   display: flex;
@@ -47,20 +47,12 @@
   border-radius: 30px;
   aspect-ratio: 1.9;
 }
+.blog-page > .holder ul {
+  gap: 10px !important;
+}
 .blog-page .title {
   font-size: 40px;
 }
 .blog-page p {
   line-height: unset;
-}
-.blog-page h1,
-.blog-page h2,
-.blog-page h3,
-.blog-page h4,
-.blog-page h5,
-.blog-page h6 {
-  margin: 8px 0 3px;
-}
-
-.blog-page {
 }
