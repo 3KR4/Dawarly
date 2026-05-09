@@ -1,18 +1,14 @@
 // services/api.js
 import axios from "axios";
-console.log("before url");
 
-
-
-// Instance بدون interceptors (للـ refresh فقط)
 export const plainApi = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   withCredentials: true,
 });
 
 // Instance الرئيسي
 const api = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   withCredentials: true,
 });
 
