@@ -93,17 +93,20 @@ export default function CreateSliderPage() {
     sliderId ? updateSlider(sliderId, payload) : createSlider(payload);
 
   const uploadNewImages = async (id) => {
-    const newImages = images.filter((img) => img instanceof File);
+    const safeImages = Array.isArray(images) ? images : [];
+
+    const newImages = safeImages.filter((img) => img?.file instanceof File);
+
     if (!newImages.length) return;
 
     const formData = new FormData();
-    newImages.forEach((file) => {
-      formData.append("files", file);
+
+    newImages.forEach((img) => {
+      formData.append("files", img.file);
     });
 
     await uploadImages("SLIDER", id, formData);
   };
-
   const handleDeletedImages = async (id) => {
     const deleted = originalImages.filter(
       (old) => !images.find((img) => img.id === old.id),
