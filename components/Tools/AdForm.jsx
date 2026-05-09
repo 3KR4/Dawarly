@@ -21,7 +21,13 @@ import {
   assignAdmin,
 } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
-import { Amenities, Currencies, Levels, RentFrequencies } from "@/data/enums";
+import {
+  Amenities,
+  Currencies,
+  Levels,
+  Priority,
+  RentFrequencies,
+} from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
 import { selectors } from "@/Contexts/selectors";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
@@ -82,6 +88,7 @@ export default function AdForm({ type = "client", adId }) {
     frequency: null,
     minRentalUnit: null,
     level: Levels[0],
+    priority: Priority[1],
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
@@ -163,6 +170,7 @@ export default function AdForm({ type = "client", adId }) {
     setValue("description", ad.description || "");
     setValue("bedrooms", ad.details.bedrooms);
     setValue("bathrooms", ad.details.bathrooms);
+    setValue("priority", ad.priority);
     setValue("child_no_max", ad.child_no_max);
     setValue("adult_no_max", ad.adult_no_max);
     setValue("rentalDuration", ad.min_rent_period);
@@ -202,6 +210,7 @@ export default function AdForm({ type = "client", adId }) {
         (x) => x.id == ad.min_rent_period_unit,
       ),
       level: Levels.find((x) => x.id == ad.details.level),
+      priority: Priority.find((x) => x.id == ad.priority),
     });
 
     const activeAmenities = Amenities.filter(
@@ -316,6 +325,7 @@ export default function AdForm({ type = "client", adId }) {
     compound_id: selectedLocations.compound?.id || null,
     bedrooms: Number(data.bedrooms),
     bathrooms: Number(data.bathrooms),
+    priority: additionalData.priority?.id,
     level: additionalData.level?.id,
     adult_no_max: Number(data.adult_no_max),
     child_no_max: Number(data.child_no_max),
@@ -334,21 +344,22 @@ export default function AdForm({ type = "client", adId }) {
   const submitAd = async (payload) =>
     adId ? updateAd(adId, payload) : crateAd(payload);
 
-  const uploadNewImages = async (adId) => {
-    const safeImages = Array.isArray(images) ? images : [];
+const uploadNewImages = async (adId) => {
+  const safeImages = Array.isArray(images) ? images : [];
 
-    const newImages = safeImages.filter((img) => img instanceof File);
+  // الصور الجديدة فقط
+  const newImages = safeImages.filter((img) => img?.file instanceof File);
 
-    if (newImages.length === 0) return;
+  if (newImages.length === 0) return;
 
-    const formData = new FormData();
+  const formData = new FormData();
 
-    newImages.forEach((file) => {
-      formData.append("files", file);
-    });
+  newImages.forEach((img) => {
+    formData.append("files", img.file);
+  });
 
-    await uploadImages("AD", adId, formData);
-  };
+  await uploadImages("AD", adId, formData);
+};
   const handleDeletedImages = async (adId) => {
     const safeOriginal = Array.isArray(originalImages) ? originalImages : [];
     const safeImages = Array.isArray(images) ? images : [];
@@ -1054,7 +1065,6 @@ export default function AdForm({ type = "client", adId }) {
                     <input
                       type="number"
                       {...register("child_no_max", {
-                        required: t.dashboard.forms.errors.required,
                         min: {
                           value: 0,
                           message: t.dashboard.forms.errors.minZero,
@@ -1203,7 +1213,20 @@ export default function AdForm({ type = "client", adId }) {
               </div>
             </div>
           </div>
-
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.priority || "priority"}</h2>
+            <SelectOptions
+              placeholder={t.ad.priorityPlaceholder || "priorityPlaceholder"}
+              options={Priority}
+              value={additionalData?.priority}
+              onChange={(item) => {
+                setAdditionalData((prev) => ({
+                  ...prev,
+                  priority: item,
+                }));
+              }}
+            />
+          </div>
           {/* === المميزات === */}
           <div className="form-section">
             <h2 className="section-title">{t.ad.amenities}</h2>

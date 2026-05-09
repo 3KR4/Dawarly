@@ -40,7 +40,7 @@ body.ar .notification span.before {
   left: 0;
 }
 .notification.active span.before {
-  animation: whenNotficationIsAction 10s forwards;
+  animation: whenNotficationIsAction 4s forwards;
 }
 @keyframes whenNotficationIsAction {
   0% {
@@ -51,7 +51,7 @@ body.ar .notification span.before {
   }
 }
 .notification.closing span.before {
-  animation: whenNotficationIsHide 10s forwards;
+  animation: whenNotficationIsHide 4s forwards;
 }
 @keyframes whenNotficationIsHide {
   0% {
