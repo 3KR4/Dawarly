@@ -129,9 +129,11 @@
   gap: 10px;
 }
 .single-page .details-holder .card.conditions ul {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  align-items: center;
   gap: 7px;
+  width: 100%;
+  display: flex;
 }
 .single-page .details-holder .card.conditions li {
   background: var(--hover-color);
@@ -139,6 +141,7 @@
   border-radius: 5px;
   align-items: center;
   min-width: max-content;
+  flex: 1;
   height: 33px;
   padding: 6px 10px;
   font-size: 15px;

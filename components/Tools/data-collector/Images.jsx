@@ -15,7 +15,7 @@ function Images({
   setImages,
   isSubmitted,
   disabled = false,
-  limit = 15,
+  limit = 25,
   label = true,
 
   // ===== BLOG vs SECTION MODE =====

@@ -46,7 +46,7 @@ export const NotificationProvider = ({ children }) => {
 
       timeouts.current[id] = setTimeout(() => {
         closeNotification(id);
-      }, 7000);
+      }, 3000);
     }, 10);
   };
 

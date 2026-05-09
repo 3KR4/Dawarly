@@ -375,7 +375,7 @@ export default function Register() {
             message: "Password reset successfully",
           });
           setStep(STEPS.LOGIN);
-          setValue("loginPassword" , new_password)
+          setValue("loginPassword", new_password);
         } catch (err) {
           addNotification({
             type: "warning",
@@ -871,13 +871,16 @@ export default function Register() {
         {/* ================= VIEW/UPDATE PASSWORD ================= */}
         {step === STEPS.FORGET_PASS_RESET && (
           <>
+            {/* NEW PASSWORD */}
             <div className="box forInput">
               <div className="inputHolder password">
                 <div className="holder">
                   <LockKeyhole />
+
                   <input
                     type={passEye.password ? "text" : "password"}
                     {...register("newPass", {
+                      required: "Please enter new password",
                       pattern: {
                         value:
                           /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:;<>,.?~\-]).{8,}$/,
@@ -886,6 +889,7 @@ export default function Register() {
                     })}
                     placeholder={auth.placeholders.newPassword}
                   />
+
                   {passEye.password ? (
                     <Eye
                       className="eye"
@@ -903,10 +907,54 @@ export default function Register() {
                   )}
                 </div>
               </div>
+
               {errors.newPass && (
                 <span className="error">
                   <CircleAlert />
                   {errors.newPass.message}
+                </span>
+              )}
+            </div>
+
+            {/* CONFIRM PASSWORD */}
+            <div className="box forInput">
+              <div className="inputHolder password">
+                <div className="holder">
+                  <LockKeyhole />
+
+                  <input
+                    type={passEye.confirm ? "text" : "password"}
+                    {...register("confirmNewPass", {
+                      required: "Please confirm your password",
+                      validate: (value) =>
+                        value === watch("newPass") ||
+                        t.auth.errors.passwordMismatch,
+                    })}
+                    placeholder={t.auth.confirmPassword}
+                  />
+
+                  {passEye.confirm ? (
+                    <Eye
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: false }))
+                      }
+                    />
+                  ) : (
+                    <EyeOff
+                      className="eye"
+                      onClick={() =>
+                        setPassEye((p) => ({ ...p, confirm: true }))
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+
+              {errors.confirmNewPass && (
+                <span className="error">
+                  <CircleAlert />
+                  {errors.confirmNewPass.message}
                 </span>
               )}
             </div>
@@ -927,8 +975,13 @@ export default function Register() {
               disabled={cooldown > 0}
               onClick={handleResend}
             >
-
-              {loadings.resend ? <span className="loader"></span> : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
+              {loadings.resend ? (
+                <span className="loader"></span>
+              ) : cooldown > 0 ? (
+                `Resend in ${cooldown}s`
+              ) : (
+                "Resend Code"
+              )}
             </button>
           </>
         )}

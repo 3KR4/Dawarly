@@ -2,8 +2,8 @@
 import axios from "axios";
 console.log("before url");
 
-// -------------------- BASE CONFIG     http://localhost:5000   --------------------
-const BASE_URL = "https://api.dawaarly.com";
+// -------------------- BASE CONFIG     https://api.dawaarly.com   --------------------
+const BASE_URL = "http://localhost:5000";
 console.log(BASE_URL);
 
 // Instance بدون interceptors (للـ refresh فقط)

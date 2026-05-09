@@ -172,10 +172,39 @@ export const Levels = [
     name_ar: "+10",
   },
 ];
+export const Priority = [
+  {
+    id: 0,
+    name_en: "No Priority",
+    name_ar: "بدون أولوية",
+  },
 
+  {
+    id: 1,
+    name_en: "Low Priority",
+    name_ar: "أولوية منخفضة",
+  },
 
+  {
+    id: 2,
+    name_en: "Medium Priority",
+    name_ar: "أولوية متوسطة",
+  },
 
-export  const RELATIONS = {
+  {
+    id: 3,
+    name_en: "High Priority",
+    name_ar: "أولوية عالية",
+  },
+
+  {
+    id: 4,
+    name_en: "Top Priority",
+    name_ar: "أولوية قصوى",
+  },
+];
+
+export const RELATIONS = {
   subcategories: {
     parentKey: "category_id",
     source: "subcategories",

@@ -303,7 +303,7 @@ export default function AdDetails() {
                     </li>
                   )}
 
-                  {ad?.child_no_max && (
+                  {ad?.child_no_max > 0 && (
                     <li>
                       {t.ad.max_children || "max children"}: {ad.child_no_max}
                     </li>
