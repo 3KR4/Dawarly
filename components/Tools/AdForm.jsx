@@ -210,7 +210,7 @@ export default function AdForm({ type = "client", adId }) {
         (x) => x.id == ad.min_rent_period_unit,
       ),
       level: Levels.find((x) => x.id == ad.details.level),
-      priority: Priority.find((x) => x.id == ad.priority),
+      priority: Priority.find((x) => x.id == ad.featured_priority),
     });
 
     const activeAmenities = Amenities.filter(
@@ -325,7 +325,7 @@ export default function AdForm({ type = "client", adId }) {
     compound_id: selectedLocations.compound?.id || null,
     bedrooms: Number(data.bedrooms),
     bathrooms: Number(data.bathrooms),
-    priority: additionalData.priority?.id,
+    featured_priority: additionalData.priority?.id,
     level: additionalData.level?.id,
     adult_no_max: Number(data.adult_no_max),
     child_no_max: Number(data.child_no_max),
