@@ -147,24 +147,26 @@ export default function CreateAd() {
     return result;
   };
 
-  const uploadNewImages = async (adId) => {
-    const newImages = images.filter((img) => img instanceof File);
+const uploadNewImages = async (adId) => {
+  const safeImages = Array.isArray(images) ? images : [];
 
-    if (newImages?.length === 0) return;
+  // الصور الجديدة فقط
+  const newImages = safeImages.filter((img) => img?.file instanceof File);
 
-    const formData = new FormData();
+  if (newImages.length === 0) return;
 
-    newImages.forEach((file) => {
-      formData.append("files", file);
-    });
+  const formData = new FormData();
 
-    await uploadImages("AD", adId, formData);
+  newImages.forEach((img) => {
+    formData.append("files", img.file);
+  });
+
+  await uploadImages("AD", adId, formData);
   };
 
   const fieldErrorMap = {
     title: "adTitle",
     categoryId: "category",
-    subCategoryId: "subCategory",
     governorate_id: "governorate",
     city_id: "city",
     rent_currency: "currency",
@@ -376,10 +378,7 @@ export default function CreateAd() {
 
   return (
     <div className="form-holder create-ad user-account">
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        adapterLocale={locale}
-      >
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="top">
             <h1>{titles[step]}</h1>
@@ -419,7 +418,11 @@ export default function CreateAd() {
                   activeClass={cat?.id == selectedCats.cat}
                   onSelect={() => {
                     setSelectedCats({ cat: cat?.id, subCat: null });
-                    setStep(STEPS.SUB_CATEGORIES);
+                    if (cat.childsCount > 0) {
+                      setStep(STEPS.SUB_CATEGORIES);
+                    } else {
+                      setStep(STEPS.BASICS);
+                    }
                   }}
                 />
               ))}
@@ -905,7 +908,6 @@ export default function CreateAd() {
                         <input
                           type="number"
                           {...register("child_no_max", {
-                            required: t.dashboard.forms.errors.required,
                             min: {
                               value: 0,
                               message: t.dashboard.forms.errors.minZero,

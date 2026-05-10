@@ -171,9 +171,9 @@ export default function AdForm({ type = "client", adId }) {
     setValue("bedrooms", ad.details.bedrooms);
     setValue("bathrooms", ad.details.bathrooms);
     setValue("priority", ad.priority);
-    setValue("child_no_max", ad.child_no_max);
-    setValue("adult_no_max", ad.adult_no_max);
-    setValue("rentalDuration", ad.min_rent_period);
+    setValue("child_no_max", ad.child_no_max > 0 ? ad.child_no_max : null);
+    setValue("adult_no_max", ad.adult_no_max > 0 ? ad.adult_no_max : null);
+    setValue("rentalDuration", ad.min_rent_period > 0 ? ad.min_rent_period : null);
     setValue("payment_no1", ad.payment_no1);
     setValue("payment_no2", ad.payment_no2);
     setValue("delivery_no1", ad.delivery_no1);
@@ -253,10 +253,7 @@ export default function AdForm({ type = "client", adId }) {
       newErrors.cat = t.ad.errors.category;
       hasErrors = true;
     }
-    if (!selectedCats.subCat) {
-      newErrors.subCat = t.ad.errors.subCategory;
-      hasErrors = true;
-    }
+
     if (!selectedLocations.gov) {
       newErrors.gov = t.ad.errors.governorate;
       hasErrors = true;
@@ -375,7 +372,6 @@ const uploadNewImages = async (adId) => {
   const fieldErrorMap = {
     title: "adTitle",
     categoryId: "category",
-    subCategoryId: "subCategory",
     governorate_id: "governorate",
     city_id: "city",
     rent_currency: "currency",
@@ -659,10 +655,7 @@ const uploadNewImages = async (adId) => {
                     ...prev,
                     subCat: item,
                   }));
-                  handleErrors("subCat", null);
                 }}
-                error={fieldErrors.subCat}
-                required={true}
               />
             </div>
           </div>
