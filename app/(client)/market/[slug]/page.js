@@ -207,12 +207,7 @@ export default function AdDetails() {
                 <div className="row">
                   <div className="column-holder">
                     <h5 className="price">
-                      {formatCurrency(
-                        ad?.rent_amount,
-                        ad?.rent_currency,
-                        locale,
-                      )}{" "}
-                      /{" "}
+                      {formatCurrency(ad?.price, ad?.currency, locale)} /{" "}
                       {
                         RentFrequencies.find(
                           (x) => x.id == ad?.rent_frequency,
@@ -221,11 +216,7 @@ export default function AdDetails() {
                     </h5>
                     <h6 className="price-dep">
                       {t.ad.deposit}:{" "}
-                      {formatCurrency(
-                        ad?.deposit_amount,
-                        ad?.rent_currency,
-                        locale,
-                      )}
+                      {formatCurrency(ad?.deposit_amount, ad?.currency, locale)}
                     </h6>
                   </div>
                   {!screenSize.includes("small") && (

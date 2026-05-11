@@ -165,7 +165,7 @@ export default function AdForm({ type = "client", adId }) {
 
   const fillFormWithAdData = (ad) => {
     setValue("adTitle", ad.title);
-    setValue("rentAmount", ad.rent_amount);
+    setValue("rentAmount", ad.price);
     setValue("deposit_amount", ad.deposit_amount);
     setValue("description", ad.description || "");
     setValue("bedrooms", ad.details.bedrooms);
@@ -204,7 +204,7 @@ export default function AdForm({ type = "client", adId }) {
       to: formatDate(ad.available_to),
     });
     setAdditionalData({
-      currency: Currencies.find((x) => x.id == ad.rent_currency),
+      currency: Currencies.find((x) => x.id == ad.currency),
       frequency: RentFrequencies.find((x) => x.id == ad.rent_frequency),
       minRentalUnit: RentFrequencies.find(
         (x) => x.id == ad.min_rent_period_unit,
@@ -303,8 +303,8 @@ export default function AdForm({ type = "client", adId }) {
     Owner_No2: data.Owner_No2 ? data.Owner_No2 : null,
     delivery_no1: data.delivery_no1 ? data.delivery_no1 : null,
     delivery_no2: data.delivery_no2 ? data.delivery_no2 : null,
-    rent_amount: Number(data.rentAmount),
-    rent_currency: additionalData.currency?.id,
+    price: Number(data.rentAmount),
+    currency: additionalData.currency?.id,
     rent_frequency: additionalData.frequency?.id,
     deposit_amount: Number(data.deposit_amount),
     min_rent_period: Number(data.rentalDuration),
@@ -374,10 +374,10 @@ const uploadNewImages = async (adId) => {
     categoryId: "category",
     governorate_id: "governorate",
     city_id: "city",
-    rent_currency: "currency",
+    currency: "currency",
     rent_frequency: "frequency",
     deposit_amount: "deposit_amount_reqire",
-    rent_amount: "priceRequired",
+    price: "priceRequired",
     bedrooms: "required",
     bathrooms: "required",
     level: "required",

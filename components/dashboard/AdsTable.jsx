@@ -193,11 +193,7 @@ export default function AdsTable({
                       </div>
 
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(
-                          item?.rent_amount,
-                          item?.rent_currency,
-                          locale,
-                        )}
+                        {formatCurrency(item?.price, item?.currency, locale)}
                       </div>
                       {!activeAds && (
                         <div
@@ -206,7 +202,7 @@ export default function AdsTable({
                         >
                           {formatCurrency(
                             item?.deposit_amount,
-                            item?.rent_currency,
+                            item?.currency,
                             locale,
                           )}
                         </div>
@@ -215,11 +211,7 @@ export default function AdsTable({
                   ) : (
                     <>
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(
-                          item?.rent_amount,
-                          item?.rent_currency,
-                          locale,
-                        )}{" "}
+                        {formatCurrency(item?.price, item?.currency, locale)}{" "}
                         {
                           RentFrequencies?.find(
                             (x) => x.id == item?.rent_frequency,
@@ -233,7 +225,7 @@ export default function AdsTable({
                         >
                           {formatCurrency(
                             item?.deposit_amount,
-                            item?.rent_currency,
+                            item?.currency,
                             locale,
                           )}
                         </div>

@@ -1785,35 +1785,35 @@ export const dynamicFilters = [
   {
     key: "level",
     uiType: "range",
-    label: {en: "level", ar: "الدور"},
-    placeholder: {en: "enter level number", ar: "ادخل رقم الدور"},
+    label: { en: "level", ar: "الدور" },
+    placeholder: { en: "enter level number", ar: "ادخل رقم الدور" },
   },
   {
     key: "bedrooms",
     uiType: "range",
-    label: {en: "bedrooms", ar: "غرف النوم"},
-    placeholder: {en: "enter bedrooms number", ar: "ادخل عدد الغرف"},
+    label: { en: "bedrooms", ar: "غرف النوم" },
+    placeholder: { en: "enter bedrooms number", ar: "ادخل عدد الغرف" },
   },
   {
     key: "bathrooms",
     uiType: "range",
-    label: {en: "bathrooms", ar: "الحمامات"},
-    placeholder: {en: "enter bathrooms number", ar: "ادخل عدد الحمامات "},
+    label: { en: "bathrooms", ar: "الحمامات" },
+    placeholder: { en: "enter bathrooms number", ar: "ادخل عدد الحمامات " },
   },
   {
-  key: "rent_amount",
-  uiType: "range",
-  label: { en: "Rent Amount", ar: "قيمة الإيجار" },
-  placeholder: { en: "Enter rent amount", ar: "ادخل قيمة الإيجار" },
-},
-{
-  key: "deposit_amount",
-  uiType: "range",
-  label: { en: "Deposit Amount", ar: "مقدم التأمين" },
-  placeholder: { en: "Enter deposit amount", ar: "ادخل مبلغ التأمين" },
-},
- {
-    key: "rent_currency",
+    key: "price",
+    uiType: "range",
+    label: { en: "Rent Amount", ar: "قيمة الإيجار" },
+    placeholder: { en: "Enter rent amount", ar: "ادخل قيمة الإيجار" },
+  },
+  {
+    key: "deposit_amount",
+    uiType: "range",
+    label: { en: "Deposit Amount", ar: "مقدم التأمين" },
+    placeholder: { en: "Enter deposit amount", ar: "ادخل مبلغ التأمين" },
+  },
+  {
+    key: "currency",
     uiType: "select",
     label: { en: "Currency", ar: "العملة" },
     placeholder: { en: "Select currency", ar: "اختر العملة" },
@@ -1837,29 +1837,32 @@ export const dynamicFilters = [
     ],
   },
   {
-  key: "available_time",
-  uiType: "date",
-  label: { en: "Available Time", ar: "موعد التوافر" },
-  placeholder: { en: "Select available date", ar: "اختر تاريخ التوافر" },
-},
-{
-  key: "amenities",
-  uiType: "multiSelect",
-  label: { en: "Amenities", ar: "وسائل الراحة" },
-  placeholder: { en: "Select amenities", ar: "اختر وسائل الراحة" },
-  options: [
-    { id: 1, value: "am_pool", label: { en: "Pool", ar: "حمام سباحة" } },
-    { id: 2, value: "am_balcony", label: { en: "Balcony", ar: "شرفة" } },
-    { id: 3, value: "am_private_garden", label: { en: "Private Garden", ar: "حديقة خاصة" } },
-    { id: 4, value: "am_kitchen", label: { en: "Kitchen", ar: "مطبخ" } },
-    { id: 5, value: "am_ac", label: { en: "AC", ar: "تكييف" } },
-    { id: 6, value: "am_heating", label: { en: "Heating", ar: "تدفئة" } },
-    { id: 7, value: "am_elevator", label: { en: "Elevator", ar: "مصعد" } },
-    { id: 8, value: "am_gym", label: { en: "Gym", ar: "جيم" } },
-  ],
-}
+    key: "available_time",
+    uiType: "date",
+    label: { en: "Available Time", ar: "موعد التوافر" },
+    placeholder: { en: "Select available date", ar: "اختر تاريخ التوافر" },
+  },
+  {
+    key: "amenities",
+    uiType: "multiSelect",
+    label: { en: "Amenities", ar: "وسائل الراحة" },
+    placeholder: { en: "Select amenities", ar: "اختر وسائل الراحة" },
+    options: [
+      { id: 1, value: "am_pool", label: { en: "Pool", ar: "حمام سباحة" } },
+      { id: 2, value: "am_balcony", label: { en: "Balcony", ar: "شرفة" } },
+      {
+        id: 3,
+        value: "am_private_garden",
+        label: { en: "Private Garden", ar: "حديقة خاصة" },
+      },
+      { id: 4, value: "am_kitchen", label: { en: "Kitchen", ar: "مطبخ" } },
+      { id: 5, value: "am_ac", label: { en: "AC", ar: "تكييف" } },
+      { id: 6, value: "am_heating", label: { en: "Heating", ar: "تدفئة" } },
+      { id: 7, value: "am_elevator", label: { en: "Elevator", ar: "مصعد" } },
+      { id: 8, value: "am_gym", label: { en: "Gym", ar: "جيم" } },
+    ],
+  },
 ];
-
 
 export const dashboardRoutes = {
   ads: {
