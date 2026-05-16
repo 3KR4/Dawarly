@@ -106,6 +106,7 @@ export const ENDPOINTS = {
       city_id ? `data/areas?city_id=${city_id}` : `data/areas`,
     GET_COMPOUNDS: (area_id) =>
       area_id ? `data/compounds?area_id=${area_id}` : `data/compounds`,
+    GET_TABLES: () => `data/tables`,
     GET_CATEGORIES: () => `data/categories`,
     GET_SUBCATEGORIES: (category_id) =>
       category_id

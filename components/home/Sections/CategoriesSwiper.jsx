@@ -27,6 +27,7 @@ export default function CategoriesSwiper({
   const {
     countries,
     governorates,
+    tables,
     categories,
     subCategories,
     cities,
@@ -51,6 +52,7 @@ export default function CategoriesSwiper({
   // DATA SOURCES
   // =========================
   const sources = {
+    tables,
     categories,
     subcategories: subCategories,
     countries,
@@ -104,6 +106,7 @@ export default function CategoriesSwiper({
   // =========================
   useEffect(() => {
     const QUERY_KEYS = {
+      tables: "dep",
       categories: "cat",
       subcategories: "subcat",
     };
@@ -133,6 +136,7 @@ export default function CategoriesSwiper({
     const params = new URLSearchParams(searchParams.toString());
 
     const QUERY_KEYS = {
+      tables: "dep",
       categories: "cat",
       subcategories: "subcat",
     };
@@ -144,6 +148,9 @@ export default function CategoriesSwiper({
       else params.delete(key);
     }
 
+    if (type === "tables") {
+      params.delete("dep");
+    }
     if (type === "categories") {
       params.delete("subcat");
     }
@@ -151,6 +158,9 @@ export default function CategoriesSwiper({
     router.push(`?${params.toString()}`);
   };
 
+  const hasCategories = (id) => {
+    return categories.some((cat) => cat.table_id === id);
+  };
   const hasSubcategories = (id) => {
     return subCategories.some((sub) => sub.category_id === id);
   };
@@ -262,9 +272,12 @@ export default function CategoriesSwiper({
                       }
                     }}
                     showSubcatIndicator={
-                      type === "categories" &&
-                      hasSubcategories(item.id) &&
-                      isSelected
+                      (type === "tables" &&
+                        hasCategories(item.id) &&
+                        isSelected) ||
+                      (type === "categories" &&
+                        hasSubcategories(item.id) &&
+                        isSelected)
                     }
                   />
                 </SwiperSlide>

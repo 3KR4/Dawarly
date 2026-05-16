@@ -21,6 +21,9 @@ export const getCompounds = (area_id) => {
   return api.get(ENDPOINTS.DATA.GET_COMPOUNDS(area_id));
 };
 
+export const getTables = () => {
+  return api.get(ENDPOINTS.DATA.GET_TABLES());
+};
 export const getCategories = () => {
   return api.get(ENDPOINTS.DATA.GET_CATEGORIES());
 };

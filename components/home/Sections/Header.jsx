@@ -1,6 +1,6 @@
 "use client";
 import "@/styles/client/header.css";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaMessage, FaAngleDown } from "react-icons/fa6";
@@ -27,19 +27,20 @@ import useClickOutside from "@/Contexts/useClickOutside";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useAppData } from "@/Contexts/DataContext";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
+import { buildNavigation } from "@/utils/buildNavigation";
 
 function Header() {
   const t = useTranslate();
   const pathname = usePathname();
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
-  const { categories, subCategories } = useAppData();
+  const { tables, categories, subCategories } = useAppData();
 
   const { user, isAuthenticated, loading, logout } = useAuth();
 
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSmallMenu, setActiveSmallMenu] = useState(false);
-  const [activeSubCat, setActiveSubCat] = useState(0);
+  const [activeSubCat, setActiveSubCat] = useState("");
   const menuRef = useRef(null);
   const menuRef2 = useRef(null);
   useClickOutside(menuRef, () => setActiveMenu(false));
@@ -77,6 +78,12 @@ function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const nav = useMemo(() => {
+    return buildNavigation(tables, categories, subCategories);
+  }, [tables, categories, subCategories]);
+
+  console.log(nav);
 
   return (
     <>
@@ -275,45 +282,46 @@ function Header() {
                 className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
                 ref={menuRef2}
               >
-                {categories?.map((cat) => {
-                  const isActive = activeSubCat === cat?.id;
-                  const Icon = cat?.icon;
+                {nav?.map((group) => {
+                  const isActive = activeSubCat === group.id;
 
                   return (
                     <div
-                      key={cat?.id}
+                      key={group.id}
                       className="cat-item"
                       onMouseEnter={
                         !screenSize.includes("small")
-                          ? () => openMenu(cat?.id)
+                          ? () => openMenu(group.id)
                           : undefined
                       }
                       onMouseLeave={
                         !screenSize.includes("small") ? closeMenu : undefined
                       }
                     >
+                      {/* ================= ROOT ================= */}
+
                       <Link
-                        href={`/market${
-                          !screenSize.includes("small") ? `?cat=${cat?.id}` : ""
-                        }`}
+                        href={`/market?group=${group.id}`}
                         onClick={(e) => {
                           if (screenSize !== "large") {
                             e.preventDefault();
-                            toggleMenu(cat?.id);
+                            toggleMenu(group.id);
                           }
                         }}
                       >
-                        {Icon ? <Icon /> : null}
-                        {cat?.[`name_${locale}`]}
-                        <FaAngleDown />
+                        <span>{group?.[`name_${locale}`]}</span>
+
+                        {group.children?.length > 0 && <FaAngleDown />}
                       </Link>
+
+                      {/* ================= MENU ================= */}
 
                       {isActive && (
                         <div
-                          className="menu active"
+                          className="menu active mega-menu"
                           onMouseEnter={
                             !screenSize.includes("small")
-                              ? () => openMenu(cat?.id)
+                              ? () => openMenu(group.id)
                               : undefined
                           }
                           onMouseLeave={
@@ -322,16 +330,182 @@ function Header() {
                               : undefined
                           }
                         >
-                          <div className="sub-cats">
-                            {subCategories
-                              .filter((x) => x.category_id == cat?.id)
-                              .map((sub) => (
-                                <Link
-                                  key={sub.id}
-                                  href={`/market?subcat=${sub.id}`}
-                                >
-                                  {sub?.[`name_${locale}`]}
-                                </Link>
+                          <div className="mega-content">
+                            {/* ========================================= */}
+                            {/* VACATION HOMES */}
+                            {/* ========================================= */}
+
+                            {group.id === "vacation_homes" &&
+                              group.children?.map((type) => (
+                                <div key={type.id} className="mega-column">
+                                  <div className="nested-wrapper">
+                                    {/* TITLE */}
+
+                                    <h4 className="column-title">
+                                      <span>{type?.[`name_${locale}`]}</span>
+
+                                      {type.children?.length > 0 && (
+                                        <FaAngleDown />
+                                      )}
+                                    </h4>
+
+                                    {/* NESTED */}
+
+                                    {type.children?.length > 0 && (
+                                      <div className="nested-links menu">
+                                        {type.children.map((item) => (
+                                          <div
+                                            key={item.id}
+                                            className="nested-item"
+                                          >
+                                            {/* SALE / RENT */}
+
+                                            <Link
+                                              href={`/market?cat=${item.category_id}`}
+                                              className="nested-parent"
+                                            >
+                                              <span>
+                                                {item?.[`name_${locale}`]}
+                                              </span>
+
+                                              {item.children?.length > 0 && (
+                                                <FaAngleDown />
+                                              )}
+
+                                              {item.children?.length > 0 && (
+                                                <div className="nested-links menu">
+                                                  {item.children.map((x) => (
+                                                    <div
+                                                      key={x.id}
+                                                      className="nested-item"
+                                                    >
+                                                      {/* SALE / RENT */}
+
+                                                      <Link
+                                                        href={`/market?cat=${x.category_id}`}
+                                                        className="nested-parent"
+                                                      >
+                                                        <span>
+                                                          {
+                                                            x?.[
+                                                              `name_${locale}`
+                                                            ]
+                                                          }
+                                                        </span>
+
+                                                        {x.children?.length >
+                                                          0 && <FaAngleDown />}
+                                                      </Link>
+
+                                                      {/* SUB CATEGORIES */}
+
+                                                      {x.children?.length >
+                                                        0 && (
+                                                        <div className="nested-sub menu">
+                                                          {x.children.map(
+                                                            (sub) => (
+                                                              <Link
+                                                                key={sub.id}
+                                                                href={`/market?sub=${sub.id}`}
+                                                              >
+                                                                {
+                                                                  sub?.[
+                                                                    `name_${locale}`
+                                                                  ]
+                                                                }
+                                                              </Link>
+                                                            ),
+                                                          )}
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              )}
+                                            </Link>
+
+                                            {/* SUB CATEGORIES */}
+
+                                            {item.children?.length > 0 && (
+                                              <div className="nested-sub menu">
+                                                {item.children.map((sub) => (
+                                                  <Link
+                                                    key={sub.id}
+                                                    href={`/market?sub=${sub.id}`}
+                                                  >
+                                                    {sub?.[`name_${locale}`]}
+                                                  </Link>
+                                                ))}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+
+                            {/* ========================================= */}
+                            {/* SALE / RENT ROOTS + OTHER TABLES */}
+                            {/* ========================================= */}
+
+                            {group.id !== "vacation_homes" &&
+                              group.children?.map((table) => (
+                                <div key={table.id} className="mega-column">
+                                  <div className="nested-wrapper">
+                                    {/* TABLE */}
+
+                                    <h4 className="column-title">
+                                      <span>{table?.[`name_${locale}`]}</span>
+
+                                      {table.children?.length > 0 && (
+                                        <FaAngleDown />
+                                      )}
+                                    </h4>
+
+                                    {/* CATEGORIES */}
+
+                                    {table.children?.length > 0 && (
+                                      <div className="nested-links menu">
+                                        {table.children.map((cat) => (
+                                          <div
+                                            key={cat.id}
+                                            className="nested-item"
+                                          >
+                                            <Link
+                                              href={`/market?cat=${cat.id}`}
+                                              className="nested-parent"
+                                            >
+                                              <span>
+                                                {cat?.[`name_${locale}`]}
+                                              </span>
+
+                                              {cat.children?.length > 0 && (
+                                                <FaAngleDown />
+                                              )}
+                                            </Link>
+
+                                            {/* SUBCATEGORIES */}
+
+                                            {cat.children?.length > 0 && (
+                                              <div className="nested-sub menu">
+                                                {cat.children.map((sub) => (
+                                                  <Link
+                                                    key={sub.id}
+                                                    href={`/market?sub=${sub.id}`}
+                                                  >
+                                                    {sub?.[`name_${locale}`]}
+                                                  </Link>
+                                                ))}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
                               ))}
                           </div>
                         </div>

@@ -31,6 +31,7 @@ header .menu {
   box-shadow: 0 1px 10px #00000023;
   border: 1px solid var(--border-color);
   transition: 0.3s;
+  min-width: 195px;
 }
 header .menu.active {
   visibility: visible;
@@ -40,6 +41,37 @@ header .menu.active {
   top: 36px;
   padding: 6px;
   border-radius: 11px;
+}
+header .menu.active .menu {
+  border-radius: 8px;
+}
+header .nested-wrapper {
+  position: relative;
+}
+header .nested-wrapper .menu {
+  left: calc(0px + 188px);
+  top: -1px;
+  border-left-width: 3px;
+  border-left-color: var(--lighter-main-color-2);
+  background: var(--section-color);
+  padding: 6px;
+  box-shadow: 5px 1px 10px #00000023;
+}
+header .nested-wrapper > .nested-links .nested-links {
+  left: calc(0px + 186px);
+}
+header .nested-wrapper:hover > .nested-links {
+  visibility: visible;
+  opacity: 1;
+  z-index: 1;
+}
+header .nested-wrapper > .nested-links .nested-item {
+  position: relative;
+}
+header .nested-wrapper > .nested-links .nested-item:hover .nested-links {
+  visibility: visible;
+  opacity: 1;
+  z-index: 1;
 }
 header .menu::before {
   content: "";
@@ -372,6 +404,10 @@ header .bottom .nav h4 {
   color: var(--title-color2);
 }
 
+header .bottom .nav .nested-links {
+  color: red;
+}
+
 header .bottom .nav .places-select .locations-holder {
   display: flex;
   flex-direction: column;
@@ -470,6 +506,20 @@ header .bottom .nav .cats-nav a {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+header .bottom .nav .cats-nav h4 {
+  background: unset;
+  font-size: 14px;
+  justify-content: space-between;
+  gap: 10px;
+  border-color: transparent;
+  font-weight: 600;
+  transition: 0.3s;
+  padding: 7px 10px;
+}
+header .bottom .nav .cats-nav h4:hover {
+  background: var(--hover-color);
+  border: 1px solid #c5a3ff;
 }
 header .bottom .nav .cats-nav a:hover {
   background: var(--hover-color);
