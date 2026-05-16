@@ -46,7 +46,7 @@ function CatCard({
         </button>
       )}
 
-      {count != null && <span className="count">{count}</span>}
+      {count > 0 && <span className="count">{count}</span>}
     </>
   );
 

@@ -113,8 +113,8 @@ export default function CreateAd() {
     display_phone: selectedContactMethods.phone,
     display_whatsapp: selectedContactMethods.chat,
     display_dawaarly_contact: selectedMediatorMethod?.id === 2,
-    rent_amount: Number(data.rentAmount),
-    rent_currency: additionalData.currency?.id,
+    price: Number(data.rentAmount),
+    currency: additionalData.currency?.id,
     rent_frequency: additionalData.frequency?.id,
     deposit_amount: Number(data.deposit_amount),
     min_rent_period: Number(data.rentalDuration),
@@ -148,14 +148,17 @@ export default function CreateAd() {
   };
 
   const uploadNewImages = async (adId) => {
-    const newImages = images.filter((img) => img instanceof File);
+    const safeImages = Array.isArray(images) ? images : [];
 
-    if (newImages?.length === 0) return;
+    // الصور الجديدة فقط
+    const newImages = safeImages.filter((img) => img?.file instanceof File);
+
+    if (newImages.length === 0) return;
 
     const formData = new FormData();
 
-    newImages.forEach((file) => {
-      formData.append("files", file);
+    newImages.forEach((img) => {
+      formData.append("files", img.file);
     });
 
     await uploadImages("AD", adId, formData);
@@ -164,13 +167,12 @@ export default function CreateAd() {
   const fieldErrorMap = {
     title: "adTitle",
     categoryId: "category",
-    subCategoryId: "subCategory",
     governorate_id: "governorate",
     city_id: "city",
-    rent_currency: "currency",
+    currency: "currency",
     rent_frequency: "frequency",
     deposit_amount: "deposit_amount_reqire",
-    rent_amount: "priceRequired",
+    price: "priceRequired",
     bedrooms: "required",
     bathrooms: "required",
     level: "required",
@@ -376,10 +378,7 @@ export default function CreateAd() {
 
   return (
     <div className="form-holder create-ad user-account">
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        adapterLocale={locale}
-      >
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="top">
             <h1>{titles[step]}</h1>
@@ -419,7 +418,11 @@ export default function CreateAd() {
                   activeClass={cat?.id == selectedCats.cat}
                   onSelect={() => {
                     setSelectedCats({ cat: cat?.id, subCat: null });
-                    setStep(STEPS.SUB_CATEGORIES);
+                    if (cat.childsCount > 0) {
+                      setStep(STEPS.SUB_CATEGORIES);
+                    } else {
+                      setStep(STEPS.BASICS);
+                    }
                   }}
                 />
               ))}
@@ -905,7 +908,6 @@ export default function CreateAd() {
                         <input
                           type="number"
                           {...register("child_no_max", {
-                            required: t.dashboard.forms.errors.required,
                             min: {
                               value: 0,
                               message: t.dashboard.forms.errors.minZero,

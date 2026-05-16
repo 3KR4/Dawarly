@@ -144,9 +144,7 @@ export default function CardItem({ data }) {
           </h5>
         </div>
         <div className="row-holder">
-          <h3>
-            {formatCurrency(data?.rent_amount, data?.rent_currency, locale)}
-          </h3>
+          <h3>{formatCurrency(data?.price, data?.currency, locale)}</h3>
           <span className={`status`}>
             {
               RentFrequencies.find((x) => x.id == data?.rent_frequency)?.[
