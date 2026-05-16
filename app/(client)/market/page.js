@@ -60,39 +60,38 @@ export default function Marketplace() {
       total: 0,
     },
   });
-    const [loadingContent, setLoadingContent] = useState(false);
+  const [loadingContent, setLoadingContent] = useState(false);
 
+  const fetchAds = async (page = 1, search) => {
+    try {
+      setLoadingContent(true);
 
-      const fetchAds = async (page = 1, search) => {
-        try {
-          setLoadingContent(true);
-    
-          const res = await getAllAds({
-            page,
-            limit: adsData.pagination.limit,
-          });
-    
-          setAdsData({
-            ads: res.data.data || [],
-            pagination: res.data.pagination || adsData.pagination,
-          });
-        } catch (err) {
-          console.error(err);
-          addNotification({
-            type: "warning",
-            message: "Failed to fetch ads from server ❌",
-          });
-        } finally {
-          setLoadingContent(false);
-        }
-      };
-    
-      // ================= INITIAL FETCH =================
-      useEffect(() => {
-          fetchAds(1);
-      }, []);
+      const res = await getAllAds({
+        page,
+        limit: adsData.pagination.limit,
+      });
 
-        const handlePageChange = (newPage) => {
+      setAdsData({
+        ads: res.data.data || [],
+        pagination: res.data.pagination || adsData.pagination,
+      });
+    } catch (err) {
+      console.error(err);
+      addNotification({
+        type: "warning",
+        message: "Failed to fetch ads from server ❌",
+      });
+    } finally {
+      setLoadingContent(false);
+    }
+  };
+
+  // ================= INITIAL FETCH =================
+  useEffect(() => {
+    fetchAds(1);
+  }, []);
+
+  const handlePageChange = (newPage) => {
     fetchAds(newPage);
   };
 
@@ -118,6 +117,8 @@ export default function Marketplace() {
     dynamicFilters: {},
   });
 
+  console.log("allFilters: ",allFilters);
+
   const [orderBy, setOrderBy] = useState(defaultOptions[0]); // الافتراضي الأحدث
   const [orderOpen, setOrderOpen] = useState(false);
 
@@ -131,7 +132,6 @@ export default function Marketplace() {
   const hasSelectedCategory = selectedCategory.cat || selectedCategory.subCat;
 
   const handleCategorySelect = (type, item) => {
-    
     if (type === "categories") {
       setSelectedCategory({
         cat: item,
@@ -144,7 +144,7 @@ export default function Marketplace() {
       }));
     }
   };
-    console.log("selectedCategory", selectedCategory);
+  console.log("selectedCategory", selectedCategory);
 
   const handleRemoveCategory = (type) => {
     if (type === "cat") {
@@ -215,7 +215,7 @@ export default function Marketplace() {
     (selectedCategory.cat ? 1 : 0) +
     (selectedCategory.subCat ? 1 : 0) +
     Object.keys(allFilters.dynamicFilters).length;
-      console.log(selectedCategory);
+  console.log(selectedCategory);
 
   return (
     <>
@@ -226,7 +226,7 @@ export default function Marketplace() {
           showControls={true}
         />
       )}
-      
+
       {selectedCategory.cat && !selectedCategory.subCat && (
         <CategoriesSwiper
           type="subcategories"
@@ -240,7 +240,7 @@ export default function Marketplace() {
           <DynamicFilters
             dynamicFilters={dynamicFilters}
             selectedFilters={allFilters.dynamicFilters}
-            setSelectedFilters={handleDynamicFilterChange}  
+            setSelectedFilters={handleDynamicFilterChange}
             screenSize={screenSize}
             active={openFilters}
             setActive={setOpenFilters}
@@ -313,37 +313,42 @@ export default function Marketplace() {
               </div>
             </div>
 
-            <div className="grid-holder"           style={{
-            position: "relative",
-            opacity: loadingContent ? "0.6" : "1",
-          }}>
-                      {loadingContent && (
-            <div className="loading-content cover">
-              <span
-                className="loader"
-                style={{ opacity: loadingContent ? "1" : "0" }}
-              ></span>
-            </div>
-          )}
-                    {!adsData?.ads?.length && !loadingContent ? (
-                      <div className="no-data-found">
-                        <TbListSearch />
-                        <p>{"no data found"} </p>
-                      </div>
-                    ) : (adsData?.ads?.map((item, index) => (
-                <AdsCard key={item.id || index} data={item} />
-              )))}
+            <div
+              className="grid-holder"
+              style={{
+                position: "relative",
+                opacity: loadingContent ? "0.6" : "1",
+              }}
+            >
+              {loadingContent && (
+                <div className="loading-content cover">
+                  <span
+                    className="loader"
+                    style={{ opacity: loadingContent ? "1" : "0" }}
+                  ></span>
+                </div>
+              )}
+              {!adsData?.ads?.length && !loadingContent ? (
+                <div className="no-data-found">
+                  <TbListSearch />
+                  <p>{"no data found"} </p>
+                </div>
+              ) : (
+                adsData?.ads?.map((item, index) => (
+                  <AdsCard key={item.id || index} data={item} />
+                ))
+              )}
             </div>
 
-      {adsData?.pagination?.totalPages > 1 && (
-        <Pagination
-          pageCount={adsData?.pagination.totalPages}
-          screenSize={screenSize}
-          isDashBoard={true}
-          currentPage={adsData?.pagination.page}
-          onPageChange={handlePageChange}
-        />
-      )}
+            {adsData?.pagination?.totalPages > 1 && (
+              <Pagination
+                pageCount={adsData?.pagination.totalPages}
+                screenSize={screenSize}
+                isDashBoard={true}
+                currentPage={adsData?.pagination.page}
+                onPageChange={handlePageChange}
+              />
+            )}
           </div>
         </div>
       </div>

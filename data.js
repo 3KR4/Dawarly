@@ -1783,44 +1783,21 @@ export const ads = [
 ];
 export const dynamicFilters = [
   {
-    key: "level",
+    key: "rent_amount",
     uiType: "range",
-    label: {en: "level", ar: "الدور"},
-    placeholder: {en: "enter level number", ar: "ادخل رقم الدور"},
+    label: { en: "Rent Amount", ar: "قيمة الإيجار" },
+    placeholder: { en: "Enter rent amount", ar: "ادخل قيمة الإيجار" },
   },
+
   {
-    key: "bedrooms",
-    uiType: "range",
-    label: {en: "bedrooms", ar: "غرف النوم"},
-    placeholder: {en: "enter bedrooms number", ar: "ادخل عدد الغرف"},
-  },
-  {
-    key: "bathrooms",
-    uiType: "range",
-    label: {en: "bathrooms", ar: "الحمامات"},
-    placeholder: {en: "enter bathrooms number", ar: "ادخل عدد الحمامات "},
-  },
-  {
-  key: "rent_amount",
-  uiType: "range",
-  label: { en: "Rent Amount", ar: "قيمة الإيجار" },
-  placeholder: { en: "Enter rent amount", ar: "ادخل قيمة الإيجار" },
-},
-{
-  key: "deposit_amount",
-  uiType: "range",
-  label: { en: "Deposit Amount", ar: "مقدم التأمين" },
-  placeholder: { en: "Enter deposit amount", ar: "ادخل مبلغ التأمين" },
-},
- {
     key: "rent_currency",
     uiType: "select",
     label: { en: "Currency", ar: "العملة" },
     placeholder: { en: "Select currency", ar: "اختر العملة" },
     options: [
+      { id: "EGP", label: { en: "Egyptian Pound", ar: "جنيه مصري" } },
       { id: "USD", label: { en: "US Dollar", ar: "دولار أمريكي" } },
       { id: "EUR", label: { en: "Euro", ar: "يورو" } },
-      { id: "EGP", label: { en: "Egyptian Pound", ar: "جنيه مصري" } },
       { id: "SAR", label: { en: "Saudi Riyal", ar: "ريال سعودي" } },
       { id: "AED", label: { en: "UAE Dirham", ar: "درهم إماراتي" } },
     ],
@@ -1837,29 +1814,112 @@ export const dynamicFilters = [
     ],
   },
   {
-  key: "available_time",
-  uiType: "date",
-  label: { en: "Available Time", ar: "موعد التوافر" },
-  placeholder: { en: "Select available date", ar: "اختر تاريخ التوافر" },
-},
-{
-  key: "amenities",
-  uiType: "multiSelect",
-  label: { en: "Amenities", ar: "وسائل الراحة" },
-  placeholder: { en: "Select amenities", ar: "اختر وسائل الراحة" },
-  options: [
-    { id: 1, value: "am_pool", label: { en: "Pool", ar: "حمام سباحة" } },
-    { id: 2, value: "am_balcony", label: { en: "Balcony", ar: "شرفة" } },
-    { id: 3, value: "am_private_garden", label: { en: "Private Garden", ar: "حديقة خاصة" } },
-    { id: 4, value: "am_kitchen", label: { en: "Kitchen", ar: "مطبخ" } },
-    { id: 5, value: "am_ac", label: { en: "AC", ar: "تكييف" } },
-    { id: 6, value: "am_heating", label: { en: "Heating", ar: "تدفئة" } },
-    { id: 7, value: "am_elevator", label: { en: "Elevator", ar: "مصعد" } },
-    { id: 8, value: "am_gym", label: { en: "Gym", ar: "جيم" } },
-  ],
-}
-];
+    key: "level",
+    uiType: "select",
+    label: { en: "level", ar: "الدور" },
+    placeholder: {
+      en: "select level",
+      ar: "اختر الدور",
+    },
 
+    options: [
+      { id: 0, label: { en: "Ground", ar: "دور أرضي" } },
+
+      ...Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        label: {
+          en: `${i + 1}`,
+          ar: `${i + 1}`,
+        },
+      })),
+
+      {
+        id: 11,
+        label: {
+          en: "+10",
+          ar: "+10",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "bedrooms",
+    uiType: "select",
+    label: { en: "bedrooms", ar: "غرف النوم" },
+    placeholder: {
+      en: "select bedrooms number",
+      ar: "اختر عدد الغرف",
+    },
+
+    options: [
+      ...Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        label: {
+          en: `${i + 1}`,
+          ar: `${i + 1}`,
+        },
+      })),
+
+      {
+        id: 11,
+        label: {
+          en: "+10",
+          ar: "+10",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "bathrooms",
+    uiType: "select",
+    label: { en: "bathrooms", ar: "الحمامات" },
+    placeholder: {
+      en: "select bathrooms number",
+      ar: "اختر عدد الحمامات",
+    },
+
+    options: [
+      ...Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        label: {
+          en: `${i + 1}`,
+          ar: `${i + 1}`,
+        },
+      })),
+
+      {
+        id: 11,
+        label: {
+          en: "+10",
+          ar: "+10",
+        },
+      },
+    ],
+  },
+
+  {
+    key: "amenities",
+    uiType: "multiSelect",
+    label: { en: "Amenities", ar: "وسائل الراحة" },
+    placeholder: { en: "Select amenities", ar: "اختر وسائل الراحة" },
+    options: [
+      { id: 1, value: "am_pool", label: { en: "Pool", ar: "حمام سباحة" } },
+      { id: 2, value: "am_balcony", label: { en: "Balcony", ar: "شرفة" } },
+      {
+        id: 3,
+        value: "am_private_garden",
+        label: { en: "Private Garden", ar: "حديقة خاصة" },
+      },
+      { id: 4, value: "am_kitchen", label: { en: "Kitchen", ar: "مطبخ" } },
+      { id: 5, value: "am_ac", label: { en: "AC", ar: "تكييف" } },
+      { id: 6, value: "am_heating", label: { en: "Heating", ar: "تدفئة" } },
+      { id: 7, value: "am_elevator", label: { en: "Elevator", ar: "مصعد" } },
+      { id: 8, value: "am_gym", label: { en: "Gym", ar: "جيم" } },
+    ],
+  },
+];
 
 export const dashboardRoutes = {
   ads: {
