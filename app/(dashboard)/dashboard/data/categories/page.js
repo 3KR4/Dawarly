@@ -21,7 +21,6 @@ import {
   deleteModel,
 } from "@/services/data/data.service";
 import { RELATIONS } from "@/data/enums";
-import { categoriesEn } from "@/data";
 
 export default function SubCategories() {
   const { locale, menuType, setMenuType } = useContext(settings);
@@ -30,7 +29,7 @@ export default function SubCategories() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [history, setHistory] = useState([]);
-  const { setCategories, setSubCategories } = useAppData();
+  const { setTables, setCategories, setSubCategories } = useAppData();
   const {
     register,
     handleSubmit,
@@ -38,28 +37,32 @@ export default function SubCategories() {
     formState: { errors },
   } = useForm();
 
-  /* ================= STEPS ================= */
   const placeholders = {
     categories: {
-      en: "e.g. Egypt",
-      ar: "مثال: مصر",
+      en: "e.g. Apartment",
+      ar: "مثال: شقة",
     },
     subcategories: {
-      en: "e.g. Cairo",
-      ar: "مثال: القاهرة",
+      en: "e.g. Penthouse",
+      ar: "مثال: بنتهاوس",
     },
   };
+
   const steps = {
+    tables: -1,
     categories: 0,
     subcategories: 1,
   };
+
   const NEXT_STEP = {
+    tables: "categories",
     categories: "subcategories",
   };
-  /* ================= HANDLERS ================= */
 
   const getSetterByType = (type) => {
     switch (type) {
+      case "tables":
+        return setTables;
       case "categories":
         return setCategories;
       case "subcategories":
@@ -89,65 +92,49 @@ export default function SubCategories() {
     reset();
   };
 
-  const nextType = NEXT_STEP[selectedItem?.type];
-  const relation = RELATIONS[nextType];
+  const currentType = NEXT_STEP[selectedItem?.type] || "categories";
+  const relation = RELATIONS[currentType];
+  const canCreateAtCurrentLevel =
+    selectedItem?.type === "tables" || selectedItem?.type === "categories";
 
-  /* ================= SUBMIT ================= */
   const onSubmit = (data) => {
     if (loading) return;
+
+    if (!selectedTarget && !canCreateAtCurrentLevel) {
+      alert("Please select a table first to create a category.");
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
       name_ar: data.name_ar,
       name_en: data.name_en,
     };
-    if (!selectedItem) {
-      payload.type = "VACATION";
-    }
-    if (relation?.parentKey) {
+
+    if (relation?.parentKey && selectedItem?.item?.id) {
       payload[relation.parentKey] = selectedItem.item.id;
     }
 
-    if (selectedTarget) {
-      updateModel(
-        relation?.source || relation || "categories",
-        selectedTarget?.id,
-        payload,
-      )
-        .then((res) => {
-          const { item: updatedItem } = res.data;
+    const model = relation?.source || "categories";
+    const setter = getSetterByType(currentType);
 
-          const setter = getSetterByType(nextType || "categories");
+    if (selectedTarget) {
+      updateModel(model, selectedTarget.id, payload)
+        .then((res) => {
+          const { item: updatedItem, parent } = res.data;
 
           if (setter) {
             setter((prev) =>
-              prev.map((item) =>
-                item.id === updatedItem.id ? updatedItem : item,
-              ),
+              prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
             );
           }
 
-          closeMenu();
-        })
-        .catch((err) => alert(err.response?.data?.message))
-        .finally(() => setLoading(false));
-    } else {
-      createModel(relation?.source || relation || "categories", payload)
-        .then((res) => {
-          const { item: newItem, parent } = res.data;
-
-          const setter = getSetterByType(nextType || "categories");
-
-          if (setter) {
-            setter((prev) => [...prev, newItem]);
-          }
-
-          // update parent count in UI
           if (parent) {
             const parentSetter = getSetterByType(selectedItem?.type);
             if (parentSetter) {
               parentSetter((prev) =>
-                prev.map((p) => (p.id === parent.id ? parent : p)),
+                prev.map((item) => (item.id === parent.id ? parent : item)),
               );
             }
           }
@@ -156,31 +143,23 @@ export default function SubCategories() {
         })
         .catch((err) => alert(err.response?.data?.message))
         .finally(() => setLoading(false));
+
+      return;
     }
-  };;
 
-  const confirmDelete = () => {
-    if (!selectedTarget) return;
-    setLoading(true);
-
-    deleteModel(nextType || relation || "categories", selectedTarget?.id)
+    createModel(model, payload)
       .then((res) => {
-        const { parent } = res.data;
+        const { item: newItem, parent } = res.data;
 
-        // ✅ احذف من الليست الصح (الـ children)
-        const setter = getSetterByType(nextType || "categories");
         if (setter) {
-          setter((prev) =>
-            prev.filter((item) => item.id !== selectedTarget.id),
-          );
+          setter((prev) => [...prev, newItem]);
         }
 
-        // ✅ حدث الأب
         if (parent) {
           const parentSetter = getSetterByType(selectedItem?.type);
           if (parentSetter) {
             parentSetter((prev) =>
-              prev.map((p) => (p.id === parent.id ? parent : p)),
+              prev.map((item) => (item.id === parent.id ? parent : item)),
             );
           }
         }
@@ -190,6 +169,37 @@ export default function SubCategories() {
       .catch((err) => alert(err.response?.data?.message))
       .finally(() => setLoading(false));
   };
+
+  const confirmDelete = () => {
+    if (!selectedTarget) return;
+    setLoading(true);
+
+    const model = relation?.source || "categories";
+    const setter = getSetterByType(currentType);
+
+    deleteModel(model, selectedTarget.id)
+      .then((res) => {
+        const { parent } = res.data;
+
+        if (setter) {
+          setter((prev) => prev.filter((item) => item.id !== selectedTarget.id));
+        }
+
+        if (parent) {
+          const parentSetter = getSetterByType(selectedItem?.type);
+          if (parentSetter) {
+            parentSetter((prev) =>
+              prev.map((item) => (item.id === parent.id ? parent : item)),
+            );
+          }
+        }
+
+        closeMenu();
+      })
+      .catch((err) => alert(err.response?.data?.message))
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     reset({
       name_en: selectedTarget?.name_en || "",
@@ -197,14 +207,23 @@ export default function SubCategories() {
     });
   }, [selectedTarget, reset]);
 
-  /* ================= RENDER ================= */
   return (
     <div className="dash-holder">
-      {/* ================= LEFT SIDE ================= */}
       <div className="body">
         <div className="cats-holder">
-          {/* COUNTRIES */}
           {steps[selectedItem?.type] === undefined && (
+            <CategoriesSwiper
+              dashboard={true}
+              type="tables"
+              setItem={handleSelect}
+              target={selectedItem?.item?.id}
+              setTarget={setSelectedTarget}
+              handleHistory={handleBack}
+            />
+          )}
+
+          {(steps[selectedItem?.type] === undefined ||
+            steps[selectedItem?.type] === 0) && (
             <CategoriesSwiper
               dashboard={true}
               type="categories"
@@ -215,9 +234,8 @@ export default function SubCategories() {
             />
           )}
 
-          {/* GOVERNORATES */}
           {(steps[selectedItem?.type] === undefined ||
-            steps?.[selectedItem?.type] == 0) && (
+            steps[selectedItem?.type] === 1) && (
             <CategoriesSwiper
               viewType={selectedItem ? "grid" : "swiper"}
               dashboard={true}
@@ -231,85 +249,95 @@ export default function SubCategories() {
         </div>
       </div>
 
-      {/* ================= FORM ================= */}
       <DynamicMenu
         open={!!menuType}
         title={
           selectedTarget
             ? `${menuType === "delete" ? t.actions.delete : t.actions.edit} ${selectedTarget?.[`name_${locale}`]}`
-            : `${t.actions.create} ${nextType || "categories"} ${selectedItem ? `in ${selectedItem.item[`name_${locale}`]}` : ""}`
+            : `${t.actions.create} ${currentType} ${selectedItem ? `in ${selectedItem.item[`name_${locale}`]}` : ""}`
         }
         onClose={closeMenu}
         backStep={false}
       >
-        {menuType === "form" && (
-          <form className="builder" onSubmit={handleSubmit(onSubmit)}>
-            {/* NAMES */}
-            <div className="row-holder">
-              <div className="box forInput">
-                <label>
-                  English Name <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      {...register("name_en", { required: true })}
-                      type="text"
-                      placeholder={placeholders?.[nextType || "categories"]?.en}
-                    />
-                  </div>
+        {menuType === "form" &&
+          (!selectedTarget && !canCreateAtCurrentLevel ? (
+            <div className="builder">
+              <div className="row-holder">
+                <div className="box">
+                  <label>Selection Required</label>
+                  <p>
+                    Please select a table to create a category, or select a
+                    category to create a subcategory.
+                  </p>
                 </div>
-                {errors.name_en && (
-                  <span className="error">
-                    <CircleAlert /> Required
-                  </span>
-                )}
-              </div>
-
-              <div className="box forInput">
-                <label>
-                  Arabic Name <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      {...register("name_ar", { required: true })}
-                      type="text"
-                      placeholder={placeholders?.[nextType || "categories"]?.ar}
-                    />
-                  </div>
-                </div>
-                {errors.name_ar && (
-                  <span className="error">
-                    <CircleAlert /> Required
-                  </span>
-                )}
               </div>
             </div>
+          ) : (
+            <form className="builder" onSubmit={handleSubmit(onSubmit)}>
+              <div className="row-holder">
+                <div className="box forInput">
+                  <label>
+                    English Name <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        {...register("name_en", { required: true })}
+                        type="text"
+                        placeholder={placeholders?.[currentType]?.en}
+                      />
+                    </div>
+                  </div>
+                  {errors.name_en && (
+                    <span className="error">
+                      <CircleAlert /> Required
+                    </span>
+                  )}
+                </div>
 
-            {/* BUTTONS */}
-            <div className="buttons-holder">
-              {selectedTarget && (
-                <button
-                  type="button"
-                  className="main-button danger"
-                  onClick={() => setMenuType("delete")}
-                >
-                  Delete
+                <div className="box forInput">
+                  <label>
+                    Arabic Name <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        {...register("name_ar", { required: true })}
+                        type="text"
+                        placeholder={placeholders?.[currentType]?.ar}
+                      />
+                    </div>
+                  </div>
+                  {errors.name_ar && (
+                    <span className="error">
+                      <CircleAlert /> Required
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="buttons-holder">
+                {selectedTarget && (
+                  <button
+                    type="button"
+                    className="main-button danger"
+                    onClick={() => setMenuType("delete")}
+                  >
+                    Delete
+                  </button>
+                )}
+                <button className="main-button" type="submit" disabled={loading}>
+                  {loading ? (
+                    <span className="loader"></span>
+                  ) : selectedTarget ? (
+                    "Update"
+                  ) : (
+                    "Create"
+                  )}
                 </button>
-              )}
-              <button className="main-button" type="submit" disabled={loading}>
-                {loading ? (
-                  <span className="loader"></span>
-                ) : selectedTarget ? (
-                  "Update"
-                ) : (
-                  "Create"
-                )}
-              </button>
-            </div>
-          </form>
-        )}
+              </div>
+            </form>
+          ))}
 
         {menuType === "delete" && (
           <DeleteConfirm

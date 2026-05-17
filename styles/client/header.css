@@ -65,6 +65,9 @@ header .nested-wrapper:hover > .nested-links {
   opacity: 1;
   z-index: 1;
 }
+header .nested-wrapper > .nested-links .nested-parent {
+justify-content: space-between;
+}
 header .nested-wrapper > .nested-links .nested-item {
   position: relative;
 }

@@ -205,6 +205,11 @@ export const Priority = [
 ];
 
 export const RELATIONS = {
+  categories: {
+    parentKey: "table_id",
+    source: "categories",
+    parentSource: "tables",
+  },
   subcategories: {
     parentKey: "category_id",
     source: "subcategories",
