@@ -149,7 +149,7 @@ export default function CategoriesSwiper({
     }
 
     if (type === "tables") {
-      params.delete("dep");
+      params.delete("cat");
     }
     if (type === "categories") {
       params.delete("subcat");

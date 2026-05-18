@@ -48,7 +48,7 @@ body:has(.form-holder) footer {
   display: flex;
   box-shadow: 0 1px 10px #00000023;
 }
-.dashboard .form-holder.create-ad form {
+.dashboard .form-holder.user-create-ad form {
   box-shadow: 0 1px 10px #00000023 !important;
   padding: 20px 26px;
 }

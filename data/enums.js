@@ -172,6 +172,25 @@ export const Levels = [
     name_ar: "+10",
   },
 ];
+export const PaymentMethod = [
+  {
+    id: "CASH",
+    name_en: "Cash",
+    name_ar: "كاش",
+  },
+
+  {
+    id: "INSTALLMENTS",
+    name_en: "Installments",
+    name_ar: "تقسيط",
+  },
+
+  {
+    id: "CASH_OR_INSTALLMENTS",
+    name_en: "Cash or Installments",
+    name_ar: "كاش أو تقسيط",
+  },
+];
 export const Priority = [
   {
     id: 0,
@@ -237,3 +256,22 @@ export const RELATIONS = {
     parentSource: "areas",
   },
 };
+
+
+export const InstallmentYears = [
+  { id: 1, name_en: "1 Year", name_ar: "سنة" },
+  { id: 2, name_en: "2 Years", name_ar: "سنتين" },
+  { id: 3, name_en: "3 Years", name_ar: "3 سنوات" },
+  { id: 4, name_en: "4 Years", name_ar: "4 سنوات" },
+  { id: 5, name_en: "5 Years", name_ar: "5 سنوات" },
+  { id: 6, name_en: "6 Years", name_ar: "6 سنوات" },
+  { id: 7, name_en: "7 Years", name_ar: "7 سنوات" },
+  { id: 8, name_en: "8 Years", name_ar: "8 سنوات" },
+  { id: 9, name_en: "9 Years", name_ar: "9 سنوات" },
+  { id: 10, name_en: "10 Years", name_ar: "10 سنوات" },
+  { id: 11, name_en: "11 Years", name_ar: "11 سنة" },
+  { id: 12, name_en: "12 Years", name_ar: "12 سنة" },
+  { id: 13, name_en: "13 Years", name_ar: "13 سنة" },
+  { id: 14, name_en: "14 Years", name_ar: "14 سنة" },
+  { id: 15, name_en: "15 Years", name_ar: "15 سنة" },
+];

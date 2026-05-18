@@ -1,6 +1,6 @@
 .dashboard .box.forInput .inputHolder .holder input {
-  height: 40px;
-  padding: 0 10px;
+  height: 40px ;
+  padding: 0 10px !important;
 }
 
 .dashboard form {
@@ -42,7 +42,7 @@ form .form-section .dynamicFilters-holder > * {
 }
 .dashboard form .row-holder {
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 7px;
   display: grid;
 }
 .dashboard form .row-holder.two {

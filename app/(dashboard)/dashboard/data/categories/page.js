@@ -48,12 +48,6 @@ export default function SubCategories() {
     },
   };
 
-  const steps = {
-    tables: -1,
-    categories: 0,
-    subcategories: 1,
-  };
-
   const NEXT_STEP = {
     tables: "categories",
     categories: "subcategories",
@@ -93,9 +87,18 @@ export default function SubCategories() {
   };
 
   const currentType = NEXT_STEP[selectedItem?.type] || "categories";
-  const relation = RELATIONS[currentType];
+  const formType = selectedTarget?.__type || currentType;
+  const relation = RELATIONS[formType];
+  const selectedType = selectedItem?.type;
+  const selectedId = selectedItem?.item?.id;
+  const categoriesTarget = selectedType === "tables" ? selectedId : undefined;
+  const subCategoriesTarget =
+  selectedType === "categories" ? selectedId : undefined;
+  const showTables = !selectedItem;
+  const showCategories = !selectedItem || selectedType === "tables";
+  const showSubCategories = !selectedItem || selectedType === "categories";
   const canCreateAtCurrentLevel =
-    selectedItem?.type === "tables" || selectedItem?.type === "categories";
+    selectedType === "tables" || selectedType === "categories";
 
   const onSubmit = (data) => {
     if (loading) return;
@@ -112,12 +115,12 @@ export default function SubCategories() {
       name_en: data.name_en,
     };
 
-    if (relation?.parentKey && selectedItem?.item?.id) {
+    if (!selectedTarget && relation?.parentKey && selectedItem?.item?.id) {
       payload[relation.parentKey] = selectedItem.item.id;
     }
 
     const model = relation?.source || "categories";
-    const setter = getSetterByType(currentType);
+    const setter = getSetterByType(formType);
 
     if (selectedTarget) {
       updateModel(model, selectedTarget.id, payload)
@@ -126,12 +129,16 @@ export default function SubCategories() {
 
           if (setter) {
             setter((prev) =>
-              prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
+              prev.map((item) =>
+                item.id === updatedItem.id ? updatedItem : item,
+              ),
             );
           }
 
           if (parent) {
-            const parentSetter = getSetterByType(selectedItem?.type);
+            const parentSetter = getSetterByType(
+              RELATIONS[formType]?.parentSource,
+            );
             if (parentSetter) {
               parentSetter((prev) =>
                 prev.map((item) => (item.id === parent.id ? parent : item)),
@@ -156,7 +163,9 @@ export default function SubCategories() {
         }
 
         if (parent) {
-          const parentSetter = getSetterByType(selectedItem?.type);
+          const parentSetter = getSetterByType(
+            RELATIONS[formType]?.parentSource,
+          );
           if (parentSetter) {
             parentSetter((prev) =>
               prev.map((item) => (item.id === parent.id ? parent : item)),
@@ -175,18 +184,22 @@ export default function SubCategories() {
     setLoading(true);
 
     const model = relation?.source || "categories";
-    const setter = getSetterByType(currentType);
+    const setter = getSetterByType(formType);
 
     deleteModel(model, selectedTarget.id)
       .then((res) => {
         const { parent } = res.data;
 
         if (setter) {
-          setter((prev) => prev.filter((item) => item.id !== selectedTarget.id));
+          setter((prev) =>
+            prev.filter((item) => item.id !== selectedTarget.id),
+          );
         }
 
         if (parent) {
-          const parentSetter = getSetterByType(selectedItem?.type);
+          const parentSetter = getSetterByType(
+            RELATIONS[formType]?.parentSource,
+          );
           if (parentSetter) {
             parentSetter((prev) =>
               prev.map((item) => (item.id === parent.id ? parent : item)),
@@ -211,37 +224,40 @@ export default function SubCategories() {
     <div className="dash-holder">
       <div className="body">
         <div className="cats-holder">
-          {steps[selectedItem?.type] === undefined && (
+          {showTables && (
             <CategoriesSwiper
               dashboard={true}
               type="tables"
               setItem={handleSelect}
-              target={selectedItem?.item?.id}
-              setTarget={setSelectedTarget}
+              setTarget={(item) =>
+                setSelectedTarget({ ...item, __type: "tables" })
+              }
               handleHistory={handleBack}
             />
           )}
 
-          {(steps[selectedItem?.type] === undefined ||
-            steps[selectedItem?.type] === 0) && (
+          {showCategories && (
             <CategoriesSwiper
               dashboard={true}
               type="categories"
               setItem={handleSelect}
-              target={selectedItem?.item?.id}
-              setTarget={setSelectedTarget}
+              target={categoriesTarget}
+              setTarget={(item) =>
+                setSelectedTarget({ ...item, __type: "categories" })
+              }
               handleHistory={handleBack}
             />
           )}
 
-          {(steps[selectedItem?.type] === undefined ||
-            steps[selectedItem?.type] === 1) && (
+          {showSubCategories && (
             <CategoriesSwiper
               viewType={selectedItem ? "grid" : "swiper"}
               dashboard={true}
               type="subcategories"
-              target={selectedItem?.item?.id}
-              setTarget={setSelectedTarget}
+              target={subCategoriesTarget}
+              setTarget={(item) =>
+                setSelectedTarget({ ...item, __type: "subcategories" })
+              }
               setItem={handleSelect}
               handleHistory={handleBack}
             />
@@ -284,7 +300,7 @@ export default function SubCategories() {
                       <input
                         {...register("name_en", { required: true })}
                         type="text"
-                        placeholder={placeholders?.[currentType]?.en}
+                        placeholder={placeholders?.[formType]?.en}
                       />
                     </div>
                   </div>
@@ -304,7 +320,7 @@ export default function SubCategories() {
                       <input
                         {...register("name_ar", { required: true })}
                         type="text"
-                        placeholder={placeholders?.[currentType]?.ar}
+                        placeholder={placeholders?.[formType]?.ar}
                       />
                     </div>
                   </div>
@@ -326,7 +342,11 @@ export default function SubCategories() {
                     Delete
                   </button>
                 )}
-                <button className="main-button" type="submit" disabled={loading}>
+                <button
+                  className="main-button"
+                  type="submit"
+                  disabled={loading}
+                >
                   {loading ? (
                     <span className="loader"></span>
                   ) : selectedTarget ? (

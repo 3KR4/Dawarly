@@ -24,7 +24,9 @@ import { useAppData } from "@/Contexts/DataContext";
 import {
   Amenities,
   Currencies,
+  InstallmentYears,
   Levels,
+  PaymentMethod,
   Priority,
   RentFrequencies,
 } from "@/data/enums";
@@ -41,10 +43,17 @@ import "dayjs/locale/en";
 export default function AdForm({ type = "client", adId }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
-  const { governorates, categories, subCategories, cities, areas, compounds } =
-    useAppData();
+  const {
+    governorates,
+    tables,
+    categories,
+    subCategories,
+    cities,
+    areas,
+    compounds,
+  } = useAppData();
+
   const { user } = useAuth();
-  const searchParams = useSearchParams();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
   const { tags, setTags } = useContext(selectors);
@@ -60,7 +69,30 @@ export default function AdForm({ type = "client", adId }) {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [selectedCats, setSelectedCats] = useState({ cat: null, subCat: null });
+  const [checkBoxes, setCheckBoxes] = useState({
+    isVerefied: false,
+    isFurnished: false,
+    isReadyToMove: false,
+  });
+
+  const toggleCheckBox = (key) => {
+    setCheckBoxes((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+  const [selectedCats, setSelectedCats] = useState({
+    dep: null,
+    cat: null,
+    subCat: null,
+  });
+  const isRent =
+    selectedCats.dep?.name_en?.toLowerCase().includes("rent") || false;
+  const isSale =
+    selectedCats.dep?.name_en?.toLowerCase().includes("sale") || false;
+  const isHomes = Number(selectedCats.dep?.id) < 7;
+  const isProperty = Number(selectedCats.dep?.id) < 11;
+  const isVacation = Number(selectedCats.dep?.id) < 3;
 
   const [selectedLocations, setSelectedLocations] = useState({
     gov: null,
@@ -79,6 +111,8 @@ export default function AdForm({ type = "client", adId }) {
     phone: false,
   });
 
+  
+
   const [images, setImages] = useState([]);
   const [originalImages, setOriginalImages] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
@@ -87,8 +121,10 @@ export default function AdForm({ type = "client", adId }) {
     currency: Currencies[0],
     frequency: null,
     minRentalUnit: null,
+    payment: null,
     level: Levels[0],
     priority: Priority[1],
+    installmentYears: null,
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [rentAvailability, setRentAvailability] = useState({
@@ -107,6 +143,22 @@ export default function AdForm({ type = "client", adId }) {
   useEffect(() => {
     if (adId) fetchAdData();
   }, [adId]);
+
+  useEffect(() => {
+    if (!adData || selectedCats.dep || !tables.length) return;
+
+    const selectedDep =
+      tables.find((table) => table.id == adData.Categories?.table_id) ||
+      tables.find((table) => table.id == adData.table_id) ||
+      null;
+
+    if (selectedDep) {
+      setSelectedCats((prev) => ({
+        ...prev,
+        dep: selectedDep,
+      }));
+    }
+  }, [adData, selectedCats.dep, tables]);
 
   // fetch admins
   useEffect(() => {
@@ -173,7 +225,10 @@ export default function AdForm({ type = "client", adId }) {
     setValue("priority", ad.priority);
     setValue("child_no_max", ad.child_no_max > 0 ? ad.child_no_max : null);
     setValue("adult_no_max", ad.adult_no_max > 0 ? ad.adult_no_max : null);
-    setValue("rentalDuration", ad.min_rent_period > 0 ? ad.min_rent_period : null);
+    setValue(
+      "rentalDuration",
+      ad.min_rent_period > 0 ? ad.min_rent_period : null,
+    );
     setValue("payment_no1", ad.payment_no1);
     setValue("payment_no2", ad.payment_no2);
     setValue("delivery_no1", ad.delivery_no1);
@@ -181,7 +236,15 @@ export default function AdForm({ type = "client", adId }) {
     setValue("Owner_No1", ad.Owner_No1);
     setValue("Owner_No2", ad.Owner_No2);
 
+    const selectedDep =
+      ad.table ||
+      ad.Table ||
+      tables.find((table) => table.id == ad.Categories?.table_id) ||
+      tables.find((table) => table.id == ad.table_id) ||
+      null;
+
     setSelectedCats({
+      dep: selectedDep,
       cat: ad.Categories,
       subCat: ad.SubCategories,
     });
@@ -341,22 +404,22 @@ export default function AdForm({ type = "client", adId }) {
   const submitAd = async (payload) =>
     adId ? updateAd(adId, payload) : crateAd(payload);
 
-const uploadNewImages = async (adId) => {
-  const safeImages = Array.isArray(images) ? images : [];
+  const uploadNewImages = async (adId) => {
+    const safeImages = Array.isArray(images) ? images : [];
 
-  // الصور الجديدة فقط
-  const newImages = safeImages.filter((img) => img?.file instanceof File);
+    // الصور الجديدة فقط
+    const newImages = safeImages.filter((img) => img?.file instanceof File);
 
-  if (newImages.length === 0) return;
+    if (newImages.length === 0) return;
 
-  const formData = new FormData();
+    const formData = new FormData();
 
-  newImages.forEach((img) => {
-    formData.append("files", img.file);
-  });
+    newImages.forEach((img) => {
+      formData.append("files", img.file);
+    });
 
-  await uploadImages("AD", adId, formData);
-};
+    await uploadImages("AD", adId, formData);
+  };
   const handleDeletedImages = async (adId) => {
     const safeOriginal = Array.isArray(originalImages) ? originalImages : [];
     const safeImages = Array.isArray(images) ? images : [];
@@ -509,7 +572,7 @@ const uploadNewImages = async (adId) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <div
-        className={`form-holder create-ad ${
+        className={`form-holder  ${
           type == "client" ? "user-create-ad" : "admin-create-ad"
         }`}
       >
@@ -625,17 +688,35 @@ const uploadNewImages = async (adId) => {
           <div className="form-section">
             <h2 className="section-title">{t.ad.category_info}</h2>
 
-            <div className="row-holder two">
+            <div className="row-holder">
+              <SelectOptions
+                label={t.ad.choose_table}
+                placeholder={t.ad.select_table}
+                options={tables}
+                value={selectedCats.dep}
+                onChange={(item) => {
+                  setSelectedCats({
+                    dep: item,
+                    cat: null,
+                    subCat: null,
+                  });
+                  handleErrors("dep", null);
+                }}
+                error={fieldErrors.dep}
+                required={true}
+              />
               <SelectOptions
                 label={t.ad.choose_category}
                 placeholder={t.ad.select_category}
                 options={categories}
                 value={selectedCats.cat}
+                disabled={!selectedCats.dep}
                 onChange={(item) => {
-                  setSelectedCats({
+                  setSelectedCats((prev) => ({
+                    ...prev,
                     cat: item,
                     subCat: null,
-                  });
+                  }));
                   handleErrors("cat", null);
                 }}
                 error={fieldErrors.cat}
@@ -747,92 +828,135 @@ const uploadNewImages = async (adId) => {
           </div>
 
           {/* === تفاصيل العقار === */}
-          <div className="form-section">
-            <h2 className="section-title">
-              {t.dashboard.tables.property_details}
-            </h2>
-            <div className={`row-holder ${type == "client" ? "two" : ""}`}>
-              <div className="box forInput">
-                <label>
-                  {t.ad.bedrooms} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("bedrooms", {
-                        required: t.dashboard.forms.errors.required,
-                        min: {
-                          value: 1,
-                          message: t.dashboard.forms.errors.minOne,
-                        },
-                        max: {
-                          value: 100,
-                          message: t.ad.errors.maxHundred,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={t.ad.bedroomsPlaceholder}
-                    />
-                  </div>
-                  {errors.bedrooms && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.bedrooms.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="box forInput">
-                <label>
-                  {t.ad.bathrooms} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("bathrooms", {
-                        required: t.dashboard.forms.errors.required,
-                        min: {
-                          value: 1,
-                          message: t.dashboard.forms.errors.minOne,
-                        },
-                        max: {
-                          value: 100,
-                          message: t.ad.errors.maxHundred,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={t.ad.bathroomsPlaceholder}
-                    />
-                  </div>
-                  {errors.bathrooms && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.bathrooms.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <SelectOptions
-                label={t.ad.level}
-                placeholder={t.ad.levelPlaceholder}
-                options={Levels}
-                value={additionalData?.level}
-                onChange={(item) => {
-                  setAdditionalData((prev) => ({
-                    ...prev,
-                    level: item,
-                  }));
-                  handleErrors("level", null);
+          {isProperty && (
+            <div className="form-section">
+              <h2 className="section-title">
+                {t.dashboard.tables.property_details}
+              </h2>
+              <div
+                className={`row-holder ${type == "client" ? "two" : ""}`}
+                style={{
+                  gridTemplateColumns: `repeat(${isHomes ? 4 : 2}, 1fr)`,
                 }}
-                error={fieldErrors.level}
-                required
-              />
+              >
+                {isHomes && (
+                  <>
+                    <div className="box forInput">
+                      <label>
+                        {t.ad.bedrooms} <span className="required">*</span>
+                      </label>
+                      <div className="inputHolder">
+                        <div className="holder">
+                          <input
+                            type="number"
+                            {...register("bedrooms", {
+                              required: t.dashboard.forms.errors.required,
+                              min: {
+                                value: 1,
+                                message: t.dashboard.forms.errors.minOne,
+                              },
+                              max: {
+                                value: 100,
+                                message: t.ad.errors.maxHundred,
+                              },
+                            })}
+                            disabled={!isEditable}
+                            placeholder={t.ad.bedroomsPlaceholder}
+                          />
+                        </div>
+                        {errors.bedrooms && (
+                          <span className="error">
+                            <CircleAlert />
+                            {errors.bedrooms.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="box forInput">
+                      <label>
+                        {t.ad.bathrooms} <span className="required">*</span>
+                      </label>
+                      <div className="inputHolder">
+                        <div className="holder">
+                          <input
+                            type="number"
+                            {...register("bathrooms", {
+                              required: t.dashboard.forms.errors.required,
+                              min: {
+                                value: 1,
+                                message: t.dashboard.forms.errors.minOne,
+                              },
+                              max: {
+                                value: 100,
+                                message: t.ad.errors.maxHundred,
+                              },
+                            })}
+                            disabled={!isEditable}
+                            placeholder={t.ad.bathroomsPlaceholder}
+                          />
+                        </div>
+                        {errors.bathrooms && (
+                          <span className="error">
+                            <CircleAlert />
+                            {errors.bathrooms.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="box forInput">
+                  <label>
+                    {t.ad.area_m2} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("area_m2", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={t.ad.area_m2Placeholder}
+                      />
+                    </div>
+                    {errors.area_m2 && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.area_m2.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <SelectOptions
+                  label={t.ad.level}
+                  placeholder={t.ad.levelPlaceholder}
+                  options={Levels}
+                  value={additionalData?.level}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      level: item,
+                    }));
+                    handleErrors("level", null);
+                  }}
+                  error={fieldErrors.level}
+                  required
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* === تفاصيل التسعير === */}
           <div className="form-section">
@@ -868,35 +992,6 @@ const uploadNewImages = async (adId) => {
                 </div>
               </div>
 
-              <div className="box forInput">
-                <label>
-                  {t.ad.deposit_amount} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("deposit_amount", {
-                        required:
-                          t.dashboard.forms.errors.deposit_amount_reqire,
-                        min: {
-                          value: 1,
-                          message: t.dashboard.forms.errors.deposit_amount_Min,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={t.ad.deposit_amount_Placeholder}
-                    />
-                  </div>
-                  {errors.deposit_amount && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.deposit_amount.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-
               <SelectOptions
                 label={t.enum.currencies}
                 placeholder={t.location.select_currency}
@@ -912,164 +1007,499 @@ const uploadNewImages = async (adId) => {
                 error={fieldErrors.currency}
                 required={true}
               />
+              {isRent && (
+                <>
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.deposit_amount} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          {...register("deposit_amount", {
+                            required:
+                              t.dashboard.forms.errors.deposit_amount_reqire,
+                            min: {
+                              value: 1,
+                              message:
+                                t.dashboard.forms.errors.deposit_amount_Min,
+                            },
+                          })}
+                          disabled={!isEditable}
+                          placeholder={t.ad.deposit_amount_Placeholder}
+                        />
+                      </div>
+                      {errors.deposit_amount && (
+                        <span className="error">
+                          <CircleAlert />
+                          {errors.deposit_amount.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-              <SelectOptions
-                label={t.enum.frequency}
-                placeholder={t.location.select_frequency}
-                options={RentFrequencies}
-                value={additionalData?.frequency || null}
-                onChange={(item) => {
-                  handleErrors("frequency", null);
-                  setAdditionalData((prev) => ({
-                    ...prev,
-                    frequency: item,
-                  }));
-                }}
-                error={fieldErrors.frequency}
-                required={true}
-              />
+                  <SelectOptions
+                    label={t.enum.frequency}
+                    placeholder={t.location.select_frequency}
+                    options={RentFrequencies}
+                    value={additionalData?.frequency || null}
+                    onChange={(item) => {
+                      handleErrors("frequency", null);
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        frequency: item,
+                      }));
+                    }}
+                    error={fieldErrors.frequency}
+                    required={true}
+                  />
+                </>
+              )}
             </div>
           </div>
+          {isRent && (
+            <>
+              <div className="form-section for-dates">
+                <h2 className="section-title">{t.ad.rental_period}</h2>
 
-          <div className="form-section for-dates">
-            <h2 className="section-title">{t.ad.rental_period}</h2>
+                <div className="row-holder for-dates two">
+                  <div className="box forInput">
+                    <label>
+                      {t.ad.from} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          value={
+                            rentAvailability.from
+                              ? dayjs(rentAvailability.from)
+                              : null
+                          }
+                          onChange={(newValue) => {
+                            const formattedFrom = newValue
+                              ? newValue.format("YYYY-MM-DD")
+                              : "";
 
-            <div className="row-holder for-dates two">
-              <div className="box forInput">
-                <label>
-                  {t.ad.from} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <DatePicker
-                      format="YYYY-MM-DD"
-                      value={
-                        rentAvailability.from
-                          ? dayjs(rentAvailability.from)
-                          : null
-                      }
-                      onChange={(newValue) => {
-                        const formattedFrom = newValue
-                          ? newValue.format("YYYY-MM-DD")
-                          : "";
+                            setRentAvailability((prev) => {
+                              const shouldResetTo =
+                                formattedFrom &&
+                                prev.to &&
+                                dayjs(prev.to).isBefore(
+                                  dayjs(formattedFrom),
+                                  "day",
+                                );
 
-                        setRentAvailability((prev) => {
-                          const shouldResetTo =
-                            formattedFrom &&
-                            prev.to &&
-                            dayjs(prev.to).isBefore(
-                              dayjs(formattedFrom),
-                              "day",
-                            );
+                              return {
+                                ...prev,
+                                from: formattedFrom,
+                                to: shouldResetTo ? "" : prev.to,
+                              };
+                            });
+                          }}
+                          slotProps={{
+                            textField: datePickerTextFieldProps,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                          return {
-                            ...prev,
-                            from: formattedFrom,
-                            to: shouldResetTo ? "" : prev.to,
-                          };
-                        });
-                      }}
-                      slotProps={{
-                        textField: datePickerTextFieldProps,
-                      }}
-                    />
+                  <div className="box forInput right">
+                    <label>
+                      {t.ad.to} <span className="required">*</span>
+                    </label>
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          value={
+                            rentAvailability.to
+                              ? dayjs(rentAvailability.to)
+                              : null
+                          }
+                          minDate={
+                            rentAvailability.from
+                              ? dayjs(rentAvailability.from)
+                              : undefined
+                          }
+                          onChange={(newValue) =>
+                            setRentAvailability((prev) => ({
+                              ...prev,
+                              to: newValue ? newValue.format("YYYY-MM-DD") : "",
+                            }))
+                          }
+                          slotProps={{
+                            textField: datePickerTextFieldProps,
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+              <div className="form-section">
+                <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
 
-              <div className="box forInput right">
-                <label>
-                  {t.ad.to} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <DatePicker
-                      format="YYYY-MM-DD"
-                      value={
-                        rentAvailability.to ? dayjs(rentAvailability.to) : null
-                      }
-                      minDate={
-                        rentAvailability.from
-                          ? dayjs(rentAvailability.from)
-                          : undefined
-                      }
-                      onChange={(newValue) =>
-                        setRentAvailability((prev) => ({
-                          ...prev,
-                          to: newValue ? newValue.format("YYYY-MM-DD") : "",
-                        }))
-                      }
-                      slotProps={{
-                        textField: datePickerTextFieldProps,
-                      }}
-                    />
+                <div className="row-holder for-dates two">
+                  <div className="box forInput right">
+                    <label>
+                      {t.ad.durationValue} <span className="required">*</span>
+                    </label>
+
+                    <div className="inputHolder">
+                      <div className="holder">
+                        <input
+                          type="number"
+                          min={1}
+                          {...register("rentalDuration")}
+                          placeholder={t.ad.durationValuePlaceholder}
+                        />
+                      </div>
+                    </div>
                   </div>
+
+                  <SelectOptions
+                    label={t.ad.durationUnit}
+                    placeholder={t.ad.select}
+                    options={RentFrequencies}
+                    value={additionalData.minRentalUnit}
+                    onChange={(item) =>
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        minRentalUnit: item,
+                      }))
+                    }
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
-
-            <div className="row-holder for-dates two">
-              <div className="box forInput right">
-                <label>
-                  {t.ad.durationValue} <span className="required">*</span>
-                </label>
-
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      min={1}
-                      {...register("rentalDuration")}
-                      placeholder={t.ad.durationValuePlaceholder}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <SelectOptions
-                label={t.ad.durationUnit}
-                placeholder={t.ad.select}
-                options={RentFrequencies}
-                value={additionalData.minRentalUnit}
-                onChange={(item) =>
-                  setAdditionalData((prev) => ({
-                    ...prev,
-                    minRentalUnit: item,
-                  }))
-                }
-              />
-            </div>
-          </div>
+            </>
+          )}
 
           {/* === سعة الضيوف === */}
+          {isVacation && (
+            <div className="form-section">
+              <h2 className="section-title">{"Guest Capacity"}</h2>
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <label>
+                    {t.ad.childMax} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("child_no_max", {
+                          min: {
+                            value: 0,
+                            message: t.dashboard.forms.errors.minZero,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={t.ad.childMaxPlaceholder}
+                      />
+                    </div>
+                    {errors.child_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.child_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>
+                    {t.ad.adultMax} <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("adult_no_max", {
+                          required: t.dashboard.forms.errors.required,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                          max: {
+                            value: 100,
+                            message: t.ad.errors.maxHundred,
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={t.ad.adultMaxPlaceholder}
+                      />
+                    </div>
+                    {errors.adult_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.adult_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isProperty && isSale && (
+            <div className="form-section">
+              <h2 className="section-title">{"sale options"}</h2>
+              <div className="row-holder two">
+                <SelectOptions
+                  label={"Payment Method"}
+                  placeholder={t.ad.PaymentMethod || "select Payment Method"}
+                  options={PaymentMethod}
+                  value={additionalData?.payment}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      payment: item,
+                    }));
+                  }}
+                />
+                <SelectOptions
+                  label={"installment Years"}
+                  placeholder={t.ad.installmentYears || "select Years count"}
+                  options={InstallmentYears}
+                  value={additionalData?.installmentYears}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      installmentYears: item,
+                    }));
+                  }}
+                />
+                <div className="box forInput">
+                  <label>{t.ad.down_payment || "down payment"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("downPayment", {
+                          min: {
+                            value: 1,
+                            message:
+                              t.dashboard.forms.errors.downPaymentMin ||
+                              "downPaymentMin",
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={
+                          t.ad.downPaymentPlaceholder ||
+                          "down Payment Placeholder"
+                        }
+                      />
+                    </div>
+                    {errors.downPayment && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.downPayment.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <div className="inputHolder">
+                    <div
+                      className="holder"
+                      style={{ padding: "7px", cursor: "pointer" }}
+                      onClick={() => toggleCheckBox("isFurnished")}
+                    >
+                      <div className="checkbox-wrapper-13">
+                        <input
+                          id="isFurnished"
+                          type="checkbox"
+                          checked={checkBoxes.isFurnished}
+                          onChange={() => toggleCheckBox("isFurnished")}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+
+                        <label htmlFor="isFurnished">
+                          {checkBoxes.isFurnished
+                            ? "property is furnished"
+                            : "property is not furnished"}
+                        </label>
+                      </div>
+                    </div>
+                    {errors.child_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.child_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="box forInput">
+                  <div className="inputHolder">
+                    <div
+                      className="holder"
+                      style={{ padding: "7px", cursor: "pointer" }}
+                      onClick={() => toggleCheckBox("isReadyToMove")}
+                    >
+                      <div className="checkbox-wrapper-13">
+                        <input
+                          id="isReadyToMove"
+                          type="checkbox"
+                          checked={checkBoxes.isReadyToMove}
+                          onChange={() => toggleCheckBox("isReadyToMove")}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+
+                        <label htmlFor="isReadyToMove">
+                          {checkBoxes.isReadyToMove
+                            ? "property is ready to move"
+                            : "property is not ready to move"}
+                        </label>
+                      </div>
+                    </div>
+                    {errors.child_no_max && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.child_no_max.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isProperty && (
+            <div className="form-section">
+              <h2 className="section-title">{"Current property data"}</h2>
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <label>{"Owner number 1 "}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("Owner_No1")}
+                        disabled={!isEditable}
+                        placeholder={"enter Owner number 1"}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>{"Owner number 2 "}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("Owner_No2")}
+                        disabled={!isEditable}
+                        placeholder={"enter Owner number 2"}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <label>{"delivery number 1"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("delivery_no1")}
+                        disabled={!isEditable}
+                        placeholder={"enter delivery number 1"}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>{"delivery number 2 "}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("delivery_no2")}
+                        disabled={!isEditable}
+                        placeholder={"enter delivery number 2"}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <label>{"payment number 1"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("payment_no1")}
+                        disabled={!isEditable}
+                        placeholder={"enter payment number 1"}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="box forInput">
+                  <label>{"payment number 2"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("payment_no2")}
+                        disabled={!isEditable}
+                        placeholder={"enter payment number 2"}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="form-section">
-            <h2 className="section-title">{"Guest Capacity"}</h2>
-            <div className="row-holder two">
+            <h2 className="section-title">
+              {t.ad.priority_verification || "priority and verification"}
+            </h2>
+            <div
+              className="row-holder"
+              style={{
+                gridTemplateColumns: "0.5fr 1fr",
+              }}
+            >
               <div className="box forInput">
-                <label>
-                  {t.ad.childMax} <span className="required">*</span>
-                </label>
                 <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("child_no_max", {
-                        min: {
-                          value: 0,
-                          message: t.dashboard.forms.errors.minZero,
-                        },
-                        max: {
-                          value: 100,
-                          message: t.ad.errors.maxHundred,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={t.ad.childMaxPlaceholder}
-                    />
+                  <div
+                    className="holder"
+                    style={{ padding: "7px", cursor: "pointer" }}
+                    onClick={() => toggleCheckBox("isVerefied")}
+                  >
+                    <div className="checkbox-wrapper-13">
+                      <input
+                        id="isVerefied"
+                        type="checkbox"
+                        checked={checkBoxes.isVerefied}
+                        onChange={() => toggleCheckBox("isVerefied")}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+
+                      <label htmlFor="isVerefied">
+                        {checkBoxes.isVerefied
+                          ? "ad verified"
+                          : "ad isn't verified"}
+                      </label>
+                    </div>
                   </div>
                   {errors.child_no_max && (
                     <span className="error">
@@ -1079,183 +1509,57 @@ const uploadNewImages = async (adId) => {
                   )}
                 </div>
               </div>
-
-              <div className="box forInput">
-                <label>
-                  {t.ad.adultMax} <span className="required">*</span>
-                </label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("adult_no_max", {
-                        required: t.dashboard.forms.errors.required,
-                        min: {
-                          value: 1,
-                          message: t.dashboard.forms.errors.minOne,
-                        },
-                        max: {
-                          value: 100,
-                          message: t.ad.errors.maxHundred,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={t.ad.adultMaxPlaceholder}
-                    />
-                  </div>
-                  {errors.adult_no_max && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.adult_no_max.message}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <SelectOptions
+                placeholder={t.ad.priorityPlaceholder || "priorityPlaceholder"}
+                options={Priority}
+                value={additionalData?.priority}
+                onChange={(item) => {
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    priority: item,
+                  }));
+                }}
+              />
             </div>
-          </div>
-
-          <div className="form-section">
-            <h2 className="section-title">{"Current property data"}</h2>
-            <div className="row-holder two">
-              <div className="box forInput">
-                <label>{"Owner number 1 "}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("Owner_No1")}
-                      disabled={!isEditable}
-                      placeholder={"enter Owner number 1"}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="box forInput">
-                <label>{"Owner number 2 "}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("Owner_No2")}
-                      disabled={!isEditable}
-                      placeholder={"enter Owner number 2"}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="row-holder two">
-              <div className="box forInput">
-                <label>{"delivery number 1"}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("delivery_no1")}
-                      disabled={!isEditable}
-                      placeholder={"enter delivery number 1"}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="box forInput">
-                <label>{"delivery number 2 "}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("delivery_no2")}
-                      disabled={!isEditable}
-                      placeholder={"enter delivery number 2"}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="row-holder two">
-              <div className="box forInput">
-                <label>{"payment number 1"}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("payment_no1")}
-                      disabled={!isEditable}
-                      placeholder={"enter payment number 1"}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="box forInput">
-                <label>{"payment number 2"}</label>
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="text"
-                      {...register("payment_no2")}
-                      disabled={!isEditable}
-                      placeholder={"enter payment number 2"}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="form-section">
-            <h2 className="section-title">{t.ad.priority || "priority"}</h2>
-            <SelectOptions
-              placeholder={t.ad.priorityPlaceholder || "priorityPlaceholder"}
-              options={Priority}
-              value={additionalData?.priority}
-              onChange={(item) => {
-                setAdditionalData((prev) => ({
-                  ...prev,
-                  priority: item,
-                }));
-              }}
-            />
           </div>
           {/* === المميزات === */}
-          <div className="form-section">
-            <h2 className="section-title">{t.ad.amenities}</h2>
-            <div className="dynamicFilters-holder">
-              <div className="box forInput">
-                <div className="options-grid flex">
-                  {Amenities.map((option) => {
-                    const displayLabel =
-                      locale === "ar" ? option.name_ar : option.name_en;
-                    const isActive = selectedAmenities.includes(option.id);
+          {selectedCats.dep && (
+            <div className="form-section">
+              <h2 className="section-title">{t.ad.amenities}</h2>
+              <div className="dynamicFilters-holder">
+                <div className="box forInput">
+                  <div className="options-grid flex">
+                    {Amenities.map((option) => {
+                      const displayLabel =
+                        locale === "ar" ? option.name_ar : option.name_en;
+                      const isActive = selectedAmenities.includes(option.id);
 
-                    return (
-                      <div
-                        key={option.id}
-                        className={`option-box small ${isActive ? "active" : ""}`}
-                        onClick={() => {
-                          if (isActive) {
-                            setSelectedAmenities((prev) =>
-                              prev.filter((v) => v !== option.id),
-                            );
-                          } else {
-                            setSelectedAmenities((prev) => [
-                              ...prev,
-                              option.id,
-                            ]);
-                          }
-                        }}
-                      >
-                        {displayLabel}
-                      </div>
-                    );
-                  })}
+                      return (
+                        <div
+                          key={option.id}
+                          className={`option-box small ${isActive ? "active" : ""}`}
+                          onClick={() => {
+                            if (isActive) {
+                              setSelectedAmenities((prev) =>
+                                prev.filter((v) => v !== option.id),
+                              );
+                            } else {
+                              setSelectedAmenities((prev) => [
+                                ...prev,
+                                option.id,
+                              ]);
+                            }
+                          }}
+                        >
+                          {displayLabel}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           <Tags disabled={!isEditable} />
 
