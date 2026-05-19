@@ -54,9 +54,9 @@ export default function Favorites() {
     fetchAds(newPage);
   };
 
-  const handleFavoriteClick = async (id) => {
+  const handleFavoriteClick = async (ad) => {
     try {
-      await toggleFavorite(id);
+      await toggleFavorite(ad.id);
 
       const remainingItems = adsData.ads.length - 1;
 

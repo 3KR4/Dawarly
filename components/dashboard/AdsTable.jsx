@@ -16,7 +16,6 @@ import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { useNotification } from "@/Contexts/NotificationContext";
-import { deleteAd } from "@/services/ads/ads.service";
 import { TbListSearch } from "react-icons/tb";
 import { AdStatuses, RentFrequencies } from "@/data/enums";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
@@ -38,6 +37,9 @@ export default function AdsTable({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [target, setTarget] = useState(null);
   const [rejectInput, setRejectInput] = useState("");
+
+  const getAdTableId = (item) =>
+    Number(item?.department?.id || item?.Categories?.table_id);
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
@@ -64,7 +66,7 @@ export default function AdsTable({
           closeMenu();
         })
         .catch(console.error)
-        .finaly(setLoadingSubmit(false));
+        .finally(() => setLoadingSubmit(false));
     }
   };
 
@@ -137,10 +139,12 @@ export default function AdsTable({
           ) : (
             ads?.map((item) => {
               const curentStatus = AdStatuses.find((s) => s.id == item?.status);
+              const tableId = getAdTableId(item);
+              const itemWithTableId = { ...item, table_id: tableId };
               return (
                 <div key={item?.id} className={`table-item ${item?.status}`}>
                   <div className="holder">
-                    <Link href={`/`} className="item-image">
+                    <Link href={`/market/${item?.id}?dep=${tableId}`} className="item-image">
                       <Image
                         src={
                           item?.images?.[0]?.secure_url ||
@@ -153,7 +157,7 @@ export default function AdsTable({
                     </Link>
 
                     <div className="item-details">
-                      <Link href={`/market/${item?.id}`} className="item-name">
+                      <Link href={`/market/${item?.id}?dep=${tableId}`} className="item-name">
                         {item?.title}
                       </Link>
                       <div className="item-location nisted">
@@ -306,9 +310,9 @@ export default function AdsTable({
                         onChange={(selected) => {
                           if (selected.id == "REJECTED") {
                             setMenuType("reject");
-                            setTarget(item?.id);
+                            setTarget(itemWithTableId);
                           } else {
-                            changeStatus(item?.id, selected);
+                            changeStatus(itemWithTableId, selected);
                           }
                         }}
                       />
@@ -316,7 +320,7 @@ export default function AdsTable({
                   )}
 
                   <div className="actions">
-                    <Link href={`/market/${item?.id}`}>
+                    <Link href={`/market/${item?.id}?dep=${tableId}`}>
                       <FaEye className="view" />
                     </Link>
                     <hr />
@@ -325,8 +329,8 @@ export default function AdsTable({
                         <Link
                           href={
                             page == "dashboard"
-                              ? `/dashboard/ads/form?id=${item?.id}`
-                              : `/mylisting/form/${item?.id}`
+                              ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
+                              : `/mylisting/form/${item?.id}?dep=${tableId}`
                           }
                         >
                           <MdEdit className="edit" />
@@ -340,7 +344,7 @@ export default function AdsTable({
                       className="delete"
                       onClick={() => {
                         setMenuType("delete");
-                        setTarget(item?.id);
+                        setTarget(itemWithTableId);
                       }}
                     />
                   </div>

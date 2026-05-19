@@ -84,11 +84,9 @@ export default function MyAdsListing() {
     fetchAds(newPage);
   };
 
-  const handelChangeStatus = async (id, status) => {
-    console.log("status:", status);
-
+  const handelChangeStatus = async (ad, status) => {
     try {
-      const res = await changeStatus(id, { status: status.id });
+      const res = await changeStatus(ad.table_id, ad.id, { status: status.id });
 
       addNotification({
         type: "success",
@@ -114,9 +112,9 @@ export default function MyAdsListing() {
     }
   };
 
-  const handleDeleteAd = async (id) => {
+  const handleDeleteAd = async (ad) => {
     try {
-      await deleteAd(id);
+      await deleteAd(ad.table_id, ad.id);
       addNotification({
         type: "success",
         message: "Ad deleted successfully ✅",

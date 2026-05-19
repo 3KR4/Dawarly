@@ -65,9 +65,9 @@ export default function ActiveAds() {
     }
   }, [loading]);
   // ================= HANDLERS =================
-  const handleDeleteAd = async (id) => {
+  const handleDeleteAd = async (ad) => {
     try {
-      await deleteAd(id);
+      await deleteAd(ad.table_id, ad.id);
 
       const remainingItems = adsData.ads.length - 1;
 
@@ -85,9 +85,9 @@ export default function ActiveAds() {
       });
     }
   };
-  const handelChangeStatus = async (id, status, reason) => {
+  const handelChangeStatus = async (ad, status, reason) => {
     try {
-      await changeStatus(id, { status: status.id, reason });
+      await changeStatus(ad.table_id, ad.id, { status: status.id, reason });
 
       const remainingItems = adsData.ads.length - 1;
 
