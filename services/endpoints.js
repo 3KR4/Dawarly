@@ -78,7 +78,10 @@ export const ENDPOINTS = {
     GET_FAVORITES: (page, limit) => `/favorites?page=${page}&limit=${limit}`,
   },
   IMAGES: {
-    ADD: (entity_type, entity_id) => `/images/${entity_type}/${entity_id}`,
+    ADD: (entity_type, entity_id, table_id = null) =>
+      table_id
+        ? `/images/${entity_type}/${table_id}/${entity_id}`
+        : `/images/${entity_type}/${entity_id}`,
     DELETE: (entity_type, entity_id, image_id) =>
       `/images/${entity_type}/${entity_id}/${image_id}`,
     EDIT: (entity_type, entity_id, image_id) =>

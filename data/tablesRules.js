@@ -37,6 +37,12 @@ const commonRentOptional = [
   "available_to",
   "child_no_max",
 ];
+const rentRequiredWithoutCapacity = commonRentRequired.filter(
+  (item) => item !== "adult_no_max",
+);
+const rentOptionalWithoutCapacity = commonRentOptional.filter(
+  (item) => item !== "child_no_max",
+);
 
 const commonSaleRequired = ["payment_method", "ready_to_move", "furnished"];
 const commonSaleOptional = ["down_payment", "installment_years"];
@@ -58,7 +64,6 @@ const apartmentAmenities = [
   "am_water",
   "am_electricity",
   "am_gym",
-  "am_pool",
 ];
 
 const vacationAmenities = [
@@ -177,21 +182,17 @@ export const TABLE_RULES = {
     allowed: [...commonSaleOptional, "area_m2", ...commercialAmenities],
   },
   8: {
-    required: [...commonRentRequired],
-    allowed: [...commonRentOptional, "area_m2", ...commercialAmenities],
+    required: [...rentRequiredWithoutCapacity],
+    allowed: [...rentOptionalWithoutCapacity, "area_m2", ...commercialAmenities],
   },
   9: {
     required: [...buildingsLandsRequired, "payment_method"],
     allowed: [...commonSaleOptional, ...landBuildingAmenities, ...buildingsLandsOptional],
   },
   10: {
-    required: [
-      ...commonRentRequired.filter((item) => item !== "adult_no_max"),
-      ...buildingsLandsRequired,
-    ],
+    required: [...rentRequiredWithoutCapacity, ...buildingsLandsRequired],
     allowed: [
-      ...commonRentOptional,
-      "adult_no_max",
+      ...rentOptionalWithoutCapacity,
       ...landBuildingAmenities,
       ...buildingsLandsOptional,
     ],

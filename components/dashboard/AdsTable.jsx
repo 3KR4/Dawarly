@@ -20,6 +20,7 @@ import { TbListSearch } from "react-icons/tb";
 import { AdStatuses, RentFrequencies } from "@/data/enums";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
+import { FaHeart } from "react-icons/fa";
 
 export default function AdsTable({
   ads,
@@ -144,11 +145,13 @@ export default function AdsTable({
               return (
                 <div key={item?.id} className={`table-item ${item?.status}`}>
                   <div className="holder">
-                    <Link href={`/market/${item?.id}?dep=${tableId}`} className="item-image">
+                    <Link
+                      href={`/market/${item?.id}?dep=${tableId}`}
+                      className="item-image"
+                    >
                       <Image
                         src={
-                          item?.images?.[0]?.secure_url ||
-                          "/apartment-mockup.avif"
+                          item?.image?.secure_url || "/apartment-mockup.avif"
                         }
                         alt={item?.name}
                         fill
@@ -157,7 +160,10 @@ export default function AdsTable({
                     </Link>
 
                     <div className="item-details">
-                      <Link href={`/market/${item?.id}?dep=${tableId}`} className="item-name">
+                      <Link
+                        href={`/market/${item?.id}?dep=${tableId}`}
+                        className="item-name"
+                      >
                         {item?.title}
                       </Link>
                       <div className="item-location nisted">
@@ -182,17 +188,17 @@ export default function AdsTable({
                     <>
                       <div className="item-categories nisted">
                         <Link
-                          href={`/market?cat=${item?.Categories?.id}`}
+                          href={`/market?dep=${item?.department?.id}`}
                           className="link"
                         >
-                          {item?.Categories?.[`name_${locale}`]} /
+                          {item?.department?.[`name_${locale}`]} /
                         </Link>
 
                         <Link
-                          href={`/market?subcat=${item?.SubCategories?.id}`}
+                          href={`/market?cat=${item?.category?.id}`}
                           className="link"
                         >
-                          {item?.SubCategories?.[`name_${locale}`]}
+                          {item?.category?.[`name_${locale}`]} 
                         </Link>
                       </div>
 
@@ -235,20 +241,20 @@ export default function AdsTable({
                         </div>
                       )}
 
-                      <div className="item-categories nisted">
-                        <Link
-                          href={`/market?cat=${item?.Categories?.id}`}
-                          className="link"
-                        >
-                          {item?.Categories?.[`name_${locale}`]} /
-                        </Link>
+                        <div className="item-categories nisted">
+                          <Link
+                            href={`/market?dep=${item?.department?.id}`}
+                            className="link"
+                          >
+                            {item?.department?.[`name_${locale}`]} /
+                          </Link>
 
-                        <Link
-                          href={`/market?subcat=${item?.SubCategories?.id}`}
-                          className="link"
-                        >
-                          {item?.SubCategories?.[`name_${locale}`]}
-                        </Link>
+                          <Link
+                            href={`/market?cat=${item?.category?.id}`}
+                            className="link"
+                          >
+                            {item?.category?.[`name_${locale}`]} 
+                          </Link>
                       </div>
                     </>
                   )}
@@ -263,6 +269,9 @@ export default function AdsTable({
                       </h4>
                       <h4 className="green">
                         {item?.reach_count} <BiSolidPurchaseTagAlt />
+                      </h4>
+                      <h4 className="love">
+                        {item?.favorites_count} <FaHeart />
                       </h4>
                     </div>
                   )}

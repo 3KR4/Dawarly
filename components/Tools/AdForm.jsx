@@ -21,8 +21,10 @@ import {
 import { useAppData } from "@/Contexts/DataContext";
 import {
   Amenities,
+  BuildingCondition,
   Currencies,
   InstallmentYears,
+  LandType,
   Levels,
   PaymentMethod,
   Priority,
@@ -63,6 +65,14 @@ const getNumberOrNull = (value) => {
 const getBooleanAdField = (ad, field) =>
   Boolean(ad?.[field] ?? ad?.details?.[field]);
 const getAdField = (ad, field) => ad?.[field] ?? ad?.details?.[field] ?? null;
+const getAdIdFromResponse = (res) =>
+  res?.data?.adId ??
+  res?.data?.id ??
+  res?.data?.ad?.id ??
+  res?.data?.data?.adId ??
+  res?.data?.data?.id ??
+  res?.data?.data?.ad?.id ??
+  null;
 
 const getNumericRules = (
   requiredMessage,
@@ -91,7 +101,11 @@ const getNumericRules = (
   return rules;
 };
 
-export default function AdForm({ type = "client", adId, initialTableId = null }) {
+export default function AdForm({
+  type = "client",
+  adId,
+  initialTableId = null,
+}) {
   const { locale } = useContext(settings);
   const t = useTranslate();
   const {
@@ -154,6 +168,8 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
     level: Levels[0],
     priority: Priority[1],
     installmentYears: null,
+    landType: null,
+    buildingCondition: null,
   });
   const [rentAvailability, setRentAvailability] = useState({
     from: "",
@@ -176,7 +192,7 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
     showBuildingLandDetails,
     showSaleDetails,
     showRentDetails,
-    amenityFields,  
+    amenityFields,
   } = currentRule;
   const isPropertyLike =
     showPropertyDetails || showCommercialDetails || showBuildingLandDetails;
@@ -259,7 +275,7 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
 
       const res = await getOneAd(targetTableId, adId);
       console.log(res?.data);
-      
+
       const ad = res?.data;
       if (!ad) return;
 
@@ -310,8 +326,6 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
     setValue("adult_no_max", getAdField(ad, "adult_no_max") || "");
     setValue("rentalDuration", getAdField(ad, "min_rent_period") || "");
     setValue("downPayment", getAdField(ad, "down_payment") || "");
-    setValue("land_type", getAdField(ad, "land_type") || "");
-    setValue("usage_type", getAdField(ad, "usage_type") || "");
     setValue("floors", getAdField(ad, "floors") || "");
 
     OWNER_FIELDS.forEach((field) => {
@@ -368,6 +382,13 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
       installmentYears:
         InstallmentYears.find(
           (item) => item.id == getAdField(ad, "installment_years"),
+        ) || null,
+      landType:
+        LandType.find((item) => item.id == getAdField(ad, "land_type")) ||
+        null,
+      buildingCondition:
+        BuildingCondition.find(
+          (item) => item.id == getAdField(ad, "usage_type"),
         ) || null,
     });
 
@@ -441,10 +462,13 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
     ) {
       newErrors.frequency = t.ad.errors.frequency;
     }
-    if (isFieldRequired(tableId, "land_type") && !data.land_type?.trim()) {
+    if (isFieldRequired(tableId, "land_type") && !additionalData.landType) {
       newErrors.land_type = t.dashboard.forms.errors.required;
     }
-    if (isFieldRequired(tableId, "usage_type") && !data.usage_type?.trim()) {
+    if (
+      isFieldRequired(tableId, "usage_type") &&
+      !additionalData.buildingCondition
+    ) {
       newErrors.usage_type = t.dashboard.forms.errors.required;
     }
 
@@ -508,10 +532,10 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
       payload.area_m2 = getNumberOrNull(data.area_m2);
     }
     if (isFieldAllowed(tableId, "land_type")) {
-      payload.land_type = data.land_type?.trim() || null;
+      payload.land_type = additionalData.landType?.id || null;
     }
     if (isFieldAllowed(tableId, "usage_type")) {
-      payload.usage_type = data.usage_type?.trim() || null;
+      payload.usage_type = additionalData.buildingCondition?.id || null;
     }
     if (isFieldAllowed(tableId, "floors")) {
       payload.floors = getNumberOrNull(data.floors);
@@ -575,11 +599,18 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
     if (newImages.length === 0) return;
 
     const formData = new FormData();
+    const coverIndex = images[0]?.file instanceof File ? 0 : -1;
+    formData.append("cover_index", String(coverIndex));
+
     newImages.forEach((img) => {
       formData.append("files", img.file);
     });
 
-    await uploadImages("AD", targetAdId, formData);
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    await uploadImages("AD", targetAdId, formData, tableId);
   };
 
   const handleDeletedImages = async (targetAdId) => {
@@ -619,16 +650,18 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
 
     try {
       const res = await submitAd(payload);
-      const finalAdId = adId || res?.data?.adId || res?.data?.id;
+      const finalAdId = adId || getAdIdFromResponse(res);
 
-      if (finalAdId) {
-        await uploadNewImages(finalAdId);
-        if (adId) {
-          await handleDeletedImages(finalAdId);
-        }
-        if (selectedAdmin) {
-          await assignAdmin(tableId, finalAdId, { admin_id: selectedAdmin.id });
-        }
+      if (!finalAdId) {
+        throw new Error("Ad was saved, but the created ad id was not returned");
+      }
+
+      await uploadNewImages(finalAdId);
+      if (adId) {
+        await handleDeletedImages(finalAdId);
+      }
+      if (selectedAdmin) {
+        await assignAdmin(tableId, finalAdId, { admin_id: selectedAdmin.id });
       }
 
       addNotification({
@@ -1067,17 +1100,16 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
                     <div className="holder">
                       <input
                         type="number"
-                        {...register(
-                          "area_m2",
-                          getNumericRules(
-                            t.dashboard.forms.errors.required,
-                            t.dashboard.forms.errors.minOne,
-                            t.ad.errors.maxHundred,
-                            isFieldRequired(tableId, "area_m2"),
-                          ),
-                        )}
+                        {...register("area_m2", {
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                        })}
                         disabled={!isEditable}
-                        placeholder={t.ad.area_m2Placeholder}
+                        placeholder={
+                          t.ad.area_m2Placeholder || "area_m2Placeholder"
+                        }
                       />
                     </div>
                     {errors.area_m2 && (
@@ -1104,48 +1136,6 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
                   error={fieldErrors.level}
                   required={isFieldRequired(tableId, "level")}
                 />
-              </div>
-            </div>
-          )}
-
-          {showCommercialDetails && (
-            <div className="form-section">
-              <h2 className="section-title">
-                {t.dashboard.tables.property_details}
-              </h2>
-              <div className="row-holder two">
-                <div className="box forInput">
-                  <label>
-                    {t.ad.area_m2}{" "}
-                    {isFieldRequired(tableId, "area_m2") && (
-                      <span className="required">*</span>
-                    )}
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register(
-                          "area_m2",
-                          getNumericRules(
-                            t.dashboard.forms.errors.required,
-                            t.dashboard.forms.errors.minOne,
-                            t.ad.errors.maxHundred,
-                            isFieldRequired(tableId, "area_m2"),
-                          ),
-                        )}
-                        disabled={!isEditable}
-                        placeholder={t.ad.area_m2Placeholder}
-                      />
-                    </div>
-                    {errors.area_m2 && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.area_m2.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -1192,55 +1182,39 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
                   </div>
                 </div>
 
-                <div className="box forInput">
-                  <label>
-                    Land Type{" "}
-                    {isFieldRequired(tableId, "land_type") && (
-                      <span className="required">*</span>
-                    )}
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("land_type")}
-                        disabled={!isEditable}
-                        placeholder="Enter land type"
-                      />
-                    </div>
-                    {fieldErrors.land_type && (
-                      <span className="error">
-                        <CircleAlert />
-                        {fieldErrors.land_type}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <SelectOptions
+                  label="Land Type"
+                  placeholder="Select land type"
+                  options={LandType}
+                  value={additionalData.landType}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      landType: item,
+                    }));
+                    handleErrors("land_type", null);
+                  }}
+                  disabled={!isEditable}
+                  error={fieldErrors.land_type}
+                  required={isFieldRequired(tableId, "land_type")}
+                />
 
-                <div className="box forInput">
-                  <label>
-                    Usage Type{" "}
-                    {isFieldRequired(tableId, "usage_type") && (
-                      <span className="required">*</span>
-                    )}
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("usage_type")}
-                        disabled={!isEditable}
-                        placeholder="Enter usage type"
-                      />
-                    </div>
-                    {fieldErrors.usage_type && (
-                      <span className="error">
-                        <CircleAlert />
-                        {fieldErrors.usage_type}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <SelectOptions
+                  label="Building Condition"
+                  placeholder="Select building condition"
+                  options={BuildingCondition}
+                  value={additionalData.buildingCondition}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      buildingCondition: item,
+                    }));
+                    handleErrors("usage_type", null);
+                  }}
+                  disabled={!isEditable}
+                  error={fieldErrors.usage_type}
+                  required={isFieldRequired(tableId, "usage_type")}
+                />
 
                 {isFieldAllowed(tableId, "floors") && (
                   <div className="box forInput">
@@ -1567,7 +1541,7 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
           {showSaleDetails && (
             <div className="form-section">
               <h2 className="section-title">Sale Options</h2>
-              <div className="row-holder two">
+              <div className="row-holder">
                 <SelectOptions
                   label="Payment Method"
                   placeholder={t.ad.PaymentMethod || "Select payment method"}
@@ -1655,6 +1629,35 @@ export default function AdForm({ type = "client", adId, initialTableId = null })
                             </label>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isFieldAllowed(tableId, "area_m2") && showCommercialDetails && (
+                    <div className="box forInput">
+                      <div className="inputHolder">
+                        <div className="holder">
+                          <input
+                            type="number"
+                            {...register(
+                              "area_m2",
+                              getNumericRules(
+                                t.dashboard.forms.errors.required,
+                                t.dashboard.forms.errors.minOne,
+                                t.ad.errors.maxHundred,
+                                isFieldRequired(tableId, "area_m2"),
+                              ),
+                            )}
+                            disabled={!isEditable}
+                            placeholder={t.ad.area_m2Placeholder}
+                          />
+                        </div>
+                        {errors.area_m2 && (
+                          <span className="error">
+                            <CircleAlert />
+                            {errors.area_m2.message}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}

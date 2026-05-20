@@ -3,8 +3,16 @@ import { ENDPOINTS } from "../endpoints";
 
 /* ================= REGISTER ================= */
 
-export const uploadImages = (entity_type, entity_id, payload) => {
-  return api.post(ENDPOINTS.IMAGES.ADD(entity_type, entity_id), payload);
+export const uploadImages = (
+  entity_type,
+  entity_id,
+  payload,
+  table_id = null,
+) => {
+  return api.post(
+    ENDPOINTS.IMAGES.ADD(entity_type, entity_id, table_id),
+    payload,
+  );
 };
 export const deleteImage = (entity_type, entity_id, image_id) => {
   return api.delete(ENDPOINTS.IMAGES.DELETE(entity_type, entity_id, image_id));

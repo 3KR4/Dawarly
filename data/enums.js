@@ -63,6 +63,23 @@ export const RentPeriodUnit = [
   { id: "MONTH", name_en: "Month", name_ar: "شهر" },
 ];
 
+export const LandType = [
+  { id: "RESIDENTIAL", name_en: "Residential", name_ar: "Residential" },
+  { id: "AGRICULTURAL", name_en: "Agricultural", name_ar: "Agricultural" },
+  { id: "COMMERCIAL", name_en: "Commercial", name_ar: "Commercial" },
+  { id: "INDUSTRIAL", name_en: "Industrial", name_ar: "Industrial" },
+];
+
+export const BuildingCondition = [
+  { id: "NEW", name_en: "New", name_ar: "New" },
+  { id: "OLD", name_en: "Old", name_ar: "Old" },
+  {
+    id: "UNDER_CONSTRUCTION",
+    name_en: "Under Construction",
+    name_ar: "Under Construction",
+  },
+];
+
 export const ImageEntityTypes = [
   { id: "AD", name_en: "Ad", name_ar: "إعلان" },
   { id: "SLIDER", name_en: "Slider", name_ar: "سلايدر" },
@@ -380,7 +397,7 @@ export const RELATIONS = {
   },
   cities: {
     parentKey: "governorate_id",
-    source: "cities",
+    source: "cities", 
     parentSource: "governorates",
   },
   areas: {
@@ -413,3 +430,7 @@ export const InstallmentYears = [
   { id: 14, name_en: "14 Years", name_ar: "14 سنة" },
   { id: 15, name_en: "15 Years", name_ar: "15 سنة" },
 ];
+
+
+
+

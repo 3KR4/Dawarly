@@ -1,5 +1,5 @@
 .dashboard .box.forInput .inputHolder .holder input {
-  height: 40px ;
+  height: 43px;
   padding: 0 10px !important;
 }
 
@@ -42,7 +42,7 @@ form .form-section .dynamicFilters-holder > * {
 }
 .dashboard form .row-holder {
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
+  gap: 15px 7px;
   display: grid;
 }
 .dashboard form .row-holder.two {
@@ -418,6 +418,11 @@ form .form-section .dynamicFilters-holder > * {
   background: var(--lighter-main-color);
 }
 
+.images-uplouder .uploaded.cover-image img {
+  outline: 2px solid var(--main-color);
+  outline-offset: -2px;
+}
+
 .images-uplouder .uploaded svg {
   background: #000000c2;
   color: white;
@@ -457,6 +462,10 @@ form .form-section .dynamicFilters-holder > * {
   font-size: 14px;
   bottom: 7px;
   left: 7px;
+}
+
+.images-uplouder .imgHolder .uploaded.cover-image p {
+  background: var(--main-color);
 }
 .images-uplouder .error {
   margin: -3px 4px -6px;
