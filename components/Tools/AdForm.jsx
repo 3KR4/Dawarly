@@ -21,7 +21,9 @@ import {
 import { useAppData } from "@/Contexts/DataContext";
 import {
   Amenities,
+  BuildingAndLandsTypes,
   BuildingCondition,
+  BuildingType,
   Currencies,
   InstallmentYears,
   LandType,
@@ -166,9 +168,11 @@ export default function AdForm({
     minRentalUnit: null,
     payment: null,
     level: Levels[0],
-    priority: Priority[1],
+    priority: Priority[4],
     installmentYears: null,
+    buildingAndLandsType: null,
     landType: null,
+    buildingType: null,
     buildingCondition: null,
   });
   const [rentAvailability, setRentAvailability] = useState({
@@ -383,12 +387,22 @@ export default function AdForm({
         InstallmentYears.find(
           (item) => item.id == getAdField(ad, "installment_years"),
         ) || null,
+      buildingAndLandsType:
+        BuildingAndLandsTypes.find(
+          (item) => item.id == getAdField(ad, "type"),
+        ) || null,
       landType:
-        LandType.find((item) => item.id == getAdField(ad, "land_type")) ||
-        null,
+        LandType.find((item) => item.id == getAdField(ad, "land_type")) || null,
+      buildingType:
+        BuildingType.find(
+          (item) => item.id == getAdField(ad, "building_type"),
+        ) || null,
       buildingCondition:
         BuildingCondition.find(
-          (item) => item.id == getAdField(ad, "usage_type"),
+          (item) =>
+            item.id ==
+            (getAdField(ad, "building_condition") ||
+              getAdField(ad, "usage_type")),
         ) || null,
     });
 
@@ -462,14 +476,32 @@ export default function AdForm({
     ) {
       newErrors.frequency = t.ad.errors.frequency;
     }
-    if (isFieldRequired(tableId, "land_type") && !additionalData.landType) {
+    if (
+      showBuildingLandDetails &&
+      additionalData.buildingAndLandsType?.id === "LAND" &&
+      !additionalData.landType
+    ) {
       newErrors.land_type = t.dashboard.forms.errors.required;
     }
     if (
-      isFieldRequired(tableId, "usage_type") &&
+      showBuildingLandDetails &&
+      additionalData.buildingAndLandsType?.id === "BUILDING" &&
+      !additionalData.buildingType
+    ) {
+      newErrors.building_type = t.dashboard.forms.errors.required;
+    }
+    if (
+      showBuildingLandDetails &&
+      additionalData.buildingAndLandsType?.id === "BUILDING" &&
       !additionalData.buildingCondition
     ) {
-      newErrors.usage_type = t.dashboard.forms.errors.required;
+      newErrors.building_condition = t.dashboard.forms.errors.required;
+    }
+    if (
+      isFieldRequired(tableId, "type") &&
+      !additionalData.buildingAndLandsType
+    ) {
+      newErrors.type = t.dashboard.forms.errors.required;
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -531,11 +563,20 @@ export default function AdForm({
     if (isFieldAllowed(tableId, "area_m2")) {
       payload.area_m2 = getNumberOrNull(data.area_m2);
     }
-    if (isFieldAllowed(tableId, "land_type")) {
-      payload.land_type = additionalData.landType?.id || null;
-    }
-    if (isFieldAllowed(tableId, "usage_type")) {
-      payload.usage_type = additionalData.buildingCondition?.id || null;
+    if (isFieldAllowed(tableId, "type")) {
+      const entityType = additionalData.buildingAndLandsType?.id || null;
+
+      payload.type = entityType;
+      payload.land_type =
+        entityType === "LAND" ? additionalData.landType?.id || null : null;
+      payload.building_type =
+        entityType === "BUILDING"
+          ? additionalData.buildingType?.id || null
+          : null;
+      payload.building_condition =
+        entityType === "BUILDING"
+          ? additionalData.buildingCondition?.id || null
+          : null;
     }
     if (isFieldAllowed(tableId, "floors")) {
       payload.floors = getNumberOrNull(data.floors);
@@ -638,8 +679,10 @@ export default function AdForm({
     bathrooms: "required",
     level: "required",
     country_id: "required",
+    type: "required",
     land_type: "required",
-    usage_type: "required",
+    building_type: "required",
+    building_condition: "required",
   };
 
   const onSubmit = async (data) => {
@@ -668,7 +711,7 @@ export default function AdForm({
         type: "success",
         message: adId ? t.ad.ad_updated : t.ad.ad_created,
       });
-
+      setTags([]);
       redirectAfterLogin(
         type === "client" ? "/mylisting" : "/dashboard/ads/all",
       );
@@ -875,60 +918,6 @@ export default function AdForm({
           </div>
 
           <div className="form-section">
-            <h2 className="section-title">{t.ad.category_info}</h2>
-            <div className="row-holder">
-              <SelectOptions
-                label={t.ad.choose_table}
-                placeholder={t.ad.select_table}
-                options={tables}
-                value={selectedCats.dep}
-                onChange={(item) => {
-                  setSelectedCats({
-                    dep: item,
-                    cat: null,
-                    subCat: null,
-                  });
-                  setSelectedAmenities([]);
-                  handleErrors("dep", null);
-                  handleErrors("cat", null);
-                }}
-                error={fieldErrors.dep}
-                required
-              />
-              <SelectOptions
-                label={t.ad.choose_category}
-                placeholder={t.ad.select_category}
-                options={filteredCategories}
-                value={selectedCats.cat}
-                disabled={!selectedCats.dep}
-                onChange={(item) => {
-                  setSelectedCats((prev) => ({
-                    ...prev,
-                    cat: item,
-                    subCat: null,
-                  }));
-                  handleErrors("cat", null);
-                }}
-                error={fieldErrors.cat}
-                required
-              />
-              <SelectOptions
-                label={t.ad.choose_sub_category}
-                placeholder={t.ad.select_sub_category}
-                options={filteredSubCategories}
-                value={selectedCats.subCat}
-                disabled={!selectedCats.cat}
-                onChange={(item) => {
-                  setSelectedCats((prev) => ({
-                    ...prev,
-                    subCat: item,
-                  }));
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="form-section">
             <h2 className="section-title">{t.dashboard.tables.location}</h2>
             <div
               className="row-holder"
@@ -1006,6 +995,100 @@ export default function AdForm({
                   setSelectedLocations((prev) => ({
                     ...prev,
                     compound: item,
+                  }));
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2 className="section-title">{t.ad.category_info}</h2>
+            <div
+              className="row-holder"
+              style={{
+                gridTemplateColumns: `${showBuildingLandDetails ? "repeat(4, 1fr)" : ""} `,
+              }}
+            >
+              <SelectOptions
+                label={t.ad.choose_table}
+                placeholder={t.ad.select_table}
+                options={tables}
+                value={selectedCats.dep}
+                onChange={(item) => {
+                  setSelectedCats({
+                    dep: item,
+                    cat: null,
+                    subCat: null,
+                  });
+                  setSelectedAmenities([]);
+                  setAdditionalData((prev) => ({
+                    ...prev,
+                    buildingAndLandsType: null,
+                    landType: null,
+                    buildingType: null,
+                    buildingCondition: null,
+                  }));
+                  handleErrors("dep", null);
+                  handleErrors("cat", null);
+                  handleErrors("type", null);
+                  handleErrors("land_type", null);
+                  handleErrors("building_type", null);
+                  handleErrors("building_condition", null);
+                }}
+                error={fieldErrors.dep}
+                required
+              />
+              {showBuildingLandDetails && (
+                <SelectOptions
+                  label="Type"
+                  placeholder="Select type"
+                  options={BuildingAndLandsTypes}
+                  value={additionalData.buildingAndLandsType}
+                  disabled={!isEditable}
+                  onChange={(item) => {
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      buildingAndLandsType: item,
+                      landType: null,
+                      buildingType: null,
+                      buildingCondition: null,
+                    }));
+                    handleErrors("type", null);
+                    handleErrors("land_type", null);
+                    handleErrors("building_type", null);
+                    handleErrors("building_condition", null);
+                  }}
+                  error={fieldErrors.type}
+                  required={isFieldRequired(tableId, "type")}
+                />
+              )}
+              <SelectOptions
+                label={t.ad.choose_category}
+                placeholder={t.ad.select_category}
+                options={filteredCategories}
+                value={selectedCats.cat}
+                disabled={!selectedCats.dep}
+                onChange={(item) => {
+                  setSelectedCats((prev) => ({
+                    ...prev,
+                    cat: item,
+                    subCat: null,
+                  }));
+                  handleErrors("cat", null);
+                }}
+                error={fieldErrors.cat}
+                required
+              />
+              <SelectOptions
+                label={t.ad.choose_sub_category}
+                placeholder={t.ad.select_sub_category}
+                options={filteredSubCategories}
+                value={selectedCats.subCat}
+                disabled={!selectedCats.cat}
+                onChange={(item) => {
+                  setSelectedCats((prev) => ({
+                    ...prev,
+                    subCat: item,
                   }));
                 }}
               />
@@ -1140,111 +1223,134 @@ export default function AdForm({
             </div>
           )}
 
-          {showBuildingLandDetails && (
-            <div className="form-section">
-              <h2 className="section-title">
-                {t.dashboard.tables.property_details}
-              </h2>
-              <div
-                className="row-holder"
-                style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
-              >
-                <div className="box forInput">
-                  <label>
-                    {t.ad.area_m2}{" "}
-                    {isFieldRequired(tableId, "area_m2") && (
-                      <span className="required">*</span>
-                    )}
-                  </label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="number"
-                        {...register(
-                          "area_m2",
-                          getNumericRules(
-                            t.dashboard.forms.errors.required,
-                            t.dashboard.forms.errors.minOne,
-                            t.ad.errors.maxHundred,
-                            isFieldRequired(tableId, "area_m2"),
-                          ),
-                        )}
-                        disabled={!isEditable}
-                        placeholder={t.ad.area_m2Placeholder}
-                      />
-                    </div>
-                    {errors.area_m2 && (
-                      <span className="error">
-                        <CircleAlert />
-                        {errors.area_m2.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <SelectOptions
-                  label="Land Type"
-                  placeholder="Select land type"
-                  options={LandType}
-                  value={additionalData.landType}
-                  onChange={(item) => {
-                    setAdditionalData((prev) => ({
-                      ...prev,
-                      landType: item,
-                    }));
-                    handleErrors("land_type", null);
+          {showBuildingLandDetails &&
+            additionalData?.buildingAndLandsType?.id && (
+              <div className="form-section">
+                <h2 className="section-title">
+                  {t.dashboard.tables.property_details}
+                </h2>
+                <div
+                  className="row-holder"
+                  style={{
+                    gridTemplateColumns: `repeat(${additionalData?.buildingAndLandsType?.id == "BUILDING" ? 4 : 2}, 1fr)`,
                   }}
-                  disabled={!isEditable}
-                  error={fieldErrors.land_type}
-                  required={isFieldRequired(tableId, "land_type")}
-                />
+                >
+                  {additionalData?.buildingAndLandsType?.id == "BUILDING" ? (
+                    <SelectOptions
+                      label="Building Type"
+                      placeholder="Select building type"
+                      options={BuildingType}
+                      value={additionalData.buildingType}
+                      onChange={(item) => {
+                        setAdditionalData((prev) => ({
+                          ...prev,
+                          buildingType: item,
+                        }));
+                        handleErrors("building_type", null);
+                      }}
+                      disabled={!isEditable}
+                      error={fieldErrors.building_type}
+                      required
+                    />
+                  ) : (
+                    <SelectOptions
+                      label="Land Type"
+                      placeholder="Select land type"
+                      options={LandType}
+                      value={additionalData.landType}
+                      onChange={(item) => {
+                        setAdditionalData((prev) => ({
+                          ...prev,
+                          landType: item,
+                        }));
+                        handleErrors("land_type", null);
+                      }}
+                      disabled={!isEditable}
+                      error={fieldErrors.land_type}
+                      required
+                    />
+                  )}
+                  {additionalData?.buildingAndLandsType?.id == "BUILDING" && (
+                    <SelectOptions
+                      label="Building Condition"
+                      placeholder="Select building condition"
+                      options={BuildingCondition}
+                      value={additionalData.buildingCondition}
+                      onChange={(item) => {
+                        setAdditionalData((prev) => ({
+                          ...prev,
+                          buildingCondition: item,
+                        }));
+                        handleErrors("building_condition", null);
+                      }}
+                      disabled={!isEditable}
+                      error={fieldErrors.building_condition}
+                      required
+                    />
+                  )}
 
-                <SelectOptions
-                  label="Building Condition"
-                  placeholder="Select building condition"
-                  options={BuildingCondition}
-                  value={additionalData.buildingCondition}
-                  onChange={(item) => {
-                    setAdditionalData((prev) => ({
-                      ...prev,
-                      buildingCondition: item,
-                    }));
-                    handleErrors("usage_type", null);
-                  }}
-                  disabled={!isEditable}
-                  error={fieldErrors.usage_type}
-                  required={isFieldRequired(tableId, "usage_type")}
-                />
+                  {additionalData?.buildingAndLandsType?.id == "BUILDING" &&
+                    isFieldAllowed(tableId, "floors") && (
+                      <div className="box forInput">
+                        <label>Floors</label>
+                        <div className="inputHolder">
+                          <div className="holder">
+                            <input
+                              type="number"
+                              {...register("floors", {
+                                min: {
+                                  value: 1,
+                                  message: t.dashboard.forms.errors.minOne,
+                                },
+                              })}
+                              disabled={!isEditable}
+                              placeholder="Enter floors count"
+                            />
+                          </div>
+                          {errors.floors && (
+                            <span className="error">
+                              <CircleAlert />
+                              {errors.floors.message}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-                {isFieldAllowed(tableId, "floors") && (
                   <div className="box forInput">
-                    <label>Floors</label>
+                    <label>
+                      {t.ad.area_m2}{" "}
+                      {isFieldRequired(tableId, "area_m2") && (
+                        <span className="required">*</span>
+                      )}
+                    </label>
                     <div className="inputHolder">
                       <div className="holder">
                         <input
                           type="number"
-                          {...register("floors", {
+                          {...register("area_m2", {
                             min: {
                               value: 1,
                               message: t.dashboard.forms.errors.minOne,
                             },
                           })}
                           disabled={!isEditable}
-                          placeholder="Enter floors count"
+                          placeholder={
+                            t.ad.area_m2Placeholder || "area_m2Placeholder"
+                          }
                         />
                       </div>
-                      {errors.floors && (
+                      {errors.area_m2 && (
                         <span className="error">
                           <CircleAlert />
-                          {errors.floors.message}
+                          {errors.area_m2.message}
                         </span>
                       )}
                     </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           <div className="form-section">
             <h2 className="section-title">
@@ -1253,7 +1359,8 @@ export default function AdForm({
             <div className="row-holder two">
               <div className="box forInput">
                 <label>
-                  {t.ad.rentPrice} <span className="required">*</span>
+                  {showRentDetails ? t.ad.rentPrice : t.ad.price}{" "}
+                  <span className="required">*</span>
                 </label>
                 <div className="inputHolder">
                   <div className="holder">
@@ -1633,34 +1740,34 @@ export default function AdForm({
                     </div>
                   )}
 
-                  {isFieldAllowed(tableId, "area_m2") && showCommercialDetails && (
-                    <div className="box forInput">
-                      <div className="inputHolder">
-                        <div className="holder">
-                          <input
-                            type="number"
-                            {...register(
-                              "area_m2",
-                              getNumericRules(
-                                t.dashboard.forms.errors.required,
-                                t.dashboard.forms.errors.minOne,
-                                t.ad.errors.maxHundred,
-                                isFieldRequired(tableId, "area_m2"),
-                              ),
-                            )}
-                            disabled={!isEditable}
-                            placeholder={t.ad.area_m2Placeholder}
-                          />
+                  {isFieldAllowed(tableId, "area_m2") &&
+                    showCommercialDetails && (
+                      <div className="box forInput">
+                        <div className="inputHolder">
+                          <div className="holder">
+                            <input
+                              type="number"
+                              {...register("area_m2", {
+                                min: {
+                                  value: 1,
+                                  message: t.dashboard.forms.errors.minOne,
+                                },
+                              })}
+                              disabled={!isEditable}
+                              placeholder={
+                                t.ad.area_m2Placeholder || "area_m2Placeholder"
+                              }
+                            />
+                          </div>
+                          {errors.area_m2 && (
+                            <span className="error">
+                              <CircleAlert />
+                              {errors.area_m2.message}
+                            </span>
+                          )}
                         </div>
-                        {errors.area_m2 && (
-                          <span className="error">
-                            <CircleAlert />
-                            {errors.area_m2.message}
-                          </span>
-                        )}
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {isFieldAllowed(tableId, "ready_to_move") && (
                     <div className="box forInput">

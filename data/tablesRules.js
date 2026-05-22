@@ -149,8 +149,13 @@ const landBuildingAmenities = [
   "am_backup_generator",
 ];
 
-const buildingsLandsRequired = ["area_m2", "land_type", "usage_type"];
-const buildingsLandsOptional = ["floors"];
+const buildingsLandsRequired = ["type", "area_m2"];
+const buildingsLandsOptional = [
+  "land_type",
+  "building_type",
+  "building_condition",
+  "floors",
+];
 
 export const TABLE_RULES = {
   1: {

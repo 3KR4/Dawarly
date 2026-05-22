@@ -29,13 +29,8 @@ export default function SubCategories() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [history, setHistory] = useState([]);
-  const {
-    setCountries,
-    setGovernorates,
-    setCities,
-    setAreas,
-    setCompounds,
-  } = useAppData();
+  const { setCountries, setGovernorates, setCities, setAreas, setCompounds } =
+    useAppData();
   const {
     register,
     handleSubmit,
@@ -44,28 +39,28 @@ export default function SubCategories() {
   } = useForm();
 
   /* ================= STEPS ================= */
-const placeholders = {
-  countries: {
-    en: "e.g. Egypt",
-    ar: "مثال: مصر",
-  },
-  governorates: {
-    en: "e.g. Cairo",
-    ar: "مثال: القاهرة",
-  },
-  cities: {
-    en: "e.g. Nasr City",
-    ar: "مثال: مدينة نصر",
-  },
-  areas: {
-    en: "e.g. Heliopolis",
-    ar: "مثال: مصر الجديدة",
-  },
-  compounds: {
-    en: "e.g. Palm Hills",
-    ar: "مثال: بالم هيلز",
-  },
-};
+  const placeholders = {
+    countries: {
+      en: "e.g. Egypt",
+      ar: "مثال: مصر",
+    },
+    governorates: {
+      en: "e.g. Cairo",
+      ar: "مثال: القاهرة",
+    },
+    cities: {
+      en: "e.g. Nasr City",
+      ar: "مثال: مدينة نصر",
+    },
+    areas: {
+      en: "e.g. Heliopolis",
+      ar: "مثال: مصر الجديدة",
+    },
+    compounds: {
+      en: "e.g. Palm Hills",
+      ar: "مثال: بالم هيلز",
+    },
+  };
   const steps = {
     countries: 0,
     governorates: 1,
@@ -98,6 +93,66 @@ const placeholders = {
     }
   };
 
+  const isSameOrderScope = (item, scopeItem, type) => {
+    const scopeRelation = RELATIONS[type];
+    if (!scopeRelation) return true;
+
+    const scopeKeys = [
+      scopeRelation.parentKey,
+      scopeRelation.parentKey2,
+    ].filter(Boolean);
+
+    return scopeKeys.every((key) => item?.[key] == scopeItem?.[key]);
+  };
+
+  const sortByOrder = (items) => {
+    return [...items].sort((a, b) => {
+      const aOrder = Number(a?.order);
+      const bOrder = Number(b?.order);
+
+      if (!Number.isFinite(aOrder) && !Number.isFinite(bOrder)) return 0;
+      if (!Number.isFinite(aOrder)) return 1;
+      if (!Number.isFinite(bOrder)) return -1;
+
+      return aOrder - bOrder;
+    });
+  };
+
+  const updateListWithOrderChange = (items, updatedItem, oldItem, type) => {
+    const oldOrder = Number(oldItem?.order);
+    const newOrder = Number(updatedItem?.order);
+
+    if (
+      !Number.isFinite(oldOrder) ||
+      !Number.isFinite(newOrder) ||
+      oldOrder === newOrder
+    ) {
+      return sortByOrder(
+        items.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
+      );
+    }
+
+    const reorderedItems = items.map((item) => {
+      if (item.id === updatedItem.id) return updatedItem;
+      if (!isSameOrderScope(item, oldItem, type)) return item;
+
+      const itemOrder = Number(item.order);
+      if (!Number.isFinite(itemOrder)) return item;
+
+      if (newOrder < oldOrder && itemOrder >= newOrder && itemOrder < oldOrder) {
+        return { ...item, order: itemOrder + 1 };
+      }
+
+      if (newOrder > oldOrder && itemOrder > oldOrder && itemOrder <= newOrder) {
+        return { ...item, order: itemOrder - 1 };
+      }
+
+      return item;
+    });
+
+    return sortByOrder(reorderedItems);
+  };
+
   const handleSelect = (item) => {
     setHistory((prev) => [...prev, item]);
     setSelectedItem(item);
@@ -114,23 +169,22 @@ const placeholders = {
 
   const closeMenu = () => {
     setMenuType(null);
-    setSelectedTarget(null)
-    reset()
+    setSelectedTarget(null);
+    reset();
   };
 
-      const nextType = NEXT_STEP[selectedItem?.type];
-      const relation = RELATIONS[nextType];
+  const nextType = NEXT_STEP[selectedItem?.type];
+  const relation = RELATIONS[nextType];
 
   /* ================= SUBMIT ================= */
   const onSubmit = (data) => {
     if (loading) return;
     setLoading(true);
 
-
-
     const payload = {
       name_ar: data.name_ar,
       name_en: data.name_en,
+      order: data.order,
     };
 
     if (relation?.parentKey) {
@@ -142,8 +196,10 @@ const placeholders = {
     }
 
     if (selectedTarget) {
+      const modelType = relation?.source || relation || "countries";
+
       updateModel(
-        relation?.source || relation || "countries",
+        modelType,
         selectedTarget?.id,
         payload,
       )
@@ -154,8 +210,11 @@ const placeholders = {
 
           if (setter) {
             setter((prev) =>
-              prev.map((item) =>
-                item.id === updatedItem.id ? updatedItem : item,
+              updateListWithOrderChange(
+                prev,
+                updatedItem,
+                selectedTarget,
+                modelType,
               ),
             );
           }
@@ -172,7 +231,7 @@ const placeholders = {
           const setter = getSetterByType(nextType || "countries");
 
           if (setter) {
-            setter((prev) => [...prev, newItem]);
+            setter((prev) => sortByOrder([...prev, newItem]));
           }
 
           // update parent count in UI
@@ -192,39 +251,42 @@ const placeholders = {
     }
   };
 
-const confirmDelete = () => {
-  if (!selectedTarget) return;
-  setLoading(true);
+  const confirmDelete = () => {
+    if (!selectedTarget) return;
+    setLoading(true);
 
-  deleteModel(nextType || relation || "countries", selectedTarget?.id)
-    .then((res) => {
-      const { parent } = res.data;
+    deleteModel(nextType || relation || "countries", selectedTarget?.id)
+      .then((res) => {
+        const { parent } = res.data;
 
-      // ✅ احذف من الليست الصح (الـ children)
-      const setter = getSetterByType(nextType || "countries");
-      if (setter) {
-        setter((prev) => prev.filter((item) => item.id !== selectedTarget.id));
-      }
-
-      // ✅ حدث الأب
-      if (parent) {
-        const parentSetter = getSetterByType(selectedItem?.type);
-        if (parentSetter) {
-          parentSetter((prev) =>
-            prev.map((p) => (p.id === parent.id ? parent : p)),
+        // ✅ احذف من الليست الصح (الـ children)
+        const setter = getSetterByType(nextType || "countries");
+        if (setter) {
+          setter((prev) =>
+            prev.filter((item) => item.id !== selectedTarget.id),
           );
         }
-      }
 
-      closeMenu();
-    })
-    .catch((err) => alert(err.response?.data?.message))
-    .finally(() => setLoading(false));
-};
+        // ✅ حدث الأب
+        if (parent) {
+          const parentSetter = getSetterByType(selectedItem?.type);
+          if (parentSetter) {
+            parentSetter((prev) =>
+              prev.map((p) => (p.id === parent.id ? parent : p)),
+            );
+          }
+        }
+
+        closeMenu();
+      })
+      .catch((err) => alert(err.response?.data?.message))
+      .finally(() => setLoading(false));
+  };
   useEffect(() => {
     reset({
       name_en: selectedTarget?.name_en || "",
       name_ar: selectedTarget?.name_ar || "",
+      order: selectedTarget?.order || null,
     });
   }, [selectedTarget, reset]);
 
@@ -352,6 +414,36 @@ const confirmDelete = () => {
                 {errors.name_ar && (
                   <span className="error">
                     <CircleAlert /> Required
+                  </span>
+                )}
+              </div>
+              <div className="box forInput">
+                <label>
+                  Display Order <span className="required">*</span>
+                </label>
+
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      {...register("order", {
+                        required: "Order is required",
+                        min: {
+                          value: 1,
+                          message: "Minimum value is 1",
+                        },
+                        valueAsNumber: true,
+                      })}
+                      type="number"
+                      min={1}
+                      placeholder="Enter display order"
+                    />
+                  </div>
+                </div>
+
+                {errors.order && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.order.message}
                   </span>
                 )}
               </div>

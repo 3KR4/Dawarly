@@ -64,12 +64,62 @@ export const RentPeriodUnit = [
 ];
 
 export const LandType = [
-  { id: "RESIDENTIAL", name_en: "Residential", name_ar: "Residential" },
-  { id: "AGRICULTURAL", name_en: "Agricultural", name_ar: "Agricultural" },
-  { id: "COMMERCIAL", name_en: "Commercial", name_ar: "Commercial" },
-  { id: "INDUSTRIAL", name_en: "Industrial", name_ar: "Industrial" },
+  {
+    id: "RESIDENTIAL",
+    name_en: "Residential",
+    name_ar: "سكني",
+  },
+
+  {
+    id: "COMMERCIAL",
+    name_en: "Commercial",
+    name_ar: "تجاري",
+  },
+
+  {
+    id: "INDUSTRIAL",
+    name_en: "Industrial",
+    name_ar: "صناعي",
+  },
+
+  {
+    id: "AGRICULTURAL",
+    name_en: "Agricultural",
+    name_ar: "زراعي",
+  },
 ];
 
+export const BuildingType = [
+  {
+    id: "RESIDENTIAL",
+    name_en: "Residential",
+    name_ar: "سكني",
+  },
+
+  {
+    id: "COMMERCIAL",
+    name_en: "Commercial",
+    name_ar: "تجاري",
+  },
+
+  {
+    id: "ADMINISTRATIVE",
+    name_en: "Administrative",
+    name_ar: "إداري",
+  },
+
+  {
+    id: "INDUSTRIAL",
+    name_en: "Industrial",
+    name_ar: "صناعي",
+  },
+
+  {
+    id: "MIXED_USE",
+    name_en: "Mixed Use",
+    name_ar: "متعدد الاستخدام",
+  },
+];
 export const BuildingCondition = [
   { id: "NEW", name_en: "New", name_ar: "New" },
   { id: "OLD", name_en: "Old", name_ar: "Old" },
@@ -78,6 +128,11 @@ export const BuildingCondition = [
     name_en: "Under Construction",
     name_ar: "Under Construction",
   },
+];
+
+export const BuildingAndLandsTypes = [
+  { id: "BUILDING", name_en: "Building", name_ar: "مبنى" },
+  { id: "LAND", name_en: "Land", name_ar: "أرض" },
 ];
 
 export const ImageEntityTypes = [
@@ -249,7 +304,12 @@ export const Amenities = [
     name_en: "Meetings Room",
     name_ar: "غرفة اجتماعات",
   },
-  { id: "am_reception", key: "reception", name_en: "Reception", name_ar: "ريسبشن" },
+  {
+    id: "am_reception",
+    key: "reception",
+    name_en: "Reception",
+    name_ar: "ريسبشن",
+  },
   {
     id: "am_fire_system",
     key: "fire_system",
@@ -397,7 +457,7 @@ export const RELATIONS = {
   },
   cities: {
     parentKey: "governorate_id",
-    source: "cities", 
+    source: "cities",
     parentSource: "governorates",
   },
   areas: {
@@ -430,7 +490,3 @@ export const InstallmentYears = [
   { id: 14, name_en: "14 Years", name_ar: "14 سنة" },
   { id: 15, name_en: "15 Years", name_ar: "15 سنة" },
 ];
-
-
-
-

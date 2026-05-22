@@ -21,22 +21,25 @@ function SelectLocation({ locale = "en", onSelect }) {
   const [searchValue, setSearchValue] = useState("");
 
   const menuRef = useRef(null);
-  useClickOutside(menuRef, () => resetAll());
 
   const getName = (item) =>
     locale === "en" ? item.name_en : item.name_ar;
 
+  const hasAds = (item) => Number(item?.adsCount) > 0;
+
   // =========================
   // RESET
   // =========================
-  const resetAll = () => {
+  function resetAll() {
     setActiveMenu(false);
     setCurrentPage(1);
     setSelectedGovernorate(null);
     setSelectedCity(null);
     setSelectedArea(null);
     setSearchValue("");
-  };
+  }
+
+  useClickOutside(menuRef, () => resetAll());
 
   // =========================
   // BACK
@@ -113,17 +116,33 @@ function SelectLocation({ locale = "en", onSelect }) {
     return [];
   };
 
-  const filteredData = getCurrentData().filter((item) =>
-    getName(item).toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredData = getCurrentData()
+    .filter(hasAds)
+    .filter((item) =>
+      getName(item).toLowerCase().includes(searchValue.toLowerCase())
+    );
 
   // =========================
   // COUNTS
   // =========================
   const getCount = (item) => {
-    if (currentPage === 1) return item.childsCount;
-    if (currentPage === 2) return item.areasCount;
-    if (currentPage === 3) return item.childsCount;
+    if (currentPage === 1) {
+      return cities.filter(
+        (city) => city.governorate_id === item.id && hasAds(city)
+      ).length;
+    }
+
+    if (currentPage === 2) {
+      return areas.filter((area) => area.city_id === item.id && hasAds(area))
+        .length;
+    }
+
+    if (currentPage === 3) {
+      return compounds.filter(
+        (compound) => compound.area_id === item.id && hasAds(compound)
+      ).length;
+    }
+
     return null;
   };
 
