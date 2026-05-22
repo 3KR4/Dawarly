@@ -63,6 +63,78 @@ export const RentPeriodUnit = [
   { id: "MONTH", name_en: "Month", name_ar: "شهر" },
 ];
 
+export const LandType = [
+  {
+    id: "RESIDENTIAL",
+    name_en: "Residential",
+    name_ar: "سكني",
+  },
+
+  {
+    id: "COMMERCIAL",
+    name_en: "Commercial",
+    name_ar: "تجاري",
+  },
+
+  {
+    id: "INDUSTRIAL",
+    name_en: "Industrial",
+    name_ar: "صناعي",
+  },
+
+  {
+    id: "AGRICULTURAL",
+    name_en: "Agricultural",
+    name_ar: "زراعي",
+  },
+];
+
+export const BuildingType = [
+  {
+    id: "RESIDENTIAL",
+    name_en: "Residential",
+    name_ar: "سكني",
+  },
+
+  {
+    id: "COMMERCIAL",
+    name_en: "Commercial",
+    name_ar: "تجاري",
+  },
+
+  {
+    id: "ADMINISTRATIVE",
+    name_en: "Administrative",
+    name_ar: "إداري",
+  },
+
+  {
+    id: "INDUSTRIAL",
+    name_en: "Industrial",
+    name_ar: "صناعي",
+  },
+
+  {
+    id: "MIXED_USE",
+    name_en: "Mixed Use",
+    name_ar: "متعدد الاستخدام",
+  },
+];
+export const BuildingCondition = [
+  { id: "NEW", name_en: "New", name_ar: "New" },
+  { id: "OLD", name_en: "Old", name_ar: "Old" },
+  {
+    id: "UNDER_CONSTRUCTION",
+    name_en: "Under Construction",
+    name_ar: "Under Construction",
+  },
+];
+
+export const BuildingAndLandsTypes = [
+  { id: "BUILDING", name_en: "Building", name_ar: "مبنى" },
+  { id: "LAND", name_en: "Land", name_ar: "أرض" },
+];
+
 export const ImageEntityTypes = [
   { id: "AD", name_en: "Ad", name_ar: "إعلان" },
   { id: "SLIDER", name_en: "Slider", name_ar: "سلايدر" },
@@ -124,6 +196,18 @@ export const Amenities = [
     name_en: "Sea View",
     name_ar: "إطلالة بحر",
   },
+  {
+    id: "am_lakeview",
+    key: "lakeview",
+    name_en: "Lake View",
+    name_ar: "إطلالة بحيرة",
+  },
+  {
+    id: "am_beach_access",
+    key: "beach_access",
+    name_en: "Beach Access",
+    name_ar: "وصول للشاطئ",
+  },
   { id: "am_pool", key: "pool", name_en: "Pool", name_ar: "حمام سباحة" },
   { id: "am_balcony", key: "balcony", name_en: "Balcony", name_ar: "بلكونة" },
   {
@@ -132,11 +216,143 @@ export const Amenities = [
     name_en: "Private Garden",
     name_ar: "حديقة خاصة",
   },
+  {
+    id: "am_private_roof",
+    key: "private_roof",
+    name_en: "Private Roof",
+    name_ar: "روف خاص",
+  },
   { id: "am_kitchen", key: "kitchen", name_en: "Kitchen", name_ar: "مطبخ" },
   { id: "am_ac", key: "ac", name_en: "Air Conditioning", name_ar: "تكييف" },
+  {
+    id: "am_central_ac",
+    key: "central_ac",
+    name_en: "Central AC",
+    name_ar: "تكييف مركزي",
+  },
   { id: "am_heating", key: "heating", name_en: "Heating", name_ar: "تدفئة" },
   { id: "am_elevator", key: "elevator", name_en: "Elevator", name_ar: "مصعد" },
+  { id: "am_security", key: "security", name_en: "Security", name_ar: "أمن" },
+  { id: "am_parking", key: "parking", name_en: "Parking", name_ar: "جراج" },
+  {
+    id: "am_private_parking",
+    key: "private_parking",
+    name_en: "Private Parking",
+    name_ar: "جراج خاص",
+  },
+  {
+    id: "am_driver_room",
+    key: "driver_room",
+    name_en: "Driver Room",
+    name_ar: "غرفة سائق",
+  },
+  {
+    id: "am_maid_room",
+    key: "maid_room",
+    name_en: "Maid Room",
+    name_ar: "غرفة مربية",
+  },
+  { id: "am_gas", key: "gas", name_en: "Gas", name_ar: "غاز" },
+  { id: "am_water", key: "water", name_en: "Water", name_ar: "مياه" },
+  {
+    id: "am_electricity",
+    key: "electricity",
+    name_en: "Electricity",
+    name_ar: "كهرباء",
+  },
+  {
+    id: "am_storage_room",
+    key: "storage_room",
+    name_en: "Storage Room",
+    name_ar: "مخزن",
+  },
+  {
+    id: "am_laundry_room",
+    key: "laundry_room",
+    name_en: "Laundry Room",
+    name_ar: "غرفة غسيل",
+  },
+  {
+    id: "am_furnished",
+    key: "furnished",
+    name_en: "Furnished",
+    name_ar: "مفروش",
+  },
   { id: "am_gym", key: "gym", name_en: "Gym", name_ar: "جيم" },
+  {
+    id: "am_clubhouse",
+    key: "clubhouse",
+    name_en: "Clubhouse",
+    name_ar: "كلوب هاوس",
+  },
+  {
+    id: "am_kids_area",
+    key: "kids_area",
+    name_en: "Kids Area",
+    name_ar: "منطقة أطفال",
+  },
+  {
+    id: "am_bbq_area",
+    key: "bbq_area",
+    name_en: "BBQ Area",
+    name_ar: "منطقة شواء",
+  },
+  { id: "am_jacuzzi", key: "jacuzzi", name_en: "Jacuzzi", name_ar: "جاكوزي" },
+  {
+    id: "am_meetings_room",
+    key: "meetings_room",
+    name_en: "Meetings Room",
+    name_ar: "غرفة اجتماعات",
+  },
+  {
+    id: "am_reception",
+    key: "reception",
+    name_en: "Reception",
+    name_ar: "ريسبشن",
+  },
+  {
+    id: "am_fire_system",
+    key: "fire_system",
+    name_en: "Fire System",
+    name_ar: "نظام إطفاء",
+  },
+  {
+    id: "am_backup_generator",
+    key: "backup_generator",
+    name_en: "Backup Generator",
+    name_ar: "مولد احتياطي",
+  },
+  {
+    id: "am_loading_area",
+    key: "loading_area",
+    name_en: "Loading Area",
+    name_ar: "منطقة تحميل",
+  },
+  {
+    id: "am_corner_plot",
+    key: "corner_plot",
+    name_en: "Corner Plot",
+    name_ar: "قطعة ناصية",
+  },
+  {
+    id: "am_main_street",
+    key: "main_street",
+    name_en: "Main Street",
+    name_ar: "شارع رئيسي",
+  },
+  { id: "am_fenced", key: "fenced", name_en: "Fenced", name_ar: "مسور" },
+  {
+    id: "am_paved_road",
+    key: "paved_road",
+    name_en: "Paved Road",
+    name_ar: "طريق ممهد",
+  },
+  {
+    id: "am_building_permit",
+    key: "building_permit",
+    name_en: "Building Permit",
+    name_ar: "ترخيص بناء",
+  },
 ];
 export const months = [
   { id: 1, name_en: "Jan", name_ar: "يناير" },
@@ -172,6 +388,25 @@ export const Levels = [
     name_ar: "+10",
   },
 ];
+export const PaymentMethod = [
+  {
+    id: "CASH",
+    name_en: "Cash",
+    name_ar: "كاش",
+  },
+
+  {
+    id: "INSTALLMENTS",
+    name_en: "Installments",
+    name_ar: "تقسيط",
+  },
+
+  {
+    id: "CASH_OR_INSTALLMENTS",
+    name_en: "Cash or Installments",
+    name_ar: "كاش أو تقسيط",
+  },
+];
 export const Priority = [
   {
     id: 0,
@@ -205,6 +440,11 @@ export const Priority = [
 ];
 
 export const RELATIONS = {
+  categories: {
+    parentKey: "table_id",
+    source: "categories",
+    parentSource: "tables",
+  },
   subcategories: {
     parentKey: "category_id",
     source: "subcategories",
@@ -232,3 +472,21 @@ export const RELATIONS = {
     parentSource: "areas",
   },
 };
+
+export const InstallmentYears = [
+  { id: 1, name_en: "1 Year", name_ar: "سنة" },
+  { id: 2, name_en: "2 Years", name_ar: "سنتين" },
+  { id: 3, name_en: "3 Years", name_ar: "3 سنوات" },
+  { id: 4, name_en: "4 Years", name_ar: "4 سنوات" },
+  { id: 5, name_en: "5 Years", name_ar: "5 سنوات" },
+  { id: 6, name_en: "6 Years", name_ar: "6 سنوات" },
+  { id: 7, name_en: "7 Years", name_ar: "7 سنوات" },
+  { id: 8, name_en: "8 Years", name_ar: "8 سنوات" },
+  { id: 9, name_en: "9 Years", name_ar: "9 سنوات" },
+  { id: 10, name_en: "10 Years", name_ar: "10 سنوات" },
+  { id: 11, name_en: "11 Years", name_ar: "11 سنة" },
+  { id: 12, name_en: "12 Years", name_ar: "12 سنة" },
+  { id: 13, name_en: "13 Years", name_ar: "13 سنة" },
+  { id: 14, name_en: "14 Years", name_ar: "14 سنة" },
+  { id: 15, name_en: "15 Years", name_ar: "15 سنة" },
+];

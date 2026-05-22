@@ -190,7 +190,7 @@ function Images({
         <div className={`imgHolder ${limit === 1 ? "single-image" : ""}`}>
           {safeImages?.map((image, index) => (
             <div
-              className="uploaded"
+              className={`uploaded ${index === 0 ? "cover-image" : ""}`}
               key={
                 image?.id || image?.secure_url || image?.preview || `${index}`
               }
@@ -203,7 +203,7 @@ function Images({
                 unoptimized
               />
 
-              {!sectionMode && <p>{index + 1}</p>}
+              {!sectionMode && <p>{index === 0 ? "Cover" : index + 1}</p>}
 
               {!disabled && (
                 <IoClose onClick={() => handleRemoveImage(index)} />

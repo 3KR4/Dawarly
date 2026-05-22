@@ -24,7 +24,7 @@ export const ENDPOINTS = {
     GET_SECTIONS_ADS: (type, id, page, limit) =>
       `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
     GET_ALL: () => `/ads/all`,
-    GET_ONE_AD: (id) => `/ads/${id}`,
+    GET_ONE_AD: (tableId, adId) => `/ads/${tableId}/${adId}`,
     GET_USER_ADS: (id, status, search, page, limit) => {
       const params = new URLSearchParams();
 
@@ -35,11 +35,11 @@ export const ENDPOINTS = {
 
       return `/ads/profile/${id}?${params.toString()}`;
     },
-    CREATE: () => `/ads/create`,
-    UPDATE: (id) => `/ads/update/${id}`,
-    DELETE: (id) => `/ads/delete/${id}`,
-    ASSIGN_ADMIN: (ad) => `/ads/assign-admin/${ad}`,
-    SHANGE_STATUS: (ad) => `/ads/update/${ad}/status`,
+    CREATE: (tableId) => `/ads/create/${tableId}`,
+    UPDATE: (tableId, adId) => `/ads/update/${tableId}/${adId}`,
+    DELETE: (tableId, adId) => `/ads/delete/${tableId}/${adId}`,
+    ASSIGN_ADMIN: (tableId, adId) => `/ads/assign-admin/${tableId}/${adId}`,
+    SHANGE_STATUS: (tableId, adId) => `/ads/update/${tableId}/${adId}/status`,
   },
   SLIDERS: {
     GET_ALL: (page, limit, active_only) => {
@@ -78,7 +78,10 @@ export const ENDPOINTS = {
     GET_FAVORITES: (page, limit) => `/favorites?page=${page}&limit=${limit}`,
   },
   IMAGES: {
-    ADD: (entity_type, entity_id) => `/images/${entity_type}/${entity_id}`,
+    ADD: (entity_type, entity_id, table_id = null) =>
+      table_id
+        ? `/images/${entity_type}/${table_id}/${entity_id}`
+        : `/images/${entity_type}/${entity_id}`,
     DELETE: (entity_type, entity_id, image_id) =>
       `/images/${entity_type}/${entity_id}/${image_id}`,
     EDIT: (entity_type, entity_id, image_id) =>
@@ -106,6 +109,7 @@ export const ENDPOINTS = {
       city_id ? `data/areas?city_id=${city_id}` : `data/areas`,
     GET_COMPOUNDS: (area_id) =>
       area_id ? `data/compounds?area_id=${area_id}` : `data/compounds`,
+    GET_TABLES: () => `data/tables`,
     GET_CATEGORIES: () => `data/categories`,
     GET_SUBCATEGORIES: (category_id) =>
       category_id

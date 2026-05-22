@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
 import { useEffect, useState, useContext, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import "@/styles/client/pages/singel-details.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +42,9 @@ import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
 export default function AdDetails() {
   const t = useTranslate();
   const { slug } = useParams();
+  const searchParams = useSearchParams();
   const { screenSize, locale } = useContext(settings);
+  const tableId = searchParams.get("dep");
 
   const [ad, setAd] = useState(null);
   const [currentImg, setCurrentImg] = useState(0);
@@ -51,14 +53,19 @@ export default function AdDetails() {
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
 
   useEffect(() => {
-    getOneAd(slug)
+    if (!tableId || !slug) {
+      setLoading(false);
+      return;
+    }
+
+    getOneAd(tableId, slug)
       .then((res) => {
         console.log("res", res.data);
         setAd(res.data);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, tableId]);
 
   const getSpecConfig = (key) => specsConfig[key];
 
@@ -207,12 +214,7 @@ export default function AdDetails() {
                 <div className="row">
                   <div className="column-holder">
                     <h5 className="price">
-                      {formatCurrency(
-                        ad?.rent_amount,
-                        ad?.rent_currency,
-                        locale,
-                      )}{" "}
-                      /{" "}
+                      {formatCurrency(ad?.price, ad?.currency, locale)} /{" "}
                       {
                         RentFrequencies.find(
                           (x) => x.id == ad?.rent_frequency,
@@ -221,11 +223,7 @@ export default function AdDetails() {
                     </h5>
                     <h6 className="price-dep">
                       {t.ad.deposit}:{" "}
-                      {formatCurrency(
-                        ad?.deposit_amount,
-                        ad?.rent_currency,
-                        locale,
-                      )}
+                      {formatCurrency(ad?.deposit_amount, ad?.currency, locale)}
                     </h6>
                   </div>
                   {!screenSize.includes("small") && (

@@ -16,11 +16,11 @@ import { settings } from "@/Contexts/settings";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { useNotification } from "@/Contexts/NotificationContext";
-import { deleteAd } from "@/services/ads/ads.service";
 import { TbListSearch } from "react-icons/tb";
 import { AdStatuses, RentFrequencies } from "@/data/enums";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
+import { FaHeart } from "react-icons/fa";
 
 export default function AdsTable({
   ads,
@@ -38,6 +38,9 @@ export default function AdsTable({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [target, setTarget] = useState(null);
   const [rejectInput, setRejectInput] = useState("");
+
+  const getAdTableId = (item) =>
+    Number(item?.department?.id || item?.Categories?.table_id);
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
@@ -64,7 +67,7 @@ export default function AdsTable({
           closeMenu();
         })
         .catch(console.error)
-        .finaly(setLoadingSubmit(false));
+        .finally(() => setLoadingSubmit(false));
     }
   };
 
@@ -137,14 +140,18 @@ export default function AdsTable({
           ) : (
             ads?.map((item) => {
               const curentStatus = AdStatuses.find((s) => s.id == item?.status);
+              const tableId = getAdTableId(item);
+              const itemWithTableId = { ...item, table_id: tableId };
               return (
                 <div key={item?.id} className={`table-item ${item?.status}`}>
                   <div className="holder">
-                    <Link href={`/`} className="item-image">
+                    <Link
+                      href={`/market/${item?.id}?dep=${tableId}`}
+                      className="item-image"
+                    >
                       <Image
                         src={
-                          item?.images?.[0]?.secure_url ||
-                          "/apartment-mockup.avif"
+                          item?.image?.secure_url || "/apartment-mockup.avif"
                         }
                         alt={item?.name}
                         fill
@@ -153,7 +160,10 @@ export default function AdsTable({
                     </Link>
 
                     <div className="item-details">
-                      <Link href={`/market/${item?.id}`} className="item-name">
+                      <Link
+                        href={`/market/${item?.id}?dep=${tableId}`}
+                        className="item-name"
+                      >
                         {item?.title}
                       </Link>
                       <div className="item-location nisted">
@@ -178,26 +188,22 @@ export default function AdsTable({
                     <>
                       <div className="item-categories nisted">
                         <Link
-                          href={`/market?cat=${item?.Categories?.id}`}
+                          href={`/market?dep=${item?.department?.id}`}
                           className="link"
                         >
-                          {item?.Categories?.[`name_${locale}`]} /
+                          {item?.department?.[`name_${locale}`]} /
                         </Link>
 
                         <Link
-                          href={`/market?subcat=${item?.SubCategories?.id}`}
+                          href={`/market?cat=${item?.category?.id}`}
                           className="link"
                         >
-                          {item?.SubCategories?.[`name_${locale}`]}
+                          {item?.category?.[`name_${locale}`]} 
                         </Link>
                       </div>
 
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(
-                          item?.rent_amount,
-                          item?.rent_currency,
-                          locale,
-                        )}
+                        {formatCurrency(item?.price, item?.currency, locale)}
                       </div>
                       {!activeAds && (
                         <div
@@ -206,7 +212,7 @@ export default function AdsTable({
                         >
                           {formatCurrency(
                             item?.deposit_amount,
-                            item?.rent_currency,
+                            item?.currency,
                             locale,
                           )}
                         </div>
@@ -215,11 +221,7 @@ export default function AdsTable({
                   ) : (
                     <>
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(
-                          item?.rent_amount,
-                          item?.rent_currency,
-                          locale,
-                        )}{" "}
+                        {formatCurrency(item?.price, item?.currency, locale)}{" "}
                         {
                           RentFrequencies?.find(
                             (x) => x.id == item?.rent_frequency,
@@ -233,26 +235,26 @@ export default function AdsTable({
                         >
                           {formatCurrency(
                             item?.deposit_amount,
-                            item?.rent_currency,
+                            item?.currency,
                             locale,
                           )}
                         </div>
                       )}
 
-                      <div className="item-categories nisted">
-                        <Link
-                          href={`/market?cat=${item?.Categories?.id}`}
-                          className="link"
-                        >
-                          {item?.Categories?.[`name_${locale}`]} /
-                        </Link>
+                        <div className="item-categories nisted">
+                          <Link
+                            href={`/market?dep=${item?.department?.id}`}
+                            className="link"
+                          >
+                            {item?.department?.[`name_${locale}`]} /
+                          </Link>
 
-                        <Link
-                          href={`/market?subcat=${item?.SubCategories?.id}`}
-                          className="link"
-                        >
-                          {item?.SubCategories?.[`name_${locale}`]}
-                        </Link>
+                          <Link
+                            href={`/market?cat=${item?.category?.id}`}
+                            className="link"
+                          >
+                            {item?.category?.[`name_${locale}`]} 
+                          </Link>
                       </div>
                     </>
                   )}
@@ -267,6 +269,9 @@ export default function AdsTable({
                       </h4>
                       <h4 className="green">
                         {item?.reach_count} <BiSolidPurchaseTagAlt />
+                      </h4>
+                      <h4 className="love">
+                        {item?.favorites_count} <FaHeart />
                       </h4>
                     </div>
                   )}
@@ -314,9 +319,9 @@ export default function AdsTable({
                         onChange={(selected) => {
                           if (selected.id == "REJECTED") {
                             setMenuType("reject");
-                            setTarget(item?.id);
+                            setTarget(itemWithTableId);
                           } else {
-                            changeStatus(item?.id, selected);
+                            changeStatus(itemWithTableId, selected);
                           }
                         }}
                       />
@@ -324,7 +329,7 @@ export default function AdsTable({
                   )}
 
                   <div className="actions">
-                    <Link href={`/market/${item?.id}`}>
+                    <Link href={`/market/${item?.id}?dep=${tableId}`}>
                       <FaEye className="view" />
                     </Link>
                     <hr />
@@ -333,8 +338,8 @@ export default function AdsTable({
                         <Link
                           href={
                             page == "dashboard"
-                              ? `/dashboard/ads/form?id=${item?.id}`
-                              : `/mylisting/form/${item?.id}`
+                              ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
+                              : `/mylisting/form/${item?.id}?dep=${tableId}`
                           }
                         >
                           <MdEdit className="edit" />
@@ -348,7 +353,7 @@ export default function AdsTable({
                       className="delete"
                       onClick={() => {
                         setMenuType("delete");
-                        setTarget(item?.id);
+                        setTarget(itemWithTableId);
                       }}
                     />
                   </div>

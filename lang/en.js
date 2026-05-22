@@ -11,6 +11,7 @@ const en = {
   home: {
     home: "home",
     seeMore: "see more",
+    tables: "departments",
     categories: "categories",
     subCategories: "sub categories",
     subcategories: "sub categories",
@@ -62,6 +63,8 @@ const en = {
     // Form sections
     choose_category: "Choose a category",
     choose_sub_category: "Choose a subcategory",
+    choose_table: "choose department",
+    select_table: "select the department",
     select_category: "Select a category",
     select_sub_category: "Select a subcategory",
     ad_basics: "Ad basics",
@@ -122,6 +125,8 @@ const en = {
     bathroomsPlaceholder: "Number of bathrooms",
     level: "Level",
     levelPlaceholder: "Floor number",
+    area_m2: "area m2",
+    area_m2Placeholder: "area in m2",
 
     // Guest capacity
     childMax: "Max Children",

@@ -5,7 +5,8 @@ import "@/styles/client/filters.css";
 import { IoIosClose } from "react-icons/io";
 import { settings } from "@/Contexts/settings";
 import useTranslate from "@/Contexts/useTranslation";
-
+import dayjs from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 const DynamicFilters = ({
   dynamicFilters = [],
   selectedFilters = {},

@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import api, { plainApi, setAccessToken } from "@/services/axios";
+import { createContext, useContext, useEffect, useState } from "react";
+import api, { refreshAccessToken, setAccessToken } from "@/services/axios";
 
 const AuthContext = createContext(null);
 
@@ -12,8 +12,6 @@ export const AuthProvider = ({ children }) => {
   // ================= LOGIN =================
   const login = ({ user, accessToken }) => {
     setAccessToken(accessToken);
-
-    // ✅ حط اليوزر فورًا
     setUser(user);
     localStorage.setItem("user", JSON.stringify(user));
   };
@@ -37,8 +35,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.get("/auth/me");
       setUser(res.data);
-
-      // ✅ save in localStorage
       localStorage.setItem("user", JSON.stringify(res.data));
     } catch (err) {
       setUser(null);
@@ -49,16 +45,14 @@ export const AuthProvider = ({ children }) => {
   // ================= REFRESH TOKEN =================
   const refreshAuth = async () => {
     try {
-      const res = await plainApi.post("/auth/refresh-token"); // ✅
-      setAccessToken(res.data.accessToken);
-
+      await refreshAccessToken();
       await fetchUser();
     } catch (err) {
       setUser(null);
       localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   // ================= INIT =================
@@ -66,28 +60,26 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem("user");
 
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // ✅ instant UI
-      setLoading(false); // ✅ منع الفلاش
+      setUser(JSON.parse(storedUser));
     }
 
     refreshAuth();
   }, []);
 
-const updateUserFavoritesCount = (newCount) => {
-  setUser((prev) => {
-    if (!prev) return prev;
+  const updateUserFavoritesCount = (newCount) => {
+    setUser((prev) => {
+      if (!prev) return prev;
 
-    const updatedUser = {
-      ...prev,
-      favorites_count: newCount,
-    };
+      const updatedUser = {
+        ...prev,
+        favorites_count: newCount,
+      };
 
-    // ✅ sync مع localStorage
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
-    return updatedUser;
-  });
-};
+      return updatedUser;
+    });
+  };
 
   return (
     <AuthContext.Provider
@@ -97,7 +89,7 @@ const updateUserFavoritesCount = (newCount) => {
         logout,
         loading,
         isAuthenticated: !!user,
-        updateUserFavoritesCount
+        updateUserFavoritesCount,
       }}
     >
       {children}

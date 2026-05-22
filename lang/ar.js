@@ -8,6 +8,8 @@ const ar = {
   home: {
     home: "الصفحة الرئيسية",
     seeMore: "رؤية المزيد",
+    tables: "الجداول",
+
     categories: "الفئات",
     subCategories: "الفئات الفرعية",
     subcategories: "الفئات الفرعية",
@@ -57,6 +59,8 @@ const ar = {
     ad_updated: "تم تحديث الإعلان بنجاح",
     // Form sections
     choose_category: "اختر القسم",
+    choose_table: "اختر قسم",
+    select_table: "ادخل القسم الخاص بمنتجك",
     choose_sub_category: "اختر القسم الفرعي",
     select_category: "اختر القسم",
     select_sub_category: "اختر القسم الفرعي",
@@ -118,7 +122,8 @@ const ar = {
     bathroomsPlaceholder: "عدد دورات المياه",
     level: "الدور",
     levelPlaceholder: "رقم الدور",
-
+    area_m2: "المساحة بالمتر",
+    area_m2Placeholder: "ادخل المساحة بالمتر المربع",
     // Guest capacity
     childMax: "الحد الأقصى للأطفال",
     childMaxPlaceholder: "عدد الأطفال المسموح به",

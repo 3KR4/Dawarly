@@ -11,12 +11,6 @@ export default function NotFound() {
       <Link href={`/`} className={`main-button`}>
         Back to Home
       </Link>
-      <Link href={`/`} className={`main-button`}>
-        Back to Home
-      </Link>
-      <Link href={`/`} className={`main-button`}>
-        Back to Home
-      </Link>
     </div>
   );
 }

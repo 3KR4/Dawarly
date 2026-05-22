@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   getCountries,
   getGovernorates,
+  getTables,
   getCategories,
   getSubCategories,
   getCities,
@@ -15,6 +16,7 @@ const DataContext = createContext();
 export const DataProvider = ({ children }) => {
   const [countries, setCountries] = useState([]);
   const [governorates, setGovernorates] = useState([]);
+  const [tables, setTables] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [cities, setCities] = useState([]);
@@ -32,6 +34,10 @@ export const DataProvider = ({ children }) => {
     localStorage.setItem("governorates", JSON.stringify(governorates));
   }, [governorates, loading]);
 
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("tables", JSON.stringify(tables));
+  }, [tables, loading]);
   useEffect(() => {
     if (loading) return;
     localStorage.setItem("categories", JSON.stringify(categories));
@@ -63,6 +69,7 @@ export const DataProvider = ({ children }) => {
         const cached = {
           countries: JSON.parse(localStorage.getItem("countries") || "null"),
           governorates: JSON.parse(localStorage.getItem("governorates") || "null"),
+          tables: JSON.parse(localStorage.getItem("tables") || "null"),
           categories: JSON.parse(localStorage.getItem("categories") || "null"),
           subCategories: JSON.parse(localStorage.getItem("subCategories") || "null"),
           cities: JSON.parse(localStorage.getItem("cities") || "null"),
@@ -73,6 +80,7 @@ export const DataProvider = ({ children }) => {
         if (
           cached.countries &&
           cached.governorates &&
+          cached.tables &&
           cached.categories &&
           cached.subCategories &&
           cached.cities &&
@@ -81,6 +89,7 @@ export const DataProvider = ({ children }) => {
         ) {
           setCountries(cached.countries);
           setGovernorates(cached.governorates);
+          setTables(cached.tables);
           setCategories(cached.categories);
           setSubCategories(cached.subCategories);
           setCities(cached.cities);
@@ -100,6 +109,7 @@ export const DataProvider = ({ children }) => {
         const [
           countriesRes,
           govRes,
+          tabRes,
           catRes,
           subCatRes,
           citiesRes,
@@ -108,6 +118,7 @@ export const DataProvider = ({ children }) => {
         ] = await Promise.all([
           getCountries(),
           getGovernorates(null),
+          getTables(),
           getCategories(),
           getSubCategories(null),
           getCities(null),
@@ -118,6 +129,7 @@ export const DataProvider = ({ children }) => {
         // 🔥 update UI مباشرة
         setCountries(countriesRes.data);
         setGovernorates(govRes.data);
+        setTables(tabRes.data);
         setCategories(catRes.data);
         setSubCategories(subCatRes.data);
         setCities(citiesRes.data);
@@ -127,6 +139,7 @@ export const DataProvider = ({ children }) => {
         // 🔥 update cache
         localStorage.setItem("countries", JSON.stringify(countriesRes.data));
         localStorage.setItem("governorates", JSON.stringify(govRes.data));
+        localStorage.setItem("tables", JSON.stringify(tabRes.data));
         localStorage.setItem("categories", JSON.stringify(catRes.data));
         localStorage.setItem("subCategories", JSON.stringify(subCatRes.data));
         localStorage.setItem("cities", JSON.stringify(citiesRes.data));
@@ -157,6 +170,7 @@ export const DataProvider = ({ children }) => {
       value={{
         countries,
         governorates,
+        tables,
         categories,
         subCategories,
         cities,
@@ -165,6 +179,7 @@ export const DataProvider = ({ children }) => {
         loading,
         setCountries,
         setGovernorates,
+        setTables,
         setCategories,
         setSubCategories,
         setCities,

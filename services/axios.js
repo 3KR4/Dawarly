@@ -6,7 +6,6 @@ export const plainApi = axios.create({
   withCredentials: true,
 });
 
-// Instance الرئيسي
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   withCredentials: true,
@@ -31,16 +30,16 @@ export const getAccessToken = () => accessToken;
 // -------------------- REFRESH CONTROL --------------------
 let refreshPromise = null;
 
-const refreshToken = async () => {
+export const refreshAccessToken = async () => {
   if (!refreshPromise) {
     refreshPromise = plainApi
       .post("/auth/refresh-token")
       .then((res) => {
-        accessToken = res.data.accessToken;
+        setAccessToken(res.data.accessToken);
         return accessToken;
       })
       .catch((err) => {
-        accessToken = null;
+        clearAuth();
         throw err;
       })
       .finally(() => {
@@ -50,16 +49,14 @@ const refreshToken = async () => {
 
   return refreshPromise;
 };
-console.log("after url");
 
 // -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
-  // لو مفيش توكن → حاول تجيبه
   if (!accessToken) {
     try {
-      return config;
+      await refreshAccessToken();
     } catch (err) {
-      return config; // سيبه يكمل بدون توكن
+      return config;
     }
   }
 
@@ -69,6 +66,7 @@ api.interceptors.request.use(async (config) => {
 
   return config;
 });
+
 // -------------------- RESPONSE INTERCEPTOR --------------------
 api.interceptors.response.use(
   (response) => response,
@@ -77,20 +75,19 @@ api.interceptors.response.use(
 
     if (
       error.response?.status === 401 &&
+      original &&
       !original._retry &&
-      !original.url.includes("/auth/refresh-token") &&
-      accessToken
+      !original.url.includes("/auth/refresh-token")
     ) {
       original._retry = true;
 
       try {
-        await refreshToken();
+        await refreshAccessToken();
 
-        // نحط التوكن الجديد ونعيد الطلب
+        original.headers = original.headers || {};
         original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
       } catch (err) {
-        // logout / redirect
         if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
 
@@ -98,6 +95,7 @@ api.interceptors.response.use(
             window.location.href = "/register";
           }
         }
+
         return Promise.reject(err);
       }
     }

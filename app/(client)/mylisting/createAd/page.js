@@ -113,8 +113,8 @@ export default function CreateAd() {
     display_phone: selectedContactMethods.phone,
     display_whatsapp: selectedContactMethods.chat,
     display_dawaarly_contact: selectedMediatorMethod?.id === 2,
-    rent_amount: Number(data.rentAmount),
-    rent_currency: additionalData.currency?.id,
+    price: Number(data.rentAmount),
+    currency: additionalData.currency?.id,
     rent_frequency: additionalData.frequency?.id,
     deposit_amount: Number(data.deposit_amount),
     min_rent_period: Number(data.rentalDuration),
@@ -147,21 +147,21 @@ export default function CreateAd() {
     return result;
   };
 
-const uploadNewImages = async (adId) => {
-  const safeImages = Array.isArray(images) ? images : [];
+  const uploadNewImages = async (adId) => {
+    const safeImages = Array.isArray(images) ? images : [];
 
-  // الصور الجديدة فقط
-  const newImages = safeImages.filter((img) => img?.file instanceof File);
+    // الصور الجديدة فقط
+    const newImages = safeImages.filter((img) => img?.file instanceof File);
 
-  if (newImages.length === 0) return;
+    if (newImages.length === 0) return;
 
-  const formData = new FormData();
+    const formData = new FormData();
 
-  newImages.forEach((img) => {
-    formData.append("files", img.file);
-  });
+    newImages.forEach((img) => {
+      formData.append("files", img.file);
+    });
 
-  await uploadImages("AD", adId, formData);
+    await uploadImages("AD", adId, formData);
   };
 
   const fieldErrorMap = {
@@ -169,10 +169,10 @@ const uploadNewImages = async (adId) => {
     categoryId: "category",
     governorate_id: "governorate",
     city_id: "city",
-    rent_currency: "currency",
+    currency: "currency",
     rent_frequency: "frequency",
     deposit_amount: "deposit_amount_reqire",
-    rent_amount: "priceRequired",
+    price: "priceRequired",
     bedrooms: "required",
     bathrooms: "required",
     level: "required",

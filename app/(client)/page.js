@@ -12,6 +12,7 @@ export default function Home() {
       <HeroSwiper />
       {/* <SearchSection /> */}
       <CategoriesSwiper type={`categories`} />
+      <CategoriesSwiper type={`tables`} />
       {/* <CategoriesSwiper type={`subcategories`} target={2}  /> */}
       {/* <CategoriesSwiper type={`subcategories`}  />
       <CategoriesSwiper type={`countries`}  />

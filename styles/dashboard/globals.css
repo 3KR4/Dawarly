@@ -169,7 +169,6 @@ header .actions-btns .userMenu .top {
 }
 .dash-holder .top.two {
   grid-template-columns: 1fr 0.4fr;
-
 }
 .dash-holder.for-client .top {
   margin-bottom: 3px;
@@ -244,8 +243,8 @@ header .actions-btns .userMenu .top {
   height: 100px !important;
 }
 .for-blogs .table-container .item-image .product-image {
-      aspect-ratio: 16 / 9;
-    height: 115px !important;
+  aspect-ratio: 16 / 9;
+  height: 115px !important;
 }
 .table-container .item-details {
   gap: 2px;
@@ -272,10 +271,10 @@ header .actions-btns .userMenu .top {
   font-size: 14px;
 }
 .table-container .item-overview {
+  flex-wrap: wrap;
   gap: 5px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   padding: 0 20px;
+  display: flex;
 }
 .table-container .item-overview.onlyOne {
   grid-template-columns: 1fr;
@@ -283,16 +282,23 @@ header .actions-btns .userMenu .top {
 .table-container .item-overview h4 {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 3px;
   background: var(--hover-color);
   font-size: 14px;
   padding: 7px 11px;
   border-radius: 7px;
-  color: var(--paragraph);
   justify-content: center;
+  min-width: 48%;
+  color: #a477ff;
+  flex: 1;
 }
 .table-container .item-overview h4.green {
   background: #fdecd2;
+  color: #ffb647;
+}
+.table-container .item-overview h4.love {
+  background: #fcddec;
+  color: #ff98ca;
 }
 .table-container.for-users .item-overview h4 {
   width: 50%;

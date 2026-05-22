@@ -32,8 +32,29 @@ import {
 import { useAuth } from "@/Contexts/AuthContext";
 import { useAppData } from "@/Contexts/DataContext";
 
+const INTEREST_GROUPS = [
+  {
+    id: "vacation_homes",
+    name_en: "Vacation Homes",
+    name_ar: "Vacation Homes",
+    tableIds: [1, 2],
+  },
+  {
+    id: "properties_sale",
+    name_en: "Properties for Sale",
+    name_ar: "Properties for Sale",
+    tableIds: [3, 5, 7, 9],
+  },
+  {
+    id: "properties_rent",
+    name_en: "Properties for Rent",
+    name_ar: "Properties for Rent",
+    tableIds: [4, 6, 8, 10],
+  },
+];
+
 export default function Register() {
-  const { governorates, subCategories, cities } = useAppData();
+  const { governorates, tables, cities } = useAppData();
 
   const { addNotification } = useNotification();
   const { login } = useAuth();
@@ -135,6 +156,15 @@ export default function Register() {
   const [verifyMethod, setVerifyMethod] = useState("");
   const [availableMethod, setAvailableMethod] = useState("both");
 
+  const interestGroups = useMemo(() => {
+    return INTEREST_GROUPS.map((group) => ({
+      ...group,
+      tableIds: group.tableIds.filter((id) =>
+        tables?.some((table) => table.id === id),
+      ),
+    })).filter((group) => group.tableIds.length > 0);
+  }, [tables]);
+
   // const canUseEmail = availableMethod === "email" || availableMethod === "both";
   // const canUsePhone = availableMethod === "phone" || availableMethod === "both";
   const [cooldown, setCooldown] = useState(60);
@@ -184,10 +214,16 @@ export default function Register() {
     setErrorTracker((prev) => ({ ...prev, [type]: value }));
   };
 
-  const toggleCategory = (id) => {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
-    );
+  const toggleInterestGroup = (ids) => {
+    setSelectedCategories((prev) => {
+      const isActive = ids.every((id) => prev.includes(id));
+
+      if (isActive) {
+        return prev.filter((id) => !ids.includes(id));
+      }
+
+      return [...new Set([...prev, ...ids])];
+    });
   };
 
   const OTP_LENGTH = 6;
@@ -1075,18 +1111,18 @@ export default function Register() {
         {/* ================= INTERESTS SELECTION ================= */}
         {step === STEPS.INTERESTS && (
           <div className="options-grid">
-            {subCategories?.map((cat) => {
-              const Icon = cat?.icon;
-              const active = selectedCategories.includes(cat.id);
+            {interestGroups.map((group) => {
+              const active = group.tableIds.every((id) =>
+                selectedCategories.includes(id),
+              );
 
               return (
                 <div
-                  key={cat.id}
+                  key={group.id}
                   className={`option-box ${active ? "active" : ""}`}
-                  onClick={() => toggleCategory(cat.id)}
+                  onClick={() => toggleInterestGroup(group.tableIds)}
                 >
-                  {/* <Icon className="cat-icon" /> */}
-                  <span>{cat[`name_${locale}`]}</span>
+                  <span>{group[`name_${locale}`] || group.name_en}</span>
                 </div>
               );
             })}

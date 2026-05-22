@@ -29,22 +29,7 @@ const ActiveFiltersBar = ({
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      // try {
-      //   const { data } = await getService.getDynamicFilters(6);
-      //   setDynamicFilters(
-      //     data || locale == "en" ? propertiesFiltersEn : propertiesFiltersAr
-      //   );
-      // } catch (err) {
-      //   console.error("Failed to fetch governorates:", err);
-      //   setDynamicFilters(locale == "en" ? propertiesFiltersEn : propertiesFiltersAr);
-      // }
-      setCategories(locale == "en" ? categoriesEn : categoriesAr);
-      setSubcategories(locale == "en" ? subcategoriesEn : subcategoriesAr);
-    };
-    fetchCategories();
-  }, [locale]);
+  console.log("dynamicFilters", dynamicFilters);
 
   // دالة لعرض اسم الفلتر
   const getFilterDisplayName = (key, value) => {
@@ -157,15 +142,8 @@ const ActiveFiltersBar = ({
       });
   }
 
-  // فلتر السعر
-  if (priceRange) {
-    const display = getFilterDisplayName("priceRange", priceRange);
-    if (display)
-      activeFilters.push({ key: "priceRange", value: priceRange, display });
-  }
-
   // فلترات ديناميكية
-  if (dynamicFilters && typeof dynamicFilters === "object") {
+  if (dynamicFilters) {
     Object.entries(dynamicFilters).forEach(([key, value]) => {
       const isEmpty =
         value === null ||
@@ -184,7 +162,9 @@ const ActiveFiltersBar = ({
   return (
     <div className="active-filters-bar">
       <div className="filters-header" onClick={onOpenFilters}>
-        {screenSize == "large" ? t.actions.active_filters : t.actions.filterations}
+        {screenSize == "large"
+          ? t.actions.active_filters
+          : t.actions.filterations}
         <span className="filters-count" style={{ display: "flex" }}>
           {screenSize !== "large" ? <LuSettings2 /> : ":"}
         </span>
