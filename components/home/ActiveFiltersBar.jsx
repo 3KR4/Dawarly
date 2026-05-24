@@ -1,22 +1,15 @@
 "use client";
-import React from "react";
-import { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { IoIosClose } from "react-icons/io";
 import "@/styles/client/pages/market.css";
 import useTranslate from "@/Contexts/useTranslation";
-import {
-  categoriesEn,
-  categoriesAr,
-  subcategoriesEn,
-  subcategoriesAr,
-} from "@/data";
 import { LuSettings2 } from "react-icons/lu";
 import { settings } from "@/Contexts/settings";
+import { useAppData } from "@/Contexts/DataContext";
 
 const ActiveFiltersBar = ({
   selectedCategory,
   dynamicFilters,
-  priceRange,
   onRemoveCategory,
   onRemoveFilter,
   onClearAll,
@@ -25,124 +18,119 @@ const ActiveFiltersBar = ({
 }) => {
   const t = useTranslate();
   const { locale, screenSize } = useContext(settings);
+  const { categories = [], subCategories = [] } = useAppData();
 
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
+  const getLocalizedText = (value) => {
+    if (!value) return "";
+    if (typeof value === "string" || typeof value === "number") return value;
+    return value[locale] || value.en || value.ar || "";
+  };
 
-  console.log("dynamicFilters", dynamicFilters);
+  const getFieldLabel = (field) => getLocalizedText(field?.label) || field?.key || "";
 
-  // دالة لعرض اسم الفلتر
   const getFilterDisplayName = (key, value) => {
-    // فلتر السعر
-    if (key === "priceRange") {
-      const defaultMin = 0;
-      const defaultMax = 10000;
-      if (value[0] === defaultMin && value[1] === defaultMax) return "";
-      return `${t.dashboard.forms.price}: ${value[0]} - ${value[1]}`;
-    }
-
-    // فلتر الفئة الرئيسية
     if (key === "cat") {
-      const cat = categories.find((c) => c.id === value.id);
-      return `${t.dashboard.forms.category}: ${cat ? cat.name : ""}`;
+      const cat = categories.find((item) => String(item.id) === String(value.id));
+      return `${t.dashboard.forms.category}: ${cat ? cat[`name_${locale}`] : value.id}`;
     }
 
-    // فلتر الفئة الفرعية
     if (key === "subCat") {
-      const sub = subcategories.find((s) => s.id == value.id);
-      return `${t.dashboard.forms.subCategory}: ${sub ? sub.name : ""}`;
+      const sub = subCategories.find((item) => String(item.id) === String(value.id));
+      return `${t.dashboard.forms.subCategory}: ${sub ? sub[`name_${locale}`] : value.id}`;
     }
 
-    // فلترات ديناميكية
-    const field = fieldDefinitions.find((f) => f.key === key);
+    const field = fieldDefinitions.find((item) => item.key === key);
     if (!field) {
       if (typeof value === "object" && value !== null) {
-        return `${key}: ${value.name || value.name || value.value || ""}`;
+        return `${key}: ${getLocalizedText(value.label) || value.value || value.id || ""}`;
       }
       return `${key}: ${value}`;
     }
 
-    // أنواع الفلاتر المختلفة
     switch (field.uiType) {
-      case "select":
+      case "select": {
         if (!value) return "";
-        const selOption = field.options.find((opt) => opt.id === value.id);
-        if (selOption) {
-          const displayName =
-            typeof selOption.name === "object"
-              ? selOption.name
-              : selOption.name;
-          return `${field.label}: ${displayName}`;
-        }
-        break;
-
-      case "radio":
-        if (!value) return "";
-        const radioOption = field.options.find(
-          (opt) => opt.value === value?.value || value,
+        const selectedOption = field.options.find(
+          (option) => String(option.id) === String(value.id),
         );
-        if (radioOption) {
-          const displayLabel = radioOption.label || radioOption.value || value;
-          return `${field.label}: ${displayLabel}`;
-        }
-        return `${field.label}: ${value}`;
+        const displayValue =
+          getLocalizedText(selectedOption?.label) ||
+          selectedOption?.[`name_${locale}`] ||
+          selectedOption?.value ||
+          value.id;
+
+        return `${getFieldLabel(field)}: ${displayValue}`;
+      }
 
       case "boolean":
-        const displayValue = value === true ? t.ad.yes : t.ad.no;
-        return `${field.label}: ${displayValue}`;
+        return `${getFieldLabel(field)}: ${value === true ? t.ad.yes : t.ad.no}`;
 
-      case "multiSelect":
-        if (!Array.isArray(value) || value.length === 0) return "";
-        const displayValues = value
-          .map((val) => {
-            const opt = field.options.find((o) => o.value === val);
-            return opt?.label || opt?.value || val;
+      case "checkbox":
+        return value === true ? getFieldLabel(field) : "";
+
+      case "nested": {
+        if (!value || typeof value !== "object") return "";
+        const parts = field.levels
+          .map((level) => {
+            const selectedId = value[level.queryKey];
+            const selectedItem = level.items.find(
+              (item) => String(item.id) === String(selectedId),
+            );
+            return selectedItem?.[`name_${locale}`] || selectedItem?.name_en;
           })
           .filter(Boolean);
-        return `${field.label}: ${displayValues.join(", ")}`;
 
-      case "input":
-        if (field.inputType === "number" && Array.isArray(value)) {
-          const [min, max] = value;
-          const defaultMin = field.min || 0;
-          const defaultMax = field.max || 10000;
-          if (min === defaultMin && max === defaultMax) return "";
-          return `${field.label}: ${min} - ${max}`;
-        }
-        break;
+        return parts.length ? `${getFieldLabel(field)}: ${parts.join(" / ")}` : "";
+      }
+
+      case "multiSelect": {
+        if (!Array.isArray(value) || value.length === 0) return "";
+        const displayValues = value
+          .map((selectedValue) => {
+            const option = field.options.find(
+              (item) => String(item.value) === String(selectedValue),
+            );
+            return getLocalizedText(option?.label) || option?.value || selectedValue;
+          })
+          .filter(Boolean);
+
+        return `${getFieldLabel(field)}: ${displayValues.join(", ")}`;
+      }
+
+      case "range":
+        if (!Array.isArray(value)) return "";
+        return `${getFieldLabel(field)}: ${value[0]} - ${value[1]}`;
 
       default:
         if (typeof value === "object" && value !== null) {
-          return `${field.label}: ${
-            value.name || value.name || value.value || ""
+          return `${getFieldLabel(field)}: ${
+            getLocalizedText(value.label) || value.value || value.id || ""
           }`;
         }
-        return `${field.label}: ${value}`;
+        return `${getFieldLabel(field)}: ${value}`;
     }
-
-    return "";
   };
 
-  // حساب الفلاتر النشطة
   const activeFilters = [];
 
   if (selectedCategory?.cat) {
     const display = getFilterDisplayName("cat", selectedCategory.cat);
-    if (display)
+    if (display) {
       activeFilters.push({ key: "cat", value: selectedCategory.cat, display });
+    }
   }
 
   if (selectedCategory?.subCat) {
     const display = getFilterDisplayName("subCat", selectedCategory.subCat);
-    if (display)
+    if (display) {
       activeFilters.push({
         key: "subCat",
         value: selectedCategory.subCat,
         display,
       });
+    }
   }
 
-  // فلترات ديناميكية
   if (dynamicFilters) {
     Object.entries(dynamicFilters).forEach(([key, value]) => {
       const isEmpty =
@@ -150,21 +138,23 @@ const ActiveFiltersBar = ({
         value === undefined ||
         value === "" ||
         (Array.isArray(value) && value.length === 0) ||
-        (typeof value === "object" && Object.keys(value).length === 0);
+        (typeof value === "object" &&
+          !Array.isArray(value) &&
+          Object.keys(value).length === 0);
+
       if (!isEmpty) {
         const display = getFilterDisplayName(key, value);
         if (display) activeFilters.push({ key, value, display });
       }
     });
   }
-  if (screenSize == "large" && activeFilters.length === 0) return null;
+
+  if (screenSize === "large" && activeFilters.length === 0) return null;
 
   return (
     <div className="active-filters-bar">
       <div className="filters-header" onClick={onOpenFilters}>
-        {screenSize == "large"
-          ? t.actions.active_filters
-          : t.actions.filterations}
+        {screenSize === "large" ? t.actions.active_filters : t.actions.filterations}
         <span className="filters-count" style={{ display: "flex" }}>
           {screenSize !== "large" ? <LuSettings2 /> : ":"}
         </span>

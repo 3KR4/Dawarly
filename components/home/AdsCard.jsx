@@ -10,13 +10,14 @@ import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { isArabic } from "@/utils/detectDirection";
 import useTranslate from "@/Contexts/useTranslation";
 import { specsConfig } from "@/Contexts/specsConfig";
-import { subcategoriesEn, subcategoriesAr } from "@/data";
 import { FaEye } from "react-icons/fa";
 import { RentFrequencies } from "@/data/enums";
 import { toggleFavorite } from "@/services/favorites/favorites.service";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { playSound } from "@/utils/sounds";
+import { BsFillPatchCheckFill } from "react-icons/bs";
+import { BsFillLightningChargeFill } from "react-icons/bs";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
@@ -91,13 +92,13 @@ export default function CardItem({ data }) {
         <Image
           className="main"
           fill
-          src={data?.images?.[0]?.secure_url || "/apartment-mockup.avif"}
+          src={data?.image?.secure_url || "/apartment-mockup.avif"}
           alt={data?.title}
         />
         <Image
           className="cover"
           fill
-          src={data?.images?.[0]?.secure_url || "/apartment-mockup.avif"}
+          src={data?.image?.secure_url || "/apartment-mockup.avif"}
           alt={`${data?.title}-cover`}
         />
         <div className="top">
@@ -123,6 +124,22 @@ export default function CardItem({ data }) {
               <span className="count">{favoritesCount}</span>
             )}
           </button>
+
+          {data?.featured_priority > 0 && (
+            <span className="verified ellipsis">
+              <BsFillLightningChargeFill /> Featured
+            </span>
+          )}
+        </div>
+        <div className="bottom">
+          <span className="department ellipsis">
+            {data?.department?.[`name_${locale}`]}
+          </span>
+          {data?.is_verified && (
+            <span className="verified ellipsis">
+              <BsFillPatchCheckFill /> verified
+            </span>
+          )}
         </div>
       </div>
       <div className="body">
@@ -136,11 +153,11 @@ export default function CardItem({ data }) {
           <h5
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/market?subcat=${data?.SubCategories?.id}`);
+              router.push(`/market?subcat=${data?.category?.id}`);
             }}
             className={`category ellipsis`}
           >
-            {data?.SubCategories?.[`name_${locale}`]}
+            {data?.category?.[`name_${locale}`]}
           </h5>
         </div>
         <div className="row-holder">
@@ -165,7 +182,9 @@ export default function CardItem({ data }) {
             const Icon = config?.icon;
 
             const displayValue =
-              typeof value === "object" ? (value.label ?? value.value) : value;
+              typeof value === "object"
+                ? (value?.label ?? value?.value)
+                : value;
 
             return (
               <div key={key} className="spec">

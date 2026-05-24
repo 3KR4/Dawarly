@@ -8,7 +8,6 @@
   transition: all 0.3s;
 }
 
-
 .filters .holder {
   gap: 10px !important;
 }
@@ -125,6 +124,119 @@
   border-color: var(--main-color);
 }
 
+.marketplace .filters .filter-checkbox {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 6px 9px;
+}
+.marketplace .filters .filter-checkbox input[type="checkbox"] + label {
+  color: var(--paragraph);
+  font-size: 13px;
+  transition: 0.3s;
+}
+.marketplace .filters .filter-checkbox input[type="checkbox"]:checked + label {
+  color: var(--main-color);
+  font-weight: 700;
+}
+
+.marketplace .filters .nisted-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.marketplace .filters .nisted-list.menu {
+  display: none;
+  margin-top: 5px;
+  padding-left: 8px;
+  border-left: 2px solid var(--lighter-main-color-2);
+}
+
+[lang="ar"] .marketplace .filters .nisted-list.menu {
+  padding-right: 12px;
+  padding-left: 0;
+  border-right: 2px solid var(--lighter-main-color-2);
+  border-left: 0;
+}
+
+.marketplace .filters .nisted-list li.open > .menu {
+  display: flex;
+}
+
+.marketplace .filters .nisted-list h5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 9px;
+  color: var(--paragraph);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.marketplace .filters .nisted-list li.active > h5,
+.marketplace .filters .nisted-list h5:hover {
+  background: var(--hover-color);
+  border-color: var(--main-color);
+}
+
+.marketplace .filters .nisted-list h5 small {
+  background: var(--hover-color);
+  color: var(--paragraph);
+  text-align: center;
+  border-radius: 50px;
+  padding: 2px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.marketplace .filters .nisted-list li.active > h5 > small,
+.marketplace .filters .nisted-list h5:hover > small {
+  color: var(--main-color);
+  letter-spacing: 0.7px;
+  font-weight: 900;
+}
+.marketplace .filters .nisted-list li.active > h5 > span,
+.marketplace .filters .nisted-list h5:hover > span {
+  color: var(--main-color);
+  font-weight: 700;
+}
+.marketplace .filters li:has(.view-toggle) {
+  margin-bottom: -5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+.marketplace .filters .view-toggle {
+  width: fit-content;
+  color: var(--main-color);
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  min-width: max-content;
+}
+
+.marketplace .filters .view-toggle:hover {
+  text-decoration: underline;
+}
+.marketplace .filters li:has(.view-toggle) hr {
+  background: var(--main-color);
+  height: 3px;
+}
 .price-slider {
   width: 100%;
   margin: 10px 0;

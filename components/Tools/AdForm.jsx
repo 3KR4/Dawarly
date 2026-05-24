@@ -1455,6 +1455,33 @@ export default function AdForm({
                 </>
               )}
             </div>
+            {isFieldAllowed(tableId, "area_m2") && showCommercialDetails && (
+              <div className="box forInput">
+                <div className="inputHolder">
+                  <div className="holder">
+                    <input
+                      type="number"
+                      {...register("area_m2", {
+                        min: {
+                          value: 1,
+                          message: t.dashboard.forms.errors.minOne,
+                        },
+                      })}
+                      disabled={!isEditable}
+                      placeholder={
+                        t.ad.area_m2Placeholder || "area_m2Placeholder"
+                      }
+                    />
+                  </div>
+                  {errors.area_m2 && (
+                    <span className="error">
+                      <CircleAlert />
+                      {errors.area_m2.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {showRentDetails && (

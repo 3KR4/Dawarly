@@ -2,8 +2,8 @@ import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
 /* ================= REGISTER ================= */
-export const getSectionsAds = (type, id, page, limit) => {
-  return api.get(ENDPOINTS.ADS.GET_SECTIONS_ADS(type, id, page, limit));
+export const getSectionsAds = (params) => {
+  return api.get(ENDPOINTS.ADS.GET_SECTIONS_ADS(params));
 };
 export const getAllAds = (filters) => {
   const params = Object.fromEntries(

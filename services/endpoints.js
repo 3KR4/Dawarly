@@ -21,8 +21,17 @@ export const ENDPOINTS = {
     UPDATE_ROLE: (id) => `/auth/${id}/role`,
   },
   ADS: {
-    GET_SECTIONS_ADS: (type, id, page, limit) =>
-      `/ads/sections?type=${type}&value=${id}&page=${page}&limit=${limit}`,
+    GET_SECTIONS_ADS: (params = {}) => {
+      const query = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          query.append(key, value);
+        }
+      });
+
+      return `/ads/sections?${query.toString()}`;
+    },
     GET_ALL: () => `/ads/all`,
     GET_ONE_AD: (tableId, adId) => `/ads/${tableId}/${adId}`,
     GET_USER_ADS: (id, status, search, page, limit) => {
@@ -79,9 +88,7 @@ export const ENDPOINTS = {
   },
   IMAGES: {
     ADD: (entity_type, entity_id, table_id = null) =>
-      table_id
-        ? `/images/${entity_type}/${table_id}/${entity_id}`
-        : `/images/${entity_type}/${entity_id}`,
+      `/images/${entity_type}/${table_id ?? 0}/${entity_id}`,
     DELETE: (entity_type, entity_id, image_id) =>
       `/images/${entity_type}/${entity_id}/${image_id}`,
     EDIT: (entity_type, entity_id, image_id) =>
@@ -96,19 +103,40 @@ export const ENDPOINTS = {
     CANCEL: (id) => `/Booking/${id}/Cancel`,
   },
   DATA: {
-    GET_COUNTRIES: () => `data/countries`,
-    GET_GOVERNRATES: (country_id) =>
-      country_id
-        ? `data/governorates?country_id=${country_id}`
-        : `data/governorates`,
-    GET_CITIES: (governorate_id) =>
-      governorate_id
-        ? `data/cities?governorate_id=${governorate_id}`
-        : `data/cities`,
-    GET_AREAS: (city_id) =>
-      city_id ? `data/areas?city_id=${city_id}` : `data/areas`,
-    GET_COMPOUNDS: (area_id) =>
-      area_id ? `data/compounds?area_id=${area_id}` : `data/compounds`,
+    GET_COUNTRIES: (table_id) => {
+      const params = new URLSearchParams();
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query ? `data/countries?${query}` : `data/countries`;
+    },
+    GET_GOVERNRATES: (country_id, table_id) => {
+      const params = new URLSearchParams();
+      if (country_id) params.append("country_id", country_id);
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query ? `data/governorates?${query}` : `data/governorates`;
+    },
+    GET_CITIES: (governorate_id, table_id) => {
+      const params = new URLSearchParams();
+      if (governorate_id) params.append("governorate_id", governorate_id);
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query ? `data/cities?${query}` : `data/cities`;
+    },
+    GET_AREAS: (city_id, table_id) => {
+      const params = new URLSearchParams();
+      if (city_id) params.append("city_id", city_id);
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query ? `data/areas?${query}` : `data/areas`;
+    },
+    GET_COMPOUNDS: (area_id, table_id) => {
+      const params = new URLSearchParams();
+      if (area_id) params.append("area_id", area_id);
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query ? `data/compounds?${query}` : `data/compounds`;
+    },
     GET_TABLES: () => `data/tables`,
     GET_CATEGORIES: () => `data/categories`,
     GET_SUBCATEGORIES: (category_id) =>

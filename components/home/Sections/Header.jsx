@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa";
 import { FiSun } from "react-icons/fi";
 import { GrLanguage } from "react-icons/gr";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LuMessageSquare } from "react-icons/lu";
 import { MdPostAdd } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
@@ -32,6 +32,7 @@ import { buildNavigation } from "@/utils/buildNavigation";
 function Header() {
   const t = useTranslate();
   const pathname = usePathname();
+  const router = useRouter();
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
   const { tables, categories, subCategories } = useAppData();
@@ -83,7 +84,23 @@ function Header() {
     return buildNavigation(tables, categories, subCategories);
   }, [tables, categories, subCategories]);
 
-  console.log(nav);
+  const marketHref = ({ dep, cat, subcat } = {}) => {
+    const params = new URLSearchParams();
+    if (dep) params.set("dep", dep);
+    if (cat) params.set("cat", cat);
+    if (subcat) params.set("subcat", subcat);
+    const query = params.toString();
+    return query ? `/market?${query}` : "/market";
+  };
+
+  const handleLocationSelect = ({ governorate, city, area, compound }) => {
+    const params = new URLSearchParams();
+    if (governorate?.id) params.set("governorate_id", governorate.id);
+    if (city?.id) params.set("city_id", city.id);
+    if (area?.id) params.set("area_id", area.id);
+    if (compound?.id) params.set("compound_id", compound.id);
+    router.push(`/market?${params.toString()}`);
+  };
 
   return (
     <>
@@ -276,7 +293,7 @@ function Header() {
                   {t.header.filterByCategories} <FaAngleDown />
                 </h4>
               )}
-              <SelectLocation locale={locale} />
+              <SelectLocation locale={locale} onSelect={handleLocationSelect} />
 
               <div
                 className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
@@ -301,7 +318,7 @@ function Header() {
                       {/* ================= ROOT ================= */}
 
                       <Link
-                        href={`/market?group=${group.id}`}
+                        href={marketHref()}
                         onClick={(e) => {
                           if (screenSize !== "large") {
                             e.preventDefault();
@@ -361,7 +378,10 @@ function Header() {
                                             {/* SALE / RENT */}
 
                                             <Link
-                                              href={`/market?cat=${item.category_id}`}
+                                              href={marketHref({
+                                                dep: item.table_id,
+                                                cat: item.category_id,
+                                              })}
                                               className="nested-parent"
                                             >
                                               <span>
@@ -382,7 +402,10 @@ function Header() {
                                                       {/* SALE / RENT */}
 
                                                       <Link
-                                                        href={`/market?cat=${x.category_id}`}
+                                                        href={marketHref({
+                                                          dep: x.table_id,
+                                                          cat: x.category_id,
+                                                        })}
                                                         className="nested-parent"
                                                       >
                                                         <span>
@@ -406,7 +429,11 @@ function Header() {
                                                             (sub) => (
                                                               <Link
                                                                 key={sub.id}
-                                                                href={`/market?sub=${sub.id}`}
+                                                                href={marketHref({
+                                                                  dep: x.table_id,
+                                                                  cat: x.category_id,
+                                                                  subcat: sub.id,
+                                                                })}
                                                               >
                                                                 {
                                                                   sub?.[
@@ -431,7 +458,11 @@ function Header() {
                                                 {item.children.map((sub) => (
                                                   <Link
                                                     key={sub.id}
-                                                    href={`/market?sub=${sub.id}`}
+                                                    href={marketHref({
+                                                      dep: item.table_id,
+                                                      cat: item.category_id,
+                                                      subcat: sub.id,
+                                                    })}
                                                   >
                                                     {sub?.[`name_${locale}`]}
                                                   </Link>
@@ -474,7 +505,10 @@ function Header() {
                                             className="nested-item"
                                           >
                                             <Link
-                                              href={`/market?cat=${cat.id}`}
+                                              href={marketHref({
+                                                dep: table.id,
+                                                cat: cat.id,
+                                              })}
                                               className="nested-parent"
                                             >
                                               <span>
@@ -493,7 +527,11 @@ function Header() {
                                                 {cat.children.map((sub) => (
                                                   <Link
                                                     key={sub.id}
-                                                    href={`/market?sub=${sub.id}`}
+                                                    href={marketHref({
+                                                      dep: table.id,
+                                                      cat: cat.id,
+                                                      subcat: sub.id,
+                                                    })}
                                                   >
                                                     {sub?.[`name_${locale}`]}
                                                   </Link>
