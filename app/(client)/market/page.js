@@ -148,6 +148,7 @@ const hasAds = (item) => Number(item?.adsCount || 0) > 0;
 const getDynamicFilterDefinitions = (tableId, data = {}) => {
   const {
     maxPrice = 10000000,
+    maxAreaM2 = 2000,
     tables = [],
     categories = [],
     subCategories = [],
@@ -243,7 +244,7 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
     key: "area_m2",
     uiType: "range",
     min: 0,
-    max: 2000,
+    max: maxAreaM2 || 2000,
     label: { en: "Area m2", ar: "Area m2" },
   });
 
@@ -370,6 +371,7 @@ export default function Marketplace() {
   const [loadingContent, setLoadingContent] = useState(false);
   const [meta, setMeta] = useState({
     max_price: 10000000,
+    max_area_m2: 2000,
     price_currency: "EGP",
   });
   const [tableLocations, setTableLocations] = useState(null);
@@ -385,6 +387,7 @@ export default function Marketplace() {
     () =>
       getDynamicFilterDefinitions(tableId, {
         maxPrice: meta.max_price,
+        maxAreaM2: meta.max_area_m2,
         tables,
         categories,
         subCategories,
@@ -400,6 +403,7 @@ export default function Marketplace() {
       compounds,
       governorates,
       meta.max_price,
+      meta.max_area_m2,
       subCategories,
       tableLocations,
       tableId,
@@ -467,6 +471,24 @@ export default function Marketplace() {
   const updateUrl = useCallback(
     (updates = {}, resetPage = true) => {
       const params = new URLSearchParams(queryString);
+      const categoryKeys = ["dep", "cat", "subcat"];
+      const shouldResetPriceRange = categoryKeys.some((key) => {
+        if (!Object.prototype.hasOwnProperty.call(updates, key)) return false;
+
+        const nextValue = updates[key];
+        const currentValue = params.get(key);
+        const normalizedNextValue =
+          nextValue === null || nextValue === undefined || nextValue === ""
+            ? null
+            : String(nextValue);
+
+        return currentValue !== normalizedNextValue;
+      });
+
+      if (shouldResetPriceRange) {
+        params.delete("min_price");
+        params.delete("max_price");
+      }
 
       Object.entries(updates).forEach(([key, value]) => {
         const isEmpty =
@@ -562,6 +584,7 @@ export default function Marketplace() {
         setMeta((prev) => {
           const next = res.data.meta || prev;
           return next.max_price === prev.max_price &&
+            next.max_area_m2 === prev.max_area_m2 &&
             next.price_currency === prev.price_currency
             ? prev
             : next;

@@ -144,9 +144,8 @@ const DynamicFilters = ({
     const expanded = isListExpanded(fieldKey, levelKey);
 
     const button = (
-      <>
+      <div className="view-toggle-row">
         <hr />
-
         <button
           type="button"
           className="view-toggle"
@@ -155,7 +154,7 @@ const DynamicFilters = ({
           {expanded ? "View less" : "View more"}
         </button>
         <hr />
-      </>
+      </div>
     );
 
     return asListItem ? <li className="view-toggle-item">{button}</li> : button;

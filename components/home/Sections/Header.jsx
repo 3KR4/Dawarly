@@ -93,6 +93,27 @@ function Header() {
     return query ? `/market?${query}` : "/market";
   };
 
+  const getNodeHref = (node) => {
+    if (!node) return marketHref();
+
+    if (node.table_id && node.category_id) {
+      return marketHref({
+        dep: node.table_id,
+        cat: node.category_id,
+      });
+    }
+
+    if (node.table_id) {
+      return marketHref({ dep: node.table_id });
+    }
+
+    if (node.children?.length) {
+      return getNodeHref(node.children[0]);
+    }
+
+    return marketHref();
+  };
+
   const handleLocationSelect = ({ governorate, city, area, compound }) => {
     const params = new URLSearchParams();
     if (governorate?.id) params.set("governorate_id", governorate.id);
@@ -318,7 +339,7 @@ function Header() {
                       {/* ================= ROOT ================= */}
 
                       <Link
-                        href={marketHref()}
+                        href={getNodeHref(group)}
                         onClick={(e) => {
                           if (screenSize !== "large") {
                             e.preventDefault();

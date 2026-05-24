@@ -4,7 +4,7 @@
   min-width: 285px;
   max-width: 286px;
   height: fit-content;
-  padding: 17px 0;
+  padding: 13px 0 10px;
   transition: all 0.3s;
 }
 
@@ -19,6 +19,10 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
+}
+.filters .filter-field .checkbox-wrapper-13 input[type="checkbox"] {
+  width: 23px !important;
+  height: 23px !important;
 }
 .filters .holder h4 {
   color: var(--paragraph);
@@ -128,11 +132,13 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 6px 9px;
+  gap: 6px;
 }
 .marketplace .filters .filter-checkbox input[type="checkbox"] + label {
   color: var(--paragraph);
   font-size: 13px;
   transition: 0.3s;
+  margin: 0;
 }
 .marketplace .filters .filter-checkbox input[type="checkbox"]:checked + label {
   color: var(--main-color);
@@ -210,12 +216,14 @@
   color: var(--main-color);
   font-weight: 700;
 }
-.marketplace .filters li:has(.view-toggle) {
-  margin-bottom: -5px;
+.marketplace .filters .view-toggle-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
+}
+.marketplace .filters .view-toggle-item {
+  margin-bottom: -5px;
 }
 .marketplace .filters .view-toggle {
   width: fit-content;
@@ -233,9 +241,10 @@
 .marketplace .filters .view-toggle:hover {
   text-decoration: underline;
 }
-.marketplace .filters li:has(.view-toggle) hr {
+.marketplace .filters .view-toggle-row hr {
   background: var(--main-color);
   height: 3px;
+  flex: 1;
 }
 .price-slider {
   width: 100%;

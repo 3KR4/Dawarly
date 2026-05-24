@@ -330,6 +330,47 @@ export default function CreateBlogPage() {
   const getSectionCount = (type) =>
     sections.filter((s) => s.type === type).length;
 
+  const uploadBlogImages = async (targetBlogId) => {
+    const coverFile = coverImage?.[0]?.file;
+    const formData = new FormData();
+    const sectionUploads = [];
+    let filesCount = 0;
+
+    if (coverFile instanceof File) {
+      formData.append("files", coverFile);
+      filesCount += 1;
+    }
+
+    sections.forEach((sec) => {
+      if (sec.type !== "image") return;
+
+      const sectionFile = sectionImages?.[sec.id]?.[0]?.file;
+
+      if (!(sectionFile instanceof File)) return;
+
+      formData.append("files", sectionFile);
+      sectionUploads.push(sec.id);
+      filesCount += 1;
+    });
+
+    if (!filesCount) return {};
+
+    const coverIndex = coverFile instanceof File ? 0 : -1;
+    formData.append("cover_index", String(coverIndex));
+
+    const res = await uploadImages("BLOG", targetBlogId, formData);
+    const uploadedImages = Array.isArray(res?.data) ? res.data : [];
+    const sectionImageMap = {};
+    const sectionStartIndex = coverIndex === 0 ? 1 : 0;
+
+    sectionUploads.forEach((sectionId, index) => {
+      sectionImageMap[sectionId] =
+        uploadedImages?.[sectionStartIndex + index]?.id || null;
+    });
+
+    return sectionImageMap;
+  };
+
   const onSubmit = async (data) => {
     if (!coverImage?.length) {
       addNotification({
@@ -349,7 +390,6 @@ export default function CreateBlogPage() {
 
     try {
       let currentBlogId = blogId;
-      let coverId = null;
 
       // ================= CREATE BLOG =================
       if (!blogSlug) {
@@ -368,43 +408,8 @@ export default function CreateBlogPage() {
         currentBlogId = createRes?.data?.id;
       }
 
-      // ================= COVER IMAGE UPLOAD =================
-      const coverFile = coverImage?.[0]?.file;
-
-      if (coverFile instanceof File) {
-        const formData = new FormData();
-        formData.append("files", coverFile);
-        formData.append("is_cover", "true");
-        await uploadImages("BLOG", currentBlogId, formData);
-      }
-
-      // ================= SECTION IMAGES UPLOAD =================
-      const sectionImageMap = {};
-
-      console.log("step: upload sections images");
-
-      for (const sec of sections) {
-        if (sec.type !== "image") continue;
-
-        const images = sectionImages?.[sec.id] || [];
-
-        const newFiles = images
-          .filter((img) => img?.file instanceof File)
-          .map((img) => img.file);
-
-        if (!newFiles.length) continue;
-
-        const formData = new FormData();
-        newFiles.forEach((file) => formData.append("files", file));
-        formData.append("is_cover", "false");
-        const res = await uploadImages("BLOG", currentBlogId, formData);
-
-        const uploadedId = res?.data?.[0]?.id ?? null;
-
-        sectionImageMap[sec.id] = uploadedId;
-
-        console.log("section uploaded:", uploadedId);
-      }
+      // ================= IMAGES UPLOAD =================
+      const sectionImageMap = await uploadBlogImages(currentBlogId);
 
       // ================= MERGE SECTIONS =================
       const finalSections = sections.map((sec) => ({
@@ -414,11 +419,6 @@ export default function CreateBlogPage() {
 
       // ================= BUILD PAYLOAD =================
       const payload = buildPayload(data, finalSections);
-
-      // ================= ATTACH COVER =================
-      if (coverId) {
-        payload.cover_id = coverId;
-      }
 
       // ================= UPDATE BLOG =================
       await updateBlog(currentBlogId, payload);
