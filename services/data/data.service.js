@@ -1,24 +1,24 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
-export const getCountries = () => {
-  return api.get(ENDPOINTS.DATA.GET_COUNTRIES());
+export const getCountries = (table_id) => {
+  return api.get(ENDPOINTS.DATA.GET_COUNTRIES(table_id));
 };
 
-export const getGovernorates = (country_id) => {
-  return api.get(ENDPOINTS.DATA.GET_GOVERNRATES(country_id));
+export const getGovernorates = (country_id, table_id) => {
+  return api.get(ENDPOINTS.DATA.GET_GOVERNRATES(country_id, table_id));
 };
 
-export const getCities = (governorate_id) => {
-  return api.get(ENDPOINTS.DATA.GET_CITIES(governorate_id));
+export const getCities = (governorate_id, table_id) => {
+  return api.get(ENDPOINTS.DATA.GET_CITIES(governorate_id, table_id));
 };
 
-export const getAreas = (city_id) => {
-  return api.get(ENDPOINTS.DATA.GET_AREAS(city_id));
+export const getAreas = (city_id, table_id) => {
+  return api.get(ENDPOINTS.DATA.GET_AREAS(city_id, table_id));
 };
 
-export const getCompounds = (area_id) => {
-  return api.get(ENDPOINTS.DATA.GET_COMPOUNDS(area_id));
+export const getCompounds = (area_id, table_id) => {
+  return api.get(ENDPOINTS.DATA.GET_COMPOUNDS(area_id, table_id));
 };
 
 export const getTables = () => {

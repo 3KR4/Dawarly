@@ -249,10 +249,16 @@ export default function CategoriesSwiper({
             {visibleData.map((item) => {
               const isSelected = selectedItem == item.id;
 
+              const parentCategory =
+                type === "subcategories"
+                  ? categories.find((cat) => cat.id == item.category_id)
+                  : null;
               const itemWithIcon =
                 type === "categories"
                   ? { ...item, icon: categoryIcons[item.id] }
-                  : item;
+                  : type === "subcategories"
+                    ? { ...item, table_id: parentCategory?.table_id }
+                    : item;
 
               return (
                 <SwiperSlide key={item.id}>
@@ -299,11 +305,19 @@ export default function CategoriesSwiper({
         <div className="data-grid">
           {visibleData.map((item) => {
             const isSelected = selectedItem == item.id;
+            const parentCategory =
+              type === "subcategories"
+                ? categories.find((cat) => cat.id == item.category_id)
+                : null;
+            const itemWithTable =
+              type === "subcategories"
+                ? { ...item, table_id: parentCategory?.table_id }
+                : item;
 
             return (
               <CatCard
                 key={item.id}
-                data={item}
+                data={itemWithTable}
                 target={target}
                 setTarget={setTarget}
                 dashboard={true}

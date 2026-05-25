@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState, useEffect } from "react";
+import React, { useContext, useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { settings } from "@/Contexts/settings";
 
@@ -16,29 +16,111 @@ import { getSectionsAds } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import AdCardSkeleton from "@/components/skeletons/AdCardSkeleton";
 
-export default function AdsSwiper({ type, id }) {
-  const { categories, subCategories, governorates, cities, compounds } =
-    useAppData();
+const TYPE_ALIASES = {
+  gov: "gov",
+  governorate: "gov",
+  city: "city",
+  area: "area",
+  compound: "compound",
+  category: "category",
+  subcategory: "subcategory",
+  subCategory: "subcategory",
+  sub_category: "subcategory",
+  table: "table",
+  views: "views",
+  top_views: "views",
+  featured: "featured",
+  futured: "futured",
+  favorites: "favorites",
+  favoriets: "favoriets",
+  favourites: "favorites",
+};
+
+const VALUE_TYPES = [
+  "gov",
+  "city",
+  "area",
+  "compound",
+  "category",
+  "subcategory",
+  "table",
+];
+
+const buildSectionTitle = (type, value, table, locale, t) => {
+  const tableName = table?.[`name_${locale}`];
+
+  if (value) {
+    const valueTitle = `${t.home.PropertiesIn} ${value?.[`name_${locale}`]}`;
+    return tableName ? `${valueTitle} ${tableName}` : valueTitle;
+  }
+
+  const titles = {
+    views: locale === "ar" ? "الأكثر مشاهدة" : "Most viewed",
+    featured: locale === "ar" ? "الإعلانات المميزة" : "Featured ads",
+    futured: locale === "ar" ? "الإعلانات المميزة" : "Featured ads",
+    favorites: locale === "ar" ? "الأكثر تفضيلا" : "Most favorited",
+    favoriets: locale === "ar" ? "الأكثر تفضيلا" : "Most favorited",
+  };
+
+  const title = titles[type] || t.home.newly_added;
+
+  return tableName ? `${title} ${tableName}` : title;
+};
+
+export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
+  const {
+    categories,
+    subCategories,
+    governorates,
+    cities,
+    areas,
+    compounds,
+    tables,
+  } = useAppData();
 
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
-  const value =
-    type == "governorate"
-      ? governorates.find((x) => x.id == id)
-      : type == "category"
-        ? categories.find((x) => x.id == id)
-        : type == "subCategory"
-          ? subCategories.find((x) => x.id == id)
-          : type == "city"
-            ? cities.find((x) => x.id == id)
-            : compounds.find((x) => x.id == id);
+  const sectionType = TYPE_ALIASES[type] || type;
+  const sectionValue = value ?? id;
+  const lookupValue =
+    sectionType === "table" ? sectionValue || tableId : sectionValue;
+  const selectedItem = useMemo(() => {
+    const sources = {
+      gov: governorates,
+      city: cities,
+      area: areas,
+      compound: compounds,
+      category: categories,
+      subcategory: subCategories,
+      table: tables,
+    };
+
+    return sources[sectionType]?.find((x) => x.id == lookupValue);
+  }, [
+    areas,
+    categories,
+    cities,
+    compounds,
+    governorates,
+    lookupValue,
+    sectionType,
+    subCategories,
+    tables,
+  ]);
+
+  const inferredTableId =
+    tableId ||
+    selectedItem?.table_id ||
+    categories.find((category) => category.id == selectedItem?.category_id)
+      ?.table_id;
+  const selectedTable = tables.find((x) => x.id == inferredTableId);
 
   const swiperRef = useRef(null);
 
   // ================= STATES =================
   const [ads, setAds] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(6);
+  const [limit] = useState(pageSize);
   const [total, setTotal] = useState(0);
 
   const [loading, setLoading] = useState(false);
@@ -62,14 +144,38 @@ export default function AdsSwiper({ type, id }) {
 
   // ================= HELPERS =================
   const hasMore = ads.length < total;
+  const hasRequiredValue =
+    sectionType === "table"
+      ? sectionValue || tableId
+      : !VALUE_TYPES.includes(sectionType) || sectionValue;
+  const shouldFetch =
+    TYPE_ALIASES[type] &&
+    hasRequiredValue &&
+    (!["category", "subcategory"].includes(sectionType) || inferredTableId);
+
+  const sectionParams = useMemo(
+    () => ({
+      type: sectionType,
+      value: VALUE_TYPES.includes(sectionType) ? sectionValue : undefined,
+      table_id:
+        sectionType === "table"
+          ? tableId
+          : inferredTableId,
+      page,
+      limit,
+    }),
+    [inferredTableId, limit, page, sectionType, sectionValue, tableId],
+  );
 
   // ================= FETCH =================
   const fetchAds = async (newPage = 1, append = false) => {
+    if (!shouldFetch) return;
+
     try {
       setLoading(true);
 
-      const res = await getSectionsAds(type, id, newPage, limit);
-      const newAds = res.data.data || [];
+      const res = await getSectionsAds({ ...sectionParams, page: newPage });
+      const newAds = res.data.data || res.data.ads || [];
 
       setAds((prev) => {
         const updated = append ? [...prev, ...newAds] : newAds;
@@ -82,7 +188,12 @@ export default function AdsSwiper({ type, id }) {
         return updated;
       });
 
-      setTotal(res.data.pagination?.total || 0);
+      setTotal(
+        res.data.pagination?.total ||
+          res.data.meta?.total ||
+          res.data.total ||
+          newAds.length,
+      );
       setPage(newPage);
     } catch (err) {
       console.error("Fetch Ads Error:", err);
@@ -97,7 +208,7 @@ export default function AdsSwiper({ type, id }) {
     setPage(1);
     setTotal(0);
     fetchAds(1, false);
-  }, [type, id]);
+  }, [type, sectionValue, inferredTableId, limit]);
 
   // ================= SWIPER =================
   const handleSwiperInit = (swiper) => {
@@ -160,10 +271,28 @@ export default function AdsSwiper({ type, id }) {
     return null; // أو ممكن Empty State UI
   }
 
+  const seeMoreHref = (() => {
+    const params = new URLSearchParams();
+    const dep =
+      sectionType === "table" ? sectionValue || tableId : inferredTableId;
+
+    if (dep) params.set("dep", dep);
+    if (sectionType === "category" && sectionValue) {
+      params.set("cat", sectionValue);
+    }
+    if (sectionType === "subcategory" && sectionValue) {
+      if (selectedItem?.category_id) params.set("cat", selectedItem.category_id);
+      params.set("subcat", sectionValue);
+    }
+
+    const query = params.toString();
+    return query ? `/market?${query}` : "/market";
+  })();
+
   return (
     <div className="swiper-section for-ads container">
       <div className="top">
-        {!value ? (
+        {VALUE_TYPES.includes(sectionType) && !selectedItem ? (
           <div className="skeleton-card swiper-top">
             <div className="title-skeleton element"></div>
             <div className="link-skeleton element"></div>
@@ -171,18 +300,18 @@ export default function AdsSwiper({ type, id }) {
         ) : (
           <>
             <h3 className="title">
-              {t.home.PropertiesIn} {value?.[`name_${locale}`]}
+              {buildSectionTitle(
+                sectionType,
+                selectedItem,
+                selectedTable,
+                locale,
+                t,
+              )}
             </h3>
 
             {total > maxSlides && (
               <Link
-                href={
-                  type === "cat"
-                    ? `/category/${id}`
-                    : type === "sub-cat"
-                      ? `/category?subcat=${id}`
-                      : "/ads"
-                }
+                href={seeMoreHref}
                 className="link"
               >
                 {t.home.seeMore}
@@ -205,7 +334,7 @@ export default function AdsSwiper({ type, id }) {
         )}
 
         <Swiper
-          key={`${locale}-${type}-${id}`}
+          key={`${locale}-${type}-${sectionValue || tableId || ""}`}
           speed={800}
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}

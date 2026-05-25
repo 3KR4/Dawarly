@@ -1,9 +1,12 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
-/* ================= REGISTER ================= */
-export const toggleFavorite = (id) => {
-  return api.post(ENDPOINTS.FAVORITES.TOGGLE_FAVORITES(id));
+export const toggleFavorite = (tableId, adId) => {
+  if (!tableId || !adId) {
+    return Promise.reject(new Error("tableId and adId are required"));
+  }
+
+  return api.post(ENDPOINTS.FAVORITES.TOGGLE_FAVORITES(tableId, adId));
 };
 
 export const getFavorites = (page, limit) => {

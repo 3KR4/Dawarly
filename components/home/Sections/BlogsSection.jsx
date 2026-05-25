@@ -9,17 +9,18 @@ import BlogCard from "../BlogCard";
 export default function BlogsSection() {
   const t = useTranslate();
 
-  // ================= STATES =================
   const [blogs, setBlogs] = useState([]);
-
+  const [totalBlogs, setTotalBlogs] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // ================= FETCH =================
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const res = await getAllBlogs(1, 3);
-      setBlogs(res.data.data);
+      const res = await getAllBlogs(1, 4);
+      const blogsData = res.data.data || [];
+
+      setBlogs(blogsData);
+      setTotalBlogs(res.data.pagination?.total || blogsData.length);
     } catch (err) {
       console.error("Fetch Ads Error:", err);
     } finally {
@@ -27,26 +28,28 @@ export default function BlogsSection() {
     }
   };
 
-  // ================= INITIAL LOAD =================
   useEffect(() => {
     fetchBlogs();
   }, []);
 
-  if (loading) {
-    return;
-  }
+  const visibleBlogs = blogs.slice(0, 3);
+  const hasMoreBlogs = totalBlogs > 3 || blogs.length > 3;
+
+  if (loading || visibleBlogs.length === 0) return null;
 
   return (
     <div className="all-blogs fluid-container for-blogs">
       <div className="top">
         <h3 className="title">latest Blogs</h3>
 
-        <Link href={`/blogs`} className="link">
-          {t.home.seeMore}
-        </Link>
+        {hasMoreBlogs && (
+          <Link href={`/blogs`} className="link">
+            {t.home.seeMore}
+          </Link>
+        )}
       </div>
       <div className="grid-holder">
-        {blogs.map((item) => (
+        {visibleBlogs.map((item) => (
           <BlogCard data={item} size={"small"} key={item.id} />
         ))}
       </div>

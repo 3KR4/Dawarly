@@ -65,8 +65,10 @@ header .nested-wrapper:hover > .nested-links {
   opacity: 1;
   z-index: 1;
 }
-header .nested-wrapper > .nested-links .nested-parent {
-justify-content: space-between;
+header .nested-wrapper > .nested-links .nested-parent,
+header .bottom .nav .cats-nav a {
+  justify-content: space-between;
+  padding: 6px !important;
 }
 header .nested-wrapper > .nested-links .nested-item {
   position: relative;
@@ -119,6 +121,7 @@ header .top .logo img {
 header .top .search {
   flex: 1;
   max-width: 45%;
+  position: relative;
 }
 header .top .search .search-holder {
   border: 1px solid var(--border-color);
@@ -163,6 +166,104 @@ header .top .search .search-holder a {
 }
 header .top .search .search-holder a:hover {
   background: var(--hover-color2);
+}
+header .top .search > .menu.active {
+  top: 53px;
+  left: 0;
+  width: 100%;
+  padding: 8px;
+}
+[lang="ar"] header .top .search > .menu.active {
+  right: 0;
+  left: unset;
+}
+header .top .search .search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 430px;
+  overflow: auto;
+}
+header .top .search .search-state {
+  color: var(--paragraph);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px;
+}
+header .top .search .search-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+header .top .search .search-group .top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+header .top .search .search-group h5 {
+  padding: 2px 8px;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--main-color);
+  position: relative;
+}
+header .top .search .search-group h5::after {
+  content: "";
+  background: var(--main-color);
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  bottom: -5px;
+  left: 5px;
+}
+header .top .search .search-result-item {
+  color: var(--paragraph);
+  border-radius: 0;
+  gap: 4px;
+  padding: 10px 7px;
+  display: grid;
+  border-bottom: 1px solid var(--border-color);
+  transition: 0.3s;
+}
+header .top .search .search-result-item:hover,
+header .top .search .see-more-results:hover {
+  background: var(--hover-color);
+  border-radius: 10px;
+}
+header .top .search .search-result-title {
+  color: var(--paragraph);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  overflow: hidden;
+  line-height: 1.2;
+}
+header .top .search .search-result-meta,
+header .top .search .search-result-price {
+  color: var(--paragraph);
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+header .top .search .search-result-price {
+  color: var(--main-color);
+}
+header .top .search .see-more-results {
+  background: transparent;
+  color: var(--main-color);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 7px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 header .top .account {
@@ -394,7 +495,7 @@ header .bottom .nav h4 {
   color: var(--paragraph-3);
   font-weight: 700;
   border: 1px solid #c5a3ff;
-  border-radius: 7px;
+  border-radius: 10px;
   align-items: center;
   gap: 4px;
   padding: 8px 7px 8px 10px;
@@ -502,13 +603,18 @@ header .bottom .nav .cats-nav .cat-item {
 header .bottom .nav .cats-nav a {
   color: var(--paragraph);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 1px 10px;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   gap: 5px;
+}
+header .bottom .nav .cats-nav a {
+}
+header .bottom .nav .cats-nav .cat-item > a {
+  padding: 6px 10px;
 }
 header .bottom .nav .cats-nav h4 {
   background: unset;
@@ -518,6 +624,14 @@ header .bottom .nav .cats-nav h4 {
   border-color: transparent;
   font-weight: 600;
   transition: 0.3s;
+  padding: 7px 10px;
+}
+header .bottom .nav .cats-nav h4:has(> a) {
+  padding: 0;
+}
+header .bottom .nav .cats-nav h4 > a {
+  width: 100%;
+  justify-content: space-between;
   padding: 7px 10px;
 }
 header .bottom .nav .cats-nav h4:hover {

@@ -21,6 +21,7 @@ import { AdStatuses, RentFrequencies } from "@/data/enums";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
 import { FaHeart } from "react-icons/fa";
+import { getAdTableId } from "@/utils/getAdTableId";
 
 export default function AdsTable({
   ads,
@@ -38,9 +39,6 @@ export default function AdsTable({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [target, setTarget] = useState(null);
   const [rejectInput, setRejectInput] = useState("");
-
-  const getAdTableId = (item) =>
-    Number(item?.department?.id || item?.Categories?.table_id);
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
@@ -143,7 +141,10 @@ export default function AdsTable({
               const tableId = getAdTableId(item);
               const itemWithTableId = { ...item, table_id: tableId };
               return (
-                <div key={item?.id} className={`table-item ${item?.status}`}>
+                <div
+                  key={`${tableId}-${item?.id}`}
+                  className={`table-item ${item?.status}`}
+                >
                   <div className="holder">
                     <Link
                       href={`/market/${item?.id}?dep=${tableId}`}

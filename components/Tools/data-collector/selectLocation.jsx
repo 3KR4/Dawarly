@@ -220,13 +220,13 @@ function SelectLocation({ locale = "en", onSelect }) {
                 const count = getCount(item);
 
                 return (
-                  <button key={item.id}>
+                  <button key={item.id} onClick={() => handleNext(item)}>
                     <Link href="#" onClick={(e) => e.preventDefault()}>
                       {getName(item)}
                     </Link>
 
                     {count > 0 && currentPage !== 4 && (
-                      <span onClick={() => handleNext(item)}>
+                      <span>
                         {count}
                         <FaAngleRight className="arrow" />
                       </span>

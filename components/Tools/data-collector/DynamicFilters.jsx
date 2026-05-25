@@ -18,6 +18,7 @@ const DynamicFilters = ({
 }) => {
   const { theme } = useContext(settings);
   const [localState, setLocalState] = useState({});
+  const [expandedLists, setExpandedLists] = useState({});
   const t = useTranslate();
 
   // sync local state with parent selectedFilters
@@ -36,8 +37,7 @@ const DynamicFilters = ({
           (Array.isArray(value) && value.length === 0) ||
           (typeof value === "object" &&
             !Array.isArray(value) &&
-            !value.id &&
-            !value.value);
+            Object.keys(value).length === 0);
 
         if (shouldDelete) delete newState[fieldKey];
         else newState[fieldKey] = value;
@@ -48,7 +48,7 @@ const DynamicFilters = ({
       // تحديث الأب
       setSelectedFilters(fieldKey, value);
     },
-    [setSelectedFilters]
+    [setSelectedFilters],
   );
 
   // Range Slider
@@ -85,6 +85,194 @@ const DynamicFilters = ({
     );
   };
 
+  const getItemName = (item) =>
+    item?.[`name_${locale}`] || item?.name_en || item?.name_ar || "";
+
+  const getItemCount = (item) => Number(item?.adsCount || 0);
+
+  const getListKey = (fieldKey, levelKey = "root") => `${fieldKey}:${levelKey}`;
+
+  const isListExpanded = (fieldKey, levelKey) =>
+    Boolean(expandedLists[getListKey(fieldKey, levelKey)]);
+
+  const toggleListExpanded = (fieldKey, levelKey) => {
+    const key = getListKey(fieldKey, levelKey);
+    setExpandedLists((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const getVisibleItems = ({
+    items,
+    limit,
+    expanded,
+    selectedId,
+    selectedIds = [],
+  }) => {
+    if (!limit || expanded || items.length <= limit) return items;
+
+    const visibleItems = items.slice(0, limit);
+    const pinnedSelectedItems = items.filter(
+      (item) =>
+        String(item.id) === String(selectedId) ||
+        selectedIds.some((id) => String(id) === String(item.value ?? item.id)),
+    );
+
+    pinnedSelectedItems.forEach((selectedItem) => {
+      if (
+        !visibleItems.some(
+          (item) => String(item.id) === String(selectedItem.id),
+        )
+      ) {
+        visibleItems.splice(Math.max(limit - 1, 0), 1, selectedItem);
+      }
+    });
+
+    return visibleItems;
+  };
+
+  const renderViewToggle = ({
+    fieldKey,
+    levelKey,
+    total,
+    limit,
+    asListItem = false,
+  }) => {
+    if (!limit || total <= limit) return null;
+
+    const expanded = isListExpanded(fieldKey, levelKey);
+
+    const button = (
+      <div className="view-toggle-row">
+        <hr />
+        <button
+          type="button"
+          className="view-toggle"
+          onClick={() => toggleListExpanded(fieldKey, levelKey)}
+        >
+          {expanded ? "View less" : "View more"}
+        </button>
+        <hr />
+      </div>
+    );
+
+    return asListItem ? <li className="view-toggle-item">{button}</li> : button;
+  };
+
+  const hasSelectedDescendant = (field, currentValue, levelIndex, item) => {
+    const nextLevel = field.levels[levelIndex + 1];
+    if (!nextLevel) return false;
+
+    const children = nextLevel.items.filter((child) => {
+      if (!nextLevel.parentKey) return false;
+      return String(child[nextLevel.parentKey]) === String(item.id);
+    });
+
+    return children.some((child) => {
+      const isChildSelected =
+        String(currentValue[nextLevel.queryKey]) === String(child.id);
+
+      return (
+        isChildSelected ||
+        hasSelectedDescendant(field, currentValue, levelIndex + 1, child)
+      );
+    });
+  };
+
+  const renderNestedList = (
+    field,
+    currentValue,
+    levelIndex = 0,
+    parentItem = null,
+  ) => {
+    const level = field.levels[levelIndex];
+    if (!level) return null;
+
+    const items = level.items.filter((item) => {
+      if (level.hasAdsOnly && Number(item?.adsCount || 0) <= 0) return false;
+      if (!level.parentKey) return true;
+      return String(item[level.parentKey]) === String(parentItem?.id);
+    });
+
+    if (!items.length) return null;
+
+    const limit = level.limit || field.limit || 5;
+    const expanded = isListExpanded(field.key, level.queryKey);
+    const visibleItems = getVisibleItems({
+      items,
+      limit,
+      expanded,
+      selectedId: currentValue[level.queryKey],
+    });
+
+    return (
+      <ul
+        className={`nisted-list ${levelIndex > 0 ? "menu" : ""}`}
+        key={level.queryKey}
+      >
+        {visibleItems.map((item) => {
+          const isSelected =
+            String(currentValue[level.queryKey]) === String(item.id);
+          const count = getItemCount(item);
+          const childList = renderNestedList(
+            field,
+            currentValue,
+            levelIndex + 1,
+            item,
+          );
+          const isOpen =
+            isSelected ||
+            hasSelectedDescendant(field, currentValue, levelIndex, item);
+
+          return (
+            <li
+              key={item.id}
+              className={`${isSelected ? "active" : ""} ${isOpen ? "open" : ""}`}
+            >
+              <h5
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  const nextValue = { ...currentValue };
+
+                  field.levels.slice(levelIndex).forEach((x) => {
+                    delete nextValue[x.queryKey];
+                  });
+
+                  if (!isSelected) nextValue[level.queryKey] = item.id;
+
+                  updateFilter(
+                    field.key,
+                    Object.keys(nextValue).length ? nextValue : null,
+                  );
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.currentTarget.click();
+                  }
+                }}
+              >
+                <span>{getItemName(item)}</span>
+                {count > 0 && <small>{count}</small>}
+              </h5>
+
+              {childList}
+            </li>
+          );
+        })}
+        {renderViewToggle({
+          fieldKey: field.key,
+          levelKey: level.queryKey,
+          total: items.length,
+          limit,
+          asListItem: true,
+        })}
+      </ul>
+    );
+  };
+
   // Select / Radio / MultiSelect / Boolean
   const renderFilterField = (field) => {
     const value = localState[field.key];
@@ -93,6 +281,42 @@ const DynamicFilters = ({
     if (field.uiType === "range") return renderNumberFilter(field);
 
     switch (field.uiType) {
+      case "checkbox":
+        return (
+          <div className="filter-field" key={field.key}>
+            <div className="checkbox-wrapper-13 filter-checkbox">
+              <input
+                id={`filter-${field.key}`}
+                type="checkbox"
+                checked={value === true}
+                onChange={(e) =>
+                  updateFilter(field.key, e.target.checked ? true : null)
+                }
+              />
+              <label htmlFor={`filter-${field.key}`}>
+                {field.label[locale]}
+              </label>
+            </div>
+          </div>
+        );
+
+      case "nested": {
+        const currentValue =
+          typeof value === "object" && value !== null && !Array.isArray(value)
+            ? value
+            : {};
+
+        return (
+          <div className="filter-field" key={field.key}>
+            <div className="filter-header">
+              <h4>{field.label[locale]}</h4>
+            </div>
+
+            {renderNestedList(field, currentValue)}
+          </div>
+        );
+      }
+
       case "select":
         return (
           <div className="filter-field" key={field.key}>
@@ -102,9 +326,10 @@ const DynamicFilters = ({
             <div className="select-options">
               {field.options.map((option) => {
                 const displayName = option.label[locale] || option.value;
-                const isSelected = value?.id === option.id;
+                const isSelected = String(value?.id) === String(option.id);
                 return (
                   <button
+                    type="button"
                     key={option.id}
                     className={`filter-option ${isSelected ? "active" : ""}`}
                     onClick={() =>
@@ -121,17 +346,27 @@ const DynamicFilters = ({
 
       case "multiSelect":
         const currentValues = Array.isArray(value) ? value : [];
+        const multiSelectLimit = field.limit || 10;
+        const multiSelectExpanded = isListExpanded(field.key, "options");
+        const visibleOptions = getVisibleItems({
+          items: field.options,
+          limit: multiSelectLimit,
+          expanded: multiSelectExpanded,
+          selectedId: null,
+          selectedIds: currentValues,
+        });
         return (
           <div className="filter-field" key={field.key}>
             <div className="filter-header">
               <h4>{field.label[locale]}</h4>
             </div>
             <div className="multiselect-options">
-              {field.options.map((option) => {
+              {visibleOptions.map((option) => {
                 const displayLabel = option.label[locale] || option.value;
                 const isSelected = currentValues.includes(option.value);
                 return (
                   <button
+                    type="button"
                     key={option.id || option.value}
                     className={`filter-option ${isSelected ? "active" : ""}`}
                     onClick={() => {
@@ -140,7 +375,7 @@ const DynamicFilters = ({
                         : [...currentValues, option.value];
                       updateFilter(
                         field.key,
-                        newValues.length ? newValues : null
+                        newValues.length ? newValues : null,
                       );
                     }}
                   >
@@ -149,6 +384,12 @@ const DynamicFilters = ({
                 );
               })}
             </div>
+            {renderViewToggle({
+              fieldKey: field.key,
+              levelKey: "options",
+              total: field.options.length,
+              limit: multiSelectLimit,
+            })}
           </div>
         );
 
@@ -160,6 +401,7 @@ const DynamicFilters = ({
             </div>
             <div className="boolean-options">
               <button
+                type="button"
                 className={`filter-option ${value === true ? "active" : ""}`}
                 onClick={() =>
                   updateFilter(field.key, value === true ? null : true)
@@ -168,6 +410,7 @@ const DynamicFilters = ({
                 {t.ad.yes}
               </button>
               <button
+                type="button"
                 className={`filter-option ${value === false ? "active" : ""}`}
                 onClick={() =>
                   updateFilter(field.key, value === false ? null : false)

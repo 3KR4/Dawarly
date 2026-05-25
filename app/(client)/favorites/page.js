@@ -10,11 +10,14 @@ import { useNotification } from "@/Contexts/NotificationContext";
 import Pagination from "@/components/Tools/Pagination";
 import { getFavorites, toggleFavorite } from "@/services/favorites/favorites.service";
 import Navigations from "@/components/Tools/Navigations";
+import { getAdTableId } from "@/utils/getAdTableId";
+import { useAuth } from "@/Contexts/AuthContext";
 
 export default function Favorites() {
   const { screenSize } = useContext(settings);
   const t = useTranslate();
   const { addNotification } = useNotification();
+  const { user, updateUserFavoritesCount } = useAuth();
   const [adsData, setAdsData] = useState({
     ads: [],
     pagination: {
@@ -56,7 +59,9 @@ export default function Favorites() {
 
   const handleFavoriteClick = async (ad) => {
     try {
-      await toggleFavorite(ad.id);
+      const tableId = getAdTableId(ad);
+      await toggleFavorite(tableId, ad.id);
+      updateUserFavoritesCount(Math.max((user?.favorites_count || 0) - 1, 0));
 
       const remainingItems = adsData.ads.length - 1;
 

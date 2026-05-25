@@ -3,6 +3,8 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
   // HELPERS
   // =========================
 
+  const hasAds = (item) => Number(item?.adsCount || 0) > 0;
+
   const isVacation = (table) =>
     table.name_en.toLowerCase().includes("vacation");
 
@@ -23,7 +25,10 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
   };
 
   const getSubCats = (categoryId) => {
-    return subCategories.filter((s) => s.category_id === categoryId);
+    return subCategories.filter(
+      (subCategory) =>
+        subCategory.category_id === categoryId && hasAds(subCategory),
+    );
   };
 
   // =========================
@@ -63,7 +68,7 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
     const mode = isSaleTable(table) ? "sale" : "rent";
 
     categories
-      .filter((cat) => cat.table_id === table.id)
+      .filter((cat) => cat.table_id === table.id && hasAds(cat))
       .forEach((cat) => {
         const key = cat.name_en.toLowerCase();
 
@@ -143,7 +148,7 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
     };
 
     categories
-      .filter((cat) => cat.table_id === table.id)
+      .filter((cat) => cat.table_id === table.id && hasAds(cat))
       .forEach((cat) => {
         tableItem.children.push({
           ...cat,
@@ -151,7 +156,9 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
         });
       });
 
-    root.children.push(tableItem);
+    if (tableItem.children.length > 0) {
+      root.children.push(tableItem);
+    }
   });
 
   // =========================
@@ -167,17 +174,19 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
       name_en: table.name_en,
       name_ar: table.name_ar,
       children: categories
-        .filter((cat) => cat.table_id === table.id)
+        .filter((cat) => cat.table_id === table.id && hasAds(cat))
         .map((cat) => ({
           ...cat,
           children: getSubCats(cat.id),
         })),
     };
-  });
+  }).filter((table) => table.children.length > 0);
 
   // =========================
   // FINAL
   // =========================
 
-  return [vacationRoot, saleRoot, rentRoot, ...otherNavigation];
+  return [vacationRoot, saleRoot, rentRoot, ...otherNavigation].filter(
+    (group) => group.children?.length > 0,
+  );
 }
