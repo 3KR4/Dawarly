@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { playSound } from "@/utils/sounds";
 import { BsFillPatchCheckFill } from "react-icons/bs";
 import { BsFillLightningChargeFill } from "react-icons/bs";
+import { getAdTableId } from "@/utils/getAdTableId";
 
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
@@ -32,21 +33,31 @@ export default function CardItem({ data }) {
   const [favLoading, setfavLoading] = useState(false);
 
   const arabic = isArabic(data?.title);
+  const tableId = getAdTableId(data);
+  const adHref = `/market/${data?.id}?dep=${tableId || ""}`;
+  const userHasFavorited = Boolean(
+    data?.isFavorite || data?.is_favorite || data?.isFavorited,
+  );
 
-  const handleFavoriteClick = async (id) => {
+  useEffect(() => {
+    setIsFavorite(userHasFavorited);
+    setFavoritesCount(data?.favorites_count || 0);
+  }, [data?.favorites_count, userHasFavorited]);
+
+  const handleFavoriteClick = async () => {
     if (!user) {
-      router.push(`/register?redirect=/market/${id}`);
+      router.push(`/register?redirect=${encodeURIComponent(adHref)}`);
       return;
     }
 
-    if (favLoading) return;
+    if (favLoading || !tableId || !data?.id) return;
 
     setfavLoading(true);
 
     const wasFavorite = isFavorite;
 
     try {
-      await toggleFavorite(id);
+      await toggleFavorite(tableId, data.id);
 
       const newCount = wasFavorite
         ? Math.max(user.favorites_count - 1, 0)
@@ -87,7 +98,11 @@ export default function CardItem({ data }) {
   ].filter(Boolean);
 
   return (
-    <Link href={`/market/${data?.id}`} key={data?.id} className={`ad-card`}>
+    <Link
+      href={adHref}
+      key={`${tableId || "ad"}-${data?.id}`}
+      className={`ad-card`}
+    >
       <div className="image-holder">
         <Image
           className="main"
@@ -103,11 +118,11 @@ export default function CardItem({ data }) {
         />
         <div className="top">
           <button
-            className={`fav-btn ${isFavorite || favoritesCount > 0 ? "active" : ""}`}
+            className={`fav-btn ${isFavorite ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleFavoriteClick(data?.id);
+              handleFavoriteClick();
             }}
             aria-label={
               isFavorite ? "Remove from favorites" : "Add to favorites"
@@ -153,7 +168,12 @@ export default function CardItem({ data }) {
           <h5
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/market?subcat=${data?.category?.id}`);
+              const params = new URLSearchParams();
+              if (data?.department?.id || data?.table_id) {
+                params.set("dep", data?.department?.id || data?.table_id);
+              }
+              if (data?.category?.id) params.set("cat", data.category.id);
+              router.push(`/market?${params.toString()}`);
             }}
             className={`category ellipsis`}
           >

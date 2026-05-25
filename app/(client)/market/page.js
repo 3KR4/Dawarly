@@ -357,6 +357,7 @@ export default function Marketplace() {
   const currentPage = Number(searchParams.get("page") || 1);
   const catParam = searchParams.get("cat");
   const subcatParam = searchParams.get("subcat");
+  const searchParam = searchParams.get("s") || searchParams.get("search") || "";
   const sortUiParam = searchParams.get("sort_by_ui");
 
   const [adsData, setAdsData] = useState({
@@ -488,6 +489,14 @@ export default function Marketplace() {
       if (shouldResetPriceRange) {
         params.delete("min_price");
         params.delete("max_price");
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(updates, "dep") &&
+        String(updates.dep || "") !== String(params.get("dep") || "")
+      ) {
+        params.delete("s");
+        params.delete("search");
       }
 
       Object.entries(updates).forEach(([key, value]) => {
@@ -687,6 +696,11 @@ export default function Marketplace() {
   );
 
   const handleRemoveFilter = (filterKey) => {
+    if (filterKey === "search") {
+      updateUrl({ s: null, search: null });
+      return;
+    }
+
     const field = activeDynamicFilters.find((item) => item.key === filterKey);
 
     if (field?.uiType === "range") {
@@ -712,7 +726,7 @@ export default function Marketplace() {
 
   const handleClearAllFilters = () => {
     setSelectedCategory({ cat: null, subCat: null });
-    const updates = { dep: null, cat: null, subcat: null };
+    const updates = { dep: null, cat: null, subcat: null, s: null, search: null };
 
     activeDynamicFilters.forEach((field) => {
       if (field.uiType === "range") {
@@ -755,6 +769,7 @@ export default function Marketplace() {
               <ActiveFiltersBar
                 selectedCategory={selectedCategory}
                 dynamicFilters={selectedDynamicFilters}
+                searchText={searchParam}
                 onRemoveCategory={handleRemoveCategory}
                 onRemoveFilter={handleRemoveFilter}
                 onClearAll={handleClearAllFilters}

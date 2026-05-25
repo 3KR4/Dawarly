@@ -5,6 +5,7 @@ import React, { useState, useContext, useEffect } from "react";
 import Pagination from "@/components/Tools/Pagination";
 import "@/styles/client/pages/market.css";
 import { settings } from "@/Contexts/settings";
+import { useSearchParams } from "next/navigation";
 import { TbListSearch } from "react-icons/tb";
 import Navigations from "@/components/Tools/Navigations";
 import { getAllBlogs } from "@/services/blogs/blogs.service";
@@ -12,6 +13,8 @@ import BlogCard from "@/components/home/BlogCard";
 
 export default function Marketplace() {
   const { screenSize, locale } = useContext(settings);
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") || "";
 
   const [blogsData, setBlogsData] = useState({
     blogs: [],
@@ -24,11 +27,11 @@ export default function Marketplace() {
 
   const [loadingContent, setLoadingContent] = useState(false);
 
-  const fetchBlogs = async (page = 1) => {
+  const fetchBlogs = async (page = 1, searchValue = search) => {
     try {
       setLoadingContent(true);
 
-      const res = await getAllBlogs(page);
+      const res = await getAllBlogs(page, 8, null, searchValue);
 
       setBlogsData({
         blogs: res.data.data || [],
@@ -43,11 +46,11 @@ export default function Marketplace() {
 
   // ================= INITIAL FETCH =================
   useEffect(() => {
-    fetchBlogs(1);
-  }, []);
+    fetchBlogs(1, search);
+  }, [search]);
 
   const handlePageChange = (newPage) => {
-    fetchBlogs(newPage);
+    fetchBlogs(newPage, search);
   };
 
   return (

@@ -11,7 +11,6 @@ import { settings } from "@/Contexts/settings";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import Tags from "@/components/Tools/data-collector/Tags";
 import {
   crateAd,
   updateAd,
@@ -34,7 +33,6 @@ import {
   RentPeriodUnit,
 } from "@/data/enums";
 import { useNotification } from "@/Contexts/NotificationContext";
-import { selectors } from "@/Contexts/selectors";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import { useAuth } from "@/Contexts/AuthContext";
 import { getAllUsers } from "@/services/auth/auth.service";
@@ -122,7 +120,6 @@ export default function AdForm({
   const { user } = useAuth();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
-  const { tags, setTags } = useContext(selectors);
 
   const [adData, setAdData] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
@@ -323,6 +320,10 @@ export default function AdForm({
     setValue("rentAmount", ad.price || "");
     setValue("deposit_amount", getAdField(ad, "deposit_amount") || "");
     setValue("description", ad.description || "");
+    setValue(
+      "tags",
+      Array.isArray(ad.tags) ? ad.tags.join(",") : ad.tags || "",
+    );
     setValue("bedrooms", getAdField(ad, "bedrooms") || "");
     setValue("bathrooms", getAdField(ad, "bathrooms") || "");
     setValue("area_m2", getAdField(ad, "area_m2") || "");
@@ -419,7 +420,6 @@ export default function AdForm({
     }).map((item) => item.id);
 
     setSelectedAmenities(activeAmenities);
-    setTags(Array.isArray(ad.tags) ? ad.tags : []);
 
     if (ad.admin) {
       setSelectedAdmin(ad.admin);
@@ -540,7 +540,7 @@ export default function AdForm({
       display_phone: selectedContactMethods.phone,
       display_whatsapp: selectedContactMethods.chat,
       display_dawaarly_contact: selectedMediatorMethod?.id === 2,
-      tags,
+      tags: data.tags || "",
       is_verified: checkBoxes.isVerified,
       featured_priority: additionalData.priority?.id ?? 0,
     };
@@ -711,7 +711,6 @@ export default function AdForm({
         type: "success",
         message: adId ? t.ad.ad_updated : t.ad.ad_created,
       });
-      setTags([]);
       redirectAfterLogin(
         type === "client" ? "/mylisting" : "/dashboard/ads/all",
       );
@@ -2004,7 +2003,19 @@ export default function AdForm({
             </div>
           )}
 
-          <Tags disabled={!isEditable} />
+          <div className="box forInput">
+            <label>{t.ad.tags.label}</label>
+            <div className="inputHolder">
+              <div className="holder">
+                <textarea
+                  {...register("tags")}
+                  placeholder={t.ad.tags.placeholder}
+                  rows={4}
+                  disabled={!isEditable}
+                />
+              </div>
+            </div>
+          </div>
 
           {((type === "admin" && !!adData?.subuser) || type === "client") && (
             <div className="form-section">

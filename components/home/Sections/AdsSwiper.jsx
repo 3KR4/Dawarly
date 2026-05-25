@@ -271,6 +271,24 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
     return null; // أو ممكن Empty State UI
   }
 
+  const seeMoreHref = (() => {
+    const params = new URLSearchParams();
+    const dep =
+      sectionType === "table" ? sectionValue || tableId : inferredTableId;
+
+    if (dep) params.set("dep", dep);
+    if (sectionType === "category" && sectionValue) {
+      params.set("cat", sectionValue);
+    }
+    if (sectionType === "subcategory" && sectionValue) {
+      if (selectedItem?.category_id) params.set("cat", selectedItem.category_id);
+      params.set("subcat", sectionValue);
+    }
+
+    const query = params.toString();
+    return query ? `/market?${query}` : "/market";
+  })();
+
   return (
     <div className="swiper-section for-ads container">
       <div className="top">
@@ -293,15 +311,7 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
 
             {total > maxSlides && (
               <Link
-                href={
-                  sectionType === "table"
-                    ? `/market?dep=${sectionValue || tableId}`
-                    : sectionType === "category"
-                      ? `/market?cat=${sectionValue}${inferredTableId ? `&dep=${inferredTableId}` : ""}`
-                      : sectionType === "subcategory"
-                        ? `/market?subcat=${sectionValue}${inferredTableId ? `&dep=${inferredTableId}` : ""}`
-                        : "/market"
-                }
+                href={seeMoreHref}
                 className="link"
               >
                 {t.home.seeMore}

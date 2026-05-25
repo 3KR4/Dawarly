@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useEffect, useState, useContext, useRef } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState, useContext, useRef } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import "@/styles/client/pages/singel-details.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
   FaPhone,
   FaEye,
 } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 
 import useTranslate from "@/Contexts/useTranslation";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -29,6 +30,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { FiShare2 } from "react-icons/fi";
+import { BsFillLightningChargeFill, BsFillPatchCheckFill } from "react-icons/bs";
 
 import { settings } from "@/Contexts/settings";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -36,25 +38,42 @@ import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 import { specsConfig } from "@/Contexts/specsConfig";
 import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
-import { Levels, RentFrequencies, RentPeriodUnit } from "@/data/enums";
+import { toggleFavorite } from "@/services/favorites/favorites.service";
+import {
+  Amenities,
+  BuildingAndLandsTypes,
+  BuildingCondition,
+  BuildingType,
+  LandType,
+  Levels,
+  PaymentMethod,
+  RentFrequencies,
+  RentPeriodUnit,
+} from "@/data/enums";
 import AdDetailsSkeleton from "@/components/skeletons/AdDetailsSkeleton";
+import { getTableRule } from "@/data/tablesRules";
+import { useAuth } from "@/Contexts/AuthContext";
+import { playSound } from "@/utils/sounds";
+import { getAdTableId } from "@/utils/getAdTableId";
 
 export default function AdDetails() {
   const t = useTranslate();
   const { slug } = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { screenSize, locale } = useContext(settings);
+  const { user, updateUserFavoritesCount } = useAuth();
   const tableId = searchParams.get("dep");
 
   const [ad, setAd] = useState(null);
   const [currentImg, setCurrentImg] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(tableId && slug));
+  const [favLoading, setFavLoading] = useState(false);
   const swiperRef = useRef(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
 
   useEffect(() => {
     if (!tableId || !slug) {
-      setLoading(false);
       return;
     }
 
@@ -67,7 +86,138 @@ export default function AdDetails() {
       .finally(() => setLoading(false));
   }, [slug, tableId]);
 
-  const getSpecConfig = (key) => specsConfig[key];
+  const activeTableId = Number(ad?.department?.id || tableId);
+  const favoriteTableId = getAdTableId(ad) || activeTableId;
+  const userHasFavorited = Boolean(
+    ad?.isFavorite || ad?.is_favorite || ad?.isFavorited,
+  );
+  const tableRule = useMemo(() => getTableRule(activeTableId), [activeTableId]);
+  const isRentAd = tableRule.isRent || Boolean(ad?.rent_frequency);
+  const isSaleAd = tableRule.isSale || Boolean(ad?.payment_method);
+
+  const getSpecConfig = (key) => specsConfig[key] || {};
+
+  const getOptionLabel = (options, id) => {
+    const option = options.find((item) => String(item.id) === String(id));
+    return option?.[`name_${locale}`] || option?.name_en || id;
+  };
+
+  const formatBoolean = (value) =>
+    value ? t.ad.yes || "Yes" : t.ad.no || "No";
+
+  const detailLabels = {
+    bedrooms: t.ad.bedrooms || "Bedrooms",
+    bathrooms: t.ad.bathrooms || "Bathrooms",
+    level: t.ad.level || "Level",
+    area_m2: t.ad.area || "Area",
+    floors: t.ad.floors || "Floors",
+    type: t.ad.type || "Type",
+    land_type: t.ad.land_type || "Land type",
+    building_type: t.ad.building_type || "Building type",
+    building_condition: t.ad.building_condition || "Building condition",
+  };
+
+  const valueFormatters = {
+    level: (value) => getOptionLabel(Levels, value),
+    area_m2: (value) => `${value} m2`,
+    type: (value) => getOptionLabel(BuildingAndLandsTypes, value),
+    land_type: (value) => getOptionLabel(LandType, value),
+    building_type: (value) => getOptionLabel(BuildingType, value),
+    building_condition: (value) => getOptionLabel(BuildingCondition, value),
+  };
+
+  const buildRows = (keys) =>
+    keys
+      .map((key) => {
+        const value = ad?.details?.[key] ?? ad?.[key];
+        if (value === null || value === undefined || value === "") return null;
+        const config = getSpecConfig(key);
+
+        return {
+          key,
+          label: config.label || detailLabels[key] || key,
+          value: valueFormatters[key] ? valueFormatters[key](value) : value,
+          Icon: config.icon,
+        };
+      })
+      .filter(Boolean);
+
+  const specRows = buildRows([
+    "bedrooms",
+    "bathrooms",
+    "level",
+    "area_m2",
+    "floors",
+    "type",
+    "land_type",
+    "building_type",
+    "building_condition",
+  ]);
+
+  const rentFrequencyLabel = getOptionLabel(RentFrequencies, ad?.rent_frequency);
+  const rentPeriodUnitLabel = getOptionLabel(
+    RentPeriodUnit,
+    ad?.min_rent_period_unit,
+  );
+
+  const saleRows = [
+    ad?.installment_years && {
+      key: "installment_years",
+      label: t.ad.installment_years || "Installment years",
+      value: ad.installment_years,
+    },
+    Object.prototype.hasOwnProperty.call(ad || {}, "ready_to_move") && {
+      key: "ready_to_move",
+      label: t.ad.ready_to_move || "Ready to move",
+      value: formatBoolean(ad.ready_to_move),
+    },
+    Object.prototype.hasOwnProperty.call(ad || {}, "furnished") && {
+      key: "furnished",
+      label: t.ad.furnished || "Furnished",
+      value: formatBoolean(ad.furnished),
+    },
+  ].filter(Boolean);
+
+  const rentRows = [
+    ad?.adult_no_max && {
+      key: "adult_no_max",
+      label: t.ad.max_adults || "Max adults",
+      value: ad.adult_no_max,
+    },
+    ad?.child_no_max && {
+      key: "child_no_max",
+      label: t.ad.max_children || "Max children",
+      value: ad.child_no_max,
+    },
+  ].filter(Boolean);
+
+  const amenities = Object.entries(ad?.amenities || {})
+    .filter(([_, value]) => value)
+    .map(([key]) => {
+      const item =
+        Amenities.find((amenity) => amenity.key === key) ||
+        Amenities.find((amenity) => amenity.id === `am_${key}`);
+      return item?.[`name_${locale}`] || item?.name_en || key;
+    });
+
+  const getLevelLabel = (levelId) => getOptionLabel(Levels, levelId);
+  const salePaymentLabel = getOptionLabel(PaymentMethod, ad?.payment_method);
+  const navigationItems = [
+    { name: t.market.all_ads, href: "/market" },
+    ad?.department?.[`name_${locale}`] && {
+      name: ad.department[`name_${locale}`],
+      href: `/market?dep=${activeTableId}`,
+    },
+    ad?.category?.[`name_${locale}`] && {
+      name: ad.category[`name_${locale}`],
+      href: `/market?dep=${activeTableId}&cat=${ad.category.id}`,
+    },
+    ad?.subCategory?.[`name_${locale}`] && {
+      name: ad.subCategory[`name_${locale}`],
+      href: `/market?dep=${activeTableId}&cat=${ad?.category?.id}&subcat=${ad.subCategory.id}`,
+    },
+    { name: t.ad.ad_details, href: "" },
+  ].filter(Boolean);
 
   const swiperDirection = screenSize === "large" ? "vertical" : "horizontal";
   const slidesView =
@@ -75,6 +225,66 @@ export default function AdDetails() {
   const space = screenSize === "large" ? 7 : 6;
 
   const showThumbNav = ad?.images?.length > slidesView;
+  const showMainImageNav = ad?.images?.length > 1;
+
+  const goToImage = (index) => {
+    setCurrentImg(index);
+    swiperRef.current?.slideTo(index);
+  };
+
+  const goToPreviousImage = () => {
+    if (!ad?.images?.length) return;
+
+    const previousIndex =
+      currentImg === 0 ? ad.images.length - 1 : currentImg - 1;
+    goToImage(previousIndex);
+  };
+
+  const goToNextImage = () => {
+    if (!ad?.images?.length) return;
+
+    const nextIndex =
+      currentImg === ad.images.length - 1 ? 0 : currentImg + 1;
+    goToImage(nextIndex);
+  };
+
+  const handleFavoriteClick = async () => {
+    if (!user) {
+      router.push(
+        `/register?redirect=${encodeURIComponent(`/market/${slug}?dep=${favoriteTableId || tableId || ""}`)}`,
+      );
+      return;
+    }
+
+    if (favLoading || !favoriteTableId || !ad?.id) return;
+
+    const wasFavorite = userHasFavorited;
+
+    try {
+      setFavLoading(true);
+      await toggleFavorite(favoriteTableId, ad.id);
+
+      setAd((prev) => ({
+        ...prev,
+        isFavorite: !wasFavorite,
+        is_favorite: !wasFavorite,
+        favorites_count: wasFavorite
+          ? Math.max((prev?.favorites_count || 0) - 1, 0)
+          : (prev?.favorites_count || 0) + 1,
+      }));
+
+      updateUserFavoritesCount(
+        wasFavorite
+          ? Math.max((user?.favorites_count || 0) - 1, 0)
+          : (user?.favorites_count || 0) + 1,
+      );
+      playSound(wasFavorite ? "favOff" : "favOn");
+    } catch (err) {
+      console.error("toggleFavorite err", err);
+    } finally {
+      setFavLoading(false);
+    }
+  };
 
   const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return "";
@@ -97,14 +307,6 @@ export default function AdDetails() {
     ad?.compound?.[`name_${locale}`],
   ].filter(Boolean);
 
-  const getLevelLabel = (levelId) => {
-    const level = Levels.find((l) => l.id === levelId);
-
-    if (!level) return levelId;
-
-    return locale === "ar" ? level.name_ar : level.name_en;
-  };
-
   if (loading) {
     return <AdDetailsSkeleton />;
   }
@@ -113,18 +315,7 @@ export default function AdDetails() {
     <>
       <div className="single-page container for-product">
         <Navigations
-          items={[
-            { name: t.market.all_ads, href: "/market" },
-            {
-              name: ad?.Categories?.[`name_${locale}`],
-              href: `/market?cat=${ad?.Categories?.id}`,
-            },
-            {
-              name: ad?.SubCategories?.[`name_${locale}`],
-              href: `/market?cat=${ad?.SubCategories?.id}`,
-            },
-            { name: t.ad.ad_details, href: "" },
-          ]}
+          items={navigationItems}
           container="main"
         />
 
@@ -138,12 +329,46 @@ export default function AdDetails() {
                   src={ad?.images?.[currentImg]?.secure_url}
                   alt={ad.title}
                 />
+                <div className="top">
+                  {ad?.featured_priority > 0 ? (
+                    <span className="verified ellipsis">
+                      <BsFillLightningChargeFill /> Featured ad
+                    </span>
+                  ) : (
+                    <span></span>
+                  )}
+                  {ad?.is_verified && (
+                    <span className="verified ellipsis">
+                      <FaCheck /> verified
+                    </span>
+                  )}
+                </div>
                 <Image
                   className="back-img"
                   src={ad?.images?.[currentImg]?.secure_url}
                   alt={ad?.title}
                   fill
                 />
+                {showMainImageNav && (
+                  <>
+                    <button
+                      type="button"
+                      className="main-image-nav prev"
+                      onClick={goToPreviousImage}
+                      aria-label="Previous image"
+                    >
+                      <FaAngleLeft />
+                    </button>
+                    <button
+                      type="button"
+                      className="main-image-nav next"
+                      onClick={goToNextImage}
+                      aria-label="Next image"
+                    >
+                      <FaAngleRight />
+                    </button>
+                  </>
+                )}
               </div>
             )}
             {ad?.images?.length > 1 && (
@@ -178,8 +403,7 @@ export default function AdDetails() {
                       <div
                         className={`img ${index === currentImg ? "active" : ""}`}
                         onClick={() => {
-                          setCurrentImg(index);
-                          swiperRef.current?.slideTo(index);
+                          goToImage(index);
                         }}
                       >
                         <Image fill src={x?.secure_url} alt={ad?.name} />
@@ -207,24 +431,51 @@ export default function AdDetails() {
                   {!screenSize.includes("small") && (
                     <div className="btns">
                       <FiShare2 />{" "}
-                      {ad?.isFavorite ? <FaHeart /> : <FaRegHeart />}
+                      {userHasFavorited ? (
+                        <FaHeart
+                          role="button"
+                          aria-label="Remove from favorites"
+                          onClick={handleFavoriteClick}
+                          style={{ cursor: favLoading ? "wait" : "pointer" }}
+                        />
+                      ) : (
+                        <FaRegHeart
+                          role="button"
+                          aria-label="Add to favorites"
+                          onClick={handleFavoriteClick}
+                          style={{ cursor: favLoading ? "wait" : "pointer" }}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
                 <div className="row">
                   <div className="column-holder">
                     <h5 className="price">
-                      {formatCurrency(ad?.price, ad?.currency, locale)} /{" "}
-                      {
-                        RentFrequencies.find(
-                          (x) => x.id == ad?.rent_frequency,
-                        )?.[`name_${locale}`]
-                      }
+                      {formatCurrency(ad?.price, ad?.currency, locale)}
+                      {isRentAd && ad?.rent_frequency
+                        ? ` / ${rentFrequencyLabel}`
+                        : ""}
+                      {isSaleAd && ad?.payment_method
+                        ? ` / ${salePaymentLabel}`
+                        : ""}
                     </h5>
-                    <h6 className="price-dep">
-                      {t.ad.deposit}:{" "}
-                      {formatCurrency(ad?.deposit_amount, ad?.currency, locale)}
-                    </h6>
+                    {isRentAd && ad?.deposit_amount && (
+                      <h6 className="price-dep">
+                        {t.ad.deposit}:{" "}
+                        {formatCurrency(
+                          ad?.deposit_amount,
+                          ad?.currency,
+                          locale,
+                        )}
+                      </h6>
+                    )}
+                    {isSaleAd && ad?.down_payment && (
+                      <h6 className="price-dep">
+                        {t.ad.down_payment || "Down payment"}:{" "}
+                        {formatCurrency(ad.down_payment, ad.currency, locale)}
+                      </h6>
+                    )}
                   </div>
                   {!screenSize.includes("small") && (
                     <div className="row stats">
@@ -250,12 +501,82 @@ export default function AdDetails() {
 
                 {screenSize.includes("small") && (
                   <div className="btns">
-                    <FiShare2 /> <FaRegHeart />
+                    <FiShare2 />{" "}
+                    {userHasFavorited ? (
+                      <FaHeart
+                        role="button"
+                        aria-label="Remove from favorites"
+                        onClick={handleFavoriteClick}
+                        style={{ cursor: favLoading ? "wait" : "pointer" }}
+                      />
+                    ) : (
+                      <FaRegHeart
+                        role="button"
+                        aria-label="Add to favorites"
+                        onClick={handleFavoriteClick}
+                        style={{ cursor: favLoading ? "wait" : "pointer" }}
+                      />
+                    )}
                   </div>
                 )}
               </div>
 
-              <div className="specifecs card">
+              {specRows.length > 0 && (
+                <div className="specifecs card">
+                  <h4>{t.ad.specifecs}</h4>
+                  <ul>
+                    {specRows.map(({ key, label, value, Icon }) => (
+                      <li key={key} className="spec-item">
+                        {Icon && <Icon className="spec-icon" />}
+                        <span className="spec-key">{label}</span>
+                        <span className="spec-value">: {value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {saleRows.length > 0 && (
+                <div className="specifecs card conditions">
+                  <h4>{t.ad.sale_details || "Sale details"}</h4>
+                  <ul>
+                    {saleRows.map((row) => (
+                      <li key={row.key} className="spec-item">
+                        <span className="spec-key">{row.label}</span>
+                        <span className="spec-value">: {row.value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {amenities.length > 0 && (
+                <div className="amenities card">
+                  <h4>{t.ad.amenities}</h4>
+                  <ul>
+                    {amenities.map((name) => (
+                      <li className="amenitie-item" key={name}>
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {isRentAd && rentRows.length > 0 && (
+                <div className="card conditions">
+                  <h4>{t.ad.conditions}</h4>
+                  <ul className="">
+                    {rentRows.map((row) => (
+                      <li key={row.key}>
+                        {row.label}: {row.value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="specifecs card legacy-hidden">
                 <h4>{t.ad.specifecs}</h4>
                 <ul>
                   {Object.entries(ad?.details || {}).map(([key, value]) => {
@@ -279,7 +600,7 @@ export default function AdDetails() {
                 </ul>
               </div>
 
-              <div className="amenities card">
+              <div className="amenities card legacy-hidden">
                 <h4>{t.ad.amenities}</h4>
                 <ul>
                   {Object.entries(ad?.amenities || {})
@@ -292,7 +613,7 @@ export default function AdDetails() {
                 </ul>
               </div>
 
-              <div className="card conditions">
+              <div className="card conditions legacy-hidden">
                 <h4>{t.ad.conditions}</h4>
                 <ul className="">
                   {ad?.adult_no_max && (
@@ -313,6 +634,7 @@ export default function AdDetails() {
                 <h4>{t.ad.description}</h4>{" "}
                 <p style={{ whiteSpace: "pre-line" }}>{ad?.description}</p>
               </div>
+              {isRentAd && (
               <div className="card booking" id="booknow">
                 <h4>{t.ad.book_now || "book now"}</h4>
 
@@ -344,33 +666,34 @@ export default function AdDetails() {
                 )}
                 <BookingRange data={ad} />
               </div>
+              )}
             </div>
             <div className="right">
               <div className="card user-info">
                 <div className="row-holder">
                   <h4>
                     {t.ad.listed_by}{" "}
-                    {ad?.admin && !ad?.subuser
+                    {ad?.admin && !ad?.user
                       ? "Dawaarly"
-                      : ad?.subuser?.full_name}
+                      : ad?.user?.full_name}
                   </h4>
 
-                  <Link href={`/listings/${ad?.admin?.id || ad?.subuser?.id}`}>
-                    {ad?.admin && !ad?.subuser
+                  <Link href={`/listings/${ad?.admin?.id || ad?.user?.id}`}>
+                    {ad?.admin && !ad?.user
                       ? "see more ads"
                       : t.ad.see_profile}{" "}
                     <FaArrowRight />
                   </Link>
                 </div>
-                {ad?.subuser && (
+                {ad?.user && (
                   <div className="row-holder">
                     <p>
                       {t.ad.member_since}{" "}
-                      {new Date(ad?.subuser?.created_at).toLocaleDateString()}
+                      {new Date(ad?.user?.created_at).toLocaleDateString()}
                     </p>
-                    <p>
-                      {`there is ${ad?.subuser?.active_ads_count} othere ads`}
-                    </p>
+                    {ad?.user?.active_ads_count > 0 && (
+                      <p>{`there is ${ad?.user?.active_ads_count} other ads`}</p>
+                    )}
                   </div>
                 )}
 
@@ -385,7 +708,7 @@ export default function AdDetails() {
                         {showPhoneNumber
                           ? ad?.admin
                             ? ad?.admin?.phone
-                            : ad?.subuser?.phone
+                            : ad?.user?.phone
                           : t.ad.phone_number}
                       </button>
                     )}
@@ -393,7 +716,7 @@ export default function AdDetails() {
                     {(!!ad?.admin || ad?.display_whatsapp) && (
                       <a
                         href={`https://wa.me/${formatPhoneForWhatsApp(
-                          ad?.admin ? ad?.admin?.phone : ad?.subuser?.phone,
+                          ad?.admin ? ad?.admin?.phone : ad?.user?.phone,
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -404,9 +727,11 @@ export default function AdDetails() {
                     )}
                   </div>
 
-                  <Link href="#booknow" className="main-button">
-                    book now
-                  </Link>
+                  {isRentAd && (
+                    <Link href="#booknow" className="main-button">
+                      book now
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -424,8 +749,12 @@ export default function AdDetails() {
           </div>
         </div>
       </div>
-      <AdsSwiper type={`category`} id={ad?.Categories?.id} />
-      <AdsSwiper type={`subCategory`} id={ad?.SubCategories?.id} />
+      <AdsSwiper type={`category`} id={ad?.category?.id} tableId={activeTableId} />
+      <AdsSwiper
+        type={`subCategory`}
+        id={ad?.subCategory?.id}
+        tableId={activeTableId}
+      />
       <AdsSwiper type={`city`} id={ad?.city?.id} />
     </>
   );

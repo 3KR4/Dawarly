@@ -17,10 +17,31 @@ function CatCard({
 }) {
   const { locale, setMenuType } = useContext(settings);
 
-  const link =
-    type === "categories"
-      ? `/market?cat=${data?.id}`
-      : `/market?subcat=${data?.id}`;
+  const link = (() => {
+    const params = new URLSearchParams();
+
+    if (type === "tables") {
+      params.set("dep", data?.id);
+    } else if (type === "categories") {
+      if (data?.table_id) params.set("dep", data.table_id);
+      params.set("cat", data?.id);
+    } else if (type === "subcategories") {
+      if (data?.table_id) params.set("dep", data.table_id);
+      if (data?.category_id) params.set("cat", data.category_id);
+      params.set("subcat", data?.id);
+    } else if (type === "governorates") {
+      params.set("governorate_id", data?.id);
+    } else if (type === "cities") {
+      params.set("city_id", data?.id);
+    } else if (type === "areas") {
+      params.set("area_id", data?.id);
+    } else if (type === "compounds") {
+      params.set("compound_id", data?.id);
+    }
+
+    const query = params.toString();
+    return query ? `/market?${query}` : "/market";
+  })();
 
   const Icon = data?.icon;
   const count = data?.childsCount ?? data?.areasCount;

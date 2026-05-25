@@ -10,6 +10,7 @@ import { useAppData } from "@/Contexts/DataContext";
 const ActiveFiltersBar = ({
   selectedCategory,
   dynamicFilters,
+  searchText,
   onRemoveCategory,
   onRemoveFilter,
   onClearAll,
@@ -113,6 +114,14 @@ const ActiveFiltersBar = ({
 
   const activeFilters = [];
 
+  if (searchText) {
+    activeFilters.push({
+      key: "search",
+      value: searchText,
+      display: `${locale === "ar" ? "بحث" : "Search"}: ${searchText}`,
+    });
+  }
+
   if (selectedCategory?.cat) {
     const display = getFilterDisplayName("cat", selectedCategory.cat);
     if (display) {
@@ -166,7 +175,9 @@ const ActiveFiltersBar = ({
             key={filter.key}
             className="filter-tag"
             onClick={() => {
-              if (filter.key === "cat" || filter.key === "subCat") {
+              if (filter.key === "search") {
+                onRemoveFilter("search");
+              } else if (filter.key === "cat" || filter.key === "subCat") {
                 onRemoveCategory(filter.key);
               } else {
                 onRemoveFilter(filter.key);

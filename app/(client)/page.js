@@ -8,10 +8,9 @@ export default function Home() {
   return (
     <>
       <HeroSwiper />
-      <CategoriesSwiper type={`categories`} />
-      <CategoriesSwiper type={`tables`} />
+      {/* <CategoriesSwiper type={`categories`} />
+      <CategoriesSwiper type={`tables`} /> */}
 
-      <BlogsSection />
 
       <AdsSwiper type="gov" id={1} />
       <AdsSwiper type="city" id={1} />
@@ -26,6 +25,8 @@ export default function Home() {
 
       <AdsSwiper type="category" id={1} tableId={3} />
       <AdsSwiper type="subCategory" id={1} tableId={4} />
+      
+      <BlogsSection />
 
       <AdsSwiper type="views" />
       <AdsSwiper type="views" tableId={3} />

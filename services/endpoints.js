@@ -82,8 +82,16 @@ export const ENDPOINTS = {
     UPDATE: (slug) => `/blogs/${slug}`,
     DELETE: (slug) => `/blogs/${slug}`,
   },
+  SEARCH: {
+    HEADER: (text, limit = 4) => {
+      const params = new URLSearchParams();
+      params.append("text", text);
+      params.append("limit", limit);
+      return `/search/header?${params.toString()}`;
+    },
+  },
   FAVORITES: {
-    TOGGLE_FAVORITES: (id) => `/favorites/${id}`,
+    TOGGLE_FAVORITES: (tableId, adId) => `/favorites/${tableId}/${adId}`,
     GET_FAVORITES: (page, limit) => `/favorites?page=${page}&limit=${limit}`,
   },
   IMAGES: {
