@@ -1,15 +1,24 @@
 "use client";
+
 import Link from "next/link";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { useState } from "react";
+import ar from "@/lang/ar";
+import en from "@/lang/en";
 
 export default function NotFound() {
+  const [locale] = useState(() => {
+    if (typeof window === "undefined") return "ar";
+    return localStorage.getItem("locale") || "ar";
+  });
+  const t = locale === "en" ? en : ar;
+
   return (
     <div className="error-page container">
       <h1>404</h1>
-      <h4>Page Not Found</h4>
-      <p>The page you’re looking for doesn’t exist or has been moved.</p>
+      <h4>{t.notFound.title}</h4>
+      <p>{t.notFound.description}</p>
       <Link href={`/`} className={`main-button`}>
-        Back to Home
+        {t.notFound.backHome}
       </Link>
     </div>
   );

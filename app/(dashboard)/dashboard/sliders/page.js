@@ -96,7 +96,7 @@ export default function Slieds() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };
@@ -165,7 +165,7 @@ export default function Slieds() {
             {!slieds?.data?.length && !loadingContent ? (
               <div className="no-data-found">
                 <TbListSearch />
-                <p>you didnt create slieds yet</p>
+                <p>{t.common.noSlidesFound}</p>
               </div>
             ) : (
               slieds?.data?.map((item) => {

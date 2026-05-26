@@ -47,8 +47,15 @@ text-align: center;
   text-align: left;
       font-size: 16px;
 }
+[lang="ar"] .legal-document p {
+  text-align: right;
+}
 .legal-document ul {
   padding-left: 30px;
+}
+[lang="ar"] .legal-document ul {
+  padding-left: 0;
+  padding-right: 30px;
 }
 .legal-document li {
     margin-bottom: 8px;

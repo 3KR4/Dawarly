@@ -55,7 +55,7 @@ export const metadata = {
         alt: "Dawaarly logo",
       },
     ],
-    locale: "en_US",
+    locale: "ar_EG",
     type: "website",
   },
 
@@ -76,7 +76,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={cairo.className}>
+    <html lang="ar" dir="rtl" className={cairo.className}>
       <body>
         <SettingsProvider>
           <NotificationProvider>

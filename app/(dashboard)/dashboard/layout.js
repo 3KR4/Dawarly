@@ -15,6 +15,7 @@ import { DataProvider } from "@/Contexts/DataContext";
 import { NotificationProvider } from "@/Contexts/NotificationContext";
 import NotificationHolder from "@/components/Tools/NotificationHolder";
 import { AuthProvider, useAuth } from "@/Contexts/AuthContext";
+import useTranslate from "@/Contexts/useTranslation";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -26,6 +27,7 @@ const cairo = Cairo({
 // ---------------- PROTECTED DASHBOARD ----------------
 const ProtectedDashboard = ({ children }) => {
   const { user, loading } = useAuth();
+  const t = useTranslate();
   const router = useRouter();
 
   useEffect(() => {
@@ -35,7 +37,7 @@ const ProtectedDashboard = ({ children }) => {
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return <div>Loading...</div>; // ممكن تحط Spinner بدل Loading
+    return <div>{t.common.loading}</div>;
   }
 
   return children;
@@ -44,7 +46,7 @@ const ProtectedDashboard = ({ children }) => {
 // ---------------- ROOT LAYOUT ----------------
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={cairo.className}>
+    <html lang="ar" dir="rtl" className={cairo.className}>
       <body>
         <SettingsProvider>
           <NotificationProvider>

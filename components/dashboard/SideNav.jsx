@@ -4,6 +4,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useTranslate from "@/Contexts/useTranslation";
+import { useAuth } from "@/Contexts/AuthContext";
 import { AiFillProduct } from "react-icons/ai";
 import { LuCalendarClock } from "react-icons/lu";
 import { LuCalendarCheck } from "react-icons/lu";
@@ -43,6 +44,7 @@ function SideNav() {
     setIsMounted,
   } = useContext(settings);
   const t = useTranslate();
+  const { user } = useAuth();
 
   const pathname = usePathname();
   const isActive = (path) => {
@@ -263,7 +265,7 @@ function SideNav() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="hold">
-                <h4>Places</h4>
+                <h4>{t.common.places}</h4>
                 <MdOutlineHomeWork />
               </div>
             </Link>
@@ -275,7 +277,7 @@ function SideNav() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="hold">
-                <h4>Categories</h4>
+                <h4>{t.common.categories}</h4>
                 <BiCategory />
               </div>
             </Link>
@@ -307,7 +309,7 @@ function SideNav() {
       <ul>
         <div className="a a-user">
           <div className="hold">
-            <h4>Mahmoud Elshazly</h4>
+            <h4>{user?.full_name || t.sideNav.profile}</h4>
             <FaUser />
           </div>
         </div>

@@ -23,6 +23,10 @@ import DynamicMenu from "@/components/Tools/DynamicMenu";
 import { FaHeart } from "react-icons/fa";
 import { getAdTableId } from "@/utils/getAdTableId";
 
+const preventAdImageContextMenu = (e) => {
+  e.preventDefault();
+};
+
 export default function AdsTable({
   ads,
   loadingContent,
@@ -143,12 +147,19 @@ export default function AdsTable({
               return (
                 <div
                   key={`${tableId}-${item?.id}`}
-                  className={`table-item ${item?.status}`}
+                  className={`table-item ${item?.status} ${
+                    item?.anonymous_id || item?.anonymous ? "anonymous-row" : ""
+                  } ${
+                    item?.subuser_id || item?.subuser ? "subuser-row" : ""
+                  } ${
+                    item?.user_id || item?.user ? "user-row" : ""
+                  }`}
                 >
                   <div className="holder">
                     <Link
                       href={`/market/${item?.id}?dep=${tableId}`}
                       className="item-image"
+                      onContextMenu={preventAdImageContextMenu}
                     >
                       <Image
                         src={
@@ -156,7 +167,9 @@ export default function AdsTable({
                         }
                         alt={item?.name}
                         fill
-                        className="product-image"
+                        className="product-image protected-ad-image"
+                        draggable={false}
+                        onContextMenu={preventAdImageContextMenu}
                       />
                     </Link>
 
@@ -366,7 +379,7 @@ export default function AdsTable({
       </div>
       <DynamicMenu
         open={!!menuType}
-        title={menuType == "delete" ? "Confirm Delete" : "reject reason"}
+        title={menuType == "delete" ? t.common.confirmDelete : t.common.rejectReason}
         onClose={closeMenu}
       >
         <DeleteConfirm

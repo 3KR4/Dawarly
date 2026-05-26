@@ -211,7 +211,7 @@ export default function CategoriesSwiper({
       <div className="top">
         <h3 className="title">
           {curentTargetName && dashboard && (
-            <IoMdArrowRoundBack onClick={handleHistory} />
+            <IoMdArrowRoundBack className="arrow" onClick={handleHistory} />
           )}
           {title} {curentTargetName ? `in ${curentTargetName}` : ""}
         </h3>
@@ -225,7 +225,7 @@ export default function CategoriesSwiper({
               onClick={() => swiperRef.current?.slidePrev()}
               disabled={isBeginning}
             >
-              <FaArrowLeft />
+              {locale === "ar" ? <FaArrowRight /> : <FaArrowLeft />}
             </button>
           )}
 
@@ -297,7 +297,7 @@ export default function CategoriesSwiper({
               onClick={() => swiperRef.current?.slideNext()}
               disabled={isEnd}
             >
-              <FaArrowRight />
+              {locale === "ar" ? <FaArrowLeft /> : <FaArrowRight />}
             </button>
           )}
         </div>

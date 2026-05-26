@@ -66,6 +66,18 @@
 .table-item:last-child {
   border-color: transparent;
 }
+.table-item.anonymous-row {
+  background: #ededed;
+  border-inline-start: 6px solid var(--paragraph);
+}
+.table-item.user-row {
+  background: #e9f2ff;
+  border-inline-start: 6px solid #1d73d4;
+}
+.table-item.subuser-row {
+  background: #fff3e6;
+  border-inline-start: 6px solid #f28c28;
+}
 .table-item .item-image {
   display: flex;
   justify-content: center;

@@ -6,16 +6,20 @@ import { useForm } from "react-hook-form";
 import useTranslate from "@/Contexts/useTranslation";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import Images from "@/components/Tools/data-collector/Images";
+import Tags from "@/components/Tools/data-collector/Tags";
 import { Phone, CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
+import { selectors } from "@/Contexts/selectors";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import {
   crateAd,
+  createAnonymousAd,
   updateAd,
   getOneAd,
   assignAdmin,
+  changeStatus,
 } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import {
@@ -28,7 +32,6 @@ import {
   LandType,
   Levels,
   PaymentMethod,
-  Priority,
   RentFrequencies,
   RentPeriodUnit,
 } from "@/data/enums";
@@ -36,7 +39,11 @@ import { useNotification } from "@/Contexts/NotificationContext";
 import useRedirectAfterLogin from "@/Contexts/useRedirectAfterLogin";
 import { useAuth } from "@/Contexts/AuthContext";
 import { getAllUsers } from "@/services/auth/auth.service";
-import { deleteImage, uploadImages } from "@/services/images/images.service";
+import {
+  deleteImage,
+  updateImage,
+  uploadImages,
+} from "@/services/images/images.service";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   getTableRule,
@@ -46,15 +53,10 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/ar";
 import "dayjs/locale/en";
-
-const OWNER_FIELDS = [
-  "owner_no1",
-  "owner_no2",
-  "delivery_no1",
-  "delivery_no2",
-  "payment_no1",
-  "payment_no2",
-];
+import CatCard from "@/components/home/CatCard";
+import DynamicMenu from "@/components/Tools/DynamicMenu";
+import DeleteConfirm from "@/components/Tools/DeleteConfirm";
+import { useRouter } from "next/navigation";
 
 const getNumberOrNull = (value) => {
   if (value === "" || value === null || value === undefined) return null;
@@ -65,6 +67,35 @@ const getNumberOrNull = (value) => {
 const getBooleanAdField = (ad, field) =>
   Boolean(ad?.[field] ?? ad?.details?.[field]);
 const getAdField = (ad, field) => ad?.[field] ?? ad?.details?.[field] ?? null;
+const formatTagsForInput = (tags) => {
+  if (Array.isArray(tags)) return tags.join(", ");
+  if (typeof tags !== "string") return tags || "";
+
+  try {
+    const parsedTags = JSON.parse(tags);
+    return Array.isArray(parsedTags) ? parsedTags.join(", ") : tags;
+  } catch {
+    return tags;
+  }
+};
+const parseTagsForState = (tags) => {
+  if (Array.isArray(tags)) {
+    return tags.map((tag) => String(tag).trim()).filter(Boolean);
+  }
+  if (typeof tags !== "string") return [];
+
+  try {
+    const parsedTags = JSON.parse(tags);
+    if (Array.isArray(parsedTags)) {
+      return parsedTags.map((tag) => String(tag).trim()).filter(Boolean);
+    }
+  } catch {}
+
+  return tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+};
 const getAdIdFromResponse = (res) =>
   res?.data?.adId ??
   res?.data?.id ??
@@ -73,6 +104,34 @@ const getAdIdFromResponse = (res) =>
   res?.data?.data?.id ??
   res?.data?.data?.ad?.id ??
   null;
+
+const DescriptionField = ({ disabled, register, t }) => (
+  <div className="box forInput">
+    <label>{t.dashboard.forms.description}</label>
+    <div className="inputHolder">
+      <div className="holder">
+        <textarea
+          {...register("description")}
+          placeholder={t.dashboard.forms.descriptionPlaceholder}
+          rows={4}
+          disabled={disabled}
+        />
+      </div>
+    </div>
+  </div>
+);
+
+const isVacationTable = (table) =>
+  table?.name_en?.toLowerCase().includes("vacation");
+
+const isSaleTable = (table) =>
+  table?.name_en?.toLowerCase().includes("for sale");
+
+const isRentTable = (table) =>
+  table?.name_en?.toLowerCase().includes("for rent");
+
+const cleanTableName = (name = "") =>
+  name.replace(/for sale/i, "").replace(/for rent/i, "").trim();
 
 const getNumericRules = (
   requiredMessage,
@@ -105,6 +164,9 @@ export default function AdForm({
   type = "client",
   adId,
   initialTableId = null,
+  stepped = false,
+  anonymousMode = false,
+  reviewActions = false,
 }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
@@ -117,9 +179,11 @@ export default function AdForm({
     areas,
     compounds,
   } = useAppData();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { addNotification } = useNotification();
   const redirectAfterLogin = useRedirectAfterLogin();
+  const router = useRouter();
+  const { tags, setTags } = useContext(selectors);
 
   const [adData, setAdData] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
@@ -129,7 +193,11 @@ export default function AdForm({
     user?.is_super_admin;
   const [loadingContent, setLoadingContnet] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingReviewAction, setLoadingReviewAction] = useState(false);
+  const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
+  const [rejectInput, setRejectInput] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contactSubmitAttempted, setContactSubmitAttempted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [selectedCats, setSelectedCats] = useState({
     dep: null,
@@ -142,17 +210,18 @@ export default function AdForm({
     area: null,
     compound: null,
   });
-  const [selectedAdmin, setSelectedAdmin] = useState(adId ? null : user);
+  const [selectedAdmin, setSelectedAdmin] = useState(
+    type === "admin" && !adId ? user : null,
+  );
   const [selectedMediatorMethod, setSelectedMediatorMethod] = useState({
-    id: adId ? 1 : 2,
-    name: adId ? t.ad.userToUser : t.ad.userToAdmin,
+    id: type === "admin" && !adId ? 2 : 1,
+    name: type === "admin" && !adId ? t.ad.userToAdmin : t.ad.userToUser,
   });
   const [selectedContactMethods, setSelectedContactMethods] = useState({
     chat: false,
     phone: false,
   });
   const [checkBoxes, setCheckBoxes] = useState({
-    isVerified: !adId,
     isFurnished: false,
     isReadyToMove: false,
   });
@@ -165,7 +234,6 @@ export default function AdForm({
     minRentalUnit: null,
     payment: null,
     level: Levels[0],
-    priority: Priority[4],
     installmentYears: null,
     buildingAndLandsType: null,
     landType: null,
@@ -176,13 +244,151 @@ export default function AdForm({
     from: "",
     to: "",
   });
+  const isStepped = stepped && type === "client" && !adId;
+  const isRequestMode = anonymousMode;
+  const needsAnonymousContact = isRequestMode && !authLoading && !user;
+  const STEPS = {
+    DEPARTMENT: 1,
+    CATEGORY: 1,
+    BASICS: 2,
+    DETAILS: 3,
+    OWNER: needsAnonymousContact ? 4 : null,
+    CONTACT: needsAnonymousContact ? 5 : 4,
+  };
+  const STEP_FLOW = [...new Set(Object.values(STEPS).filter(Boolean))];
+  const [step, setStep] = useState(STEPS.DEPARTMENT);
+  const isAnonymous = needsAnonymousContact;
+  const [selectedRootGroup, setSelectedRootGroup] = useState(null);
+  const [selectedVacationGroup, setSelectedVacationGroup] = useState(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    trigger,
+    getValues,
   } = useForm();
+
+  const createAdNavigation = useMemo(() => {
+    const getSubCategories = (categoryId) =>
+      subCategories.filter((subCategory) => subCategory.category_id === categoryId);
+
+    const vacationTables = tables.filter(isVacationTable);
+    const vacationMap = {};
+
+    vacationTables.forEach((table) => {
+      const mode = isSaleTable(table) ? "sale" : "rent";
+
+      categories
+        .filter((category) => category.table_id === table.id)
+        .forEach((category) => {
+          const key = category.name_en.toLowerCase();
+
+          if (!vacationMap[key]) {
+            vacationMap[key] = {
+              id: key,
+              name_en: category.name_en,
+              name_ar: category.name_ar,
+              items: [],
+            };
+          }
+
+          vacationMap[key].items.push({
+            ...category,
+            id: `${category.id}_${mode}`,
+            category_id: category.id,
+            table_id: table.id,
+            mode,
+            name_en:
+              mode === "sale"
+                ? `${category.name_en} For Sale`
+                : `${category.name_en} For Rent`,
+            name_ar:
+              mode === "sale"
+                ? `${category.name_ar} للبيع`
+                : `${category.name_ar} للإيجار`,
+            children: getSubCategories(category.id),
+          });
+        });
+    });
+
+    const vacationRoot = {
+      id: "vacation_homes",
+      name_en: "Vacation Homes",
+      name_ar: "بيوت مصيفية",
+      children: Object.values(vacationMap).map((item) => ({
+        id: item.id,
+        name_en: item.name_en,
+        name_ar: item.name_ar,
+        children: item.items,
+      })),
+    };
+
+    const saleRoot = {
+      id: "properties_sale",
+      name_en: "Properties for Sale",
+      name_ar: "عقارات للبيع",
+      children: [],
+    };
+
+    const rentRoot = {
+      id: "properties_rent",
+      name_en: "Properties for Rent",
+      name_ar: "عقارات للإيجار",
+      children: [],
+    };
+
+    tables
+      .filter(
+        (table) =>
+          !isVacationTable(table) && (isSaleTable(table) || isRentTable(table)),
+      )
+      .forEach((table) => {
+        const root = isSaleTable(table) ? saleRoot : rentRoot;
+
+        root.children.push({
+          ...table,
+          table_id: table.id,
+          name_en: cleanTableName(table.name_en),
+          name_ar: cleanTableName(table.name_ar),
+          children: categories
+            .filter((category) => category.table_id === table.id)
+            .map((category) => ({
+              ...category,
+              children: getSubCategories(category.id),
+            })),
+        });
+      });
+
+    const otherTables = tables.filter(
+      (table) =>
+        !isVacationTable(table) && !isSaleTable(table) && !isRentTable(table),
+    );
+
+    return [
+      vacationRoot,
+      saleRoot,
+      rentRoot,
+      ...otherTables.map((table) => ({
+        id: table.id,
+        name_en: table.name_en,
+        name_ar: table.name_ar,
+        children: [
+          {
+            ...table,
+            table_id: table.id,
+            children: categories
+              .filter((category) => category.table_id === table.id)
+              .map((category) => ({
+                ...category,
+                children: getSubCategories(category.id),
+              })),
+          },
+        ],
+      })),
+    ].filter((group) => group.children.length > 0);
+  }, [categories, subCategories, tables]);
 
   const tableId = Number(selectedCats.dep?.id);
   const currentRule = useMemo(() => getTableRule(tableId), [tableId]);
@@ -233,11 +439,91 @@ export default function AdForm({
     { id: 1, name: t.ad.userToUser },
     { id: 2, name: t.ad.userToAdmin },
   ];
+  const shouldForceAdminContact = Boolean(adId && adData && !adData.subuser);
+  const adminContactMethodOptions =
+    shouldForceAdminContact
+      ? contactMethod.filter((method) => method.id === 2)
+      : contactMethod;
+  const canReviewPendingAd =
+    reviewActions &&
+    type === "admin" &&
+    adId &&
+    adData?.status === "PENDING";
+  const uploaderInfo = useMemo(() => {
+    if (!adId || !adData) return null;
+
+    const source =
+      adData.anonymous
+        ? {
+            type: locale === "ar" ? "زائر" : "Anonymous",
+            data: adData.anonymous,
+          }
+        : adData.subuser
+          ? {
+              type: locale === "ar" ? "سبيوزر" : "Subuser",
+              data: adData.subuser,
+            }
+          : adData.user
+            ? {
+                type: locale === "ar" ? "مستخدم" : "User",
+                data: adData.user,
+              }
+            : adData.admin
+              ? {
+                  type: locale === "ar" ? "أدمن" : "Admin",
+                  data: adData.admin,
+                }
+              : null;
+
+    if (!source) return null;
+
+    return {
+      type: source.type,
+      name: source.data?.full_name || "-",
+      email: source.data?.email || "-",
+      phone: source.data?.phone || "-",
+      ip: source.data?.ip_address || null,
+    };
+  }, [adData, adId, locale]);
 
   const methods = [
     { key: "phone", label: t.ad.contact_via_phone, icon: Phone },
     { key: "chat", label: t.ad.contact_via_chat, icon: IoChatbubblesOutline },
   ];
+
+  const validationFieldLabels = {
+    dep: "Department",
+    cat: "Category",
+    subCat: "Sub category",
+    gov: "Governorate",
+    city: "City",
+    admin: "Responsible admin",
+    images: "Images",
+    currency: "Currency",
+    contact: "Contact method",
+    anonymous_full_name: "Anonymous full name",
+    anonymous_contact: "Anonymous email or phone",
+    level: "Level",
+    payment_method: "Payment method",
+    frequency: "Rent frequency",
+    type: "Building or land",
+    land_type: "Land type",
+    building_type: "Building type",
+    building_condition: "Building condition",
+  };
+
+  const logValidationAndScroll = (source, validationErrors) => {
+    const readableErrors = Object.fromEntries(
+      Object.entries(validationErrors).map(([field, message]) => [
+        validationFieldLabels[field] || field,
+        message,
+      ]),
+    );
+
+    console.log("[AdForm validation]", source, validationErrors);
+    console.log("[AdForm validation readable]", source, readableErrors);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     if (adId && initialTableId) {
@@ -246,10 +532,36 @@ export default function AdForm({
   }, [adId, initialTableId]);
 
   useEffect(() => {
+    if (step > STEPS.CONTACT) {
+      setStep(STEPS.CONTACT);
+    }
+  }, [STEPS.CONTACT, step]);
+
+  useEffect(() => {
+    if (!adId) {
+      setTags([]);
+    }
+  }, [adId, setTags]);
+
+  useEffect(() => {
+    if (!isRequestMode || !user) return;
+
+    setValue("anonymous_full_name", user.full_name || "");
+    setValue("anonymous_email", user.email || "");
+    setValue("anonymous_phone", user.phone || "");
+  }, [isRequestMode, setValue, user]);
+
+  useEffect(() => {
     if (adId && canAssignAdmin) {
       fetchAdmins();
     }
   }, [adId, canAssignAdmin]);
+
+  useEffect(() => {
+    if (shouldForceAdminContact) {
+      setSelectedMediatorMethod({ id: 2, name: t.ad.userToAdmin });
+    }
+  }, [shouldForceAdminContact, t.ad.userToAdmin]);
 
   useEffect(() => {
     if (!adData || selectedCats.dep || !tables.length) return;
@@ -310,8 +622,11 @@ export default function AdForm({
 
   const canEditAd = (ad) => {
     if (!ad || !user) return false;
+    const ownerId = ad.subuser?.id ?? ad.subuser_id;
     return (
-      ad.user_id === user.id || user.role === "admin" || user.is_super_admin
+      ownerId === user.id ||
+      user.user_type === "ADMIN" ||
+      user.is_super_admin
     );
   };
 
@@ -320,10 +635,8 @@ export default function AdForm({
     setValue("rentAmount", ad.price || "");
     setValue("deposit_amount", getAdField(ad, "deposit_amount") || "");
     setValue("description", ad.description || "");
-    setValue(
-      "tags",
-      Array.isArray(ad.tags) ? ad.tags.join(",") : ad.tags || "",
-    );
+    setValue("tags", formatTagsForInput(ad.tags));
+    setTags(parseTagsForState(ad.tags));
     setValue("bedrooms", getAdField(ad, "bedrooms") || "");
     setValue("bathrooms", getAdField(ad, "bathrooms") || "");
     setValue("area_m2", getAdField(ad, "area_m2") || "");
@@ -332,10 +645,6 @@ export default function AdForm({
     setValue("rentalDuration", getAdField(ad, "min_rent_period") || "");
     setValue("downPayment", getAdField(ad, "down_payment") || "");
     setValue("floors", getAdField(ad, "floors") || "");
-
-    OWNER_FIELDS.forEach((field) => {
-      setValue(field, getAdField(ad, field) || "");
-    });
 
     setSelectedCats({
       dep: ad.department || null,
@@ -380,10 +689,6 @@ export default function AdForm({
         ) || null,
       level:
         Levels.find((item) => item.id == getAdField(ad, "level")) || Levels[0],
-      priority:
-        Priority.find(
-          (item) => item.id == getAdField(ad, "featured_priority"),
-        ) || Priority[1],
       installmentYears:
         InstallmentYears.find(
           (item) => item.id == getAdField(ad, "installment_years"),
@@ -408,7 +713,6 @@ export default function AdForm({
     });
 
     setCheckBoxes({
-      isVerified: getBooleanAdField(ad, "is_verified"),
       isFurnished: getBooleanAdField(ad, "furnished"),
       isReadyToMove: getBooleanAdField(ad, "ready_to_move"),
     });
@@ -421,8 +725,8 @@ export default function AdForm({
 
     setSelectedAmenities(activeAmenities);
 
-    if (ad.admin) {
-      setSelectedAdmin(ad.admin);
+    if (ad.admin || !ad.subuser) {
+      setSelectedAdmin(ad.admin || null);
       setSelectedMediatorMethod({ id: 2, name: t.ad.userToAdmin });
     }
 
@@ -463,6 +767,15 @@ export default function AdForm({
     ) {
       newErrors.contact =
         t.ad.contact_method_required || "Please choose a contact method";
+    }
+    if (needsAnonymousContact) {
+      if (!data.anonymous_full_name) {
+        newErrors.anonymous_full_name = t.dashboard.forms.errors.required;
+      }
+      if (!data.anonymous_email && !data.anonymous_phone) {
+        newErrors.anonymous_contact =
+          "Please add either an email or a phone number";
+      }
     }
     if (isFieldRequired(tableId, "level") && !additionalData.level) {
       newErrors.level = t.dashboard.forms.errors.required;
@@ -505,10 +818,8 @@ export default function AdForm({
     }
 
     if (Object.keys(newErrors).length > 0) {
-      console.log(newErrors);
-
       setFieldErrors(newErrors);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      logValidationAndScroll("submit", newErrors);
       return false;
     }
 
@@ -540,16 +851,16 @@ export default function AdForm({
       display_phone: selectedContactMethods.phone,
       display_whatsapp: selectedContactMethods.chat,
       display_dawaarly_contact: selectedMediatorMethod?.id === 2,
-      tags: data.tags || "",
-      is_verified: checkBoxes.isVerified,
-      featured_priority: additionalData.priority?.id ?? 0,
+      tags: tags.join(","),
     };
 
-    OWNER_FIELDS.forEach((field) => {
-      if (isFieldAllowed(tableId, field)) {
-        payload[field] = data[field] || null;
-      }
-    });
+    if (needsAnonymousContact) {
+      payload.anonymous = {
+        full_name: data.anonymous_full_name,
+        email: data.anonymous_email || null,
+        phone: data.anonymous_phone || null,
+      };
+    }
 
     if (isFieldAllowed(tableId, "bedrooms")) {
       payload.bedrooms = getNumberOrNull(data.bedrooms);
@@ -632,11 +943,16 @@ export default function AdForm({
   };
 
   const submitAd = async (payload) => {
-    return adId ? updateAd(tableId, adId, payload) : crateAd(tableId, payload);
+    if (adId) return updateAd(tableId, adId, payload);
+    return anonymousMode && !user
+      ? createAnonymousAd(tableId, payload)
+      : crateAd(tableId, payload);
   };
 
   const uploadNewImages = async (targetAdId) => {
-    const newImages = images.filter((img) => img?.file instanceof File);
+    const newImages = images
+      .map((img, index) => ({ ...img, order: index }))
+      .filter((img) => img?.file instanceof File);
     if (newImages.length === 0) return;
 
     const formData = new FormData();
@@ -645,6 +961,7 @@ export default function AdForm({
 
     newImages.forEach((img) => {
       formData.append("files", img.file);
+      formData.append("orders", String(img.order));
     });
 
     for (const [key, value] of formData.entries()) {
@@ -652,6 +969,22 @@ export default function AdForm({
     }
 
     await uploadImages("AD", targetAdId, formData, tableId);
+  };
+
+  const syncExistingImageOrders = async (targetAdId) => {
+    const existingImages = images
+      .map((img, index) => ({ ...img, nextOrder: index }))
+      .filter((img) => img?.id && !(img?.file instanceof File));
+
+    await Promise.all(
+      existingImages.map((img) => {
+        const currentOrder = Number(img.order);
+
+        if (currentOrder === img.nextOrder) return Promise.resolve();
+
+        return updateImage("AD", targetAdId, img.id, { order: img.nextOrder });
+      }),
+    );
   };
 
   const handleDeletedImages = async (targetAdId) => {
@@ -685,6 +1018,387 @@ export default function AdForm({
     building_condition: "required",
   };
 
+  const stepTitles = {
+    [STEPS.DEPARTMENT]: selectedRootGroup
+      ? t.ad.choose_category
+      : t.ad.choose_table || "Choose department",
+    [STEPS.BASICS]: t.ad.ad_basics,
+    [STEPS.DETAILS]: t.ad.ad_details,
+    ...(needsAnonymousContact && {
+      [STEPS.OWNER]: "Your contact details",
+    }),
+    [STEPS.CONTACT]: t.ad.contact_information,
+  };
+
+  const stepDescriptions = {
+    [STEPS.DEPARTMENT]: selectedRootGroup
+      ? t.ad.choose_category_description
+      : t.ad.choose_category_description ||
+        "Select the department that best fits your ad.",
+    [STEPS.BASICS]: t.ad.ad_basics_description,
+    [STEPS.DETAILS]: t.ad.ad_details_description,
+    ...(needsAnonymousContact && {
+      [STEPS.OWNER]:
+        "Add your contact details so the admin can review your ad request.",
+    }),
+    [STEPS.CONTACT]: t.ad.contact_information_description,
+  };
+
+  const isStepVisible = (targetStep) => !isStepped || step === targetStep;
+  const getStepClass = (targetStep) =>
+    isStepVisible(targetStep) ? "" : "step-hidden";
+
+  const validateCurrentStep = async () => {
+    if (!isStepped) return true;
+
+    const newErrors = {};
+
+    if (step === STEPS.DEPARTMENT) {
+      if (!selectedRootGroup) newErrors.dep = t.ad.select_table;
+    }
+
+    if (step === STEPS.CATEGORY) {
+      if (!selectedCats.dep) newErrors.dep = t.ad.select_table;
+      if (
+        isFieldRequired(tableId, "type") &&
+        !additionalData.buildingAndLandsType
+      ) {
+        newErrors.type = t.dashboard.forms.errors.required;
+      }
+      if (!selectedCats.cat) newErrors.cat = t.ad.errors.category;
+      if (filteredSubCategories.length > 0 && !selectedCats.subCat) {
+        newErrors.subCat =
+          t.ad.errors.subCategory || "Please choose a subcategory";
+      }
+    }
+
+    if (step === STEPS.DETAILS) {
+      if (
+        showBuildingLandDetails &&
+        additionalData.buildingAndLandsType?.id === "LAND" &&
+        !additionalData.landType
+      ) {
+        newErrors.land_type = t.dashboard.forms.errors.required;
+      }
+      if (
+        showBuildingLandDetails &&
+        additionalData.buildingAndLandsType?.id === "BUILDING" &&
+        !additionalData.buildingType
+      ) {
+        newErrors.building_type = t.dashboard.forms.errors.required;
+      }
+      if (
+        showBuildingLandDetails &&
+        additionalData.buildingAndLandsType?.id === "BUILDING" &&
+        !additionalData.buildingCondition
+      ) {
+        newErrors.building_condition = t.dashboard.forms.errors.required;
+      }
+    }
+
+    if (step === STEPS.BASICS) {
+      const basicsFields = ["adTitle", "rentAmount"];
+
+      if (
+        isFieldAllowed(tableId, "area_m2") &&
+        (showCommercialDetails || showBuildingLandDetails)
+      ) {
+        basicsFields.push("area_m2");
+      }
+
+      const basicsValid = await trigger(basicsFields);
+      if (!selectedLocations.gov) newErrors.gov = t.ad.errors.governorate;
+      if (!selectedLocations.city) newErrors.city = t.ad.errors.city;
+      if (!additionalData.currency) newErrors.currency = t.ad.errors.currency;
+      if (images.length === 0) newErrors.images = t.ad.images.errors.required;
+      if (!basicsValid) {
+        setIsSubmitted(true);
+      }
+    }
+
+    if (step === STEPS.DETAILS) {
+      const detailsFields = [
+        "bedrooms",
+        "bathrooms",
+        "adult_no_max",
+        "child_no_max",
+      ];
+
+      if (!showCommercialDetails && !showBuildingLandDetails) {
+        detailsFields.push("area_m2");
+      }
+
+      const detailsValid = await trigger(detailsFields);
+      if (isFieldRequired(tableId, "level") && !additionalData.level) {
+        newErrors.level = t.dashboard.forms.errors.required;
+      }
+      if (isFieldRequired(tableId, "payment_method") && !additionalData.payment) {
+        newErrors.payment_method = t.dashboard.forms.errors.required;
+      }
+      if (
+        isFieldRequired(tableId, "rent_frequency") &&
+        !additionalData.frequency
+      ) {
+        newErrors.frequency = t.ad.errors.frequency;
+      }
+      if (!detailsValid) {
+        setIsSubmitted(true);
+      }
+    }
+
+    if (needsAnonymousContact && step === STEPS.OWNER) {
+      const anonymousValid = await trigger([
+        "anonymous_full_name",
+        "anonymous_email",
+        "anonymous_phone",
+      ]);
+      const anonymousValues = getValues();
+      const hasAnonymousContact =
+        Boolean(anonymousValues.anonymous_email) ||
+        Boolean(anonymousValues.anonymous_phone);
+
+      if (!hasAnonymousContact) {
+        newErrors.anonymous_contact =
+          "Please add either an email or a phone number";
+      }
+      if (!anonymousValid) {
+        setIsSubmitted(true);
+      }
+    }
+
+    if (step === STEPS.CONTACT) {
+      if (!selectedContactMethods.phone && !selectedContactMethods.chat) {
+        newErrors.contact =
+          t.ad.contact_method_required || "Please choose a contact method";
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      logValidationAndScroll(`step ${step}`, newErrors);
+      return false;
+    }
+
+    setFieldErrors({});
+    return true;
+  };
+
+  const goNextStep = async () => {
+    if (!(await validateCurrentStep())) return;
+    setStep((prev) => Math.min(prev + 1, STEPS.CONTACT));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const goPreviousStep = () => {
+    setFieldErrors({});
+    if (isStepped && step === STEPS.CATEGORY) {
+      if (selectedRootGroup?.id === "vacation_homes") {
+        if (selectedCats.cat) {
+          setSelectedCats({
+            dep: null,
+            cat: null,
+            subCat: null,
+          });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+
+        if (selectedVacationGroup) {
+          setSelectedVacationGroup(null);
+          setSelectedCats({
+            dep: null,
+            cat: null,
+            subCat: null,
+          });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+      }
+
+      if (selectedCats.cat) {
+        setSelectedCats((prev) => ({
+          ...prev,
+          cat: null,
+          subCat: null,
+        }));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (showBuildingLandDetails && additionalData.buildingAndLandsType) {
+        setAdditionalData((prev) => ({
+          ...prev,
+          buildingAndLandsType: null,
+          landType: null,
+          buildingType: null,
+          buildingCondition: null,
+        }));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (selectedCats.dep) {
+        setSelectedCats({
+          dep: null,
+          cat: null,
+          subCat: null,
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (selectedRootGroup) {
+        setSelectedRootGroup(null);
+        resetAdTaxonomy();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+    }
+
+    setStep((prev) => Math.max(prev - 1, STEPS.DEPARTMENT));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const resetAdTaxonomy = () => {
+    setSelectedCats({
+      dep: null,
+      cat: null,
+      subCat: null,
+    });
+    setSelectedVacationGroup(null);
+    setSelectedAmenities([]);
+    setAdditionalData((prev) => ({
+      ...prev,
+      buildingAndLandsType: null,
+      landType: null,
+      buildingType: null,
+      buildingCondition: null,
+    }));
+  };
+
+  const selectRootGroup = (group) => {
+    setSelectedRootGroup(group);
+    resetAdTaxonomy();
+    setFieldErrors({});
+    setStep(STEPS.CATEGORY);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const selectTable = (table) => {
+    const fullTable = tables.find((item) => item.id === table.table_id) || table;
+
+    setSelectedCats({
+      dep: fullTable,
+      cat: null,
+      subCat: null,
+    });
+    setSelectedAmenities([]);
+    handleErrors("dep", null);
+    handleErrors("cat", null);
+    handleErrors("subCat", null);
+  };
+
+  const selectCategory = (category) => {
+    const fullCategory =
+      categories.find((item) => item.id === (category.category_id || category.id)) ||
+      category;
+
+    setSelectedCats((prev) => ({
+      ...prev,
+      cat: fullCategory,
+      subCat: null,
+    }));
+    handleErrors("cat", null);
+    handleErrors("subCat", null);
+  };
+
+  const selectTableCategory = (table, category) => {
+    const fullTable = tables.find((item) => item.id === table.table_id) || table;
+    const fullCategory =
+      categories.find((item) => item.id === (category.category_id || category.id)) ||
+      category;
+
+    setSelectedCats({
+      dep: fullTable,
+      cat: fullCategory,
+      subCat: null,
+    });
+    setSelectedAmenities([]);
+    handleErrors("dep", null);
+    handleErrors("cat", null);
+    handleErrors("subCat", null);
+  };
+
+  const selectVacationItem = (item) => {
+    const table = tables.find((target) => target.id === item.table_id);
+    const category = categories.find((target) => target.id === item.category_id);
+
+    if (!table || !category) return;
+
+    setSelectedCats({
+      dep: table,
+      cat: category,
+      subCat: null,
+    });
+    handleErrors("dep", null);
+    handleErrors("cat", null);
+    handleErrors("subCat", null);
+  };
+
+  const closeReviewMenu = () => {
+    setReviewMenuOpen(false);
+    setRejectInput("");
+    setLoadingReviewAction(false);
+  };
+
+  const handleReviewStatus = async (status, reason) => {
+    const targetTableId = Number(initialTableId || tableId);
+    if (!targetTableId || !adId) return;
+
+    setLoadingReviewAction(true);
+    try {
+      await changeStatus(targetTableId, adId, {
+        status,
+        ...(reason ? { reason } : {}),
+      });
+
+      addNotification({
+        type: "success",
+        message:
+          status === "ACTIVE"
+            ? locale === "ar"
+              ? "تم قبول الإعلان"
+              : "Ad accepted"
+            : locale === "ar"
+              ? "تم رفض الإعلان"
+              : "Ad rejected",
+      });
+
+      router.push("/dashboard/ads/pending");
+    } catch (error) {
+      addNotification({
+        type: "error",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
+      });
+    } finally {
+      setLoadingReviewAction(false);
+      closeReviewMenu();
+    }
+  };
+
+  const canGoBackInTaxonomy =
+    isStepped &&
+    step === STEPS.CATEGORY &&
+    Boolean(
+      selectedRootGroup ||
+        selectedVacationGroup ||
+        selectedCats.dep ||
+        selectedCats.cat ||
+        selectedCats.subCat,
+    );
+  const showCategoryRootTitle =
+    !selectedCats.dep && !selectedVacationGroup && !selectedCats.cat;
+
   const onSubmit = async (data) => {
     if (!validateForm(data)) return;
 
@@ -699,12 +1413,19 @@ export default function AdForm({
         throw new Error("Ad was saved, but the created ad id was not returned");
       }
 
+      if (adId) {
+        await syncExistingImageOrders(finalAdId);
+      }
       await uploadNewImages(finalAdId);
       if (adId) {
         await handleDeletedImages(finalAdId);
       }
-      if (selectedAdmin) {
-        await assignAdmin(tableId, finalAdId, { admin_id: selectedAdmin.id });
+      if (type === "admin" && adId) {
+        if (selectedMediatorMethod?.id === 2 && selectedAdmin) {
+          await assignAdmin(tableId, finalAdId, { admin_id: selectedAdmin.id });
+        } else if (selectedMediatorMethod?.id === 1) {
+          await assignAdmin(tableId, finalAdId, { admin_id: null });
+        }
       }
 
       addNotification({
@@ -712,7 +1433,11 @@ export default function AdForm({
         message: adId ? t.ad.ad_updated : t.ad.ad_created,
       });
       redirectAfterLogin(
-        type === "client" ? "/mylisting" : "/dashboard/ads/all",
+        anonymousMode
+          ? "/"
+          : type === "client"
+            ? "/mylisting"
+            : "/dashboard/ads/all",
       );
     } catch (err) {
       let message = "An error occurred";
@@ -735,6 +1460,12 @@ export default function AdForm({
     } finally {
       setLoadingSubmit(false);
     }
+  };
+
+  const onInvalidSubmit = (validationErrors) => {
+    setIsSubmitted(true);
+    setContactSubmitAttempted(true);
+    logValidationAndScroll("react-hook-form submit", validationErrors);
   };
 
   const datePickerTextFieldProps = {
@@ -794,14 +1525,18 @@ export default function AdForm({
       },
     },
   };
+  const showContactErrors = contactSubmitAttempted;
+
+
+  
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <div
-        className={`form-holder ${type === "client" ? "user-create-ad" : "admin-create-ad"}`}
+        className={`form-holder create-ad ${type === "client" ? "user-create-ad" : "admin-create-ad"}`}
       >
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
           style={{
             position: "relative",
             opacity: loadingContent ? "0.6" : "1",
@@ -816,6 +1551,29 @@ export default function AdForm({
             </div>
           )}
 
+          {isStepped && (
+            <>
+              <div className="top">
+                <h1>{stepTitles[step]}</h1>
+                <p>{stepDescriptions[step]}</p>
+              </div>
+              <div className="steps-holder">
+                {STEP_FLOW.map((stepItem, index, arr) => (
+                  <div className="step-wrapper" key={stepItem}>
+                    <div
+                      className={`step ${
+                        step > stepItem ? "done" : ""
+                      } ${step === stepItem ? "current" : ""}`}
+                    >
+                      {stepItem}
+                    </div>
+                    {index !== arr.length - 1 && <span className="bar"></span>}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
           {type === "admin" &&
             adId &&
             canAssignAdmin &&
@@ -826,7 +1584,7 @@ export default function AdForm({
                   <SelectOptions
                     label={t.ad.theContactMethod}
                     placeholder=""
-                    options={contactMethod}
+                    options={adminContactMethodOptions}
                     value={selectedMediatorMethod}
                     onChange={setSelectedMediatorMethod}
                   />
@@ -848,7 +1606,274 @@ export default function AdForm({
               </div>
             )}
 
-          <div className="form-section">
+          {type === "admin" && adId && uploaderInfo && (
+            <div className="form-section uploader-summary">
+              <h2 className="section-title">
+                {locale === "ar" ? "بيانات الرافع" : "Uploader details"}
+              </h2>
+              <div className="uploader-summary-grid">
+                <div>
+                  <span>{locale === "ar" ? "النوع" : "Type"}</span>
+                  <strong>{uploaderInfo.type}</strong>
+                </div>
+                <div>
+                  <span>{locale === "ar" ? "الاسم" : "Name"}</span>
+                  <strong>{uploaderInfo.name}</strong>
+                </div>
+                <div>
+                  <span>{locale === "ar" ? "البريد" : "Email"}</span>
+                  <strong>{uploaderInfo.email}</strong>
+                </div>
+                <div>
+                  <span>{locale === "ar" ? "الهاتف" : "Phone"}</span>
+                  <strong>{uploaderInfo.phone}</strong>
+                </div>
+                {uploaderInfo.ip && (
+                  <div>
+                    <span>IP</span>
+                    <strong>{uploaderInfo.ip}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {isStepped && step === STEPS.DEPARTMENT && !selectedRootGroup && (
+            <div className="form-section category-picker-step">
+              <h2 className="section-title">{t.ad.choose_table}</h2>
+              {fieldErrors.dep && (
+                <span className="error">
+                  <CircleAlert />
+                  {fieldErrors.dep}
+                </span>
+              )}
+              <div className="options-grid">
+                {createAdNavigation.map((group) => (
+                  <CatCard
+                    key={group.id}
+                    data={group}
+                    type="tables"
+                    position="when-create-ad"
+                    activeClass={selectedRootGroup?.id === group.id}
+                    onSelect={() => selectRootGroup(group)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isStepped && step === STEPS.CATEGORY && selectedRootGroup && (
+            <div className="form-section category-picker-step">
+              {showCategoryRootTitle && (
+                <h2 className="section-title">
+                  {selectedRootGroup?.[`name_${locale}`] || t.ad.choose_category}
+                </h2>
+              )}
+              {fieldErrors.dep && (
+                <span className="error">
+                  <CircleAlert />
+                  {fieldErrors.dep}
+                </span>
+              )}
+              {fieldErrors.cat && (
+                <span className="error">
+                  <CircleAlert />
+                  {fieldErrors.cat}
+                </span>
+              )}
+
+              {selectedCats.cat && filteredSubCategories.length > 0 ? (
+                <>
+                  <h2 className="section-title">{t.ad.choose_sub_category}</h2>
+                  {fieldErrors.subCat && (
+                    <span className="error">
+                      <CircleAlert />
+                      {fieldErrors.subCat}
+                    </span>
+                  )}
+                  <div className="options-grid">
+                    {filteredSubCategories.map((subCategory) => (
+                      <div
+                        key={subCategory.id}
+                        className={`cat-card ${
+                          selectedCats.subCat?.id === subCategory.id
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedCats((prev) => ({
+                            ...prev,
+                            subCat: subCategory,
+                          }));
+                          handleErrors("subCat", null);
+                          setStep(STEPS.BASICS);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                      >
+                        <h4 className="cat-name ellipsis">
+                          {subCategory?.[`name_${locale}`]}
+                        </h4>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : selectedRootGroup?.id === "vacation_homes" ? (
+                <>
+                  {selectedVacationGroup?.children?.length > 0 ? (
+                    <>
+                      <h2 className="section-title">
+                        {selectedVacationGroup?.[`name_${locale}`]}
+                      </h2>
+                      <div className="options-grid">
+                        {selectedVacationGroup.children.map((item) => (
+                          <div
+                            key={item.id}
+                            className={`cat-card ${
+                              selectedCats.dep?.id === item.table_id &&
+                              selectedCats.cat?.id === item.category_id
+                                ? "active"
+                                : ""
+                            }`}
+                            onClick={() => selectVacationItem(item)}
+                          >
+                            <h4 className="cat-name ellipsis">
+                              {item?.[`name_${locale}`]}
+                            </h4>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="options-grid">
+                      {selectedRootGroup.children.map((type) => (
+                        <div
+                          key={type.id}
+                          className={`cat-card ${
+                            selectedVacationGroup?.id === type.id ? "active" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedVacationGroup(type);
+                            setSelectedCats({
+                              dep: null,
+                              cat: null,
+                              subCat: null,
+                            });
+                          }}
+                        >
+                          <h4 className="cat-name ellipsis">
+                            {type?.[`name_${locale}`]}
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {selectedCats.dep && filteredCategories.length > 0 ? (
+                    <>
+                      {showBuildingLandDetails &&
+                      !additionalData.buildingAndLandsType ? (
+                        <>
+                          <h2 className="section-title">{t.common.type}</h2>
+                          {fieldErrors.type && (
+                            <span className="error">
+                              <CircleAlert />
+                              {fieldErrors.type}
+                            </span>
+                          )}
+                          <div className="options-grid">
+                            {BuildingAndLandsTypes.map((item) => (
+                              <div
+                                key={item.id}
+                                className={`cat-card ${
+                                  additionalData.buildingAndLandsType?.id ===
+                                  item.id
+                                    ? "active"
+                                    : ""
+                                }`}
+                                onClick={() => {
+                                  setAdditionalData((prev) => ({
+                                    ...prev,
+                                    buildingAndLandsType: item,
+                                    landType: null,
+                                    buildingType: null,
+                                    buildingCondition: null,
+                                  }));
+                                  handleErrors("type", null);
+                                  handleErrors("land_type", null);
+                                  handleErrors("building_type", null);
+                                  handleErrors("building_condition", null);
+                                  window.scrollTo({
+                                    top: 0,
+                                    behavior: "smooth",
+                                  });
+                                }}
+                              >
+                                <h4 className="cat-name ellipsis">
+                                  {item?.[`name_${locale}`]}
+                                </h4>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="section-title">
+                            {t.ad.choose_category}
+                          </h2>
+                          <div className="options-grid">
+                            {filteredCategories.map((category) => (
+                              <CatCard
+                                key={category.id}
+                                data={category}
+                                type="categories"
+                                position="when-create-ad"
+                                activeClass={
+                                  selectedCats.cat?.id === category.id
+                                }
+                                onSelect={() => {
+                                  selectTableCategory(selectedCats.dep, category);
+
+                                  const hasSubCategories = subCategories.some(
+                                    (subCategory) =>
+                                      subCategory.category_id === category.id,
+                                  );
+
+                                  if (!hasSubCategories) {
+                                    setStep(STEPS.BASICS);
+                                    window.scrollTo({
+                                      top: 0,
+                                      behavior: "smooth",
+                                    });
+                                  }
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="options-grid">
+                      {selectedRootGroup?.children?.map((table) => (
+                        <CatCard
+                          key={table.id}
+                          data={table}
+                          type="tables"
+                          position="when-create-ad"
+                          activeClass={selectedCats.dep?.id === table.table_id}
+                          onSelect={() => selectTable(table)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          <div className={`form-section ${getStepClass(STEPS.BASICS)}`}>
             <h2 className="section-title">{t.ad.basic_info}</h2>
             <div className="row-holder two">
               <div className="left">
@@ -881,19 +1906,14 @@ export default function AdForm({
                   </div>
                 </div>
 
-                <div className="box forInput">
-                  <label>{t.dashboard.forms.description}</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <textarea
-                        {...register("description")}
-                        placeholder={t.dashboard.forms.descriptionPlaceholder}
-                        rows={4}
-                        disabled={!isEditable}
-                      />
-                    </div>
-                  </div>
-                </div>
+                {type === "admin" && (
+                  <DescriptionField
+                    disabled={!isEditable}
+                    register={register}
+                    t={t}
+                  />
+                )}
+
               </div>
 
               <div className="right">
@@ -916,11 +1936,10 @@ export default function AdForm({
             </div>
           </div>
 
-          <div className="form-section">
+          <div className={`form-section ${getStepClass(STEPS.BASICS)}`}>
             <h2 className="section-title">{t.dashboard.tables.location}</h2>
             <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
+              className="row-holder client-two-grid"
             >
               <SelectOptions
                 label={t.location.yourGovernorate}
@@ -1000,47 +2019,53 @@ export default function AdForm({
             </div>
           </div>
 
-          <div className="form-section">
+          <div
+            className={`form-section ${
+              isStepped ? "step-hidden" : getStepClass(STEPS.CATEGORY)
+            }`}
+          >
             <h2 className="section-title">{t.ad.category_info}</h2>
             <div
-              className="row-holder"
-              style={{
-                gridTemplateColumns: `${showBuildingLandDetails ? "repeat(4, 1fr)" : ""} `,
-              }}
+              className={`row-holder ${
+                !showBuildingLandDetails ? "three" : ""
+              }`}
             >
-              <SelectOptions
-                label={t.ad.choose_table}
-                placeholder={t.ad.select_table}
-                options={tables}
-                value={selectedCats.dep}
-                onChange={(item) => {
-                  setSelectedCats({
-                    dep: item,
-                    cat: null,
-                    subCat: null,
-                  });
-                  setSelectedAmenities([]);
-                  setAdditionalData((prev) => ({
-                    ...prev,
-                    buildingAndLandsType: null,
-                    landType: null,
-                    buildingType: null,
-                    buildingCondition: null,
-                  }));
-                  handleErrors("dep", null);
-                  handleErrors("cat", null);
-                  handleErrors("type", null);
-                  handleErrors("land_type", null);
-                  handleErrors("building_type", null);
-                  handleErrors("building_condition", null);
-                }}
-                error={fieldErrors.dep}
-                required
-              />
+              {!isStepped && (
+                <SelectOptions
+                  label={t.ad.choose_table}
+                  placeholder={t.ad.select_table}
+                  options={tables}
+                  value={selectedCats.dep}
+                  onChange={(item) => {
+                    setSelectedCats({
+                      dep: item,
+                      cat: null,
+                      subCat: null,
+                    });
+                    setSelectedAmenities([]);
+                    setAdditionalData((prev) => ({
+                      ...prev,
+                      buildingAndLandsType: null,
+                      landType: null,
+                      buildingType: null,
+                      buildingCondition: null,
+                    }));
+                    handleErrors("dep", null);
+                    handleErrors("cat", null);
+                    handleErrors("type", null);
+                    handleErrors("land_type", null);
+                    handleErrors("building_type", null);
+                    handleErrors("building_condition", null);
+                  }}
+                  error={fieldErrors.dep}
+                  disabled={Boolean(adId)}
+                  required
+                />
+              )}
               {showBuildingLandDetails && (
                 <SelectOptions
                   label="Type"
-                  placeholder="Select type"
+                    placeholder={t.common.selectType}
                   options={BuildingAndLandsTypes}
                   value={additionalData.buildingAndLandsType}
                   disabled={!isEditable}
@@ -1061,50 +2086,49 @@ export default function AdForm({
                   required={isFieldRequired(tableId, "type")}
                 />
               )}
-              <SelectOptions
-                label={t.ad.choose_category}
-                placeholder={t.ad.select_category}
-                options={filteredCategories}
-                value={selectedCats.cat}
-                disabled={!selectedCats.dep}
-                onChange={(item) => {
-                  setSelectedCats((prev) => ({
-                    ...prev,
-                    cat: item,
-                    subCat: null,
-                  }));
-                  handleErrors("cat", null);
-                }}
-                error={fieldErrors.cat}
-                required
-              />
-              <SelectOptions
-                label={t.ad.choose_sub_category}
-                placeholder={t.ad.select_sub_category}
-                options={filteredSubCategories}
-                value={selectedCats.subCat}
-                disabled={!selectedCats.cat}
-                onChange={(item) => {
-                  setSelectedCats((prev) => ({
-                    ...prev,
-                    subCat: item,
-                  }));
-                }}
-              />
+              {!isStepped && (
+                <>
+                  <SelectOptions
+                    label={t.ad.choose_category}
+                    placeholder={t.ad.select_category}
+                    options={filteredCategories}
+                    value={selectedCats.cat}
+                    disabled={!selectedCats.dep}
+                    onChange={(item) => {
+                      setSelectedCats((prev) => ({
+                        ...prev,
+                        cat: item,
+                        subCat: null,
+                      }));
+                      handleErrors("cat", null);
+                    }}
+                    error={fieldErrors.cat}
+                    required
+                  />
+                  <SelectOptions
+                    label={t.ad.choose_sub_category}
+                    placeholder={t.ad.select_sub_category}
+                    options={filteredSubCategories}
+                    value={selectedCats.subCat}
+                    disabled={!selectedCats.cat}
+                    onChange={(item) => {
+                      setSelectedCats((prev) => ({
+                        ...prev,
+                        subCat: item,
+                      }));
+                    }}
+                  />
+                </>
+              )}
             </div>
           </div>
 
           {showPropertyDetails && (
-            <div className="form-section">
+            <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
               <h2 className="section-title">
                 {t.dashboard.tables.property_details}
               </h2>
-              <div
-                className={`row-holder ${type === "client" ? "two" : ""}`}
-                style={{
-                  gridTemplateColumns: `repeat(${isHomes ? 4 : 2}, 1fr)`,
-                }}
-              >
+              <div className="row-holder client-four-grid">
                 <div className="box forInput">
                   <label>
                     {t.ad.bedrooms}{" "}
@@ -1224,20 +2248,15 @@ export default function AdForm({
 
           {showBuildingLandDetails &&
             additionalData?.buildingAndLandsType?.id && (
-              <div className="form-section">
+              <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
                 <h2 className="section-title">
                   {t.dashboard.tables.property_details}
                 </h2>
-                <div
-                  className="row-holder"
-                  style={{
-                    gridTemplateColumns: `repeat(${additionalData?.buildingAndLandsType?.id == "BUILDING" ? 4 : 2}, 1fr)`,
-                  }}
-                >
+                <div className="row-holder client-three-grid">
                   {additionalData?.buildingAndLandsType?.id == "BUILDING" ? (
                     <SelectOptions
                       label="Building Type"
-                      placeholder="Select building type"
+                      placeholder={t.common.selectBuildingType}
                       options={BuildingType}
                       value={additionalData.buildingType}
                       onChange={(item) => {
@@ -1254,7 +2273,7 @@ export default function AdForm({
                   ) : (
                     <SelectOptions
                       label="Land Type"
-                      placeholder="Select land type"
+                      placeholder={t.common.selectLandType}
                       options={LandType}
                       value={additionalData.landType}
                       onChange={(item) => {
@@ -1272,7 +2291,7 @@ export default function AdForm({
                   {additionalData?.buildingAndLandsType?.id == "BUILDING" && (
                     <SelectOptions
                       label="Building Condition"
-                      placeholder="Select building condition"
+                      placeholder={t.common.selectBuildingCondition}
                       options={BuildingCondition}
                       value={additionalData.buildingCondition}
                       onChange={(item) => {
@@ -1291,7 +2310,7 @@ export default function AdForm({
                   {additionalData?.buildingAndLandsType?.id == "BUILDING" &&
                     isFieldAllowed(tableId, "floors") && (
                       <div className="box forInput">
-                        <label>Floors</label>
+                        <label>{t.common.floors}</label>
                         <div className="inputHolder">
                           <div className="holder">
                             <input
@@ -1303,7 +2322,7 @@ export default function AdForm({
                                 },
                               })}
                               disabled={!isEditable}
-                              placeholder="Enter floors count"
+                              placeholder={t.common.enterFloorsCount}
                             />
                           </div>
                           {errors.floors && (
@@ -1316,46 +2335,19 @@ export default function AdForm({
                       </div>
                     )}
 
-                  <div className="box forInput">
-                    <label>
-                      {t.ad.area_m2}{" "}
-                      {isFieldRequired(tableId, "area_m2") && (
-                        <span className="required">*</span>
-                      )}
-                    </label>
-                    <div className="inputHolder">
-                      <div className="holder">
-                        <input
-                          type="number"
-                          {...register("area_m2", {
-                            min: {
-                              value: 1,
-                              message: t.dashboard.forms.errors.minOne,
-                            },
-                          })}
-                          disabled={!isEditable}
-                          placeholder={
-                            t.ad.area_m2Placeholder || "area_m2Placeholder"
-                          }
-                        />
-                      </div>
-                      {errors.area_m2 && (
-                        <span className="error">
-                          <CircleAlert />
-                          {errors.area_m2.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
 
-          <div className="form-section">
+          <div className={`form-section ${getStepClass(STEPS.BASICS)}`}>
             <h2 className="section-title">
               {t.dashboard.tables.pricing_details}
             </h2>
-            <div className="row-holder two">
+            <div
+              className={`row-holder client-two-grid ${
+                !showRentDetails ? "two" : ""
+              }`}
+            >
               <div className="box forInput">
                 <label>
                   {showRentDetails ? t.ad.rentPrice : t.ad.price}{" "}
@@ -1454,38 +2446,49 @@ export default function AdForm({
                 </>
               )}
             </div>
-            {isFieldAllowed(tableId, "area_m2") && showCommercialDetails && (
-              <div className="box forInput">
-                <div className="inputHolder">
-                  <div className="holder">
-                    <input
-                      type="number"
-                      {...register("area_m2", {
-                        min: {
-                          value: 1,
-                          message: t.dashboard.forms.errors.minOne,
-                        },
-                      })}
-                      disabled={!isEditable}
-                      placeholder={
-                        t.ad.area_m2Placeholder || "area_m2Placeholder"
-                      }
-                    />
+
+            {isFieldAllowed(tableId, "area_m2") &&
+              (showCommercialDetails || showBuildingLandDetails) && (
+                <div className="box forInput">
+                  <label>
+                    {t.ad.area_m2}{" "}
+                    {isFieldRequired(tableId, "area_m2") && (
+                      <span className="required">*</span>
+                    )}
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="number"
+                        {...register("area_m2", {
+                          required: isFieldRequired(tableId, "area_m2")
+                            ? t.dashboard.forms.errors.required
+                            : false,
+                          min: {
+                            value: 1,
+                            message: t.dashboard.forms.errors.minOne,
+                          },
+                        })}
+                        disabled={!isEditable}
+                        placeholder={
+                          t.ad.area_m2Placeholder || "area_m2Placeholder"
+                        }
+                      />
+                    </div>
+                    {errors.area_m2 && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.area_m2.message}
+                      </span>
+                    )}
                   </div>
-                  {errors.area_m2 && (
-                    <span className="error">
-                      <CircleAlert />
-                      {errors.area_m2.message}
-                    </span>
-                  )}
                 </div>
-              </div>
-            )}
+              )}
           </div>
 
           {showRentDetails && (
             <>
-              <div className="form-section for-dates">
+              <div className={`form-section for-dates ${getStepClass(STEPS.DETAILS)}`}>
                 <h2 className="section-title">{t.ad.rental_period}</h2>
                 <div className="row-holder for-dates two">
                   <div className="box forInput">
@@ -1557,7 +2560,7 @@ export default function AdForm({
                 </div>
               </div>
 
-              <div className="form-section">
+              <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
                 <h2 className="section-title">{t.ad.minimumRentalDuration}</h2>
                 <div className="row-holder for-dates two">
                   <div className="box forInput right">
@@ -1593,11 +2596,11 @@ export default function AdForm({
 
           {(isFieldAllowed(tableId, "adult_no_max") ||
             isFieldAllowed(tableId, "child_no_max")) && (
-            <div className="form-section">
+            <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
               <h2 className="section-title">
                 {isVacation ? "Guest Capacity" : "Occupancy Details"}
               </h2>
-              <div className="row-holder two">
+              <div className="row-holder client-two-grid two">
                 {isFieldAllowed(tableId, "child_no_max") && (
                   <div className="box forInput">
                     <label>{t.ad.childMax}</label>
@@ -1672,12 +2675,12 @@ export default function AdForm({
           )}
 
           {showSaleDetails && (
-            <div className="form-section">
-              <h2 className="section-title">Sale Options</h2>
-              <div className="row-holder">
+            <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
+              <h2 className="section-title">{t.common.saleOptions}</h2>
+              <div className="row-holder client-three-grid three">
                 <SelectOptions
                   label="Payment Method"
-                  placeholder={t.ad.PaymentMethod || "Select payment method"}
+                  placeholder={t.ad.PaymentMethod || t.common.selectPaymentMethod}
                   options={PaymentMethod}
                   value={additionalData.payment}
                   onChange={(item) => {
@@ -1693,7 +2696,7 @@ export default function AdForm({
                 {isFieldAllowed(tableId, "installment_years") && (
                   <SelectOptions
                     label="Installment Years"
-                    placeholder={t.ad.installmentYears || "Select years count"}
+                    placeholder={t.ad.installmentYears || t.common.selectYearsCount}
                     options={InstallmentYears}
                     value={additionalData.installmentYears}
                     onChange={(item) => {
@@ -1738,7 +2741,7 @@ export default function AdForm({
 
               {(isFieldAllowed(tableId, "furnished") ||
                 isFieldAllowed(tableId, "ready_to_move")) && (
-                <div className="row-holder two">
+                <div className="row-holder client-two-grid two">
                   {isFieldAllowed(tableId, "furnished") && (
                     <div className="box forInput">
                       <div className="inputHolder">
@@ -1765,35 +2768,6 @@ export default function AdForm({
                       </div>
                     </div>
                   )}
-
-                  {isFieldAllowed(tableId, "area_m2") &&
-                    showCommercialDetails && (
-                      <div className="box forInput">
-                        <div className="inputHolder">
-                          <div className="holder">
-                            <input
-                              type="number"
-                              {...register("area_m2", {
-                                min: {
-                                  value: 1,
-                                  message: t.dashboard.forms.errors.minOne,
-                                },
-                              })}
-                              disabled={!isEditable}
-                              placeholder={
-                                t.ad.area_m2Placeholder || "area_m2Placeholder"
-                              }
-                            />
-                          </div>
-                          {errors.area_m2 && (
-                            <span className="error">
-                              <CircleAlert />
-                              {errors.area_m2.message}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
 
                   {isFieldAllowed(tableId, "ready_to_move") && (
                     <div className="box forInput">
@@ -1826,147 +2800,8 @@ export default function AdForm({
             </div>
           )}
 
-          {isPropertyLike && (
-            <div className="form-section">
-              <h2 className="section-title">Current Property Data</h2>
-              <div className="row-holder two">
-                <div className="box forInput">
-                  <label>Owner number 1</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("owner_no1")}
-                        disabled={!isEditable}
-                        placeholder="Enter owner number 1"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="box forInput">
-                  <label>Owner number 2</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("owner_no2")}
-                        disabled={!isEditable}
-                        placeholder="Enter owner number 2"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row-holder two">
-                <div className="box forInput">
-                  <label>Delivery number 1</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("delivery_no1")}
-                        disabled={!isEditable}
-                        placeholder="Enter delivery number 1"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="box forInput">
-                  <label>Delivery number 2</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("delivery_no2")}
-                        disabled={!isEditable}
-                        placeholder="Enter delivery number 2"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row-holder two">
-                <div className="box forInput">
-                  <label>Payment number 1</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("payment_no1")}
-                        disabled={!isEditable}
-                        placeholder="Enter payment number 1"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="box forInput">
-                  <label>Payment number 2</label>
-                  <div className="inputHolder">
-                    <div className="holder">
-                      <input
-                        type="text"
-                        {...register("payment_no2")}
-                        disabled={!isEditable}
-                        placeholder="Enter payment number 2"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="form-section">
-            <h2 className="section-title">
-              {t.ad.priority_verification || "Priority and verification"}
-            </h2>
-            <div
-              className="row-holder"
-              style={{ gridTemplateColumns: "0.5fr 1fr" }}
-            >
-              <div className="box forInput">
-                <div className="inputHolder">
-                  <div
-                    className="holder"
-                    style={{ padding: "7px", cursor: "pointer" }}
-                    onClick={() => toggleCheckBox("isVerified")}
-                  >
-                    <div className="checkbox-wrapper-13">
-                      <input
-                        id="isVerified"
-                        type="checkbox"
-                        checked={checkBoxes.isVerified}
-                        onChange={() => toggleCheckBox("isVerified")}
-                        onClick={(event) => event.stopPropagation()}
-                      />
-                      <label htmlFor="isVerified">
-                        {checkBoxes.isVerified
-                          ? "Ad verified"
-                          : "Ad is not verified"}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <SelectOptions
-                placeholder={t.ad.priorityPlaceholder || "Priority"}
-                options={Priority}
-                value={additionalData.priority}
-                onChange={(item) => {
-                  setAdditionalData((prev) => ({
-                    ...prev,
-                    priority: item,
-                  }));
-                }}
-              />
-            </div>
-          </div>
-
           {allowedAmenities.length > 0 && (
-            <div className="form-section">
+            <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
               <h2 className="section-title">{t.ad.amenities}</h2>
               <div className="dynamicFilters-holder">
                 <div className="box forInput">
@@ -2003,22 +2838,94 @@ export default function AdForm({
             </div>
           )}
 
-          <div className="box forInput">
-            <label>{t.ad.tags.label}</label>
-            <div className="inputHolder">
-              <div className="holder">
-                <textarea
-                  {...register("tags")}
-                  placeholder={t.ad.tags.placeholder}
-                  rows={4}
-                  disabled={!isEditable}
-                />
-              </div>
-            </div>
+          <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
+            {type !== "admin" && (
+              <DescriptionField
+                disabled={!isEditable}
+                register={register}
+                t={t}
+              />
+            )}
+
+            <Tags disabled={!isEditable} />
           </div>
 
+          {needsAnonymousContact && (
+            <div className={`form-section ${getStepClass(STEPS.OWNER)}`}>
+              <h2 className="section-title">
+                {t.ad.contact_information || "Contact information"}
+              </h2>
+              <div className="row-holder two">
+                <div className="box forInput">
+                  <label>
+                    {t.auth?.fullName || "Full name"}{" "}
+                    <span className="required">*</span>
+                  </label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="text"
+                        {...register("anonymous_full_name", {
+                          required: t.dashboard.forms.errors.required,
+                        })}
+                        disabled={!!user || !isEditable}
+                        placeholder={t.auth?.fullName || t.common.fullName}
+                      />
+                    </div>
+                    {errors.anonymous_full_name && (
+                      <span className="error">
+                        <CircleAlert />
+                        {errors.anonymous_full_name.message}
+                      </span>
+                    )}
+                    {fieldErrors.anonymous_full_name && (
+                      <span className="error">
+                        <CircleAlert />
+                        {fieldErrors.anonymous_full_name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="box forInput">
+                  <label>{t.auth?.email || "Email"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="email"
+                        {...register("anonymous_email")}
+                        disabled={!!user || !isEditable}
+                        placeholder={t.auth?.email || t.common.emailAddress}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="box forInput">
+                  <label>{t.auth?.phone || "Phone"}</label>
+                  <div className="inputHolder">
+                    <div className="holder">
+                      <input
+                        type="tel"
+                        {...register("anonymous_phone")}
+                        disabled={!!user || !isEditable}
+                        placeholder={t.auth?.phone || t.common.phone}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {fieldErrors.anonymous_contact && (
+                  <div className="box forInput">
+                    <span className="error">
+                      <CircleAlert />
+                      {fieldErrors.anonymous_contact}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {((type === "admin" && !!adData?.subuser) || type === "client") && (
-            <div className="form-section">
+            <div className={`form-section ${getStepClass(STEPS.CONTACT)}`}>
               <h2 className="section-title">{t.ad.theContactMethod}</h2>
               <div className="options-grid verfiyMethod">
                 {methods.map(({ key, label, icon: Icon }) => {
@@ -2027,12 +2934,17 @@ export default function AdForm({
                   return (
                     <div
                       key={key}
-                      className={`option-box ${isActive ? "active" : ""} ${fieldErrors.contact ? "error-border" : ""}`}
+                      className={`option-box ${isActive ? "active" : ""} ${
+                        showContactErrors && fieldErrors.contact
+                          ? "error-border"
+                          : ""
+                      }`}
                       onClick={() => {
                         setSelectedContactMethods((prev) => ({
                           ...prev,
                           [key]: !prev[key],
                         }));
+                        setContactSubmitAttempted(false);
                         handleErrors("contact", null);
                       }}
                     >
@@ -2042,7 +2954,7 @@ export default function AdForm({
                   );
                 })}
               </div>
-              {fieldErrors.contact && (
+              {showContactErrors && fieldErrors.contact && (
                 <div className="box forInput">
                   <span className="error">
                     <CircleAlert />
@@ -2054,12 +2966,62 @@ export default function AdForm({
           )}
 
           <div className="form-section submit-section">
-            <button
-              type="submit"
-              className={`main-button ${adId ? "update-button" : "create-button"}`}
-              onClick={() => setIsSubmitted(true)}
-              disabled={loadingSubmit}
-            >
+            {canReviewPendingAd && (
+              <>
+                <button
+                  type="button"
+                  className="main-button create-button"
+                  onClick={() => handleReviewStatus("ACTIVE")}
+                  disabled={loadingSubmit || loadingReviewAction}
+                >
+                  {loadingReviewAction ? (
+                    <span className="loader"></span>
+                  ) : locale === "ar" ? (
+                    "قبول"
+                  ) : (
+                    "Accept"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="main-button danger"
+                  onClick={() => setReviewMenuOpen(true)}
+                  disabled={loadingSubmit || loadingReviewAction}
+                >
+                  {locale === "ar" ? "رفض" : "Reject"}
+                </button>
+              </>
+            )}
+            {isStepped &&
+              (step > STEPS.DEPARTMENT || canGoBackInTaxonomy) && (
+                <button
+                  type="button"
+                  className="main-button update-button"
+                  onClick={goPreviousStep}
+                  disabled={loadingSubmit}
+                >
+                  {t.actions?.back || "Back"}
+                </button>
+              )}
+            {isStepped && step < STEPS.CONTACT ? (
+              <button
+                type="button"
+                className="main-button create-button"
+                onClick={goNextStep}
+                disabled={loadingSubmit}
+              >
+                {t.actions.next}
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className={`main-button ${adId ? "update-button" : "create-button"}`}
+                onClick={() => {
+                  setIsSubmitted(true);
+                  setContactSubmitAttempted(true);
+                }}
+                disabled={loadingSubmit}
+              >
               {loadingSubmit
                 ? locale === "ar"
                   ? "جاري..."
@@ -2067,9 +3029,24 @@ export default function AdForm({
                 : adId
                   ? t.ad.update_ad
                   : t.ad.create_your_ad}
-            </button>
+              </button>
+            )}
           </div>
         </form>
+        <DynamicMenu
+          open={reviewMenuOpen}
+          title={t.common.rejectReason}
+          onClose={closeReviewMenu}
+        >
+          <DeleteConfirm
+            menuType="reject"
+            rejectInput={rejectInput}
+            setRejectInput={setRejectInput}
+            onConfirm={(reason) => handleReviewStatus("REJECTED", reason)}
+            onCancel={closeReviewMenu}
+            loading={loadingReviewAction}
+          />
+        </DynamicMenu>
       </div>
     </LocalizationProvider>
   );

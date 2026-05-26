@@ -1,9 +1,18 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo, useContext } from "react";
+
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { CircleAlert } from "lucide-react";
 import { settings } from "@/Contexts/settings";
+import useTranslate from "@/Contexts/useTranslation";
 
 function SelectOptions({
   size = "large",
@@ -21,39 +30,43 @@ function SelectOptions({
   required = false,
 }) {
   const { locale } = useContext(settings);
+  const t = useTranslate();
   const [active, setActive] = useState(false);
   const [search, setSearch] = useState("");
   const selectRef = useRef(null);
 
-  const getText = (item) => {
-    if (!item) return "";
+  const getSingleText = useCallback(
+    (item) => {
+      if (!item) return "";
 
-    // لو multi => نتوقع مصفوفة
-    if (multi) {
-      if (!Array.isArray(item)) return getSingleText(item); // لو مش مصفوفة
-      return item.map((i) => getSingleText(i)).join(", "); // ندمج كل الأسماء بفاصلة
-    }
+      if (type === "users") return item.full_name;
 
-    // لو single
-    return getSingleText(item);
-  };
+      if (type === "date") {
+        const rawValue = typeof item === "string" ? item : item?.name || item?.id;
+        const date = new Date(rawValue);
+        if (isNaN(date)) return rawValue || "";
+        return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US");
+      }
 
-  // دالة مساعدة للتعامل مع عنصر واحد
-  const getSingleText = (i) => {
-    if (!i) return "";
+      return item[`name_${locale}`] || item.name_en || item.name || "";
+    },
+    [locale, type],
+  );
 
-    if (type === "users") return i.full_name;
+  const getText = useCallback(
+    (item) => {
+      if (!item) return "";
 
-    if (type === "date") {
-      const value = typeof i === "string" ? i : i?.name || i?.id;
-      const date = new Date(value);
-      if (isNaN(date)) return value || "";
-      return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US");
-    }
+      if (multi) {
+        if (!Array.isArray(item)) return getSingleText(item);
+        return item.map((option) => getSingleText(option)).join(", ");
+      }
 
-    return i[`name_${locale}`] || i.name_en || i.name || "";
-  };
-  /* ---------------- SEARCH ---------------- */
+      return getSingleText(item);
+    },
+    [getSingleText, multi],
+  );
+
   const filteredOptions = useMemo(() => {
     if (!search) return options;
 
@@ -73,9 +86,7 @@ function SelectOptions({
 
       return searchPool.includes(normalizedSearch);
     });
-  }, [options, search, locale]);
-
-  /* ---------------- CLOSE OUTSIDE ---------------- */
+  }, [options, search, getText]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -89,8 +100,6 @@ function SelectOptions({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ---------------- HANDLERS ---------------- */
-
   const toggle = () => {
     if (disabled) return;
     setActive(!active);
@@ -101,8 +110,6 @@ function SelectOptions({
     setActive(false);
     setSearch("");
   };
-
-  /* ---------------- UI ---------------- */
 
   return (
     <div
@@ -161,7 +168,7 @@ function SelectOptions({
                   key={item.id}
                   className={
                     multi
-                      ? value?.some((v) => v.id === item.id)
+                      ? value?.some((selected) => selected.id === item.id)
                         ? "active"
                         : ""
                       : value?.id === item.id
@@ -175,7 +182,7 @@ function SelectOptions({
                 </button>
               ))
             ) : (
-              <div className="no-results">No results</div>
+              <div className="no-results">{t.common.noResults}</div>
             )}
           </div>
         )}

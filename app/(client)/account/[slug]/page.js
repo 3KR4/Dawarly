@@ -311,7 +311,7 @@ export default function UsersForm({ params }) {
     } catch (err) {
       addNotification({
         type: "warning",
-        message: err?.response?.data?.message || "Something went wrong!",
+        message: err?.response?.data?.message || t.common.somethingWentWrong,
       });
     } finally {
       setLoadingSubmit(false);

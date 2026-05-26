@@ -20,6 +20,10 @@ import { BsFillPatchCheckFill } from "react-icons/bs";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import { getAdTableId } from "@/utils/getAdTableId";
 
+const preventAdImageContextMenu = (e) => {
+  e.preventDefault();
+};
+
 export default function CardItem({ data }) {
   const { locale } = useContext(settings);
   const t = useTranslate();
@@ -103,18 +107,22 @@ export default function CardItem({ data }) {
       key={`${tableId || "ad"}-${data?.id}`}
       className={`ad-card`}
     >
-      <div className="image-holder">
+      <div className="image-holder" onContextMenu={preventAdImageContextMenu}>
         <Image
-          className="main"
+          className="main protected-ad-image"
           fill
           src={data?.image?.secure_url || "/apartment-mockup.avif"}
           alt={data?.title}
+          draggable={false}
+          onContextMenu={preventAdImageContextMenu}
         />
         <Image
-          className="cover"
+          className="cover protected-ad-image"
           fill
           src={data?.image?.secure_url || "/apartment-mockup.avif"}
           alt={`${data?.title}-cover`}
+          draggable={false}
+          onContextMenu={preventAdImageContextMenu}
         />
         <div className="top">
           <button
@@ -125,7 +133,7 @@ export default function CardItem({ data }) {
               handleFavoriteClick();
             }}
             aria-label={
-              isFavorite ? "Remove from favorites" : "Add to favorites"
+              isFavorite ? t.ad.remove_from_favorites : t.ad.add_to_favorites
             }
           >
             {favLoading ? (
@@ -142,7 +150,7 @@ export default function CardItem({ data }) {
 
           {data?.featured_priority > 0 && (
             <span className="verified ellipsis">
-              <BsFillLightningChargeFill /> Featured
+              <BsFillLightningChargeFill /> {t.ad.featured_ad}
             </span>
           )}
         </div>
@@ -152,7 +160,7 @@ export default function CardItem({ data }) {
           </span>
           {data?.is_verified && (
             <span className="verified ellipsis">
-              <BsFillPatchCheckFill /> verified
+              <BsFillPatchCheckFill /> {t.ad.verified}
             </span>
           )}
         </div>
@@ -219,7 +227,7 @@ export default function CardItem({ data }) {
       </div>
 
       <div className="date-area">
-        <p className="area ellipsis">{locationParts.join("، ")}</p>
+        <p className="area ellipsis">{locationParts.join(" / ")}</p>
         <p className="date" style={{ minWidth: "max-content" }}>
           {formatRelativeDate(data?.created_at, locale)}
         </p>

@@ -41,12 +41,15 @@ form .form-section .dynamicFilters-holder > * {
   flex: 1;
 }
 .dashboard form .row-holder {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 15px 7px;
   display: grid;
 }
 .dashboard form .row-holder.two {
   grid-template-columns: repeat(2, 1fr) !important;
+}
+.dashboard form .row-holder.three {
+  grid-template-columns: repeat(3, 1fr) !important;
 }
 .dashboard form .row-holder .left {
   display: flex;
@@ -61,6 +64,16 @@ form .form-section .dynamicFilters-holder > * {
   padding: 0 20px;
   width: 100%;
   border-radius: 10px;
+}
+.dashboard form .submit-section .main-button {
+  flex: 1;
+}
+.dashboard form .submit-section .main-button.danger {
+  background: var(--red-color);
+  color: #fff;
+}
+.dashboard form .submit-section .main-button.danger:hover {
+  opacity: 0.9;
 }
 .dashboard form .main-button[type="submit"] span {
   text-transform: uppercase;
@@ -81,6 +94,31 @@ form .form-section .dynamicFilters-holder > * {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+.dashboard form .uploader-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.dashboard form .uploader-summary-grid div {
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: var(--section-color);
+  min-width: 0;
+}
+.dashboard form .uploader-summary-grid span {
+  display: block;
+  font-size: 11px;
+  color: var(--paragraph-2);
+  margin-bottom: 6px;
+}
+.dashboard form .uploader-summary-grid strong {
+  display: block;
+  color: var(--title-color);
+  font-size: 13px;
+  line-height: 1.3;
+  word-break: break-word;
 }
 .main-button .for-specs {
   text-transform: capitalize;
@@ -464,6 +502,11 @@ form .form-section .dynamicFilters-holder > * {
   left: 7px;
 }
 
+[lang="ar"] .images-uplouder .imgHolder .uploaded p {
+  left: unset;
+  right: 7px;
+}
+
 .images-uplouder .imgHolder .uploaded.cover-image p {
   background: var(--main-color);
 }
@@ -478,5 +521,8 @@ form .form-section .dynamicFilters-holder > * {
   }
   form .form-section .dynamicFilters-holder > * {
     min-width: 100%;
+  }
+  .dashboard form .uploader-summary-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }

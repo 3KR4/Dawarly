@@ -114,7 +114,7 @@ function Footer() {
             <div className="footer-section company-info">
               <Link href="/" className="footer-logo">
                 <Image src="/logo.png" width={45} height={45} alt="Dawaarly" />
-                <span>{t.header.awaarly}</span>
+                <span dir="ltr">awaarly</span>
               </Link>
               <p className="company-description">{t.footer.companyDesc}</p>
               <div className="contact-info">

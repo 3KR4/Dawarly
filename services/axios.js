@@ -11,6 +11,23 @@ const api = axios.create({
   withCredentials: true,
 });
 
+const getProtectedLoginRedirect = () => {
+  if (typeof window === "undefined") return null;
+
+  const currentPath = window.location.pathname;
+  const protectedPaths = ["/dashboard", "/account"];
+
+  if (currentPath.startsWith("/register")) return null;
+
+  const isProtectedPath = protectedPaths.some((path) =>
+    currentPath.startsWith(path),
+  );
+
+  if (!isProtectedPath) return null;
+
+  return `/register?redirect=${encodeURIComponent(currentPath)}`;
+};
+
 // -------------------- TOKEN STORAGE --------------------
 let accessToken = null;
 let isAuthenticated = false;
@@ -88,12 +105,10 @@ api.interceptors.response.use(
         original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
       } catch (err) {
-        if (typeof window !== "undefined") {
-          const currentPath = window.location.pathname;
+        const loginRedirect = getProtectedLoginRedirect();
 
-          if (!currentPath.includes("/register")) {
-            window.location.href = "/register";
-          }
+        if (loginRedirect) {
+          window.location.href = loginRedirect;
         }
 
         return Promise.reject(err);

@@ -156,7 +156,7 @@ export default function CreateBlogPage() {
       console.error(err);
       addNotification({
         type: "error",
-        message: t.ad.fetch_error || "Error fetching data",
+        message: t.ad.fetch_error || t.common.fetchError,
       });
     } finally {
       setLoadingContent(false);

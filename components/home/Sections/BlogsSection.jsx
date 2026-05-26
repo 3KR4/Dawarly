@@ -40,7 +40,7 @@ export default function BlogsSection() {
   return (
     <div className="all-blogs fluid-container for-blogs">
       <div className="top">
-        <h3 className="title">latest Blogs</h3>
+        <h3 className="title">{t.common.latestBlogs}</h3>
 
         {hasMoreBlogs && (
           <Link href={`/blogs`} className="link">

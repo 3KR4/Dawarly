@@ -268,14 +268,14 @@ export default function UsersForm() {
 
       addNotification({
         type: "success",
-        message: messages.join(" | ") || "Updated successfully",
+        message: messages.join(" | ") || t.common.updatedSuccessfully,
       });
       redirectAfterLogin("/dashboard/users");
     } catch (err) {
       console.error(err);
       addNotification({
         type: "warning",
-        message: err?.response?.data?.message || "Something went wrong!",
+        message: err?.response?.data?.message || t.common.somethingWentWrong,
       });
     } finally {
       setLoadingSubmit(false);

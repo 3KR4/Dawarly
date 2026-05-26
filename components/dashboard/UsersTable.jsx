@@ -43,13 +43,13 @@ export default function UsersTable({
         <div className="table-header">
           {!screenSize.includes("small") && (
             <>
-              <div className="header-item details">User</div>
-              <div className="header-item">Phone</div>
-              <div className="header-item">email</div>
-              <div className="header-item">Permissions</div>
-              <div className="header-item">active Ads</div>
-              <div className="header-item">join at</div>
-              <div className="header-item">Actions</div>
+              <div className="header-item details">{t.common.user}</div>
+              <div className="header-item">{t.common.phone}</div>
+              <div className="header-item">{t.common.email}</div>
+              <div className="header-item">{t.common.permissions}</div>
+              <div className="header-item">{t.common.activeAds}</div>
+              <div className="header-item">{t.common.joinAt}</div>
+              <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
           )}
         </div>
@@ -73,7 +73,7 @@ export default function UsersTable({
           {!users?.length && !loadingContent ? (
             <div className="no-data-found">
               <TbListSearch />
-              <p>No users found</p>
+              <p>{t.common.noUsersFound}</p>
             </div>
           ) : (
             users.map((user) => {

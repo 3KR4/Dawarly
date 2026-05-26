@@ -331,7 +331,7 @@ export default function Register() {
           });
           setStep(STEPS.EMAIL_VERIFY);
         } catch (err) {
-          const msg = err.response?.data?.message || "Something went wrong";
+          const msg = err.response?.data?.message || t.common.somethingWentWrong;
           addNotification({
             type: "warning",
             message: msg,
@@ -358,7 +358,7 @@ export default function Register() {
         } catch (err) {
           addNotification({
             type: "warning",
-            message: err.response?.data?.message || "Something went wrong",
+            message: err.response?.data?.message || t.common.somethingWentWrong,
           });
         }
         return;
@@ -415,7 +415,7 @@ export default function Register() {
         } catch (err) {
           addNotification({
             type: "warning",
-            message: err.response?.data?.message || "Something went wrong",
+            message: err.response?.data?.message || t.common.somethingWentWrong,
           });
           setOtp(Array(OTP_LENGTH).fill(""));
         }
@@ -459,7 +459,7 @@ export default function Register() {
     } catch (err) {
       addNotification({
         type: "warning",
-        message: err.response?.data?.message || "Invalid code",
+        message: err.response?.data?.message || t.common.invalidCode,
       });
       setOtp(Array(OTP_LENGTH).fill(""));
       throw err;
@@ -487,7 +487,7 @@ export default function Register() {
       } else {
         addNotification({
           type: "warning",
-          message: err.response?.data?.message || "Something went wrong",
+          message: err.response?.data?.message || t.common.somethingWentWrong,
         });
       }
 
@@ -507,7 +507,7 @@ export default function Register() {
 
       addNotification({
         type: "warning",
-        message: err.response?.data?.message || "Something went wrong",
+        message: err.response?.data?.message || t.common.somethingWentWrong,
       });
       throw err;
     }
@@ -576,7 +576,7 @@ export default function Register() {
             onClick={() => {
               addNotification({
                 type: "warning",
-                message: "Something went wrong",
+                message: t.common.somethingWentWrong,
               });
             }}
           >
