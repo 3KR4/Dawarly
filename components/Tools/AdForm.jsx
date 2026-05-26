@@ -122,16 +122,19 @@ const DescriptionField = ({ disabled, register, t }) => (
 );
 
 const isVacationTable = (table) =>
-  table?.name_en?.toLowerCase().includes("vacation");
+  table?.name_en?.toLowerCase()?.includes("vacation");
 
 const isSaleTable = (table) =>
-  table?.name_en?.toLowerCase().includes("for sale");
+  table?.name_en?.toLowerCase()?.includes("for sale");
 
 const isRentTable = (table) =>
-  table?.name_en?.toLowerCase().includes("for rent");
+  table?.name_en?.toLowerCase()?.includes("for rent");
 
 const cleanTableName = (name = "") =>
-  name.replace(/for sale/i, "").replace(/for rent/i, "").trim();
+  name
+    .replace(/for sale/i, "")
+    .replace(/for rent/i, "")
+    .trim();
 
 const getNumericRules = (
   requiredMessage,
@@ -272,7 +275,9 @@ export default function AdForm({
 
   const createAdNavigation = useMemo(() => {
     const getSubCategories = (categoryId) =>
-      subCategories.filter((subCategory) => subCategory.category_id === categoryId);
+      subCategories.filter(
+        (subCategory) => subCategory.category_id === categoryId,
+      );
 
     const vacationTables = tables.filter(isVacationTable);
     const vacationMap = {};
@@ -403,10 +408,10 @@ export default function AdForm({
   } = currentRule;
   const isPropertyLike =
     showPropertyDetails || showCommercialDetails || showBuildingLandDetails;
-  const isHomes = [1, 2, 3, 4, 5, 6].includes(tableId);
+  const isHomes = [1, 2, 3, 4, 5, 6]?.includes(tableId);
 
   const allowedAmenities = useMemo(
-    () => Amenities.filter((item) => amenityFields.includes(item.id)),
+    () => Amenities.filter((item) => amenityFields?.includes(item.id)),
     [amenityFields],
   );
 
@@ -440,40 +445,35 @@ export default function AdForm({
     { id: 2, name: t.ad.userToAdmin },
   ];
   const shouldForceAdminContact = Boolean(adId && adData && !adData.subuser);
-  const adminContactMethodOptions =
-    shouldForceAdminContact
-      ? contactMethod.filter((method) => method.id === 2)
-      : contactMethod;
+  const adminContactMethodOptions = shouldForceAdminContact
+    ? contactMethod.filter((method) => method.id === 2)
+    : contactMethod;
   const canReviewPendingAd =
-    reviewActions &&
-    type === "admin" &&
-    adId &&
-    adData?.status === "PENDING";
+    reviewActions && type === "admin" && adId && adData?.status === "PENDING";
   const uploaderInfo = useMemo(() => {
     if (!adId || !adData) return null;
 
-    const source =
-      adData.anonymous
+    const source = adData.anonymous
+      ? {
+          type: locale === "ar" ? "زائر" : "Anonymous",
+          data: adData.anonymous,
+        }
+      : adData.subuser
         ? {
-            type: locale === "ar" ? "زائر" : "Anonymous",
-            data: adData.anonymous,
+            type: locale === "ar" ? "سبيوزر" : "Subuser",
+            data: adData.subuser,
           }
-        : adData.subuser
+        : adData.user
           ? {
-              type: locale === "ar" ? "سبيوزر" : "Subuser",
-              data: adData.subuser,
+              type: locale === "ar" ? "مستخدم" : "User",
+              data: adData.user,
             }
-          : adData.user
+          : adData.admin
             ? {
-                type: locale === "ar" ? "مستخدم" : "User",
-                data: adData.user,
+                type: locale === "ar" ? "أدمن" : "Admin",
+                data: adData.admin,
               }
-            : adData.admin
-              ? {
-                  type: locale === "ar" ? "أدمن" : "Admin",
-                  data: adData.admin,
-                }
-              : null;
+            : null;
 
     if (!source) return null;
 
@@ -624,9 +624,7 @@ export default function AdForm({
     if (!ad || !user) return false;
     const ownerId = ad.subuser?.id ?? ad.subuser_id;
     return (
-      ownerId === user.id ||
-      user.user_type === "ADMIN" ||
-      user.is_super_admin
+      ownerId === user.id || user.user_type === "ADMIN" || user.is_super_admin
     );
   };
 
@@ -829,7 +827,7 @@ export default function AdForm({
 
   const mapAmenities = () => {
     return allowedAmenities.reduce((accumulator, item) => {
-      accumulator[item.id] = selectedAmenities.includes(item.id);
+      accumulator[item.id] = selectedAmenities?.includes(item.id);
       return accumulator;
     }, {});
   };
@@ -1132,7 +1130,10 @@ export default function AdForm({
       if (isFieldRequired(tableId, "level") && !additionalData.level) {
         newErrors.level = t.dashboard.forms.errors.required;
       }
-      if (isFieldRequired(tableId, "payment_method") && !additionalData.payment) {
+      if (
+        isFieldRequired(tableId, "payment_method") &&
+        !additionalData.payment
+      ) {
         newErrors.payment_method = t.dashboard.forms.errors.required;
       }
       if (
@@ -1285,7 +1286,8 @@ export default function AdForm({
   };
 
   const selectTable = (table) => {
-    const fullTable = tables.find((item) => item.id === table.table_id) || table;
+    const fullTable =
+      tables.find((item) => item.id === table.table_id) || table;
 
     setSelectedCats({
       dep: fullTable,
@@ -1300,8 +1302,9 @@ export default function AdForm({
 
   const selectCategory = (category) => {
     const fullCategory =
-      categories.find((item) => item.id === (category.category_id || category.id)) ||
-      category;
+      categories.find(
+        (item) => item.id === (category.category_id || category.id),
+      ) || category;
 
     setSelectedCats((prev) => ({
       ...prev,
@@ -1313,10 +1316,12 @@ export default function AdForm({
   };
 
   const selectTableCategory = (table, category) => {
-    const fullTable = tables.find((item) => item.id === table.table_id) || table;
+    const fullTable =
+      tables.find((item) => item.id === table.table_id) || table;
     const fullCategory =
-      categories.find((item) => item.id === (category.category_id || category.id)) ||
-      category;
+      categories.find(
+        (item) => item.id === (category.category_id || category.id),
+      ) || category;
 
     setSelectedCats({
       dep: fullTable,
@@ -1331,7 +1336,9 @@ export default function AdForm({
 
   const selectVacationItem = (item) => {
     const table = tables.find((target) => target.id === item.table_id);
-    const category = categories.find((target) => target.id === item.category_id);
+    const category = categories.find(
+      (target) => target.id === item.category_id,
+    );
 
     if (!table || !category) return;
 
@@ -1391,10 +1398,10 @@ export default function AdForm({
     step === STEPS.CATEGORY &&
     Boolean(
       selectedRootGroup ||
-        selectedVacationGroup ||
-        selectedCats.dep ||
-        selectedCats.cat ||
-        selectedCats.subCat,
+      selectedVacationGroup ||
+      selectedCats.dep ||
+      selectedCats.cat ||
+      selectedCats.subCat,
     );
   const showCategoryRootTitle =
     !selectedCats.dep && !selectedVacationGroup && !selectedCats.cat;
@@ -1526,9 +1533,6 @@ export default function AdForm({
     },
   };
   const showContactErrors = contactSubmitAttempted;
-
-
-  
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
@@ -1666,7 +1670,8 @@ export default function AdForm({
             <div className="form-section category-picker-step">
               {showCategoryRootTitle && (
                 <h2 className="section-title">
-                  {selectedRootGroup?.[`name_${locale}`] || t.ad.choose_category}
+                  {selectedRootGroup?.[`name_${locale}`] ||
+                    t.ad.choose_category}
                 </h2>
               )}
               {fieldErrors.dep && (
@@ -1749,7 +1754,9 @@ export default function AdForm({
                         <div
                           key={type.id}
                           className={`cat-card ${
-                            selectedVacationGroup?.id === type.id ? "active" : ""
+                            selectedVacationGroup?.id === type.id
+                              ? "active"
+                              : ""
                           }`}
                           onClick={() => {
                             setSelectedVacationGroup(type);
@@ -1833,7 +1840,10 @@ export default function AdForm({
                                   selectedCats.cat?.id === category.id
                                 }
                                 onSelect={() => {
-                                  selectTableCategory(selectedCats.dep, category);
+                                  selectTableCategory(
+                                    selectedCats.dep,
+                                    category,
+                                  );
 
                                   const hasSubCategories = subCategories.some(
                                     (subCategory) =>
@@ -1913,7 +1923,6 @@ export default function AdForm({
                     t={t}
                   />
                 )}
-
               </div>
 
               <div className="right">
@@ -1938,9 +1947,7 @@ export default function AdForm({
 
           <div className={`form-section ${getStepClass(STEPS.BASICS)}`}>
             <h2 className="section-title">{t.dashboard.tables.location}</h2>
-            <div
-              className="row-holder client-two-grid"
-            >
+            <div className="row-holder client-two-grid">
               <SelectOptions
                 label={t.location.yourGovernorate}
                 placeholder={t.location.selectGovernorate}
@@ -2065,7 +2072,7 @@ export default function AdForm({
               {showBuildingLandDetails && (
                 <SelectOptions
                   label="Type"
-                    placeholder={t.common.selectType}
+                  placeholder={t.common.selectType}
                   options={BuildingAndLandsTypes}
                   value={additionalData.buildingAndLandsType}
                   disabled={!isEditable}
@@ -2334,7 +2341,6 @@ export default function AdForm({
                         </div>
                       </div>
                     )}
-
                 </div>
               </div>
             )}
@@ -2488,7 +2494,9 @@ export default function AdForm({
 
           {showRentDetails && (
             <>
-              <div className={`form-section for-dates ${getStepClass(STEPS.DETAILS)}`}>
+              <div
+                className={`form-section for-dates ${getStepClass(STEPS.DETAILS)}`}
+              >
                 <h2 className="section-title">{t.ad.rental_period}</h2>
                 <div className="row-holder for-dates two">
                   <div className="box forInput">
@@ -2680,7 +2688,9 @@ export default function AdForm({
               <div className="row-holder client-three-grid three">
                 <SelectOptions
                   label="Payment Method"
-                  placeholder={t.ad.PaymentMethod || t.common.selectPaymentMethod}
+                  placeholder={
+                    t.ad.PaymentMethod || t.common.selectPaymentMethod
+                  }
                   options={PaymentMethod}
                   value={additionalData.payment}
                   onChange={(item) => {
@@ -2696,7 +2706,9 @@ export default function AdForm({
                 {isFieldAllowed(tableId, "installment_years") && (
                   <SelectOptions
                     label="Installment Years"
-                    placeholder={t.ad.installmentYears || t.common.selectYearsCount}
+                    placeholder={
+                      t.ad.installmentYears || t.common.selectYearsCount
+                    }
                     options={InstallmentYears}
                     value={additionalData.installmentYears}
                     onChange={(item) => {
@@ -2809,7 +2821,7 @@ export default function AdForm({
                     {allowedAmenities.map((option) => {
                       const displayLabel =
                         locale === "ar" ? option.name_ar : option.name_en;
-                      const isActive = selectedAmenities.includes(option.id);
+                      const isActive = selectedAmenities?.includes(option.id);
 
                       return (
                         <div
@@ -2992,17 +3004,16 @@ export default function AdForm({
                 </button>
               </>
             )}
-            {isStepped &&
-              (step > STEPS.DEPARTMENT || canGoBackInTaxonomy) && (
-                <button
-                  type="button"
-                  className="main-button update-button"
-                  onClick={goPreviousStep}
-                  disabled={loadingSubmit}
-                >
-                  {t.actions?.back || "Back"}
-                </button>
-              )}
+            {isStepped && (step > STEPS.DEPARTMENT || canGoBackInTaxonomy) && (
+              <button
+                type="button"
+                className="main-button update-button"
+                onClick={goPreviousStep}
+                disabled={loadingSubmit}
+              >
+                {t.actions?.back || "Back"}
+              </button>
+            )}
             {isStepped && step < STEPS.CONTACT ? (
               <button
                 type="button"
@@ -3022,13 +3033,13 @@ export default function AdForm({
                 }}
                 disabled={loadingSubmit}
               >
-              {loadingSubmit
-                ? locale === "ar"
-                  ? "جاري..."
-                  : "Loading..."
-                : adId
-                  ? t.ad.update_ad
-                  : t.ad.create_your_ad}
+                {loadingSubmit
+                  ? locale === "ar"
+                    ? "جاري..."
+                    : "Loading..."
+                  : adId
+                    ? t.ad.update_ad
+                    : t.ad.create_your_ad}
               </button>
             )}
           </div>
