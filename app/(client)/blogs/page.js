@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
 import "@/styles/client/pages/blogs.css";
-import React, { useState, useContext, useEffect } from "react";
+import React, { Suspense, useState, useContext, useEffect } from "react";
 import Pagination from "@/components/Tools/Pagination";
 import "@/styles/client/pages/market.css";
 import { settings } from "@/Contexts/settings";
@@ -11,7 +11,7 @@ import Navigations from "@/components/Tools/Navigations";
 import { getAllBlogs } from "@/services/blogs/blogs.service";
 import BlogCard from "@/components/home/BlogCard";
 
-export default function Marketplace() {
+function BlogsContent() {
   const { screenSize, locale } = useContext(settings);
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
@@ -94,5 +94,13 @@ export default function Marketplace() {
         />
       )}
     </div>
+  );
+}
+
+export default function BlogsPage() {
+  return (
+    <Suspense fallback={null}>
+      <BlogsContent />
+    </Suspense>
   );
 }

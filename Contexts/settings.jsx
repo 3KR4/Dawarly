@@ -27,7 +27,7 @@ const updateStoredUser = (updates) => {
 };
 
 const getScreenSize = () => {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return "large";
 
   const width = window.innerWidth;
   if (width < 400) return "ultra-small";

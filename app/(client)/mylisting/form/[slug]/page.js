@@ -1,9 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import AdForm from "@/components/Tools/AdForm";
 import { useParams, useSearchParams } from "next/navigation";
 
-export default function CreateAd() {
+function MyListingAdFormContent() {
   const { slug } = useParams();
   const searchParams = useSearchParams();
   const adId = slug;
@@ -12,5 +13,13 @@ export default function CreateAd() {
     <div className="dashboard container">
       <AdForm type="client" adId={adId} initialTableId={tableId} />
     </div>
+  );
+}
+
+export default function CreateAd() {
+  return (
+    <Suspense fallback={null}>
+      <MyListingAdFormContent />
+    </Suspense>
   );
 }

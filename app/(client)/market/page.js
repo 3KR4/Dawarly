@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import React, {
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -342,7 +343,7 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
   return fields;
 };
 
-export default function Marketplace() {
+function MarketplaceContent() {
   const { screenSize, locale } = useContext(settings);
   const { addNotification } = useNotification();
   const {
@@ -922,5 +923,13 @@ export default function Marketplace() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function Marketplace() {
+  return (
+    <Suspense fallback={null}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }
