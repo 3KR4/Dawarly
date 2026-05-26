@@ -279,7 +279,7 @@ function Header() {
           <div className="top">
             <Link href="/" className="logo">
               <Image src={`/logo.png`} fill alt="Dawaarly" />
-              {t.header.awaarly}
+              <span dir="ltr">awaarly</span>
             </Link>
             <div className="search" ref={searchRef}>
               <div
@@ -517,12 +517,22 @@ function Header() {
                               {t.actions.accountSettings}
                             </Link>
                           </li>
-                          <li>
-                            <Link href={`/mylisting/createAd`} className="btn">
-                              <MdPostAdd style={{ fontSize: "17px" }} />
-                              {t.actions.postAd}
-                            </Link>
-                          </li>
+                          {user?.user_type !== "USER" && (
+                            <li>
+                              <Link href={`/mylisting/createAd`} className="btn">
+                                <MdPostAdd style={{ fontSize: "17px" }} />
+                                {t.actions.postAd}
+                              </Link>
+                            </li>
+                          )}
+                          {user?.user_type === "USER" && (
+                            <li>
+                              <Link href={`/request-ad`} className="btn">
+                                <MdPostAdd style={{ fontSize: "17px" }} />
+                                Request an ad
+                              </Link>
+                            </li>
+                          )}
                           {user?.user_type !== "USER" && (
                             <li>
                               <Link href={`/mylisting`} className="btn">
@@ -583,6 +593,9 @@ function Header() {
                 </>
               ) : (
                 <>
+                  <Link className="main-button request-ad" href={`/request-ad`}>
+                    {!screenSize.includes("small") ? "Request an ad" : <MdPostAdd />}
+                  </Link>
                   <Link className="main-button login-in" href={`/register`}>
                     {!screenSize.includes("small") ? t.auth.login : <FaUser />}
                   </Link>

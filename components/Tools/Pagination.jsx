@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import ReactPaginate from "react-paginate";
+import useTranslate from "@/Contexts/useTranslation";
 
 const Pagination = ({
   pageCount = 10,
@@ -9,14 +10,16 @@ const Pagination = ({
   onPageChange,
   isDashBoard = false,
 }) => {
+  const t = useTranslate();
+
   return (
     <ReactPaginate
       pageCount={pageCount}
       marginPagesDisplayed={isDashBoard ? 2 : 1}
       pageRangeDisplayed={screenSize.includes("small") ? 1 : 2}
       breakLabel="..."
-      nextLabel={`${!screenSize.includes("small") ? "next" : ""} >`}
-      previousLabel={`< ${!screenSize.includes("small") ? "prev" : ""}`}
+      nextLabel={`${!screenSize.includes("small") ? t.common.next : ""} >`}
+      previousLabel={`< ${!screenSize.includes("small") ? t.common.prev : ""}`}
       pageLinkClassName="page-num"
       previousLinkClassName="page-num btns"
       nextLinkClassName="page-num btns"

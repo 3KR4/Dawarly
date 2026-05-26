@@ -1,7 +1,7 @@
 "use client";
 import Pagination from "@/components/Tools/Pagination";
 import useTranslate from "@/Contexts/useTranslation";
-import { IoSearchSharp } from "react-icons/io5";
+import { IoCloseSharp, IoSearchSharp } from "react-icons/io5";
 import Image from "next/image";
 import "@/styles/dashboard/tables.css";
 import { FaEye, FaTrashAlt } from "react-icons/fa";
@@ -107,7 +107,7 @@ export default function Blogs() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };
@@ -232,7 +232,7 @@ export default function Blogs() {
             {!blogs?.data?.length && !loadingContent ? (
               <div className="no-data-found">
                 <TbListSearch />
-                <p>you didnt create blogs yet</p>
+                <p>{t.common.noBlogsFound}</p>
               </div>
             ) : (
               blogs?.data?.map((item) => {

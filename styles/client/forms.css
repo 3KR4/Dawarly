@@ -69,6 +69,21 @@ body:has(.form-holder) footer {
   flex-direction: column;
   gap: 7px;
 }
+.form-holder.create-ad.user-create-ad form .row-holder.client-two-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 10px;
+}
+.form-holder.create-ad.user-create-ad form .row-holder.client-three-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 10px;
+}
+.form-holder.create-ad.user-create-ad form .row-holder.client-four-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 10px;
+}
 .form-holder form .row-holder .left {
   display: flex;
   flex-direction: column;
@@ -115,6 +130,75 @@ body:has(.form-holder) footer {
   gap: 10px;
   grid-template-columns: repeat(2, 1fr);
 }
+.box.forInput .inputHolder.tags {
+  border: 1px solid var(--input-border-color);
+  border-radius: 11px;
+  flex-direction: column;
+  gap: 0;
+  padding: 12px 9px;
+  display: flex;
+  overflow: hidden;
+}
+.box.forInput .inputHolder.tags:has(.tagsList),
+.box.forInput .inputHolder.tags:has(.error) {
+  gap: 7px;
+}
+.box.forInput .inputHolder.tags .holder {
+  overflow: hidden;
+}
+.box.forInput .inputHolder.tags .tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.box.forInput .inputHolder.tags .tagsList span {
+  color: var(--paragraph);
+  cursor: pointer;
+  border-radius: 7px;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 7px 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: flex;
+  background: var(--lighter-main-color);
+}
+.box.forInput .inputHolder.tags .tagsList span svg {
+  font-size: 17px;
+}
+.box.forInput:not(.disabled) .inputHolder.tags .tagsList span:hover {
+  background: #ff3535f5 !important;
+  color: white;
+}
+.box.forInput.disabled .inputHolder.tags .tagsList span {
+  cursor: auto;
+}
+.box.forInput:not(.disabled) .inputHolder.tags .tagsList span:hover svg {
+  color: white;
+}
+.box.forInput .inputHolder.tags .error {
+  margin: -4px 4px;
+}
+.box.forInput .for-tags {
+  padding: 0 27px;
+  color: var(--paragraph);
+  font-weight: 400;
+  height: 32px;
+  border-radius: 5px !important;
+  background: var(--lighter-main-color-2);
+  margin-right: 4px;
+  border: none;
+}
+[lang="ar"] .box.forInput .for-tags {
+  margin-right: unset;
+  margin-left: 4px;
+}
+.box.forInput .for-tags:hover {
+  font-weight: 600;
+  color: white;
+  background: var(--main-color);
+}
 
 .form-holder form > .main-button {
   width: 100%;
@@ -133,6 +217,38 @@ body:has(.form-holder) footer {
   width: 100%;
   height: 40px;
   border-radius: 10px;
+}
+.form-holder.create-ad.user-create-ad form .submit-section {
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+}
+.form-holder.create-ad.user-create-ad
+  form
+  .submit-section
+  > .main-button.update-button {
+  flex: 0 0 34%;
+}
+.form-holder.create-ad.user-create-ad
+  form
+  .submit-section
+  > .main-button.create-button {
+  flex: 1 1 auto;
+}
+.step-hidden {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .form-holder.create-ad.user-create-ad form .row-holder.client-two-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-holder.create-ad.user-create-ad form .row-holder.client-three-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-holder.create-ad.user-create-ad form .row-holder.client-four-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .form-holder form .otherWay {
   display: flex;

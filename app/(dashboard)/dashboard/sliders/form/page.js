@@ -73,7 +73,7 @@ export default function CreateSliderPage() {
       console.error(err);
       addNotification({
         type: "error",
-        message: t.ad.fetch_error || "Error fetching data",
+        message: t.ad.fetch_error || t.common.fetchError,
       });
     } finally {
       setLoadingContent(false);
@@ -158,7 +158,7 @@ export default function CreateSliderPage() {
       addNotification({
         type: "error",
         message:
-          err.response?.data?.message || err.message || "Something went wrong",
+          err.response?.data?.message || err.message || t.common.somethingWentWrong,
       });
     } finally {
       setLoadingSubmit(false);
@@ -212,7 +212,7 @@ export default function CreateSliderPage() {
               )}
             </div>
             <div className="box forInput">
-              <label>Link</label>
+              <label>{t.common.link}</label>
               <div className="inputHolder">
                 <div className="holder">
                   <input

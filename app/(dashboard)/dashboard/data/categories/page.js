@@ -280,7 +280,7 @@ export default function SubCategories() {
             <div className="builder">
               <div className="row-holder">
                 <div className="box">
-                  <label>Selection Required</label>
+                  <label>{t.common.selectionRequired}</label>
                   <p>
                     Please select a table to create a category, or select a
                     category to create a subcategory.

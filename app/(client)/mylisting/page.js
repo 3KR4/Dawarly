@@ -107,7 +107,7 @@ export default function MyAdsListing() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };
@@ -135,7 +135,7 @@ export default function MyAdsListing() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };

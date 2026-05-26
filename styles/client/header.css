@@ -1,5 +1,5 @@
 header {
-  z-index: 2;
+  z-index: 4;
   border-bottom: 1px solid var(--border-color);
 }
 header.border {
@@ -9,7 +9,7 @@ header:has(.container > .top) {
   position: sticky;
   top: 0;
   background: var(--body-color);
-  z-index: 3;
+  z-index: 5;
   border-bottom: 0;
 }
 header .container > .top {
@@ -57,8 +57,21 @@ header .nested-wrapper .menu {
   padding: 6px;
   box-shadow: 5px 1px 10px #00000023;
 }
+[lang="ar"] header .nested-wrapper .menu {
+  left: unset;
+  right: calc(0px + 188px);
+  border-left-width: 1px;
+  border-left-color: var(--border-color);
+  border-right-width: 3px;
+  border-right-color: var(--lighter-main-color-2);
+  box-shadow: -5px 1px 10px #00000023;
+}
 header .nested-wrapper > .nested-links .nested-links {
   left: calc(0px + 186px);
+}
+[lang="ar"] header .nested-wrapper > .nested-links .nested-links {
+  left: unset;
+  right: calc(0px + 186px);
 }
 header .nested-wrapper:hover > .nested-links {
   visibility: visible;
@@ -87,6 +100,10 @@ header .menu::before {
   background: transparent;
   position: absolute;
 }
+[lang="ar"] header .menu::before {
+  left: unset;
+  right: 0;
+}
 header .top {
   width: 100%;
   display: flex;
@@ -100,23 +117,19 @@ header .top .logo {
   font-family: cursive;
   font-size: 32px;
   font-weight: bolder;
-  text-transform: lowercase;
+  text-transform: none;
   display: flex;
+  direction: ltr;
 }
-[lang="ar"] header .top .logo {
-  font-family: "Cairo";
-  font-weight: 900;
+header .top .logo span {
+  color: var(--main-color);
+  text-transform: none;
 }
 header .top .logo img {
   position: relative !important;
   width: 45px !important;
   height: 45px !important;
   margin-right: -6px;
-}
-[lang="ar"] header .top .logo img {
-  /* transform: scaleX(-1); */
-  margin-right: 0;
-  margin-left: -3px;
 }
 header .top .search {
   flex: 1;
@@ -219,6 +232,10 @@ header .top .search .search-group h5::after {
   bottom: -5px;
   left: 5px;
 }
+[lang="ar"] header .top .search .search-group h5::after {
+  left: unset;
+  right: 5px;
+}
 header .top .search .search-result-item {
   color: var(--paragraph);
   border-radius: 0;
@@ -253,6 +270,7 @@ header .top .search .search-result-price {
 }
 header .top .search .search-result-price {
   color: var(--main-color);
+  line-height: 1.2;
 }
 header .top .search .see-more-results {
   background: transparent;
@@ -329,6 +347,10 @@ header .top .account .user svg.small-drop-down {
   position: absolute;
   bottom: 0px;
   right: 4px;
+}
+[lang="ar"] header .top .account .user svg.small-drop-down {
+  right: unset;
+  left: 4px;
 }
 /* header .top .account .user .holder img {
   position: relative !important;
@@ -474,6 +496,16 @@ header .top .account .icon-holder:hover .main {
 
 header .top .account .login-in {
   padding: 11px 30px;
+}
+header .top .account .request-ad {
+  padding: 11px 22px;
+  background: transparent;
+  border: 1px solid var(--main-color);
+  color: var(--main-color);
+}
+header .top .account .request-ad:hover {
+  background: var(--main-color);
+  color: #fff;
 }
 header .bottom {
   display: flex;
@@ -722,6 +754,9 @@ header .bottom .actions button:hover svg {
   header .top .account .user .holder {
     padding: 0;
   }
+  header .menu {
+    position: fixed !important;
+  }
 }
 @media (max-width: 768px) {
   header .container {
@@ -824,12 +859,21 @@ header .bottom .actions button:hover svg {
     position: absolute;
     right: 4px;
   }
+  [lang="ar"] header .bottom .nav .cats-nav a svg:last-child {
+    right: unset;
+    left: 4px;
+  }
   header .bottom .nav .cats-nav .menu.active {
     right: unset;
+    left: 0;
     top: unset;
     position: relative;
     box-shadow: unset;
     margin-top: 5px;
+  }
+  [lang="ar"] header .bottom .nav .cats-nav .menu.active {
+    left: unset;
+    right: 0;
   }
   [theme="dark"] header .bottom .nav .cats-nav .menu.active {
     border: 1px solid #4d4d4d;
@@ -853,15 +897,24 @@ header .bottom .actions button:hover svg {
     padding: 0;
     background: transparent;
   }
+  header .top .account .request-ad {
+    height: 34px;
+    width: 34px;
+    padding: 0;
+    background: transparent;
+  }
   header .top .account .login-in svg {
     font-size: 17px;
+  }
+  header .top .account .request-ad svg {
+    font-size: 19px;
   }
   [theme="dark"] header .top .account .user svg.small-drop-down {
     color: var(--body-color);
   }
   [lang="ar"] header .top .account .user svg.small-drop-down {
     right: unset;
-    left: 0;
+    left: 4px;
   }
   [theme="dark"] header .top .search .search-holder svg {
     color: var(--body-color);
@@ -875,7 +928,7 @@ header .bottom .actions button:hover svg {
     right: 0;
   }
   [lang="ar"] header .menu.active {
-    left: 0;
-    right: unset;
+    left: unset;
+    right: 0;
   }
 }

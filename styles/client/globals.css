@@ -760,6 +760,10 @@ a {
   left: 40px;
   bottom: 40px;
 }
+[lang="ar"] .hero-image-holder .details {
+  left: unset;
+  right: 40px;
+}
 .hero-image-holder .details::before {
   content: "";
   z-index: 0;
@@ -768,6 +772,10 @@ a {
   bottom: 0;
   left: 0;
   box-shadow: 0 0 175px 62px #000;
+}
+[lang="ar"] .hero-image-holder .details::before {
+  left: unset;
+  right: 0;
 }
 .hero-image-holder .details > * {
   position: relative;
@@ -1355,6 +1363,11 @@ svg.main-ico {
     margin-left: 4px;
   }
 
+  [lang="ar"] .checkbox-wrapper-13 input[type="checkbox"] + label {
+    margin-left: 0;
+    margin-right: 4px;
+  }
+
   .checkbox-wrapper-13 input[type="checkbox"]:not(.switch) {
     border-radius: 7px;
   }
@@ -1598,4 +1611,10 @@ svg.main-ico {
   .container:has(.table-container) {
     margin-top: 26px;
   }
+}
+img.protected-ad-image,
+.protected-ad-image img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
 }

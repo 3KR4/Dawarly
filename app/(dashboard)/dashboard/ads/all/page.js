@@ -35,6 +35,7 @@ export default function ActiveAds() {
   const [searchActive, setSearchActive] = useState(false); 
   const [searchConfirmed, setSearchConfirmed] = useState(false); 
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const statusOptions = AdStatuses.filter((status) => status.id !== "PENDING");
 
   const fetchAds = async (page = 1, search) => {
     try {
@@ -44,6 +45,7 @@ export default function ActiveAds() {
         page,
         limit: adsData.pagination.limit,
         status: selectedStatus?.id || null,
+        exclude_status: selectedStatus ? null : "PENDING",
         search: search !== undefined ? search : searchText,
       });
 
@@ -94,7 +96,7 @@ export default function ActiveAds() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };
@@ -118,7 +120,7 @@ export default function ActiveAds() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };
@@ -171,7 +173,7 @@ export default function ActiveAds() {
         <SelectOptions
           size="small"
           placeholder={t.ad.status.label}
-          options={AdStatuses}
+          options={statusOptions}
           value={selectedStatus}
           locale={locale}
           t={t}

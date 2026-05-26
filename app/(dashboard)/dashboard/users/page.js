@@ -67,7 +67,7 @@ export default function ActiveAds() {
       console.error(err);
       addNotification({
         type: "warning",
-        message: err.response.data.message || "Failed to fetch users from server ❌",
+        message: err.response.data.message || t.common.fetchError,
       });
     } finally {
       setLoadingContent(false);
@@ -109,7 +109,7 @@ export default function ActiveAds() {
       console.error(error);
       addNotification({
         type: "warning",
-        message: error.response?.data?.message || "Something went wrong ❌",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };

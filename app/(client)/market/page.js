@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import React, {
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -47,33 +48,33 @@ const SORT_OPTIONS = [
     id: "newest",
     backendSort: "date",
     backendOrder: "desc",
-    name: { en: "Publish Date: Newest", ar: "Publish Date: Newest" },
+    name: { en: "Publish Date: Newest", ar: "تاريخ النشر: الأحدث" },
   },
   {
     id: "oldest",
     backendSort: "date",
     backendOrder: "asc",
-    name: { en: "Publish Date: Oldest", ar: "Publish Date: Oldest" },
+    name: { en: "Publish Date: Oldest", ar: "تاريخ النشر: الأقدم" },
   },
   {
     id: "price_low",
     backendSort: "price_asc",
-    name: { en: "Price: Low to High", ar: "Price: Low to High" },
+    name: { en: "Price: Low to High", ar: "السعر: من الأقل للأعلى" },
   },
   {
     id: "price_high",
     backendSort: "price_desc",
-    name: { en: "Price: High to Low", ar: "Price: High to Low" },
+    name: { en: "Price: High to Low", ar: "السعر: من الأعلى للأقل" },
   },
   {
     id: "most_viewed",
     backendSort: "views_desc",
-    name: { en: "Most Viewed", ar: "Most Viewed" },
+    name: { en: "Most Viewed", ar: "الأكثر مشاهدة" },
   },
   {
     id: "most_favorites",
     backendSort: "favorites_desc",
-    name: { en: "Most Favorites", ar: "Most Favorites" },
+    name: { en: "Most Favorites", ar: "الأكثر تفضيلا" },
   },
 ];
 
@@ -158,6 +159,22 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
     compounds = [],
   } = data;
   const tableRule = getTableRule(tableId);
+  const ownerOnly = Boolean(data.ownerOnly);
+  const ownerFields = [
+    {
+      key: "price",
+      uiType: "range",
+      min: 0,
+      max: maxPrice || 10000000,
+      label: { en: "Price (EGP)", ar: "Price (EGP)" },
+    },
+    {
+      key: "currency",
+      uiType: "select",
+      label: { en: "Currency", ar: "Currency" },
+      options: Currencies.map(toFilterOption),
+    },
+  ];
   const fields = [
     {
       key: "location_tree",
@@ -213,25 +230,15 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
       ],
     },
 
-    {
-      key: "price",
-      uiType: "range",
-      min: 0,
-      max: maxPrice || 10000000,
-      label: { en: "Price (EGP)", ar: "Price (EGP)" },
-    },
-    {
-      key: "currency",
-      uiType: "select",
-      label: { en: "Currency", ar: "Currency" },
-      options: Currencies.map(toFilterOption),
-    },
+    ...ownerFields,
     {
       key: "is_verified_only",
       uiType: "checkbox",
       label: { en: "Verified ads only", ar: "Verified ads only" },
     },
   ];
+
+  if (ownerOnly) return ownerFields;
 
   if (!tableId) return fields;
 
@@ -336,7 +343,7 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
   return fields;
 };
 
-export default function Marketplace() {
+function MarketplaceContent() {
   const { screenSize, locale } = useContext(settings);
   const { addNotification } = useNotification();
   const {
@@ -359,6 +366,13 @@ export default function Marketplace() {
   const subcatParam = searchParams.get("subcat");
   const searchParam = searchParams.get("s") || searchParams.get("search") || "";
   const sortUiParam = searchParams.get("sort_by_ui");
+  const ownerParam = searchParams.get("owner");
+  const ownerTypeParam = searchParams.get("owner_type");
+  const ownerIdParam = searchParams.get("owner_id");
+  const ownerNameParam = searchParams.get("owner_name");
+  const hasOwnerFilter = Boolean(
+    ownerParam || (ownerTypeParam && ownerIdParam),
+  );
 
   const [adsData, setAdsData] = useState({
     ads: [],
@@ -396,6 +410,7 @@ export default function Marketplace() {
         cities: tableLocations?.cities || cities,
         areas: tableLocations?.areas || areas,
         compounds: tableLocations?.compounds || compounds,
+        ownerOnly: hasOwnerFilter,
       }),
     [
       areas,
@@ -405,6 +420,7 @@ export default function Marketplace() {
       governorates,
       meta.max_price,
       meta.max_area_m2,
+      hasOwnerFilter,
       subCategories,
       tableLocations,
       tableId,
@@ -530,9 +546,19 @@ export default function Marketplace() {
 
       if (selectedSort.backendOrder) filters.order = selectedSort.backendOrder;
       if (search) filters.search = search;
-      if (params.get("dep")) filters.table_id = params.get("dep");
-      if (params.get("cat")) filters.category = params.get("cat");
-      if (params.get("subcat")) filters.subCategory = params.get("subcat");
+      if (params.get("owner")) filters.owner = params.get("owner");
+      if (params.get("owner_type")) filters.owner_type = params.get("owner_type");
+      if (params.get("owner_id")) filters.owner_id = params.get("owner_id");
+
+      const ownerOnlyRequest = Boolean(
+        params.get("owner") || (params.get("owner_type") && params.get("owner_id")),
+      );
+
+      if (!ownerOnlyRequest) {
+        if (params.get("dep")) filters.table_id = params.get("dep");
+        if (params.get("cat")) filters.category = params.get("cat");
+        if (params.get("subcat")) filters.subCategory = params.get("subcat");
+      }
 
       activeDynamicFilters.forEach((field) => {
         const value = getFilterValueForUrl(params, field);
@@ -696,6 +722,11 @@ export default function Marketplace() {
   );
 
   const handleRemoveFilter = (filterKey) => {
+    if (filterKey === "owner") {
+      updateUrl({ owner: null, owner_type: null, owner_id: null });
+      return;
+    }
+
     if (filterKey === "search") {
       updateUrl({ s: null, search: null });
       return;
@@ -726,7 +757,16 @@ export default function Marketplace() {
 
   const handleClearAllFilters = () => {
     setSelectedCategory({ cat: null, subCat: null });
-    const updates = { dep: null, cat: null, subcat: null, s: null, search: null };
+    const updates = {
+      dep: null,
+      cat: null,
+      subcat: null,
+      s: null,
+      search: null,
+      owner: null,
+      owner_type: null,
+      owner_id: null,
+    };
 
     activeDynamicFilters.forEach((field) => {
       if (field.uiType === "range") {
@@ -770,6 +810,12 @@ export default function Marketplace() {
                 selectedCategory={selectedCategory}
                 dynamicFilters={selectedDynamicFilters}
                 searchText={searchParam}
+                ownerFilter={{
+                  owner: ownerParam,
+                  ownerType: ownerTypeParam,
+                  ownerId: ownerIdParam,
+                  ownerName: ownerNameParam,
+                }}
                 onRemoveCategory={handleRemoveCategory}
                 onRemoveFilter={handleRemoveFilter}
                 onClearAll={handleClearAllFilters}
@@ -877,5 +923,13 @@ export default function Marketplace() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function Marketplace() {
+  return (
+    <Suspense fallback={null}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }

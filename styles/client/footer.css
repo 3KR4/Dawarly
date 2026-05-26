@@ -176,6 +176,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  direction: ltr;
 }
 
 .company-info .footer-logo img {
@@ -187,12 +188,7 @@
   font-size: 28px;
   font-weight: bolder;
   font-family: cursive;
-  text-transform: lowercase;
-}
-
-[lang="ar"] .company-info .footer-logo span {
-  font-family: "Cairo";
-  font-weight: 900;
+  text-transform: none;
 }
 
 .company-description {

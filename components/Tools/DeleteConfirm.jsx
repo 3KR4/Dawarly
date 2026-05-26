@@ -24,7 +24,7 @@ export default function DeleteConfirm({
       }
 
       if (!rejectInput || rejectInput.trim().length < 3) {
-        setFieldError("Please enter a valid reason");
+        setFieldError(t.confirm.validReasonRequired);
         return;
       }
 
@@ -42,7 +42,7 @@ export default function DeleteConfirm({
       {menuType === "delete" && (
         <div className="warning">
           <CircleAlert />
-          <p>This item will be permanently deleted</p>
+          <p>{t.confirm.deleteMessage}</p>
         </div>
       )}
 
@@ -58,7 +58,7 @@ export default function DeleteConfirm({
                   setRejectInput(e.target.value);
                   if (fieldError) setFieldError(null);
                 }}
-                placeholder={t.ad?.theRejectReason || "Type the reject reason"}
+                placeholder={t.ad?.theRejectReason || t.confirm.rejectReasonPlaceholder}
               />
             </div>
 
@@ -75,7 +75,7 @@ export default function DeleteConfirm({
       {/* BUTTONS */}
       <div className="buttons-holder">
         <button type="button" className="main-button cancel" onClick={onCancel}>
-          Cancel
+          {t.common.cancel}
         </button>
 
         <button
@@ -87,9 +87,9 @@ export default function DeleteConfirm({
           {loading ? (
             <span className="loader"></span>
           ) : menuType === "delete" ? (
-            "Delete"
+            t.common.delete
           ) : (
-            "Reject"
+            t.common.reject
           )}
         </button>
       </div>

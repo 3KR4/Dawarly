@@ -5,6 +5,16 @@ import api, { refreshAccessToken, setAccessToken } from "@/services/axios";
 
 const AuthContext = createContext(null);
 
+const storeUser = (user) => {
+  localStorage.setItem("user", JSON.stringify(user));
+  window.dispatchEvent(new CustomEvent("user-preferences-updated", {
+    detail: {
+      language: user?.language,
+      theme: user?.theme,
+    },
+  }));
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   const login = ({ user, accessToken }) => {
     setAccessToken(accessToken);
     setUser(user);
-    localStorage.setItem("user", JSON.stringify(user));
+    storeUser(user);
   };
 
   // ================= LOGOUT =================
@@ -35,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.get("/auth/me");
       setUser(res.data);
-      localStorage.setItem("user", JSON.stringify(res.data));
+      storeUser(res.data);
     } catch (err) {
       setUser(null);
       localStorage.removeItem("user");
@@ -75,7 +85,7 @@ export const AuthProvider = ({ children }) => {
         favorites_count: newCount,
       };
 
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      storeUser(updatedUser);
 
       return updatedUser;
     });

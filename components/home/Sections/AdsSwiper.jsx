@@ -329,7 +329,7 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
             onClick={() => swiperRef.current?.slidePrev()}
             disabled={isBeginning}
           >
-            <FaArrowLeft />
+            {locale === "ar" ? <FaArrowRight /> : <FaArrowLeft />}
           </button>
         )}
 
@@ -355,7 +355,7 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
             onClick={() => swiperRef.current?.slideNext()}
             disabled={isEnd}
           >
-            <FaArrowRight />
+            {locale === "ar" ? <FaArrowLeft /> : <FaArrowRight />}
           </button>
         )}
       </div>

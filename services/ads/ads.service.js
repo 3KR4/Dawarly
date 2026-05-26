@@ -1,4 +1,4 @@
-import api from "../axios";
+import api, { plainApi } from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
 /* ================= REGISTER ================= */
@@ -19,6 +19,9 @@ export const userAds = (id, status, search, page, limit) => {
 };
 export const crateAd = (tableId, payload) => {
   return api.post(ENDPOINTS.ADS.CREATE(tableId), payload);
+};
+export const createAnonymousAd = (tableId, payload) => {
+  return plainApi.post(ENDPOINTS.ADS.CREATE(tableId), payload);
 };
 export const updateAd = (tableId, adId, payload) => {
   return api.patch(ENDPOINTS.ADS.UPDATE(tableId, adId), payload);

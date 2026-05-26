@@ -77,7 +77,7 @@ export default function Favorites() {
       console.error("toggleFavorite err", err);
       addNotification({
         type: "warning",
-        message: err.response?.data?.message || "Something went wrong ❌",
+        message: err.response?.data?.message || t.common.somethingWentWrong,
       });
     }
   };

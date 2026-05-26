@@ -4,8 +4,10 @@ import { CircleAlert } from "lucide-react";
 import { selectors } from "@/Contexts/selectors";
 import { useContext } from "react";
 import { FaCircleInfo } from "react-icons/fa6";
+import useTranslate from "@/Contexts/useTranslation";
 
 function Specs() {
+  const t = useTranslate();
   const { specifications, setSpecifications, compsErrors, updateCompsError } =
     useContext(selectors);
 
@@ -54,7 +56,7 @@ function Specs() {
 
   return (
     <div className="box forInput">
-      <label>specifications</label>
+      <label>{t.common.specifications}</label>
 
       <ul className="spec-list">
         {specifications?.map((spec, i) => (

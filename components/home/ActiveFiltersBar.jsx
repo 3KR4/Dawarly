@@ -11,6 +11,7 @@ const ActiveFiltersBar = ({
   selectedCategory,
   dynamicFilters,
   searchText,
+  ownerFilter,
   onRemoveCategory,
   onRemoveFilter,
   onClearAll,
@@ -122,6 +123,51 @@ const ActiveFiltersBar = ({
     });
   }
 
+  if (ownerFilter?.owner === "dawaarly") {
+    activeFilters.push({
+      key: "owner",
+      value: ownerFilter.owner,
+      display: locale === "ar" ? "إعلانات دورلي" : "Dawaarly ads",
+    });
+  } else if (ownerFilter?.ownerType && ownerFilter?.ownerId) {
+    const ownerName = ownerFilter.ownerName || "";
+    const ownerLabel = ownerName
+      ? locale === "ar"
+        ? `إعلانات ${ownerName}`
+        : `${ownerName} ads`
+      : locale === "ar"
+        ? "إعلانات المستخدم"
+        : "User ads";
+
+    activeFilters.push({
+      key: "owner",
+      value: ownerFilter.ownerId,
+      display: ownerLabel,
+    });
+  }
+
+  if (dynamicFilters) {
+    const dynamicFilterEntries = Object.entries(dynamicFilters);
+    const departmentFilter = dynamicFilterEntries.find(([key]) => key === "dep");
+    const otherDynamicFilters = dynamicFilterEntries.filter(([key]) => key !== "dep");
+
+    [departmentFilter, ...otherDynamicFilters].filter(Boolean).forEach(([key, value]) => {
+      const isEmpty =
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === "object" &&
+          !Array.isArray(value) &&
+          Object.keys(value).length === 0);
+
+      if (!isEmpty) {
+        const display = getFilterDisplayName(key, value);
+        if (display) activeFilters.push({ key, value, display });
+      }
+    });
+  }
+
   if (selectedCategory?.cat) {
     const display = getFilterDisplayName("cat", selectedCategory.cat);
     if (display) {
@@ -140,25 +186,12 @@ const ActiveFiltersBar = ({
     }
   }
 
-  if (dynamicFilters) {
-    Object.entries(dynamicFilters).forEach(([key, value]) => {
-      const isEmpty =
-        value === null ||
-        value === undefined ||
-        value === "" ||
-        (Array.isArray(value) && value.length === 0) ||
-        (typeof value === "object" &&
-          !Array.isArray(value) &&
-          Object.keys(value).length === 0);
+  const orderedActiveFilters = [...activeFilters].sort((a, b) => {
+    const priority = { owner: 0, dep: 1, category_tree: 1, search: 2, cat: 3, subCat: 4 };
+    return (priority[a.key] ?? 4) - (priority[b.key] ?? 4);
+  });
 
-      if (!isEmpty) {
-        const display = getFilterDisplayName(key, value);
-        if (display) activeFilters.push({ key, value, display });
-      }
-    });
-  }
-
-  if (screenSize === "large" && activeFilters.length === 0) return null;
+  if (screenSize === "large" && orderedActiveFilters.length === 0) return null;
 
   return (
     <div className="active-filters-bar">
@@ -170,12 +203,14 @@ const ActiveFiltersBar = ({
       </div>
 
       <div className="filters-list">
-        {activeFilters.map((filter) => (
+        {orderedActiveFilters.map((filter) => (
           <div
             key={filter.key}
             className="filter-tag"
             onClick={() => {
-              if (filter.key === "search") {
+              if (filter.key === "owner") {
+                onRemoveFilter("owner");
+              } else if (filter.key === "search") {
                 onRemoveFilter("search");
               } else if (filter.key === "cat" || filter.key === "subCat") {
                 onRemoveCategory(filter.key);
@@ -189,7 +224,7 @@ const ActiveFiltersBar = ({
           </div>
         ))}
 
-        {activeFilters.length > 1 && (
+        {orderedActiveFilters.length > 1 && (
           <button className="clear-all-btn" onClick={onClearAll}>
             {t.actions.clear_all}
           </button>
