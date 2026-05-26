@@ -74,7 +74,7 @@ export async function generateMetadata({ params, searchParams }) {
       siteName: "Dawaarly",
       type: "article",
       images: [
-        {
+        { 
           url: getAbsoluteUrl(coverImage),
           width: 1200,
           height: 630,
