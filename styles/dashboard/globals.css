@@ -208,7 +208,7 @@ header .actions-btns .userMenu .top {
 }
 .table-container.for-users .table-header,
 .table-container.for-users .table-item {
-  grid-template-columns: 1.25fr 1fr 1.25fr 1.5fr 1fr 1fr 0.5fr;
+  grid-template-columns: 1.25fr 1fr 1.25fr 1.5fr 1.15fr 1fr 0.5fr;
 }
 .table-container.for-users .table-item {
   padding: 0.5rem 1rem;
@@ -279,6 +279,9 @@ header .actions-btns .userMenu .top {
 .table-container .item-overview.onlyOne {
   grid-template-columns: 1fr;
 }
+.table-container .item-overview a {
+  flex: 1;
+}
 .table-container .item-overview h4 {
   display: flex;
   align-items: center;
@@ -300,9 +303,23 @@ header .actions-btns .userMenu .top {
   background: #fcddec;
   color: #ff98ca;
 }
+.table-container .item-overview h4.active {
+  color: #6abf67;
+  background: #ddf1dd;
+}
 .table-container.for-users .item-overview h4 {
   width: 50%;
   margin: auto;
+}
+.table-container.for-users .item-overview.users-ads-counts {
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+.table-container.for-users .item-overview.users-ads-counts h4 {
+  width: auto;
+  min-width: 31%;
+  margin: 0;
+  padding: 7px 9px;
 }
 .table-container .nisted {
   display: flex;

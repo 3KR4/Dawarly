@@ -619,6 +619,24 @@
   height: 35px;
   border: none;
 }
+.single-page .details-holder .right .user-info .main-button.whatsapp-button,
+.single-page .details-holder .right .user-info .main-button.whatsapp-button > * {
+  background: #25d366;
+  color: #ffffff;
+}
+.single-page .details-holder .right .user-info .main-button.whatsapp-button {
+  border: 1px solid #25d366;
+}
+.single-page .details-holder .right .user-info .main-button.whatsapp-button:hover,
+.single-page
+  .details-holder
+  .right
+  .user-info
+  .main-button.whatsapp-button:hover
+  > * {
+  background: #1ebe5d;
+  color: #ffffff;
+}
 .single-page .details-holder .right .user-info .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));

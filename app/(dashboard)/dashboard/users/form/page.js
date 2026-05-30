@@ -13,6 +13,7 @@ import {
   updateRole,
   updateSubscriperProfile,
   updateUserProfile,
+  updateUserBasicInfo,
 } from "@/services/auth/auth.service";
 import { PiTiktokLogo } from "react-icons/pi";
 import { FiFacebook } from "react-icons/fi";
@@ -57,7 +58,7 @@ export default function UsersForm() {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
   const isMyProfile = userId == user?.id;
-
+  const canEdit = isMyProfile || user?.is_super_admin;
   const {
     register,
     handleSubmit,
@@ -231,7 +232,11 @@ export default function UsersForm() {
       const messages = [];
 
       if (updates.profile) {
-        const res = await updateUserProfile(updates.profile);
+        const res =
+          user?.is_super_admin && !isMyProfile
+            ? await updateUserBasicInfo(userId, updates.profile)
+            : await updateUserProfile(updates.profile);
+
         if (res?.data?.message) messages.push(res.data.message);
       }
 
@@ -283,7 +288,7 @@ export default function UsersForm() {
   };
 
   return (
-    <div className={`form-holder create-ad`}>
+    <div className={`form-holder user-data-form`}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         style={{
@@ -327,9 +332,7 @@ export default function UsersForm() {
               )}
             </div>
           </div>
-          <div
-            className="row-holder two"
-          >
+          <div className="row-holder two">
             <div className="box forInput">
               <label>{t.auth.fullName}</label>
               <div className="inputHolder">
@@ -337,7 +340,7 @@ export default function UsersForm() {
                   <UserRound />
                   <input
                     type="text"
-                    disabled={!isMyProfile}
+                    disabled={!canEdit}
                     {...register("fullname", {
                       required: t.auth.errors.requiredFullName,
                       validate: (value) => {
@@ -372,7 +375,7 @@ export default function UsersForm() {
                 <div className="holder">
                   <Phone />
                   <input
-                    disabled={!isMyProfile}
+                    disabled={!canEdit}
                     type="tel"
                     id="phone"
                     {...register("phone", {
@@ -397,11 +400,9 @@ export default function UsersForm() {
         </div>
 
         {/* ================= ADDRESS SELECTION ================= */}
-        <div
-          className="row-holder two"
-        >
+        <div className="row-holder two">
           <SelectOptions
-            disabled={!isMyProfile}
+            disabled={!canEdit}
             label={t.location.yourGovernorate}
             placeholder={t.location.selectGovernorate}
             options={governorates}
@@ -414,7 +415,7 @@ export default function UsersForm() {
             required={true}
           />
           <SelectOptions
-            disabled={!isMyProfile || !additionalData?.gov}
+            disabled={!canEdit || !additionalData?.gov}
             label={t.location.yourCity}
             placeholder={t.location.selectCity}
             options={cities}
@@ -430,9 +431,7 @@ export default function UsersForm() {
         {selectedType?.id == "SUBUSER" && (
           <div className="form-section ">
             <h2 className="section-title">{t.auth.SubscriptionDetails}</h2>
-            <div
-              className="row-holder two"
-            >
+            <div className="row-holder two">
               {/* Facebook */}
               <div className="box forInput">
                 <label>{t.auth.facebook}</label>
@@ -440,7 +439,7 @@ export default function UsersForm() {
                   <div className="holder">
                     <FiFacebook />
                     <input
-                      disabled={!isMyProfile}
+                      disabled={!canEdit}
                       type="text"
                       {...register("facebook_link", {
                         pattern: {
@@ -467,7 +466,7 @@ export default function UsersForm() {
                   <div className="holder">
                     <PiTiktokLogo />
                     <input
-                      disabled={!isMyProfile}
+                      disabled={!canEdit}
                       type="text"
                       {...register("tiktok_link", {
                         pattern: {
@@ -492,9 +491,7 @@ export default function UsersForm() {
 
         <div className="form-section ">
           <h2 className="section-title">{t.auth.rolesAndPermitions}</h2>
-          <div
-            className="row-holder two"
-          >
+          <div className="row-holder two">
             <SelectOptions
               label={t.auth.role}
               placeholder={t.auth.placeholders.role}

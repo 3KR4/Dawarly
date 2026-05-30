@@ -1,7 +1,7 @@
 "use client";
 import useTranslate from "@/Contexts/useTranslation";
 import "@/styles/dashboard/tables.css";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useCallback, useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
 import { settings } from "@/Contexts/settings";
@@ -38,7 +38,7 @@ export default function ActiveAds() {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
   // ================= FETCH ADS =================
-  const fetchUsers = async (
+  const fetchUsers = useCallback(async (
     page = users.pagination.page,
     search = searchText,
   ) => {
@@ -59,10 +59,10 @@ export default function ActiveAds() {
         users.pagination.limit || 12,
       );
 
-      setUsers({
-        users: res.data.users || [], // صححت المفتاح
-        pagination: res.data.pagination || users.pagination,
-      });
+      setUsers((prev) => ({
+        users: res.data.users || [],
+        pagination: res.data.pagination || prev.pagination,
+      }));
     } catch (err) {
       console.error(err);
       addNotification({
@@ -72,14 +72,22 @@ export default function ActiveAds() {
     } finally {
       setLoadingContent(false);
     }
-  };
+  }, [
+    addNotification,
+    searchText,
+    selectedPermissions,
+    selectedType,
+    t.common.fetchError,
+    users.pagination.limit,
+    users.pagination.page,
+  ]);
 
   // ================= INITIAL FETCH =================
   useEffect(() => {
     if (!loading) {
       fetchUsers(1);
     }
-  }, [loading, selectedType, selectedPermissions]);
+  }, [fetchUsers, loading]);
   // ================= HANDLERS =================
 
   const handlePageChange = (newPage) => {

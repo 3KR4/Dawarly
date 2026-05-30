@@ -1,7 +1,7 @@
 "use client";
 import useTranslate from "@/Contexts/useTranslation";
 import "@/styles/dashboard/tables.css";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useCallback, useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
 import { getAllAds, deleteAd, changeStatus } from "@/services/ads/ads.service";
@@ -13,12 +13,17 @@ import Pagination from "@/components/Tools/Pagination";
 import { IoCloseSharp } from "react-icons/io5";
 import { AdStatuses } from "@/data/enums";
 import { useAuth } from "@/Contexts/AuthContext";
-
+import { useRouter, useSearchParams } from "next/navigation";
 export default function ActiveAds() {
   const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
   const { addNotification } = useNotification();
   const { loading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const ownerFilterId = searchParams.get("user");
+  const ownerFilterType = searchParams.get("user_type");
   // 🌟 State واحدة للإعلانات + Pagination
   const [adsData, setAdsData] = useState({
     ads: [],
@@ -33,37 +38,43 @@ export default function ActiveAds() {
   const [loadingContent, setLoadingContent] = useState(false);
 
   // ================= FETCH ADS =================
-  const fetchAds = async (page = 1, search) => {
-    try {
-      setLoadingContent(true);
+  const fetchAds = useCallback(
+    async (page = 1) => {
+      try {
+        setLoadingContent(true);
 
-      const res = await getAllAds({
-        page,
-        limit: adsData.pagination.limit,
-        status: "PENDING",
-      });
+        const res = await getAllAds({
+          scope: "dashboard",
+          page,
+          limit: adsData.pagination.limit,
+          status: "PENDING",
+          user: ownerFilterId || null,
+          user_type: ownerFilterType || null,
+        });
 
-      setAdsData({
-        ads: res.data.data || [],
-        pagination: res.data.pagination || adsData.pagination,
-      });
-    } catch (err) {
-      console.error(err);
-      addNotification({
-        type: "warning",
-        message: "Failed to fetch ads from server ❌",
-      });
-    } finally {
-      setLoadingContent(false);
-    }
-  };
+        setAdsData((prev) => ({
+          ads: res.data.data || [],
+          pagination: res.data.pagination || prev.pagination,
+        }));
+      } catch (err) {
+        console.error(err);
+        addNotification({
+          type: "warning",
+          message: "Failed to fetch ads from server ❌",
+        });
+      } finally {
+        setLoadingContent(false);
+      }
+    },
+    [addNotification, adsData.pagination.limit, ownerFilterId, ownerFilterType],
+  );
 
   // ================= INITIAL FETCH =================
   useEffect(() => {
     if (!loading) {
       fetchAds(1);
     }
-  }, [loading]);
+  }, [fetchAds, loading]);
   // ================= HANDLERS =================
   const handleDeleteAd = async (ad) => {
     try {
@@ -109,6 +120,15 @@ export default function ActiveAds() {
   const handlePageChange = (newPage) => {
     fetchAds(newPage);
   };
+  const handleOwnerClick = (owner) => {
+    if (!owner?.id) return;
+
+    const params = new URLSearchParams();
+    params.set("user", owner.id);
+    params.set("user_type", owner.type);
+
+    router.push(`/dashboard/ads/all?${params.toString()}`);
+  };
 
   return (
     <div className="dash-holder">
@@ -120,6 +140,8 @@ export default function ActiveAds() {
         changeStatus={handelChangeStatus}
         activeAds={false}
         statusChanger={"aprover"}
+        showOwnerDetails={true}
+        onOwnerClick={handleOwnerClick}
       />
 
       {/* ================= PAGINATION ================= */}

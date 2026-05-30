@@ -44,6 +44,9 @@ export const getCurrentUser = () => {
 export const updateUserProfile = (payload) => {
   return api.patch(ENDPOINTS.AUTH.UPDATE_USER_PROFILE(), payload);
 };
+export const updateUserBasicInfo  = (id,payload) => {
+  return api.patch(ENDPOINTS.AUTH.UPDATE_USER_BASIC_INFO(id), payload);
+};
 export const updateSubscriperProfile = (payload) => {
   return api.patch(ENDPOINTS.AUTH.UPDATE_SUBSCRIBER_PROFILE(), payload);
 };

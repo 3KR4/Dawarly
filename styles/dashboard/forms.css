@@ -1,4 +1,4 @@
-.dashboard .box.forInput .inputHolder .holder input {
+.dashboard:not(:has(.user-data-form)) .box.forInput .inputHolder .holder input {
   height: 43px;
   padding: 0 10px !important;
 }

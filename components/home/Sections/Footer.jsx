@@ -30,24 +30,17 @@ function Footer() {
 
   const footerLinks = {
     quickLinks: [
-      // { name: t.footer.aboutUs, href: "/about" },
       { name: t.footer.contactUs, href: "/contact" },
-      // { name: t.footer.howItWorks, href: "/how-it-works" },
-      // { name: t.footer.faq, href: "/faq" },
-      { name: t.footer.favorites, href: "/favorites" },
-
-      { name: t.footer.blog, href: "/blog" },
+      { name: t.footer.blog, href: "/blogs" },
     ],
     forBuyers: [
       { name: t.footer.browseListings, href: "/market" },
-      { name: t.footer.searchByLocation, href: "/market?location" },
-      { name: t.footer.searchByCategory, href: "/market?category" },
+      { name: t.footer.favorites, href: "/favorites" },
+      { name: t.footer.requestUploadAd, href: "/request-ad" },
     ],
     forSellers: [
       { name: t.footer.postAd, href: "/mylisting/createAd" },
       { name: t.footer.myListings, href: "/mylisting" },
-      { name: t.footer.pricing, href: "/pricing" },
-      { name: t.footer.advertising, href: "/advertise" },
     ],
     legal: [
       { name: t.footer.termsOfUse, href: "/terms" },
@@ -58,7 +51,11 @@ function Footer() {
   };
 
   const socialLinks = [
-    { icon: <FaFacebookF />, href: "https://facebook.com", label: "Facebook" },
+    {
+      icon: <FaFacebookF />,
+      href: "https://www.facebook.com/profile.php?id=61590529229653",
+      label: "Facebook",
+    },
     // { icon: <FaTwitter />, href: "https://twitter.com", label: "Twitter" },
     {
       icon: <FaInstagram />,
@@ -217,4 +214,4 @@ function Footer() {
   );
 }
 
-export default Footer
+export default Footer;

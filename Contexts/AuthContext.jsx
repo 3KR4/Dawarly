@@ -5,8 +5,28 @@ import api, { refreshAccessToken, setAccessToken } from "@/services/axios";
 
 const AuthContext = createContext(null);
 
+const getStoredUser = () => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 const storeUser = (user) => {
   localStorage.setItem("user", JSON.stringify(user));
+  if (["ar", "en"].includes(user?.language)) {
+    localStorage.setItem("locale", user.language);
+    document.cookie = `locale=${user.language}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+  if (["light", "dark"].includes(user?.theme)) {
+    localStorage.setItem("theme", user.theme);
+    document.cookie = `theme=${user.theme}; path=/; max-age=31536000; SameSite=Lax`;
+  }
   window.dispatchEvent(new CustomEvent("user-preferences-updated", {
     detail: {
       language: user?.language,
@@ -16,7 +36,7 @@ const storeUser = (user) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getStoredUser);
   const [loading, setLoading] = useState(true);
 
   // ================= LOGIN =================
@@ -67,12 +87,6 @@ export const AuthProvider = ({ children }) => {
 
   // ================= INIT =================
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
     refreshAuth();
   }, []);
 

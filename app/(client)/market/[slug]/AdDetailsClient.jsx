@@ -8,7 +8,7 @@ import Navigations from "@/components/Tools/Navigations";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { TbBrandWhatsappFilled } from "react-icons/tb";
 import { FaLocationDot } from "react-icons/fa6";
-import { eachDayOfInterval } from "date-fns";
+// import { eachDayOfInterval } from "date-fns";
 import { FaHeart } from "react-icons/fa";
 import {
   FaAngleUp,
@@ -29,13 +29,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { FiShare2 } from "react-icons/fi";
+import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { BsFillLightningChargeFill, BsFillPatchCheckFill } from "react-icons/bs";
 
 import { settings } from "@/Contexts/settings";
 import { formatCurrency } from "@/utils/formatCurrency";
 import AdsSwiper from "@/components/home/Sections/AdsSwiper";
 import { specsConfig } from "@/Contexts/specsConfig";
-import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
+// import BookingRange from "@/components/Tools/data-collector/BookingCalendar";
 import { getOneAd } from "@/services/ads/ads.service";
 import { toggleFavorite } from "@/services/favorites/favorites.service";
 import {
@@ -74,6 +75,7 @@ export default function AdDetails() {
   const [favLoading, setFavLoading] = useState(false);
   const swiperRef = useRef(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [pageUrl, setPageUrl] = useState("");
 
   useEffect(() => {
     if (!tableId || !slug) {
@@ -89,6 +91,17 @@ export default function AdDetails() {
       .finally(() => setLoading(false));
   }, [slug, tableId]);
 
+  useEffect(() => {
+    const productionOrigin = "https://dawaarly.com";
+    const isLocalHost = ["localhost", "127.0.0.1"].includes(
+      window.location.hostname,
+    );
+
+    setPageUrl(
+      `${isLocalHost ? productionOrigin : window.location.origin}${window.location.pathname}${window.location.search}`,
+    );
+  }, [slug, tableId]);
+
   const activeTableId = Number(ad?.department?.id || tableId);
   const favoriteTableId = getAdTableId(ad) || activeTableId;
   const userHasFavorited = Boolean(
@@ -97,6 +110,7 @@ export default function AdDetails() {
   const tableRule = useMemo(() => getTableRule(activeTableId), [activeTableId]);
   const isRentAd = tableRule.isRent || Boolean(ad?.rent_frequency);
   const isSaleAd = tableRule.isSale || Boolean(ad?.payment_method);
+  const isAdmin = user?.user_type === "ADMIN" || user?.is_super_admin;
 
   const getSpecConfig = (key) => specsConfig[key] || {};
 
@@ -319,6 +333,10 @@ export default function AdDetails() {
             subuser.id
           }&owner_name=${encodeURIComponent(subuser.full_name || "")}`
         : "/market";
+  const adShareUrl =
+    pageUrl ||
+    `https://dawaarly.com/market/${slug}?dep=${favoriteTableId || tableId || ""}`;
+  const whatsappMessage = encodeURIComponent(`${adShareUrl}\n\n`);
 
   if (loading) {
     return <AdDetailsSkeleton />;
@@ -515,6 +533,11 @@ export default function AdDetails() {
                       <span>
                         <FaEye /> {ad?.views_count}
                       </span>
+                      {isAdmin && (
+                        <span>
+                          <BiSolidPurchaseTagAlt /> {ad?.reach_count}
+                        </span>
+                      )}
                       <span>
                         <FaHeart /> {ad?.favorites_count}
                       </span>
@@ -667,39 +690,41 @@ export default function AdDetails() {
                 <h4>{t.ad.description}</h4>{" "}
                 <p style={{ whiteSpace: "pre-line" }}>{ad?.description}</p>
               </div>
+              {/* Booking is temporarily hidden.
               {isRentAd && (
-              <div className="card booking" id="booknow">
-                <h4>{t.ad.book_now}</h4>
+                <div className="card booking" id="booknow">
+                  <h4>{t.ad.book_now}</h4>
 
-                {ad?.min_rent_period && (
-                  <p className="min_rent_period">
-                    {t.ad.minimum_rent_period}{" "}
-                    <span>
-                      {ad?.min_rent_period}{" "}
-                      {
-                        RentPeriodUnit.find(
-                          (x) => x.id == ad?.min_rent_period_unit,
-                        )?.[`name_${locale}`]
-                      }
-                    </span>
-                  </p>
-                )}
-                {ad?.available_from && (
-                  <p>
-                    {t.ad.available_from}{" "}
-                    <span>
-                      {" "}
-                      {new Date(ad?.available_from).toLocaleDateString(
-                        locale,
-                      )}{" "}
-                      {t.ad.to}:{" "}
-                      {new Date(ad?.available_to).toLocaleDateString(locale)}
-                    </span>
-                  </p>
-                )}
-                <BookingRange data={ad} />
-              </div>
+                  {ad?.min_rent_period && (
+                    <p className="min_rent_period">
+                      {t.ad.minimum_rent_period}{" "}
+                      <span>
+                        {ad?.min_rent_period}{" "}
+                        {
+                          RentPeriodUnit.find(
+                            (x) => x.id == ad?.min_rent_period_unit,
+                          )?.[`name_${locale}`]
+                        }
+                      </span>
+                    </p>
+                  )}
+                  {ad?.available_from && (
+                    <p>
+                      {t.ad.available_from}{" "}
+                      <span>
+                        {" "}
+                        {new Date(ad?.available_from).toLocaleDateString(
+                          locale,
+                        )}{" "}
+                        {t.ad.to}:{" "}
+                        {new Date(ad?.available_to).toLocaleDateString(locale)}
+                      </span>
+                    </p>
+                  )}
+                  <BookingRange data={ad} />
+                </div>
               )}
+              */}
             </div>
             <div className="right">
               <div className="card user-info">
@@ -751,21 +776,23 @@ export default function AdDetails() {
                       <a
                         href={`https://wa.me/${formatPhoneForWhatsApp(
                           contactOwner?.phone,
-                        )}`}
+                        )}?text=${whatsappMessage}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="main-button"
+                        className="main-button whatsapp-button"
                       >
                         <TbBrandWhatsappFilled /> {t.ad.whatsapp}
                       </a>
                     )}
                   </div>
 
+                  {/* Booking is temporarily hidden.
                   {isRentAd && (
                     <Link href="#booknow" className="main-button">
                       {t.ad.book_now}
                     </Link>
                   )}
+                  */}
                 </div>
               </div>
 

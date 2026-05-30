@@ -9,7 +9,7 @@ const API_URL =
   (!CONFIGURED_API_URL || CONFIGURED_API_URL.includes("localhost"))
     ? `${SITE_URL}/api-proxy`
     : CONFIGURED_API_URL || "http://localhost:5000";
-const FALLBACK_IMAGE = `${SITE_URL}/logo-favicon.png`;
+const FALLBACK_IMAGE = `${SITE_URL}/og-image.png`;
 const FALLBACK_DESCRIPTION =
   "Find your next getaway with Dawaarly, the platform that connects renters with property owners across Egypt.";
 

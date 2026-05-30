@@ -68,6 +68,7 @@ export default function Blogs() {
       blogs.pagination.limit,
       selectedStatus?.id || null,
       search !== undefined ? search : searchText,
+      "dashboard",
     )
       .then((res) => {
         setBlogs(res.data);
