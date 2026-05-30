@@ -23,6 +23,43 @@ import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { uploadImages } from "@/services/images/images.service";
 import { useSearchParams } from "next/navigation";
 
+const createEmptyListItem = () => ({
+  id: Date.now(),
+  value: { en: "", ar: "" },
+});
+
+const parseTagsForInput = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((tag) => String(tag).trim()).filter(Boolean);
+  }
+
+  if (typeof value !== "string") return [];
+
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.map((tag) => String(tag).trim()).filter(Boolean);
+    }
+  } catch {}
+
+  return value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+};
+
+const mergeListItems = (enList = [], arList = []) => {
+  const maxLength = Math.max(enList.length, arList.length, 1);
+
+  return Array.from({ length: maxLength }, (_, index) => ({
+    id: Date.now() + index,
+    value: {
+      en: enList[index]?.value || "",
+      ar: arList[index]?.value || "",
+    },
+  }));
+};
+
 const headingLevels = [
   { id: 1, name_en: "Main Title (H1)", name_ar: "العنوان الرئيسي (H1)" },
   { id: 2, name_en: "Section Title (H2)", name_ar: "عنوان قسم (H2)" },
@@ -51,8 +88,6 @@ export default function CreateBlogPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [coverImage, setCoverImage] = useState([]);
   const [sectionImages, setSectionImages] = useState({});
-
-  console.log(sectionImages);
 
   const [sections, setSections] = useState([]);
   const [blogId, setBlogId] = useState(null);
@@ -91,7 +126,7 @@ export default function CreateBlogPage() {
   const fetchBlog = async () => {
     setLoadingContent(true);
     try {
-      const res = await getOneBlog(blogSlug);
+      const res = await getOneBlog(blogSlug, "dashboard");
       const blog = res?.data;
       setBlogId(blog.id);
       // ===== FORM =====
@@ -107,7 +142,7 @@ export default function CreateBlogPage() {
       setValue("meta_desc.en", blog.meta_desc_en);
       setValue("meta_desc.ar", blog.meta_desc_ar);
 
-      setTags(blog.tags ? blog.tags.split(",").map((tag) => tag.trim()) : []);
+      setTags(parseTagsForInput(blog.tags));
       // ===== SECTIONS =====
       const mergedSections = blog.content_en.map((enSec, index) => {
         const arSec = blog.content_ar[index];
@@ -131,7 +166,10 @@ export default function CreateBlogPage() {
           image_id: enSec.image_id || null,
 
           image: enSec.image || null,
-          items: enSec.list || arSec?.list || [],
+          items:
+            enSec.type === "list"
+              ? mergeListItems(enSec.list, arSec?.list)
+              : undefined,
         };
       });
 
@@ -205,6 +243,11 @@ export default function CreateBlogPage() {
               !lastSection.label?.en?.trim() && !lastSection.label?.ar?.trim()
             );
 
+          case "list":
+            return !(lastSection.items || []).some(
+              (item) => item.value?.en?.trim() || item.value?.ar?.trim(),
+            );
+
           case "image":
             return (
               !sectionImages?.[lastSection.id] ||
@@ -237,7 +280,7 @@ export default function CreateBlogPage() {
       level: type === "heading" ? 1 : null,
       link: "",
       image_id: null,
-      items: type === "list" ? [] : undefined,
+      items: type === "list" ? [createEmptyListItem()] : undefined,
     };
 
     setSections((prev) => [...prev, newSection]);
@@ -294,12 +337,19 @@ export default function CreateBlogPage() {
 
   // ================= BUILD PAYLOAD =================
   const buildPayload = (data, sectionsWithImages) => {
+    const tagsValue = tags.map((tag) => String(tag).trim()).filter(Boolean).join(",");
+
     return {
       title_en: data.title.en,
       title_ar: data.title.ar,
 
       description_en: data.description.en,
       description_ar: data.description.ar,
+      meta_title_en: data.meta_title.en,
+      meta_title_ar: data.meta_title.ar,
+      meta_desc_en: data.meta_desc.en,
+      meta_desc_ar: data.meta_desc.ar,
+      tags: tagsValue,
 
       content_en: sectionsWithImages.map((sec, index) => ({
         type: sec.type,
@@ -311,7 +361,13 @@ export default function CreateBlogPage() {
         level: sec.level || null,
         link: sec.link || null,
         image_id: sec.image_id || null,
-        list: sec.type === "list" ? sec.items || [] : null,
+        list:
+          sec.type === "list"
+            ? (sec.items || []).map((item) => ({
+                id: item.id,
+                value: item.value?.en || "",
+              }))
+            : null,
       })),
 
       content_ar: sectionsWithImages.map((sec, index) => ({
@@ -324,6 +380,13 @@ export default function CreateBlogPage() {
         level: sec.level || null,
         link: sec.link || null,
         image_id: sec.image_id || null,
+        list:
+          sec.type === "list"
+            ? (sec.items || []).map((item) => ({
+                id: item.id,
+                value: item.value?.ar || "",
+              }))
+            : null,
       })),
     };
   };
@@ -402,7 +465,7 @@ export default function CreateBlogPage() {
           meta_title_ar: data.meta_title.ar,
           meta_desc_en: data.meta_desc.en,
           meta_desc_ar: data.meta_desc.ar,
-          tags: tags?.join(",") || "",
+          tags: tags.map((tag) => String(tag).trim()).filter(Boolean).join(","),
         });
 
         currentBlogId = createRes?.data?.id;
@@ -548,7 +611,7 @@ export default function CreateBlogPage() {
                 </div>
               </div>
 
-              <Tags disabled={null} />
+              <Tags inputMode="textarea" />
             </div>
           </div>
         </div>
@@ -640,13 +703,12 @@ export default function CreateBlogPage() {
                   <div className="holder">
                     <ul style={{ flex: 1 }}>
                       {(sec.items || []).map((item, index) => {
-                        console.log("item:", sec.items);
                         return (
                           <li key={item.id}>
                             <div className="inputHolder">
                               <div className="holder">
                                 <input
-                                  value={item.value}
+                                  value={item.value?.[currentLocale] || ""}
                                   placeholder="list item..."
                                   onChange={(e) => {
                                     const value = e.target.value;
@@ -658,7 +720,13 @@ export default function CreateBlogPage() {
                                         const updatedItems = [
                                           ...(s.items || []),
                                         ];
-                                        updatedItems[index].value = value;
+                                        updatedItems[index] = {
+                                          ...updatedItems[index],
+                                          value: {
+                                            ...(updatedItems[index].value || {}),
+                                            [currentLocale]: value,
+                                          },
+                                        };
 
                                         return { ...s, items: updatedItems };
                                       }),
@@ -685,7 +753,10 @@ export default function CreateBlogPage() {
                             // ================= VALIDATION =================
                             const lastItem = items[items.length - 1];
 
-                            if (lastItem && !lastItem.value?.trim()) {
+                            if (
+                              lastItem &&
+                              !lastItem.value?.[currentLocale]?.trim()
+                            ) {
                               addNotification({
                                 type: "error",
                                 message:
@@ -696,7 +767,7 @@ export default function CreateBlogPage() {
 
                             return {
                               ...s,
-                              items: [...items, { id: Date.now(), value: "" }],
+                              items: [...items, createEmptyListItem()],
                             };
                           }),
                         );

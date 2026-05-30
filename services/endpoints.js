@@ -14,6 +14,7 @@ export const ENDPOINTS = {
     ONE_USER: (id) => `/auth/users/${id}`,
     ME: () => "/auth/me",
     UPDATE_USER_PROFILE: () => `/auth/profile`,
+    UPDATE_USER_BASIC_INFO: (id) => `/auth/users/${id}/basic-info`,
     UPDATE_SUBSCRIBER_PROFILE: () => `/auth/subuser-profile`,
     UPDATE_PERMISSIONS: (id) => `/auth/${id}/permissions`,
     MAKE_SUBER_ADMIN: (id) => `/auth/${id}/super-admin`,
@@ -33,7 +34,18 @@ export const ENDPOINTS = {
       return `/ads/sections?${query.toString()}`;
     },
     GET_ALL: () => `/ads/all`,
-    GET_ONE_AD: (tableId, adId) => `/ads/${tableId}/${adId}`,
+    GET_ONE_AD: (tableId, adId, params = {}) => {
+      const query = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          query.append(key, value);
+        }
+      });
+
+      const queryString = query.toString();
+      return `/ads/${tableId}/${adId}${queryString ? `?${queryString}` : ""}`;
+    },
     GET_USER_ADS: (id, status, search, page, limit) => {
       const params = new URLSearchParams();
 
@@ -69,15 +81,16 @@ export const ENDPOINTS = {
     DELETE: (id) => `/sliders/${id}`,
   },
   BLOGS: {
-    GET_ALL: (page, limit, status, search) => {
+    GET_ALL: (page, limit, status, search, scope) => {
       let url = `/blogs?page=${page}&limit=${limit}`;
 
       if (status) url += `&status=${status}`;
       if (search) url += `&search=${search}`;
+      if (scope) url += `&scope=${scope}`;
 
       return url;
     },
-    GET_ONE: (slug) => `/blogs/${slug}`,
+    GET_ONE: (slug, scope) => `/blogs/${slug}${scope ? `?scope=${scope}` : ""}`,
     CREATE: () => `/blogs`,
     UPDATE: (slug) => `/blogs/${slug}`,
     DELETE: (slug) => `/blogs/${slug}`,

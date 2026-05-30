@@ -1,11 +1,11 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 
-export const getAllBlogs = (page = 1, limit = 8, status, search) => {
-  return api.get(ENDPOINTS.BLOGS.GET_ALL(page, limit, status, search));
+export const getAllBlogs = (page = 1, limit = 8, status, search, scope) => {
+  return api.get(ENDPOINTS.BLOGS.GET_ALL(page, limit, status, search, scope));
 };
-export const getOneBlog = (slug) => {
-  return api.get(ENDPOINTS.BLOGS.GET_ONE(slug));
+export const getOneBlog = (slug, scope) => {
+  return api.get(ENDPOINTS.BLOGS.GET_ONE(slug, scope));
 };
 export const createBlog = (payload) => {
   return api.post(ENDPOINTS.BLOGS.CREATE(), payload);

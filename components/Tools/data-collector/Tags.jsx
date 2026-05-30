@@ -1,11 +1,17 @@
 import React from "react";
-import { useState, useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { CircleAlert } from "lucide-react";
 import { selectors } from "@/Contexts/selectors";
 import useTranslate from "@/Contexts/useTranslation";
 
-export default function Tags({ disabled = false }) {
+const parseTagsText = (value) =>
+  value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+export default function Tags({ disabled = false, inputMode = "chips" }) {
   const {
     tags,
     setTags,
@@ -16,6 +22,21 @@ export default function Tags({ disabled = false }) {
   } = useContext(selectors);
 
   const t = useTranslate();
+  const [rawTagsText, setRawTagsText] = useState(tags.join(","));
+  const skipNextRawSync = useRef(false);
+
+  useEffect(() => {
+    if (inputMode !== "textarea") return;
+
+    if (skipNextRawSync.current) {
+      skipNextRawSync.current = false;
+      return;
+    }
+
+    queueMicrotask(() => {
+      setRawTagsText(tags.join(","));
+    });
+  }, [inputMode, tags]);
 
   const addTag = () => {
     const trimmed = compsInput.tags.trim();
@@ -39,6 +60,38 @@ export default function Tags({ disabled = false }) {
     setTags(tags.filter((_, i) => i !== index));
     updateCompsError("tags", "");
   };
+
+  if (inputMode === "textarea") {
+    return (
+      <div className={`box forInput ${disabled ? "disabled" : ""}`}>
+        <label>{t.ad.tags.label}</label>
+
+        <div className="inputHolder tags">
+          <div className="holder">
+            <textarea
+              value={rawTagsText}
+              onChange={(e) => {
+                const value = e.target.value;
+                setRawTagsText(value);
+                skipNextRawSync.current = true;
+                setTags(parseTagsText(value));
+                updateCompsError("tags", "");
+              }}
+              placeholder={t.ad.tags.placeholder}
+              rows={3}
+              disabled={disabled}
+            />
+          </div>
+          {compsErrors.tags && (
+            <span className="error">
+              <CircleAlert />
+              {compsErrors.tags}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`box forInput ${disabled ? "disabled" : ""}`}>

@@ -39,6 +39,10 @@
 .dash-holder.for-client .table-item {
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
+.table-container.with-owner-details .table-header,
+.table-container.with-owner-details .table-item {
+  grid-template-columns: 1.5fr 0.7fr 0.8fr 1fr 1fr 1fr 1fr 0.7fr;
+}
 .header-item {
   justify-content: center;
   align-items: center;
@@ -65,18 +69,6 @@
 }
 .table-item:last-child {
   border-color: transparent;
-}
-.table-item.anonymous-row {
-  background: #ededed;
-  border-inline-start: 6px solid var(--paragraph);
-}
-.table-item.user-row {
-  background: #e9f2ff;
-  border-inline-start: 6px solid #1d73d4;
-}
-.table-item.subuser-row {
-  background: #fff3e6;
-  border-inline-start: 6px solid #f28c28;
 }
 .table-item .item-image {
   display: flex;
@@ -106,7 +98,7 @@
 .table-container .table-items .holder {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 .table-container .table-items > * {
   color: var(--paragraph);
@@ -193,6 +185,84 @@
   align-items: center;
   gap: 0.5rem;
 }
+.owner-details {
+  color: var(--paragraph);
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  display: flex;
+  border-radius: 11px;
+  padding: 9px;
+  background: #fdecd2;
+  justify-content: center;
+  align-items: center;
+}
+.owner-details:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.owner-details:not(:disabled):hover {
+  border-color: var(--main-color);
+  color: var(--main-color);
+}
+.owner-details .row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 5px;
+  align-items: center;
+}
+.owner-details .column {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.owner-details span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.owner-details .owner-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.owner-details .owner-phone {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.owner-details .owner-type {
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.owner-details:has(.owner-type.anonymous) {
+  background: #d5d5d5;
+}
+.owner-details:has(.owner-type.user) {
+  background: #d5ebff;
+}
+.owner-details:has(.owner-type.subuser) {
+  background: #fdecd2;
+}
+.owner-details:has(.owner-type.admin) {
+  background: var(--hover-color);
+}
+.owner-details .owner-type.anonymous {
+  color: black;
+}
+.owner-details .owner-type.user {
+  color: #1d73d4;
+}
+.owner-details .owner-type.subuser {
+  color: #f28c28;
+}
+.owner-details .owner-type.admin {
+  color: var(--main-color);
+}
 .item-rating.center {
   gap: 0.2rem;
   font-size: 15px;
@@ -221,6 +291,10 @@
   .table-container .table-item {
     grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.45fr 0.9fr 0.6fr;
     gap: 10px;
+  }
+  .table-container.with-owner-details .table-header,
+  .table-container.with-owner-details .table-item {
+    grid-template-columns: 1fr 0.55fr 0.45fr 0.9fr 0.75fr 0.45fr 0.8fr 0.55fr;
   }
   .table-container.slieds-tasble .table-header,
   .table-container.slieds-tasble .table-item {
@@ -255,6 +329,10 @@
   .table-container .table-header,
   .table-container .table-item {
     grid-template-columns: 1fr 0.45fr 1fr 0.8fr 0.45fr 0.9fr 0.5fr;
+  }
+  .table-container.with-owner-details .table-header,
+  .table-container.with-owner-details .table-item {
+    grid-template-columns: 0.95fr 0.55fr 0.45fr 0.85fr 0.7fr 0.45fr 0.8fr 0.5fr;
   }
 
   .item-price {
@@ -300,6 +378,11 @@
   .table-container .table-item {
     grid-template-columns: 0.9fr 0.45fr 0.6fr 0.5fr 0.45fr 0.35fr 0.4fr;
     gap: 15px;
+  }
+  .table-container.with-owner-details .table-header,
+  .table-container.with-owner-details .table-item {
+    grid-template-columns: 0.9fr 0.55fr 0.45fr 0.6fr 0.5fr 0.4fr 0.5fr 0.4fr;
+    gap: 10px;
   }
 
   .table-container .item-overview h4 {
@@ -375,6 +458,11 @@
     padding: 0.42rem 0.7rem;
     grid-template-columns: 0.9fr 0.1fr 0.6fr 0.5fr 0.45fr 0.35fr 0.4fr;
     gap: 22px;
+  }
+  .table-container.with-owner-details .table-header,
+  .table-container.with-owner-details .table-item {
+    grid-template-columns: 0.85fr 0.55fr 0.25fr 0.55fr 0.45fr 0.35fr 0.45fr 0.35fr;
+    gap: 9px;
   }
   .table-container.pending-ads .table-header,
   .table-container.pending-ads .table-item {
@@ -462,6 +550,9 @@
   .table-container .table-item {
     gap: 7px;
     margin-bottom: 5px;
+  }
+  .owner-details {
+    width: calc(100% - 18px);
   }
   .table-container .table-header {
     display: none;

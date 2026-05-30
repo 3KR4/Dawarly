@@ -50,7 +50,7 @@ export default function Blog() {
         <div className="holder container">
           <h1 className="title">{blog?.[`title_${locale}`]}</h1>
 
-          {blog?.content_en?.map((item, index) => {
+          {(blog?.[`content_${locale}`] || []).map((item, index) => {
             switch (item.type) {
               case "paragraph":
                 return (

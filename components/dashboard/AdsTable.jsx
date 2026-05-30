@@ -35,6 +35,8 @@ export default function AdsTable({
   changeStatus,
   page = "dashboard",
   statusChanger = "admin",
+  showOwnerDetails = false,
+  onOwnerClick,
 }) {
   const { screenSize, locale } = useContext(settings);
   const t = useTranslate();
@@ -52,6 +54,45 @@ export default function AdsTable({
         : status.id === "ACTIVE" || status.id === "REJECTED",
   );
   const getSpecConfig = (key) => specsConfig[key];
+  const getOwnerInfo = (item) => {
+    if (item?.anonymous) {
+      return {
+        id: item.anonymous.id,
+        type: "anonymous",
+        name: item.anonymous.full_name,
+        phone: item.anonymous.phone,
+      };
+    }
+
+    if (item?.subuser) {
+      return {
+        id: item.subuser.id,
+        type: "subuser",
+        name: item.subuser.full_name,
+        phone: item.subuser.phone,
+      };
+    }
+
+    if (item?.user) {
+      return {
+        id: item.user.id,
+        type: "user",
+        name: item.user.full_name,
+        phone: item.user.phone,
+      };
+    }
+
+    if (item?.admin) {
+      return {
+        id: item.admin.id,
+        type: "admin",
+        name: item.admin.full_name,
+        phone: item.admin.phone,
+      };
+    }
+
+    return null;
+  };
 
   const closeMenu = () => {
     setMenuType(null);
@@ -76,7 +117,9 @@ export default function AdsTable({
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
       <div
-        className={`table-container products ${!activeAds ? "pending-ads" : ""}`}
+        className={`table-container products ${!activeAds ? "pending-ads" : ""} ${
+          showOwnerDetails ? "with-owner-details" : ""
+        }`}
       >
         <div className="table-header">
           {!screenSize.includes("small") && (
@@ -84,6 +127,11 @@ export default function AdsTable({
               <div className="header-item details">
                 {t.dashboard.tables.ad_details}
               </div>
+              {showOwnerDetails && (
+                <div className="header-item">
+                  {t.dashboard.tables.owner_details}
+                </div>
+              )}
               <div className="header-item">{t.ad.rentPrice}</div>
               {!activeAds && (
                 <div className="header-item">{t.ad.deposit_amount}</div>
@@ -144,16 +192,11 @@ export default function AdsTable({
               const curentStatus = AdStatuses.find((s) => s.id == item?.status);
               const tableId = getAdTableId(item);
               const itemWithTableId = { ...item, table_id: tableId };
+              const ownerInfo = getOwnerInfo(item);
               return (
                 <div
                   key={`${tableId}-${item?.id}`}
-                  className={`table-item ${item?.status} ${
-                    item?.anonymous_id || item?.anonymous ? "anonymous-row" : ""
-                  } ${
-                    item?.subuser_id || item?.subuser ? "subuser-row" : ""
-                  } ${
-                    item?.user_id || item?.user ? "user-row" : ""
-                  }`}
+                  className={`table-item ${item?.status}`}
                 >
                   <div className="holder">
                     <Link
@@ -198,6 +241,31 @@ export default function AdsTable({
                     </div>
                   </div>
 
+                  {showOwnerDetails && (
+                    <button
+                      type="button"
+                      className="owner-details"
+                      disabled={!ownerInfo?.id || !onOwnerClick}
+                      onClick={() => ownerInfo && onOwnerClick(ownerInfo)}
+                    >
+                      <div className="column">
+                        <span className="owner-name">
+                          {ownerInfo?.name || "Unknown owner"}
+                        </span>
+                        <div className="row">
+                          <span
+                            className={`owner-type ${ownerInfo?.type || ""}`}
+                          >
+                            {ownerInfo?.type || "unknown"}
+                          </span>
+                          <span className="owner-phone">
+                            {ownerInfo?.phone || "No phone"}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  )}
+
                   {screenSize === "small" || screenSize === "ultra-small" ? (
                     <>
                       <div className="item-categories nisted">
@@ -212,7 +280,7 @@ export default function AdsTable({
                           href={`/market?cat=${item?.category?.id}`}
                           className="link"
                         >
-                          {item?.category?.[`name_${locale}`]} 
+                          {item?.category?.[`name_${locale}`]}
                         </Link>
                       </div>
 
@@ -255,20 +323,20 @@ export default function AdsTable({
                         </div>
                       )}
 
-                        <div className="item-categories nisted">
-                          <Link
-                            href={`/market?dep=${item?.department?.id}`}
-                            className="link"
-                          >
-                            {item?.department?.[`name_${locale}`]} /
-                          </Link>
+                      <div className="item-categories nisted">
+                        <Link
+                          href={`/market?dep=${item?.department?.id}`}
+                          className="link"
+                        >
+                          {item?.department?.[`name_${locale}`]} /
+                        </Link>
 
-                          <Link
-                            href={`/market?cat=${item?.category?.id}`}
-                            className="link"
-                          >
-                            {item?.category?.[`name_${locale}`]} 
-                          </Link>
+                        <Link
+                          href={`/market?cat=${item?.category?.id}`}
+                          className="link"
+                        >
+                          {item?.category?.[`name_${locale}`]}
+                        </Link>
                       </div>
                     </>
                   )}
@@ -379,7 +447,9 @@ export default function AdsTable({
       </div>
       <DynamicMenu
         open={!!menuType}
-        title={menuType == "delete" ? t.common.confirmDelete : t.common.rejectReason}
+        title={
+          menuType == "delete" ? t.common.confirmDelete : t.common.rejectReason
+        }
         onClose={closeMenu}
       >
         <DeleteConfirm

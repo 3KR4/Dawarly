@@ -32,6 +32,7 @@ import {
   LandType,
   Levels,
   PaymentMethod,
+  Priority,
   RentFrequencies,
   RentPeriodUnit,
 } from "@/data/enums";
@@ -227,6 +228,7 @@ export default function AdForm({
   const [checkBoxes, setCheckBoxes] = useState({
     isFurnished: false,
     isReadyToMove: false,
+    isVerified: false,
   });
   const [images, setImages] = useState([]);
   const [originalImages, setOriginalImages] = useState([]);
@@ -242,6 +244,7 @@ export default function AdForm({
     landType: null,
     buildingType: null,
     buildingCondition: null,
+    priority: Priority[3],
   });
   const [rentAvailability, setRentAvailability] = useState({
     from: "",
@@ -586,7 +589,11 @@ export default function AdForm({
       const targetTableId = Number(initialTableId || tableId);
       if (!targetTableId || !adId) return;
 
-      const res = await getOneAd(targetTableId, adId);
+      const res = await getOneAd(
+        targetTableId,
+        adId,
+        type === "admin" ? { scope: "dashboard" } : undefined,
+      );
       console.log(res?.data);
 
       const ad = res?.data;
@@ -708,11 +715,16 @@ export default function AdForm({
             (getAdField(ad, "building_condition") ||
               getAdField(ad, "usage_type")),
         ) || null,
+      priority:
+        Priority.find(
+          (item) => item.id == getAdField(ad, "featured_priority"),
+        ) || Priority[1],
     });
 
     setCheckBoxes({
       isFurnished: getBooleanAdField(ad, "furnished"),
       isReadyToMove: getBooleanAdField(ad, "ready_to_move"),
+      isVerified: getBooleanAdField(ad, "is_verified"),
     });
 
     const activeAmenities = Amenities.filter((item) => {
@@ -932,6 +944,10 @@ export default function AdForm({
     }
     if (isFieldAllowed(tableId, "child_no_max")) {
       payload.child_no_max = getNumberOrNull(data.child_no_max);
+    }
+    if (type === "admin") {
+      payload.is_verified = checkBoxes.isVerified;
+      payload.featured_priority = additionalData.priority?.id ?? 0;
     }
 
     return {
@@ -2859,7 +2875,59 @@ export default function AdForm({
               />
             )}
 
-            <Tags disabled={!isEditable} />
+            {type === "admin" && (
+              <div className="form-section">
+                <h2 className="section-title">
+                  {t.ad.priority_verification || "Priority and verification"}
+                </h2>
+                <div
+                  className="row-holder"
+                  style={{ gridTemplateColumns: "0.5fr 1fr" }}
+                >
+                  <div className="box forInput">
+                    <div className="inputHolder">
+                      <div
+                        className="holder"
+                        style={{ padding: "7px", cursor: "pointer" }}
+                        onClick={() => toggleCheckBox("isVerified")}
+                      >
+                        <div className="checkbox-wrapper-13">
+                          <input
+                            id="isVerified"
+                            type="checkbox"
+                            checked={checkBoxes.isVerified}
+                            onChange={() => toggleCheckBox("isVerified")}
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                          <label htmlFor="isVerified">
+                            {checkBoxes.isVerified
+                              ? "Ad verified"
+                              : "Ad is not verified"}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <SelectOptions
+                    placeholder={t.ad.priorityPlaceholder || "Priority"}
+                    options={Priority}
+                    value={additionalData.priority}
+                    onChange={(item) => {
+                      setAdditionalData((prev) => ({
+                        ...prev,
+                        priority: item,
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <Tags
+              disabled={!isEditable}
+              inputMode={type === "admin" ? "textarea" : "chips"}
+            />
           </div>
 
           {needsAnonymousContact && (

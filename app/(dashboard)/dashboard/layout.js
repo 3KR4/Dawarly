@@ -46,7 +46,32 @@ const ProtectedDashboard = ({ children }) => {
 // ---------------- ROOT LAYOUT ----------------
 export default function RootLayout({ children }) {
   return (
-    <html lang="ar" dir="rtl" className={cairo.className}>
+    <html lang="ar" dir="rtl" className={cairo.className} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var locale = localStorage.getItem("locale");
+                if (locale !== "ar" && locale !== "en") {
+                  var storedUser = localStorage.getItem("user");
+                  var user = storedUser ? JSON.parse(storedUser) : null;
+                  locale = user && (user.language === "ar" || user.language === "en")
+                    ? user.language
+                    : "ar";
+                }
+                document.cookie = "locale=" + locale + "; path=/; max-age=31536000; SameSite=Lax";
+                document.documentElement.setAttribute("lang", locale);
+                document.documentElement.setAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+                if (locale !== "ar") {
+                  document.documentElement.setAttribute("data-locale-pending", "true");
+                }
+              } catch (error) {}
+            `,
+          }}
+        />
+        <style>{`html[data-locale-pending="true"] body { visibility: hidden; }`}</style>
+      </head>
       <body>
         <SettingsProvider>
           <NotificationProvider>

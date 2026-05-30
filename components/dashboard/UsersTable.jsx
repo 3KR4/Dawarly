@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from "react";
 import { settings } from "@/Contexts/settings";
 import useTranslate from "@/Contexts/useTranslation";
 import { TbListSearch } from "react-icons/tb";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaEye, FaTrashAlt } from "react-icons/fa";
 import { Permissions, UserTypes } from "@/data/enums";
 import Link from "next/link";
 import { FaCrown } from "react-icons/fa6";
@@ -34,6 +34,21 @@ export default function UsersTable({
     }, {});
   }, []);
 
+  const buildAdsUrl = (user, status) => {
+    const params = new URLSearchParams();
+
+    params.set("user", user.id);
+    params.set("user_type", user.user_type?.toLowerCase());
+
+    if (status) params.set("status", status);
+
+    if (status === "PENDING") {
+      return `/dashboard/ads/pending?${params.toString()}`;
+    }
+
+    return `/dashboard/ads/all?${params.toString()}`;
+  };
+
   return (
     <div
       className={`body ${page === "user" ? "fluid-container for-user" : ""}`}
@@ -47,7 +62,7 @@ export default function UsersTable({
               <div className="header-item">{t.common.phone}</div>
               <div className="header-item">{t.common.email}</div>
               <div className="header-item">{t.common.permissions}</div>
-              <div className="header-item">{t.common.activeAds}</div>
+              <div className="header-item">{t.common.allAds}</div>
               <div className="header-item">{t.common.joinAt}</div>
               <div className="header-item">{t.dashboard.tables.actions}</div>
             </>
@@ -79,7 +94,7 @@ export default function UsersTable({
             users.map((user) => {
               const type = userTypesMap[user.user_type];
               const isSuper = user.is_super_admin;
-
+              const isAdmin = user.user_type === "ADMIN" || user.is_super_admin;
               return (
                 <div key={user.id} className="table-item">
                   <div className="holder">
@@ -155,8 +170,9 @@ export default function UsersTable({
                   >
                     {type.id === "SUBUSER" ? (
                       <span style={{ color: type?.tx }}>
-                        {user.subscription_ads_limit > 0 ?
-                          `${user.subscription_ads_limit} active ads` : "-"}
+                        {user.subscription_ads_limit > 0
+                          ? `${user.subscription_ads_limit} active ads`
+                          : "-"}
                       </span>
                     ) : user.permissions?.length ? (
                       <>
@@ -194,19 +210,53 @@ export default function UsersTable({
                     )}
                   </div>
 
-                  {/* 📊 Active Ads */}
-                  <div className="item-overview onlyOne">
-                    <h4
-                      style={{
-                        background:
-                          type.id !== "USER" && user.active_ads_count > 0
-                            ? type?.bg
-                            : "transparent",
-                        color: type?.tx,
-                      }}
+                  {/* 📊 Ads counts */}
+                  <div className="item-overview users-ads-counts">
+                    <Link href={buildAdsUrl(user)} title={t.common.approvedAds}>
+                      <h4>
+                        {user.approved_ads_count > 0 ? (
+                          <>
+                            {user.approved_ads_count}
+                            <FaCheckCircle />
+                          </>
+                        ) : (
+                          "-"
+                        )}
+                      </h4>
+                    </Link>
+
+                    <Link
+                      href={buildAdsUrl(user, "ACTIVE")}
+                      title={t.common.activeAds}
                     >
-                      {user.active_ads_count > 0 ? user.active_ads_count : "-"}
-                    </h4>
+                      <h4 className="active">
+                        {user.active_ads_count > 0 ? (
+                          <>
+                            {user.active_ads_count}
+                            <FaEye />
+                          </>
+                        ) : (
+                          "-"
+                        )}
+                      </h4>
+                    </Link>
+                    {!isAdmin && (
+                      <Link
+                        href={buildAdsUrl(user, "PENDING")}
+                        title={t.common.pendingAds}
+                      >
+                        <h4 className="green">
+                          {user.pending_ads_count > 0 ? (
+                            <>
+                              {user.pending_ads_count}
+                              <FaClock />
+                            </>
+                          ) : (
+                            "-"
+                          )}
+                        </h4>
+                      </Link>
+                    )}
                   </div>
                   <p className="date">
                     {formatRelativeDate(user?.created_at, locale, "detailed")}

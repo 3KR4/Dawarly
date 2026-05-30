@@ -178,7 +178,9 @@
   margin-bottom: 10px;
   direction: ltr;
 }
-
+[lang="ar"]  .company-info .footer-logo {
+  justify-content: flex-end;
+}
 .company-info .footer-logo img {
   margin-right: -6px;
   margin-left: -5px;

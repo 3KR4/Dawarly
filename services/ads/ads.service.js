@@ -11,8 +11,8 @@ export const getAllAds = (filters) => {
   );
   return api.get(ENDPOINTS.ADS.GET_ALL(), { params });
 };
-export const getOneAd = (tableId, adId) => {
-  return api.get(ENDPOINTS.ADS.GET_ONE_AD(tableId, adId));
+export const getOneAd = (tableId, adId, params) => {
+  return api.get(ENDPOINTS.ADS.GET_ONE_AD(tableId, adId, params));
 };
 export const userAds = (id, status, search, page, limit) => {
   return api.get(ENDPOINTS.ADS.GET_USER_ADS(id, status, search, page, limit));

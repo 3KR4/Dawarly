@@ -7,6 +7,13 @@ export const settings = createContext();
 
 const DEFAULT_LOCALE = "ar";
 const DEFAULT_THEME = "light";
+const SUPPORTED_LOCALES = ["ar", "en"];
+
+const setPreferenceCookie = (key, value) => {
+  if (typeof document === "undefined") return;
+
+  document.cookie = `${key}=${value}; path=/; max-age=31536000; SameSite=Lax`;
+};
 
 const getStoredUser = () => {
   if (typeof window === "undefined") return null;
@@ -26,6 +33,18 @@ const updateStoredUser = (updates) => {
   localStorage.setItem("user", JSON.stringify({ ...user, ...updates }));
 };
 
+const getStoredLocale = (initialLocale = DEFAULT_LOCALE) => {
+  if (typeof window === "undefined") return initialLocale;
+
+  const storedLocale = localStorage.getItem("locale");
+  if (SUPPORTED_LOCALES.includes(storedLocale)) return storedLocale;
+
+  const user = getStoredUser();
+  if (SUPPORTED_LOCALES.includes(user?.language)) return user.language;
+
+  return initialLocale;
+};
+
 const getScreenSize = () => {
   if (typeof window === "undefined") return "large";
 
@@ -36,7 +55,7 @@ const getScreenSize = () => {
   return "large";
 };
 
-export const SettingsProvider = ({ children }) => {
+export const SettingsProvider = ({ children, initialLocale = DEFAULT_LOCALE }) => {
   const [screenSize, setScreenSize] = useState(getScreenSize);
   const pathname = usePathname();
   const [menuType, setMenuType] = useState(null);
@@ -89,6 +108,14 @@ export const SettingsProvider = ({ children }) => {
     if (!storedUser) return;
 
     updateStoredUser(updates);
+    if (SUPPORTED_LOCALES.includes(updates.language)) {
+      localStorage.setItem("locale", updates.language);
+      setPreferenceCookie("locale", updates.language);
+    }
+    if (["light", "dark"].includes(updates.theme)) {
+      localStorage.setItem("theme", updates.theme);
+      setPreferenceCookie("theme", updates.theme);
+    }
 
     try {
       const res = await updateUserProfile(updates);
@@ -109,12 +136,7 @@ export const SettingsProvider = ({ children }) => {
   };
 
   const [locale, setLocale] = useState(() => {
-    if (typeof window !== "undefined") {
-      const user = getStoredUser();
-
-      return user?.language || localStorage.getItem("locale") || DEFAULT_LOCALE;
-    }
-    return DEFAULT_LOCALE;
+    return getStoredLocale(initialLocale);
   });
 
   useEffect(() => {
@@ -124,6 +146,8 @@ export const SettingsProvider = ({ children }) => {
       locale === "ar" ? "rtl" : "ltr",
     );
     localStorage.setItem("locale", locale);
+    setPreferenceCookie("locale", locale);
+    document.documentElement.removeAttribute("data-locale-pending");
   }, [locale]);
 
   useEffect(() => {

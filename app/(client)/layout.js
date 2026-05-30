@@ -1,4 +1,5 @@
 import { Cairo } from "next/font/google";
+import { cookies } from "next/headers";
 import Header from "@/components/home/Sections/Header";
 import Footer from "@/components/home/Sections/Footer";
 import { SettingsProvider } from "@/Contexts/settings";
@@ -18,12 +19,17 @@ const cairo = Cairo({
   display: "swap",
 });
 
+const SITE_DESCRIPTION =
+  "Find your next getaway with Dawaarly - the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.";
+
 export const metadata = {
-  metadataBase: new URL("https://www.dawaarly.com"),
+  metadataBase: new URL("https://dawaarly.com"),
 
   title: "Dawaarly",
-  description:
-    "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "https://dawaarly.com",
+  },
 
   keywords: [
     "vacation rentals Egypt",
@@ -43,16 +49,15 @@ export const metadata = {
 
   openGraph: {
     title: "Dawaarly",
-    description:
-      "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
-    url: "https://www.dawaarly.com",
+    description: SITE_DESCRIPTION,
+    url: "https://dawaarly.com",
     siteName: "Dawaarly",
     images: [
       {
-        url: "/logo-favicon.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Dawaarly logo",
+        alt: "Dawaarly vacation rentals in Egypt",
       },
     ],
     locale: "ar_EG",
@@ -62,9 +67,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Dawaarly",
-    description:
-      "Find your next getaway with Dawaarly — the platform that connects renters with property owners for vacation homes, summer stays, and short-term rentals across Egypt. Simple, secure, and made for your perfect escape.",
-    images: ["/logo-favicon.png"],
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.png"],
   },
 
   icons: {
@@ -74,11 +78,43 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+const getInitialLocale = async () => {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value;
+  return locale === "en" || locale === "ar" ? locale : "ar";
+};
+
+export default async function RootLayout({ children }) {
+  const initialLocale = await getInitialLocale();
+
   return (
-    <html lang="ar" dir="rtl" className={cairo.className}>
+    <html
+      lang={initialLocale}
+      dir={initialLocale === "ar" ? "rtl" : "ltr"}
+      className={cairo.className}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var storedLocale = localStorage.getItem("locale");
+                var locale = storedLocale === "ar" || storedLocale === "en" ? storedLocale : "${initialLocale}";
+                document.cookie = "locale=" + locale + "; path=/; max-age=31536000; SameSite=Lax";
+                document.documentElement.setAttribute("lang", locale);
+                document.documentElement.setAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+                if (locale !== "${initialLocale}") {
+                  document.documentElement.setAttribute("data-locale-pending", "true");
+                }
+              } catch (error) {}
+            `,
+          }}
+        />
+        <style>{`html[data-locale-pending="true"] body { visibility: hidden; }`}</style>
+      </head>
       <body>
-        <SettingsProvider>
+        <SettingsProvider initialLocale={initialLocale}>
           <NotificationProvider>
             <AuthProvider>
               <FiltersProvider>
