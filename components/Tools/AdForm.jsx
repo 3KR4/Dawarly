@@ -106,18 +106,44 @@ const getAdIdFromResponse = (res) =>
   res?.data?.data?.ad?.id ??
   null;
 
-const DescriptionField = ({ disabled, register, t }) => (
+const AD_TITLE_MAX_LENGTH = 191;
+const AD_DESCRIPTION_MAX_LENGTH = 1200;
+
+const getMaxLengthMessage = (message, limit) =>
+  message?.replace("{limit}", limit) || `Must be ${limit} characters or less`;
+
+const DescriptionField = ({ disabled, errors, register, t }) => (
   <div className="box forInput">
     <label>{t.dashboard.forms.description}</label>
     <div className="inputHolder">
       <div className="holder">
         <textarea
-          {...register("description")}
+          {...register("description", {
+            required:
+              t.ad.errors.description ||
+              t.dashboard.forms.errors.required ||
+              "Description is required",
+            maxLength: {
+              value: AD_DESCRIPTION_MAX_LENGTH,
+              message: getMaxLengthMessage(
+                t.ad.errors.descriptionMax ||
+                  t.dashboard.forms.errors.descriptionMax,
+                AD_DESCRIPTION_MAX_LENGTH,
+              ),
+            },
+          })}
+          maxLength={AD_DESCRIPTION_MAX_LENGTH}
           placeholder={t.dashboard.forms.descriptionPlaceholder}
           rows={4}
           disabled={disabled}
         />
       </div>
+      {errors.description && (
+        <span className="error">
+          <CircleAlert />
+          {errors.description.message}
+        </span>
+      )}
     </div>
   </div>
 );
@@ -199,6 +225,8 @@ export default function AdForm({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [loadingReviewAction, setLoadingReviewAction] = useState(false);
   const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
+  const [updateWarningOpen, setUpdateWarningOpen] = useState(false);
+  const [pendingSubmitData, setPendingSubmitData] = useState(null);
   const [rejectInput, setRejectInput] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [contactSubmitAttempted, setContactSubmitAttempted] = useState(false);
@@ -629,7 +657,13 @@ export default function AdForm({
 
   const canEditAd = (ad) => {
     if (!ad || !user) return false;
-    const ownerId = ad.subuser?.id ?? ad.subuser_id;
+    const ownerId =
+      ad.subuser?.id ??
+      ad.subuser_id ??
+      ad.user?.id ??
+      ad.user_id ??
+      ad.admin?.id ??
+      ad.admin_id;
     return (
       ownerId === user.id || user.user_type === "ADMIN" || user.is_super_admin
     );
@@ -1112,6 +1146,9 @@ export default function AdForm({
 
     if (step === STEPS.BASICS) {
       const basicsFields = ["adTitle", "rentAmount"];
+      if (type === "admin") {
+        basicsFields.push("description");
+      }
 
       if (
         isFieldAllowed(tableId, "area_m2") &&
@@ -1137,6 +1174,9 @@ export default function AdForm({
         "adult_no_max",
         "child_no_max",
       ];
+      if (type !== "admin") {
+        detailsFields.push("description");
+      }
 
       if (!showCommercialDetails && !showBuildingLandDetails) {
         detailsFields.push("area_m2");
@@ -1409,6 +1449,11 @@ export default function AdForm({
     }
   };
 
+  const closeUpdateWarning = () => {
+    setUpdateWarningOpen(false);
+    setPendingSubmitData(null);
+  };
+
   const canGoBackInTaxonomy =
     isStepped &&
     step === STEPS.CATEGORY &&
@@ -1422,9 +1467,7 @@ export default function AdForm({
   const showCategoryRootTitle =
     !selectedCats.dep && !selectedVacationGroup && !selectedCats.cat;
 
-  const onSubmit = async (data) => {
-    if (!validateForm(data)) return;
-
+  const submitValidatedAd = async (data) => {
     const payload = buildPayload(data);
     setLoadingSubmit(true);
 
@@ -1483,6 +1526,23 @@ export default function AdForm({
     } finally {
       setLoadingSubmit(false);
     }
+  };
+
+  const onSubmit = async (data) => {
+    if (!validateForm(data)) return;
+
+    if (type === "client" && adId && user?.user_type === "USER") {
+      setPendingSubmitData(data);
+      setUpdateWarningOpen(true);
+      return;
+    }
+
+    await submitValidatedAd(data);
+  };
+
+  const confirmUserUpdate = async () => {
+    if (!pendingSubmitData) return;
+    await submitValidatedAd(pendingSubmitData);
   };
 
   const onInvalidSubmit = (validationErrors) => {
@@ -1918,7 +1978,16 @@ export default function AdForm({
                             value: 6,
                             message: t.ad.errors.adTitleValidation,
                           },
+                          maxLength: {
+                            value: AD_TITLE_MAX_LENGTH,
+                            message: getMaxLengthMessage(
+                              t.ad.errors.adTitleMax ||
+                                t.dashboard.forms.errors.titleMax,
+                              AD_TITLE_MAX_LENGTH,
+                            ),
+                          },
                         })}
+                        maxLength={AD_TITLE_MAX_LENGTH}
                         disabled={!isEditable}
                         placeholder={t.ad.placeholders.adTitle}
                       />
@@ -1932,9 +2001,10 @@ export default function AdForm({
                   </div>
                 </div>
 
-                {type === "admin" && (
+                {(type === "admin" || adId) && (
                   <DescriptionField
                     disabled={!isEditable}
+                    errors={errors}
                     register={register}
                     t={t}
                   />
@@ -2867,9 +2937,10 @@ export default function AdForm({
           )}
 
           <div className={`form-section ${getStepClass(STEPS.DETAILS)}`}>
-            {type !== "admin" && (
+            {type !== "admin" && !adId && (
               <DescriptionField
                 disabled={!isEditable}
+                errors={errors}
                 register={register}
                 t={t}
               />
@@ -2924,10 +2995,7 @@ export default function AdForm({
               </div>
             )}
 
-            <Tags
-              disabled={!isEditable}
-              inputMode={type === "admin" ? "textarea" : "chips"}
-            />
+            <Tags disabled={!isEditable} />
           </div>
 
           {needsAnonymousContact && (
@@ -3124,6 +3192,18 @@ export default function AdForm({
             onConfirm={(reason) => handleReviewStatus("REJECTED", reason)}
             onCancel={closeReviewMenu}
             loading={loadingReviewAction}
+          />
+        </DynamicMenu>
+        <DynamicMenu
+          open={updateWarningOpen}
+          title={t.confirm.updatePendingTitle}
+          onClose={closeUpdateWarning}
+        >
+          <DeleteConfirm
+            menuType="updateWarning"
+            onConfirm={confirmUserUpdate}
+            onCancel={closeUpdateWarning}
+            loading={loadingSubmit}
           />
         </DynamicMenu>
       </div>

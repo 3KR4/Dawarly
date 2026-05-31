@@ -17,7 +17,7 @@ export default function DeleteConfirm({
 
   const handleConfirm = async () => {
     try {
-      if (menuType === "delete") {
+      if (menuType === "delete" || menuType === "updateWarning") {
         await onConfirm?.();
         onCancel();
         return;
@@ -39,10 +39,14 @@ export default function DeleteConfirm({
   return (
     <div className="confirm-box">
       {/* DELETE MESSAGE */}
-      {menuType === "delete" && (
+      {(menuType === "delete" || menuType === "updateWarning") && (
         <div className="warning">
           <CircleAlert />
-          <p>{t.confirm.deleteMessage}</p>
+          <p>
+            {menuType === "updateWarning"
+              ? t.confirm.updatePendingMessage
+              : t.confirm.deleteMessage}
+          </p>
         </div>
       )}
 
@@ -88,6 +92,8 @@ export default function DeleteConfirm({
             <span className="loader"></span>
           ) : menuType === "delete" ? (
             t.common.delete
+          ) : menuType === "updateWarning" ? (
+            t.ad.update_ad
           ) : (
             t.common.reject
           )}

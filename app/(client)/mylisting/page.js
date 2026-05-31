@@ -46,6 +46,8 @@ export default function MyAdsListing() {
 
   // ================= FETCH ADS =================
   const fetchAds = async (page = 1, search) => {
+    if (!user?.id) return;
+
     try {
       setLoadingContent(true);
 
@@ -74,10 +76,10 @@ export default function MyAdsListing() {
 
   // ================= INITIAL FETCH =================
   useEffect(() => {
-    if (!loading) {
+    if (!loading && user?.id) {
       fetchAds(1);
     }
-  }, [loading, selectedStatus]);
+  }, [loading, selectedStatus, user?.id]);
   // ================= HANDLERS =================
 
   const handlePageChange = (newPage) => {

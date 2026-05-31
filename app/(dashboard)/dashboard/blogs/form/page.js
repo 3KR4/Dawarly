@@ -69,6 +69,12 @@ const headingLevels = [
   { id: 6, name_en: "Minor Heading (H6)", name_ar: "عنوان ثانوي (H6)" },
 ];
 
+const BLOG_TITLE_MAX_LENGTH = 191;
+const BLOG_DESCRIPTION_MAX_LENGTH = 1200;
+
+const getMaxLengthMessage = (message, limit) =>
+  message?.replace("{limit}", limit) || `Must be ${limit} characters or less`;
+
 export default function CreateBlogPage() {
   const searchParams = useSearchParams();
 
@@ -103,6 +109,8 @@ export default function CreateBlogPage() {
     register,
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
     watch,
     formState: { errors },
   } = useForm({
@@ -117,6 +125,65 @@ export default function CreateBlogPage() {
 
   const watchTitle = watch("title");
   const watchDescription = watch("description");
+
+  const validateLocalizedBlogFields = (data) => {
+    const fieldPaths = [
+      "title.en",
+      "title.ar",
+      "description.en",
+      "description.ar",
+    ];
+    clearErrors(fieldPaths);
+
+    for (const locale of ["en", "ar"]) {
+      const title = String(data.title?.[locale] || "").trim();
+      const description = String(data.description?.[locale] || "").trim();
+
+      if (!title) {
+        setCurrentLocale(locale);
+        setError(`title.${locale}`, {
+          type: "required",
+          message: t.dashboard.forms.errors.required || "Required",
+        });
+        return false;
+      }
+
+      if (title.length > BLOG_TITLE_MAX_LENGTH) {
+        setCurrentLocale(locale);
+        setError(`title.${locale}`, {
+          type: "maxLength",
+          message: getMaxLengthMessage(
+            t.dashboard.forms.errors.titleMax,
+            BLOG_TITLE_MAX_LENGTH,
+          ),
+        });
+        return false;
+      }
+
+      if (!description) {
+        setCurrentLocale(locale);
+        setError(`description.${locale}`, {
+          type: "required",
+          message: t.dashboard.forms.errors.required || "Required",
+        });
+        return false;
+      }
+
+      if (description.length > BLOG_DESCRIPTION_MAX_LENGTH) {
+        setCurrentLocale(locale);
+        setError(`description.${locale}`, {
+          type: "maxLength",
+          message: getMaxLengthMessage(
+            t.dashboard.forms.errors.descriptionMax,
+            BLOG_DESCRIPTION_MAX_LENGTH,
+          ),
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   // ===== FETCH (EDIT MODE) =====
   useEffect(() => {
@@ -435,6 +502,8 @@ export default function CreateBlogPage() {
   };
 
   const onSubmit = async (data) => {
+    if (!validateLocalizedBlogFields(data)) return;
+
     if (!coverImage?.length) {
       addNotification({
         type: "error",
@@ -539,8 +608,17 @@ export default function CreateBlogPage() {
                       key={currentLocale}
                       placeholder={"enter the blog title"}
                       {...register(`title.${currentLocale}`, {
-                        required: "Required",
+                        required:
+                          t.dashboard.forms.errors.required || "Required",
+                        maxLength: {
+                          value: BLOG_TITLE_MAX_LENGTH,
+                          message: getMaxLengthMessage(
+                            t.dashboard.forms.errors.titleMax,
+                            BLOG_TITLE_MAX_LENGTH,
+                          ),
+                        },
                       })}
+                      maxLength={BLOG_TITLE_MAX_LENGTH}
                     />
                   </div>
                 </div>
@@ -565,11 +643,26 @@ export default function CreateBlogPage() {
                       key={currentLocale}
                       placeholder={"enter the blog description"}
                       {...register(`description.${currentLocale}`, {
-                        required: "Required",
+                        required:
+                          t.dashboard.forms.errors.required || "Required",
+                        maxLength: {
+                          value: BLOG_DESCRIPTION_MAX_LENGTH,
+                          message: getMaxLengthMessage(
+                            t.dashboard.forms.errors.descriptionMax,
+                            BLOG_DESCRIPTION_MAX_LENGTH,
+                          ),
+                        },
                       })}
+                      maxLength={BLOG_DESCRIPTION_MAX_LENGTH}
                     />
                   </div>
                 </div>
+                {errors?.description?.[currentLocale] && (
+                  <span className="error">
+                    <CircleAlert />
+                    {errors.description[currentLocale].message}
+                  </span>
+                )}
               </div>
               <Images
                 images={coverImage}
@@ -611,7 +704,7 @@ export default function CreateBlogPage() {
                 </div>
               </div>
 
-              <Tags inputMode="textarea" />
+              <Tags />
             </div>
           </div>
         </div>

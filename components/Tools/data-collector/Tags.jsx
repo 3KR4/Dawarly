@@ -39,19 +39,28 @@ export default function Tags({ disabled = false, inputMode = "chips" }) {
   }, [inputMode, tags]);
 
   const addTag = () => {
-    const trimmed = compsInput.tags.trim();
+    const parsedTags = parseTagsText(compsInput.tags).map((tag) =>
+      tag.toLowerCase(),
+    );
+    const uniqueNewTags = parsedTags.filter(
+      (tag, index) => parsedTags.indexOf(tag) === index,
+    );
+    const validTags = uniqueNewTags.filter((tag) => tag.length >= 3);
 
-    if (!trimmed || trimmed.length < 3) {
+    if (!validTags.length) {
       updateCompsError("tags", t.ad.tags.errors.minLength);
       return;
     }
 
-    if (tags.includes(trimmed.toLowerCase())) {
+    const existingTags = tags.map((tag) => String(tag).toLowerCase());
+    const tagsToAdd = validTags.filter((tag) => !existingTags.includes(tag));
+
+    if (!tagsToAdd.length) {
       updateCompsError("tags", t.ad.tags.errors.duplicate);
       return;
     }
 
-    setTags([...tags, trimmed.toLowerCase()]);
+    setTags([...tags, ...tagsToAdd]);
     updateCompsInput("tags", "");
     updateCompsError("tags", "");
   };
