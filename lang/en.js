@@ -168,6 +168,9 @@ const en = {
     errors: {
       adTitle: "Ad title is required",
       adTitleValidation: "Ad title is too short",
+      adTitleMax: "Ad title must be {limit} characters or less",
+      description: "Description is required",
+      descriptionMax: "Description must be {limit} characters or less",
       governorate: "Governorate is required",
       city: "City is required",
       category: "Category is required",
@@ -284,6 +287,9 @@ const en = {
   },
   confirm: {
     deleteMessage: "This item will be permanently deleted",
+    updatePendingTitle: "Be careful",
+    updatePendingMessage:
+      "Any change you make will return your ad to pending admin approval.",
     rejectReasonPlaceholder: "Type the reject reason",
     validReasonRequired: "Please enter a valid reason",
   },
@@ -413,7 +419,9 @@ const en = {
       errors: {
         titleRequired: "Product title is required",
         titleMin: "Title must be at least 3 characters",
+        titleMax: "Title must be {limit} characters or less",
         required: "This field is required",
+        descriptionMax: "Description must be {limit} characters or less",
         minOne: "Value must be at least 1",
         minZero: "Value cannot be less than 0",
         deposit_amount_reqire: "Deposit amount is required",

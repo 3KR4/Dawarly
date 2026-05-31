@@ -206,17 +206,17 @@
   color: var(--main-color);
 }
 .owner-details .row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 5px;
+  justify-content: center;
   align-items: center;
+  gap: 6px;
+  width: 100%;
+  display: flex;
 }
 .owner-details .column {
   display: flex;
   gap: 5px;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
 }
 .owner-details span {
   max-width: 100%;

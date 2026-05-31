@@ -533,7 +533,7 @@ function Header() {
                               </Link>
                             </li>
                           )}
-                          {user?.user_type !== "USER" && (
+                          {user && (
                             <li>
                               <Link href={`/mylisting`} className="btn">
                                 <FaListUl />
