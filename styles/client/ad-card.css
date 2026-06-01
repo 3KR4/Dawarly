@@ -37,6 +37,12 @@
   justify-content: space-between;
   gap: 8px;
 }
+.ad-card .image-holder .top .column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
 .ad-card .image-holder .top .department {
   color: var(--paragraph);
   background: #fff;
@@ -108,6 +114,12 @@
   border-color: white !important;
   border-bottom-color: #0000 !important;
 }
+.ad-card .image-holder .top .count {
+  transition: 0.3s;
+}
+.ad-card .image-holder .top .fav-btn:not(.active):hover .count {
+  color: white;
+}
 .ad-card .image-holder .top button:hover .loader {
   border-color: var(--main-color) !important;
   border-bottom-color: #0000 !important;
@@ -165,7 +177,7 @@
 
 .ad-card .body {
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
   padding: 13px 15px 11px;
   display: flex;
   background: var(--body-color);
@@ -179,10 +191,20 @@
   gap: 5px;
   justify-content: space-between;
 }
-.ad-card .body span,
+.ad-card > .row {
+  align-items: center;
+  gap: 5px;
+  display: flex;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-color);
+  transition: 0.3s;
+}
+.ad-card > .row > *:hover {
+  color: var(--main-color);
+}
+.ad-card span,
 .ad-card .body a,
 .ad-card .body .category {
-  border-radius: 50px;
   font-size: 14px;
   letter-spacing: 0.3px;
   font-weight: 700;
@@ -240,6 +262,7 @@
 .ad-card .date-area * {
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.3;
   color: var(--paragraph);
 }
 
@@ -257,9 +280,13 @@
   .ad-card .body h3 {
     font-size: 18px;
   }
-  .ad-card .image-holder .top {
-    padding: 8px 12px;
+
+  .ad-card .image-holder .top .fav-btn {
+    opacity: 1;
+    visibility: visible;
+    transform: unset;
   }
+
   .specs-holder .spec {
     height: 26px;
   }
@@ -279,7 +306,31 @@
   .specs-holder .spec svg.model_year {
     font-size: 15px;
   }
+
   .ad-card .date-area {
-    padding: 10px 14px;
+    padding: 14px;
+  }
+  .ad-card span {
+    font-size: 13px;
+  }
+  .ad-card .row-holder span {
+    font-size: 15px;
+  }
+  .ad-card .image-holder .top span.verified {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+  .ad-card .image-holder .top span svg {
+    font-size: 13px;
+  }
+  .ad-card .image-holder .top svg {
+    font-size: 16px;
+  }
+  .ad-card .image-holder .top .fav-btn {
+    height: fit-content;
+    padding: 5px 7px;
+  }
+  .ad-card .image-holder .bottom span {
+    padding: 4px 8px;
   }
 }

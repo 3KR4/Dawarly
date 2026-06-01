@@ -38,7 +38,7 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
   const vacationRoot = {
     id: "vacation_homes",
     name_en: "Vacation Homes",
-    name_ar: "بيوت مصيفية",
+    name_ar: "عقارات مصيفية",
     children: [],
   };
 

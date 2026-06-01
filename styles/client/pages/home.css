@@ -1,9 +1,9 @@
 .hero-section {
+  aspect-ratio: 5;
   border-radius: 0 0 50px 50px;
-  width: 85%;
-  position: relative;
-  aspect-ratio: 3;
+  width: 84%;
   margin: 0 auto 30px;
+  position: relative;
 }
 
 .hero-swiper {
@@ -46,7 +46,7 @@
 .slide-content {
   z-index: 2;
   color: #fff;
-  max-width: 40%;
+  max-width: 46%;
   width: fit-content;
   position: absolute;
   bottom: 40px;
@@ -60,12 +60,12 @@
 .slide-content::before {
   content: "";
   z-index: 0;
-  box-shadow: 0 0 150px 60px #000000;
   width: 100%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  box-shadow: 0 0 87px 32px #000;
 }
 
 .slide-title {
@@ -255,7 +255,9 @@
 @media (max-width: 500px) {
   .hero-section {
     aspect-ratio: 2.2;
+    margin-bottom: 10px;
   }
+
   .slide-content {
     min-width: 95%;
   }

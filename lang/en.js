@@ -318,6 +318,7 @@ const en = {
     create: "create",
   },
   location: {
+    egypt: "Egypt",
     egyptGovernorates: "egypt governorates",
     searchGovernorate: "Search in governorate...",
     searchCity: "Search in",

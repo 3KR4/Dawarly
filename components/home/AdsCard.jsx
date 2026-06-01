@@ -25,7 +25,7 @@ const preventAdImageContextMenu = (e) => {
 };
 
 export default function CardItem({ data }) {
-  const { locale } = useContext(settings);
+  const { locale, screenSize } = useContext(settings);
   const t = useTranslate();
   const { user, updateUserFavoritesCount } = useAuth();
   const router = useRouter();
@@ -125,6 +125,18 @@ export default function CardItem({ data }) {
           onContextMenu={preventAdImageContextMenu}
         />
         <div className="top">
+          <div className="column">
+            {data?.featured_priority > 0 && (
+              <span className="verified ellipsis">
+                <BsFillLightningChargeFill /> {t.ad.featured_ad}
+              </span>
+            )}
+            {data?.is_verified && (
+              <span className="verified ellipsis">
+                <BsFillPatchCheckFill /> {t.ad.verified}
+              </span>
+            )}
+          </div>
           <button
             className={`fav-btn ${isFavorite ? "active" : ""}`}
             onClick={(e) => {
@@ -147,22 +159,6 @@ export default function CardItem({ data }) {
               <span className="count">{favoritesCount}</span>
             )}
           </button>
-
-          {data?.featured_priority > 0 && (
-            <span className="verified ellipsis">
-              <BsFillLightningChargeFill /> {t.ad.featured_ad}
-            </span>
-          )}
-        </div>
-        <div className="bottom">
-          <span className="department ellipsis">
-            {data?.department?.[`name_${locale}`]}
-          </span>
-          {data?.is_verified && (
-            <span className="verified ellipsis">
-              <BsFillPatchCheckFill /> {t.ad.verified}
-            </span>
-          )}
         </div>
       </div>
       <div className="body">
@@ -173,20 +169,6 @@ export default function CardItem({ data }) {
           >
             {data?.title}
           </h4>
-          <h5
-            onClick={(e) => {
-              e.stopPropagation();
-              const params = new URLSearchParams();
-              if (data?.department?.id || data?.table_id) {
-                params.set("dep", data?.department?.id || data?.table_id);
-              }
-              if (data?.category?.id) params.set("cat", data.category.id);
-              router.push(`/market?${params.toString()}`);
-            }}
-            className={`category ellipsis`}
-          >
-            {data?.category?.[`name_${locale}`]}
-          </h5>
         </div>
         <div className="row-holder">
           <h3>{formatCurrency(data?.price, data?.currency, locale)}</h3>
@@ -198,6 +180,25 @@ export default function CardItem({ data }) {
             }
           </span>
         </div>
+      </div>
+      <div className="row">
+        <span className="department ellipsis">
+          {data?.department?.[`name_${locale}`]}
+        </span>
+        /
+        <h5
+          onClick={(e) => {
+            e.stopPropagation();
+            const params = new URLSearchParams();
+            if (data?.department?.id || data?.table_id) {
+              params.set("dep", data?.department?.id || data?.table_id);
+            }
+            if (data?.category?.id) params.set("cat", data.category.id);
+            router.push(`/market?${params.toString()}`);
+          }}
+        >
+          {data?.category?.[`name_${locale}`]}
+        </h5>
       </div>
       <div className="specs-holder">
         {Object.entries(data?.details || {})

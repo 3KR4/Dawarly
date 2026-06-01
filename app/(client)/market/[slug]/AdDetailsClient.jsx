@@ -11,8 +11,6 @@ import { FaLocationDot } from "react-icons/fa6";
 // import { eachDayOfInterval } from "date-fns";
 import { FaHeart } from "react-icons/fa";
 import {
-  FaAngleUp,
-  FaAngleDown,
   FaAngleRight,
   FaAngleLeft,
   FaArrowRight,
@@ -22,15 +20,19 @@ import {
 } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 
+import { FaImage } from "react-icons/fa";
+
+
 import useTranslate from "@/Contexts/useTranslation";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/navigation";
 
 import { FiShare2 } from "react-icons/fi";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
-import { BsFillLightningChargeFill, BsFillPatchCheckFill } from "react-icons/bs";
+import {
+  BsFillLightningChargeFill,
+  BsFillPatchCheckFill,
+} from "react-icons/bs";
 
 import { settings } from "@/Contexts/settings";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -73,9 +75,13 @@ export default function AdDetails() {
   const [currentImg, setCurrentImg] = useState(0);
   const [loading, setLoading] = useState(Boolean(tableId && slug));
   const [favLoading, setFavLoading] = useState(false);
-  const swiperRef = useRef(null);
+  const mainSwiperRef = useRef(null);
+  const thumbsSwiperRef = useRef(null);
+  const fullscreenSwiperRef = useRef(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+  const [isImagesFullscreenOpen, setIsImagesFullscreenOpen] = useState(false);
+  const [fullscreenMode, setFullscreenMode] = useState("grid");
 
   useEffect(() => {
     if (!tableId || !slug) {
@@ -170,7 +176,10 @@ export default function AdDetails() {
     "building_condition",
   ]);
 
-  const rentFrequencyLabel = getOptionLabel(RentFrequencies, ad?.rent_frequency);
+  const rentFrequencyLabel = getOptionLabel(
+    RentFrequencies,
+    ad?.rent_frequency,
+  );
   const rentPeriodUnitLabel = getOptionLabel(
     RentPeriodUnit,
     ad?.min_rent_period_unit,
@@ -235,18 +244,81 @@ export default function AdDetails() {
     { name: t.ad.ad_details, href: "" },
   ].filter(Boolean);
 
-  const swiperDirection = screenSize === "large" ? "vertical" : "horizontal";
+  const swiperDirection = "horizontal";
   const slidesView =
-    screenSize === "ultra-small" ? 4 : screenSize === "small" ? 5 : 6;
-  const space = screenSize === "large" ? 7 : 6;
+    screenSize === "ultra-small" ? 2 : screenSize === "small" ? 3 : 7;
+  const space = 6;
 
-  const showThumbNav = ad?.images?.length > slidesView;
   const showMainImageNav = ad?.images?.length > 1;
 
   const goToImage = (index) => {
     setCurrentImg(index);
-    swiperRef.current?.slideTo(index);
+    mainSwiperRef.current?.slideTo(index);
+    thumbsSwiperRef.current?.slideTo(index);
   };
+
+  const handleMainSlideChange = (swiper) => {
+    setCurrentImg(swiper.activeIndex);
+    thumbsSwiperRef.current?.slideTo(swiper.activeIndex);
+  };
+
+  const handleThumbSlideChange = (swiper) => {
+    setCurrentImg(swiper.activeIndex);
+    mainSwiperRef.current?.slideTo(swiper.activeIndex);
+  };
+
+  const openImagesFullscreen = (index = currentImg) => {
+    goToImage(index);
+    setFullscreenMode("grid");
+    setIsImagesFullscreenOpen(true);
+  };
+
+  const closeImagesFullscreen = () => {
+    setIsImagesFullscreenOpen(false);
+    setFullscreenMode("grid");
+  };
+
+  const openFullscreenViewer = (index) => {
+    goToImage(index);
+    setFullscreenMode("viewer");
+  };
+
+  const goToFullscreenImage = (index) => {
+    if (!ad?.images?.length) return;
+    goToImage(index);
+    fullscreenSwiperRef.current?.slideTo(index);
+  };
+
+  const goToPreviousFullscreenImage = () => {
+    if (!ad?.images?.length) return;
+    const previousIndex =
+      currentImg === 0 ? ad.images.length - 1 : currentImg - 1;
+    goToFullscreenImage(previousIndex);
+  };
+
+  const goToNextFullscreenImage = () => {
+    if (!ad?.images?.length) return;
+    const nextIndex = currentImg === ad.images.length - 1 ? 0 : currentImg + 1;
+    goToFullscreenImage(nextIndex);
+  };
+
+  useEffect(() => {
+    if (!isImagesFullscreenOpen) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeImagesFullscreen();
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isImagesFullscreenOpen]);
 
   const goToPreviousImage = () => {
     if (!ad?.images?.length) return;
@@ -259,8 +331,7 @@ export default function AdDetails() {
   const goToNextImage = () => {
     if (!ad?.images?.length) return;
 
-    const nextIndex =
-      currentImg === ad.images.length - 1 ? 0 : currentImg + 1;
+    const nextIndex = currentImg === ad.images.length - 1 ? 0 : currentImg + 1;
     goToImage(nextIndex);
   };
 
@@ -345,45 +416,72 @@ export default function AdDetails() {
   return (
     <>
       <div className="single-page container for-product">
-        <Navigations
-          items={navigationItems}
-          container="main"
-        />
+        <Navigations items={navigationItems} container="main" />
 
         <div className="holder big-holder">
-          <div className="images-holder" onContextMenu={preventAdImageContextMenu}>
+          <div
+            className="images-holder"
+            onContextMenu={preventAdImageContextMenu}
+          >
             {ad?.images?.[currentImg] && (
               <div className="img">
-                <Image
-                  className="main-img protected-ad-image"
-                  fill
-                  src={ad?.images?.[currentImg]?.secure_url}
-                  alt={ad.title}
-                  draggable={false}
-                  onContextMenu={preventAdImageContextMenu}
-                />
+                <Swiper
+                  dir="ltr"
+                  slidesPerView={1}
+                  onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
+                  onSlideChange={handleMainSlideChange}
+                  className="main-img-swiper"
+                >
+                  {ad?.images?.map((image, index) => (
+                    <SwiperSlide key={image?.id || image?.secure_url || index}>
+                      <div
+                        className="main-image-slide"
+                        style={{
+                          "--back-image": `url("${image?.secure_url}")`,
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openImagesFullscreen(index)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            openImagesFullscreen(index);
+                          }
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          className="main-img protected-ad-image"
+                          src={image?.secure_url}
+                          alt={ad.title}
+                          draggable={false}
+                          onContextMenu={preventAdImageContextMenu}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
                 <div className="top">
-                  {ad?.featured_priority > 0 ? (
-                    <span className="verified ellipsis">
-                      <BsFillLightningChargeFill /> {t.ad.featured_ad}
-                    </span>
-                  ) : (
-                    <span></span>
-                  )}
-                  {ad?.is_verified && (
-                    <span className="verified ellipsis">
-                      <FaCheck /> {t.ad.verified}
+                  <div className="column">
+                    {ad?.featured_priority > 0 ? (
+                      <span className="verified ellipsis">
+                        <BsFillLightningChargeFill /> {t.ad.featured_ad}
+                      </span>
+                    ) : (
+                      <span></span>
+                    )}
+                    {ad?.is_verified && (
+                      <span className="verified ellipsis">
+                        <FaCheck /> {t.ad.verified}
+                      </span>
+                    )}
+                  </div>
+                  {ad?.images?.length > 1 && (
+                    <span className="verified image-counter">
+                      <FaImage /> {currentImg + 1} / {ad.images.length}
                     </span>
                   )}
                 </div>
-                <Image
-                  className="back-img protected-ad-image"
-                  src={ad?.images?.[currentImg]?.secure_url}
-                  alt={ad?.title}
-                  fill
-                  draggable={false}
-                  onContextMenu={preventAdImageContextMenu}
-                />
                 {showMainImageNav && (
                   <>
                     <button
@@ -392,7 +490,7 @@ export default function AdDetails() {
                       onClick={goToPreviousImage}
                       aria-label={t.ad.previous_image}
                     >
-                      {locale === "ar" ? <FaAngleRight /> : <FaAngleLeft />}
+                      <FaAngleLeft />
                     </button>
                     <button
                       type="button"
@@ -400,41 +498,23 @@ export default function AdDetails() {
                       onClick={goToNextImage}
                       aria-label={t.ad.next_image}
                     >
-                      {locale === "ar" ? <FaAngleLeft /> : <FaAngleRight />}
+                      <FaAngleRight />
                     </button>
                   </>
                 )}
               </div>
             )}
             {ad?.images?.length > 1 && (
-              <div
-                className={`imgs-swiper-wrapper ${screenSize == "large" ? "vertical" : "horizontal"}`}
-              >
-                {/* Prev Button */}
-                {showThumbNav &&
-                  (screenSize === "large" ? (
-                    <FaAngleUp className="nav-btn up" />
-                  ) : (
-                    locale === "ar" ? (
-                      <FaAngleRight className="nav-btn up" />
-                    ) : (
-                      <FaAngleLeft className="nav-btn up" />
-                    )
-                  ))}
-
+              <div className="imgs-swiper-wrapper horizontal">
                 <Swiper
+                  dir="ltr"
+                  key={swiperDirection}
                   direction={swiperDirection}
                   slidesPerView={slidesView}
                   spaceBetween={space}
-                  onSwiper={(swiper) => (swiperRef.current = swiper)}
-                  onSlideChange={(swiper) => setCurrentImg(swiper.activeIndex)}
+                  onSwiper={(swiper) => (thumbsSwiperRef.current = swiper)}
+                  onSlideChange={handleThumbSlideChange}
                   watchSlidesProgress
-                  modules={[Navigation]}
-                  navigation={
-                    showThumbNav
-                      ? { nextEl: ".nav-btn.down", prevEl: ".nav-btn.up" }
-                      : false
-                  }
                   className="imgs-swiper"
                 >
                   {ad?.images?.map((x, index) => (
@@ -443,7 +523,7 @@ export default function AdDetails() {
                         className={`img ${index === currentImg ? "active" : ""}`}
                         onContextMenu={preventAdImageContextMenu}
                         onClick={() => {
-                          goToImage(index);
+                          openImagesFullscreen(index);
                         }}
                       >
                         <Image
@@ -458,18 +538,6 @@ export default function AdDetails() {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-
-                {/* Next Button */}
-                {showThumbNav &&
-                  (screenSize === "large" ? (
-                    <FaAngleDown className="nav-btn down" />
-                  ) : (
-                    locale === "ar" ? (
-                      <FaAngleLeft className="nav-btn down" />
-                    ) : (
-                      <FaAngleRight className="nav-btn down" />
-                    )
-                  ))}
               </div>
             )}
           </div>
@@ -730,8 +798,7 @@ export default function AdDetails() {
               <div className="card user-info">
                 <div className="row-holder">
                   <h4>
-                    {t.ad.listed_by}{" "}
-                    {listedByName}
+                    {t.ad.listed_by} {listedByName}
                   </h4>
 
                   <Link href={ownerAdsHref}>
@@ -810,13 +877,118 @@ export default function AdDetails() {
           </div>
         </div>
       </div>
-      <AdsSwiper type={`category`} id={ad?.category?.id} tableId={activeTableId} />
+      <AdsSwiper
+        type={`category`}
+        id={ad?.category?.id}
+        tableId={activeTableId}
+      />
       <AdsSwiper
         type={`subCategory`}
         id={ad?.subCategory?.id}
         tableId={activeTableId}
       />
       <AdsSwiper type={`city`} id={ad?.city?.id} />
+
+      {isImagesFullscreenOpen && (
+        <div className="images-fullscreen" role="dialog" aria-modal="true">
+          <div className={`images-container ${fullscreenMode === "viewer" ? "viewer-mode" : ""}`}>
+          <div className="top">
+            {fullscreenMode === "viewer" ? (
+              <button
+                type="button"
+                className="back-btn"
+                onClick={() => setFullscreenMode("grid")}
+              >
+                Back
+              </button>
+            ) : (
+              <h3>All Images</h3>
+            )}
+            {fullscreenMode === "viewer" && (
+              <span className="viewer-count">
+                {currentImg + 1} / {ad?.images?.length || 0}
+              </span>
+            )}
+            <button
+              type="button"
+              className="close-btn"
+              onClick={closeImagesFullscreen}
+              aria-label="Close images"
+            >
+              ×
+            </button>
+          </div>
+            {fullscreenMode === "grid" ? (
+              <div className="images-list">
+                {ad?.images?.map((image, index) => (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className="fullscreen-image"
+                    key={image?.id || image?.secure_url || index}
+                    onClick={() => openFullscreenViewer(index)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        openFullscreenViewer(index);
+                      }
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={image?.secure_url}
+                      alt={`${ad?.title || "Ad image"} ${index + 1}`}
+                      draggable={false}
+                      onContextMenu={preventAdImageContextMenu}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <Swiper
+                  dir="ltr"
+                  slidesPerView={1}
+                  initialSlide={currentImg}
+                  onSwiper={(swiper) => (fullscreenSwiperRef.current = swiper)}
+                  onSlideChange={(swiper) => goToImage(swiper.activeIndex)}
+                  className="fullscreen-viewer-swiper"
+                >
+                  {ad?.images?.map((image, index) => (
+                    <SwiperSlide key={image?.id || image?.secure_url || index}>
+                      <div className="fullscreen-viewer-slide">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={image?.secure_url}
+                          alt={`${ad?.title || "Ad image"} ${index + 1}`}
+                          draggable={false}
+                          onContextMenu={preventAdImageContextMenu}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <button
+                  type="button"
+                  className="fullscreen-nav prev"
+                  onClick={goToPreviousFullscreenImage}
+                  aria-label="Previous image"
+                >
+                  <FaAngleLeft />
+                </button>
+                <button
+                  type="button"
+                  className="fullscreen-nav next"
+                  onClick={goToNextFullscreenImage}
+                  aria-label="Next image"
+                >
+                  <FaAngleRight />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
