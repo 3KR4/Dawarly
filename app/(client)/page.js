@@ -8,25 +8,22 @@ export default function Home() {
   return (
     <>
       <HeroSwiper />
-      {/* <CategoriesSwiper type={`categories`} />
-      <CategoriesSwiper type={`tables`} /> */}
+      {
+      /* <CategoriesSwiper type={`categories`} />
+      <CategoriesSwiper type={`tables`} /> */
+      }
 
+      <AdsSwiper type="table" id={2} />
+      <AdsSwiper type="table" id={1} />
 
-      <AdsSwiper type="gov" id={1} />
+      <AdsSwiper type="gov" id={1}  />
       <AdsSwiper type="city" id={1} />
       <AdsSwiper type="area" id={10} />
       <AdsSwiper type="compound" id={5} />
 
-      <AdsSwiper type="table" id={3} />
-      <AdsSwiper type="table" id={4} />
+      <AdsSwiper type="category" id={1}/>
+      <AdsSwiper type="subcategory" id={1} />
 
-      <AdsSwiper type="category" id={1} tableId={3} />
-      <AdsSwiper type="subcategory" id={1} tableId={3} />
-
-      <AdsSwiper type="category" id={1} tableId={3} />
-      <AdsSwiper type="subCategory" id={1} tableId={4} />
-      
-      <BlogsSection />
 
       <AdsSwiper type="views" />
       <AdsSwiper type="views" tableId={3} />
@@ -36,6 +33,10 @@ export default function Home() {
 
       <AdsSwiper type="favorites" />
       <AdsSwiper type="favorites" tableId={4} />
+
+
+
+      <BlogsSection />
     </>
   );
 }

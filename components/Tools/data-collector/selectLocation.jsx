@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { FaAngleDown, FaAngleRight, FaArrowLeft } from "react-icons/fa";
+import {
+  FaAngleDown,
+  FaAngleRight,
+  FaArrowLeft,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import useTranslate from "@/Contexts/useTranslation";
 import Link from "next/link";
 import useClickOutside from "@/Contexts/useClickOutside";
@@ -184,7 +189,11 @@ function SelectLocation({ locale = "en", onSelect }) {
   return (
     <div className="places-select" ref={menuRef}>
       <h4 onClick={() => setActiveMenu((p) => !p)}>
-        {t.actions.filterByLocation} <FaAngleDown />
+        <span className="location-label">
+          <FaMapMarkerAlt />
+          {t.location.egypt}
+        </span>
+        <FaAngleDown />
       </h4>
 
       {activeMenu && (

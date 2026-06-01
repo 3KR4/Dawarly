@@ -322,6 +322,7 @@ const ar = {
     create: "انشاء",
   },
   location: {
+    egypt: "مصر",
     egyptGovernorates: "محافظات مصر",
     searchGovernorate: "ابحث في المحافظات...",
     searchCity: "ابحث في",

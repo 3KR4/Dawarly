@@ -568,7 +568,7 @@
   .item-price {
     color: var(--main-color);
     font-size: 20px;
-    line-height: 1;
+    line-height: 1.2;
     font-weight: 800;
   }
   .table-container .table-item {

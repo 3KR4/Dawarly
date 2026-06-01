@@ -352,7 +352,7 @@ export default function AdForm({
     const vacationRoot = {
       id: "vacation_homes",
       name_en: "Vacation Homes",
-      name_ar: "بيوت مصيفية",
+      name_ar: "عقارات مصيفية",
       children: Object.values(vacationMap).map((item) => ({
         id: item.id,
         name_en: item.name_en,
