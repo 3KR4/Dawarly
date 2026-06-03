@@ -1420,6 +1420,27 @@ export default function AdForm({
 
     setLoadingReviewAction(true);
     try {
+      if (status === "ACTIVE") {
+        setIsSubmitted(true);
+        setContactSubmitAttempted(true);
+
+        const isFormValid = await trigger();
+        const currentData = getValues();
+
+        if (!isFormValid || !validateForm(currentData)) {
+          return;
+        }
+
+        const savedAdId = await submitValidatedAd(currentData, {
+          redirectOnSuccess: false,
+          showSuccessNotification: false,
+        });
+
+        if (!savedAdId) {
+          return;
+        }
+      }
+
       await changeStatus(targetTableId, adId, {
         status,
         ...(reason ? { reason } : {}),
@@ -1467,7 +1488,10 @@ export default function AdForm({
   const showCategoryRootTitle =
     !selectedCats.dep && !selectedVacationGroup && !selectedCats.cat;
 
-  const submitValidatedAd = async (data) => {
+  const submitValidatedAd = async (
+    data,
+    { redirectOnSuccess = true, showSuccessNotification = true } = {},
+  ) => {
     const payload = buildPayload(data);
     setLoadingSubmit(true);
 
@@ -1494,17 +1518,24 @@ export default function AdForm({
         }
       }
 
-      addNotification({
-        type: "success",
-        message: adId ? t.ad.ad_updated : t.ad.ad_created,
-      });
-      redirectAfterLogin(
-        anonymousMode
-          ? "/"
-          : type === "client"
-            ? "/mylisting"
-            : "/dashboard/ads/all",
-      );
+      if (showSuccessNotification) {
+        addNotification({
+          type: "success",
+          message: adId ? t.ad.ad_updated : t.ad.ad_created,
+        });
+      }
+
+      if (redirectOnSuccess) {
+        redirectAfterLogin(
+          anonymousMode
+            ? "/"
+            : type === "client"
+              ? "/mylisting"
+              : "/dashboard/ads/all",
+        );
+      }
+
+      return finalAdId;
     } catch (err) {
       let message = "An error occurred";
 
@@ -1523,6 +1554,7 @@ export default function AdForm({
         type: "error",
         message,
       });
+      return null;
     } finally {
       setLoadingSubmit(false);
     }

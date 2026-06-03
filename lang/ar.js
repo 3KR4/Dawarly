@@ -459,6 +459,7 @@ const ar = {
     tables: {
       ad_details: "تفاصيل الاعلان",
       owner_details: "بيانات المالك",
+      payment_method: "طريقة الدفع",
       reach: "الاحصائيات",
       status: "الحالة",
       permetionsPlaceHolder: "التصفية بالصلاحيات",

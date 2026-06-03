@@ -1,4 +1,5 @@
-.marketplace .filters {
+.marketplace .filters,
+.hero-search-card .filters {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   min-width: 285px;
@@ -23,6 +24,8 @@
 .filters .filter-field .checkbox-wrapper-13 input[type="checkbox"] {
   width: 23px !important;
   height: 23px !important;
+  max-width: 23px !important;
+  max-height: 23px !important;
 }
 .filters .holder h4 {
   color: var(--paragraph);
@@ -108,13 +111,18 @@
 .marketplace .filters .select-options,
 .marketplace .filters .boolean-options,
 .marketplace .filters .radio-options,
-.marketplace .filters .multiselect-options {
+.marketplace .filters .multiselect-options,
+.hero-search-card .filters .select-options,
+.hero-search-card .filters .boolean-options,
+.hero-search-card .filters .radio-options,
+.hero-search-card .filters .multiselect-options {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
 
-.marketplace .filters .filter-option {
+.marketplace .filters .filter-option,
+.hero-search-card .filters .filter-option {
   flex: 1;
   min-width: max-content;
   border: 1px solid var(--border-color);
@@ -123,29 +131,42 @@
   font-size: 13px;
 }
 .marketplace .filters .filter-option:hover,
-.marketplace .filters .filter-option.active {
+.marketplace .filters .filter-option.active,
+.hero-search-card .filters .filter-option:hover,
+.hero-search-card .filters .filter-option.active {
   background: var(--hover-color);
   border-color: var(--main-color);
 }
+.hero-search-card .filters .filter-option {
+  font-weight: 600;
+}
 
-.marketplace .filters .filter-checkbox {
+.marketplace .filters .filter-checkbox,
+.hero-search-card .filters .filter-checkbox {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 6px 9px;
   gap: 6px;
 }
-.marketplace .filters .filter-checkbox input[type="checkbox"] + label {
+.marketplace .filters .filter-checkbox input[type="checkbox"] + label,
+.hero-search-card .filters .filter-checkbox input[type="checkbox"] + label {
   color: var(--paragraph);
   font-size: 13px;
   transition: 0.3s;
   margin: 0;
 }
-.marketplace .filters .filter-checkbox input[type="checkbox"]:checked + label {
+.marketplace .filters .filter-checkbox input[type="checkbox"]:checked + label,
+.hero-search-card
+  .filters
+  .filter-checkbox
+  input[type="checkbox"]:checked
+  + label {
   color: var(--main-color);
   font-weight: 700;
 }
 
-.marketplace .filters .nisted-list {
+.marketplace .filters .nisted-list,
+.hero-search-card .filters .nisted-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -154,25 +175,42 @@
   padding: 0;
 }
 
-.marketplace .filters .nisted-list.menu {
+.marketplace .filters .nisted-list.menu,
+.hero-search-card .filters .nisted-list.menu {
   display: none;
   margin-top: 5px;
   padding-left: 8px;
   border-left: 2px solid var(--lighter-main-color-2);
 }
 
-[lang="ar"] .marketplace .filters .nisted-list.menu {
+.hero-search-card .filters .nisted-list.nested-child {
+  margin-top: 5px;
+  padding-left: 8px;
+  border-left: 2px solid var(--lighter-main-color-2);
+}
+
+[lang="ar"] .marketplace .filters .nisted-list.menu,
+[lang="ar"] .hero-search-card .filters .nisted-list.menu {
   padding-right: 12px;
   padding-left: 0;
   border-right: 2px solid var(--lighter-main-color-2);
   border-left: 0;
 }
 
-.marketplace .filters .nisted-list li.open > .menu {
+[lang="ar"] .hero-search-card .filters .nisted-list.nested-child {
+  padding-right: 12px;
+  padding-left: 0;
+  border-right: 2px solid var(--lighter-main-color-2);
+  border-left: 0;
+}
+
+.marketplace .filters .nisted-list li.open > .menu,
+.hero-search-card .filters .nisted-list li.open > .menu {
   display: flex;
 }
 
-.marketplace .filters .nisted-list h5 {
+.marketplace .filters .nisted-list h5,
+.hero-search-card .filters .nisted-list h5 {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -190,12 +228,15 @@
 }
 
 .marketplace .filters .nisted-list li.active > h5,
-.marketplace .filters .nisted-list h5:hover {
+.marketplace .filters .nisted-list h5:hover,
+.hero-search-card .filters .nisted-list li.active > h5,
+.hero-search-card .filters .nisted-list h5:hover {
   background: var(--hover-color);
   border-color: var(--main-color);
 }
 
-.marketplace .filters .nisted-list h5 small {
+.marketplace .filters .nisted-list h5 small,
+.hero-search-card .filters .nisted-list h5 small {
   background: var(--hover-color);
   color: var(--paragraph);
   text-align: center;
@@ -206,26 +247,33 @@
   transition: 0.3s;
 }
 .marketplace .filters .nisted-list li.active > h5 > small,
-.marketplace .filters .nisted-list h5:hover > small {
+.marketplace .filters .nisted-list h5:hover > small,
+.hero-search-card .filters .nisted-list li.active > h5 > small,
+.hero-search-card .filters .nisted-list h5:hover > small {
   color: var(--main-color);
   letter-spacing: 0.7px;
   font-weight: 900;
 }
 .marketplace .filters .nisted-list li.active > h5 > span,
-.marketplace .filters .nisted-list h5:hover > span {
+.marketplace .filters .nisted-list h5:hover > span,
+.hero-search-card .filters .nisted-list li.active > h5 > span,
+.hero-search-card .filters .nisted-list h5:hover > span {
   color: var(--main-color);
   font-weight: 700;
 }
-.marketplace .filters .view-toggle-row {
+.marketplace .filters .view-toggle-row,
+.hero-search-card .filters .view-toggle-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
 }
-.marketplace .filters .view-toggle-item {
+.marketplace .filters .view-toggle-item,
+.hero-search-card .filters .view-toggle-item {
   margin-bottom: -5px;
 }
-.marketplace .filters .view-toggle {
+.marketplace .filters .view-toggle,
+.hero-search-card .filters .view-toggle {
   width: fit-content;
   color: var(--main-color);
   cursor: pointer;
@@ -238,10 +286,12 @@
   min-width: max-content;
 }
 
-.marketplace .filters .view-toggle:hover {
+.marketplace .filters .view-toggle:hover,
+.hero-search-card .filters .view-toggle:hover {
   text-decoration: underline;
 }
-.marketplace .filters .view-toggle-row hr {
+.marketplace .filters .view-toggle-row hr,
+.hero-search-card .filters .view-toggle-row hr {
   background: var(--main-color);
   height: 3px;
   flex: 1;
@@ -304,6 +354,7 @@
     max-width: 280px;
     min-width: unset;
     width: 280px !important;
+    min-height: 100%;
     max-height: 100vh;
     background: var(--body-color);
     top: 0;

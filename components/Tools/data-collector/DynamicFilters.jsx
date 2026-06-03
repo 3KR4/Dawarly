@@ -15,6 +15,9 @@ const DynamicFilters = ({
   active,
   setActive,
   locale = "en",
+  showViewToggle = true,
+  nestedChildrenAsMenu = true,
+  focusSelectedBranch = false,
 }) => {
   const { theme } = useContext(settings);
   const [localState, setLocalState] = useState({});
@@ -139,6 +142,7 @@ const DynamicFilters = ({
     limit,
     asListItem = false,
   }) => {
+    if (!showViewToggle) return null;
     if (!limit || total <= limit) return null;
 
     const expanded = isListExpanded(fieldKey, levelKey);
@@ -195,12 +199,18 @@ const DynamicFilters = ({
       return String(item[level.parentKey]) === String(parentItem?.id);
     });
 
-    if (!items.length) return null;
+    const selectedAtThisLevel = currentValue[level.queryKey];
+    const visibleBranchItems =
+      focusSelectedBranch && selectedAtThisLevel
+        ? items.filter((item) => String(item.id) === String(selectedAtThisLevel))
+        : items;
+
+    if (!visibleBranchItems.length) return null;
 
     const limit = level.limit || field.limit || 5;
     const expanded = isListExpanded(field.key, level.queryKey);
     const visibleItems = getVisibleItems({
-      items,
+      items: visibleBranchItems,
       limit,
       expanded,
       selectedId: currentValue[level.queryKey],
@@ -208,7 +218,7 @@ const DynamicFilters = ({
 
     return (
       <ul
-        className={`nisted-list ${levelIndex > 0 ? "menu" : ""}`}
+        className={`nisted-list ${levelIndex > 0 && nestedChildrenAsMenu ? "menu" : ""} ${levelIndex > 0 && !nestedChildrenAsMenu ? "nested-child" : ""}`}
         key={level.queryKey}
       >
         {visibleItems.map((item) => {
@@ -258,14 +268,14 @@ const DynamicFilters = ({
                 {count > 0 && <small>{count}</small>}
               </h5>
 
-              {childList}
+              {(nestedChildrenAsMenu || isOpen) ? childList : null}
             </li>
           );
         })}
         {renderViewToggle({
           fieldKey: field.key,
           levelKey: level.queryKey,
-          total: items.length,
+          total: visibleBranchItems.length,
           limit,
           asListItem: true,
         })}

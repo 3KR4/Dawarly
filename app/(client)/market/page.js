@@ -513,6 +513,10 @@ function MarketplaceContent() {
       ) {
         params.delete("s");
         params.delete("search");
+        params.delete("governorate_id");
+        params.delete("city_id");
+        params.delete("area_id");
+        params.delete("compound_id");
       }
 
       Object.entries(updates).forEach(([key, value]) => {

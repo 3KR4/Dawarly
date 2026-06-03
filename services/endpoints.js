@@ -124,6 +124,14 @@ export const ENDPOINTS = {
     CANCEL: (id) => `/Booking/${id}/Cancel`,
   },
   DATA: {
+    GET_HERO_SEARCH_FILTERS: (table_id) => {
+      const params = new URLSearchParams();
+      if (table_id) params.append("table_id", table_id);
+      const query = params.toString();
+      return query
+        ? `data/hero-search-filters?${query}`
+        : `data/hero-search-filters`;
+    },
     GET_COUNTRIES: (table_id) => {
       const params = new URLSearchParams();
       if (table_id) params.append("table_id", table_id);
@@ -151,9 +159,10 @@ export const ENDPOINTS = {
       const query = params.toString();
       return query ? `data/areas?${query}` : `data/areas`;
     },
-    GET_COMPOUNDS: (area_id, table_id) => {
+    GET_COMPOUNDS: (area_id, table_id, city_id) => {
       const params = new URLSearchParams();
       if (area_id) params.append("area_id", area_id);
+      if (city_id) params.append("city_id", city_id);
       if (table_id) params.append("table_id", table_id);
       const query = params.toString();
       return query ? `data/compounds?${query}` : `data/compounds`;
