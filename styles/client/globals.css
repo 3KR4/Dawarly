@@ -366,6 +366,14 @@ a {
   font-size: 14px;
   text-transform: uppercase;
 }
+.cat-card.user-create-card {
+  min-width: 100%;
+  align-items: unset;
+  height: 54px;
+}
+.cat-card.user-create-card h4 {
+  text-transform: capitalize;
+}
 .cat-card button {
   display: flex;
   position: absolute;
@@ -444,7 +452,7 @@ a {
   color: #555;
   flex-wrap: wrap;
   align-items: center;
-    gap: 0px 5px;
+  gap: 0px 5px;
   font-size: 14px;
   display: flex;
   padding-left: 10px;
@@ -875,6 +883,9 @@ a {
   align-items: center;
   justify-content: flex-start;
   padding: 0 9px;
+}
+.selectOptions.hero-trigger .btn h4 {
+  padding: 0 6px;
 }
 .dash-holder.for-client .top .selectOptions .btn h4 {
   justify-content: unset;

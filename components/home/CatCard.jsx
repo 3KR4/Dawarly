@@ -10,10 +10,12 @@ function CatCard({
   type,
   position,
   activeClass,
+  className = "",
   dashboard = false,
   onSelect,
   target,
   setTarget,
+  hideCount = false,
 }) {
   const { locale, setMenuType } = useContext(settings);
 
@@ -67,14 +69,14 @@ function CatCard({
         </button>
       )}
 
-      {count > 0 && <span className="count">{count}</span>}
+      {!hideCount && count > 0 && <span className="count">{count}</span>}
     </>
   );
 
   if (position === "when-create-ad") {
     return (
       <div
-        className={`cat-card ${activeClass ? "active" : ""}`}
+        className={`cat-card ${activeClass ? "active" : ""} ${className}`}
         onClick={() => {
           if (["compounds", "subcategories"].includes(type)) {
             setTarget(data);
@@ -90,7 +92,10 @@ function CatCard({
   }
 
   return (
-    <Link href={link} className={`cat-card ${activeClass ? "active" : ""}`}>
+    <Link
+      href={link}
+      className={`cat-card ${activeClass ? "active" : ""} ${className}`}
+    >
       {Content}
     </Link>
   );

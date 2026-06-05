@@ -2,9 +2,19 @@
 
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { IoSearchSharp } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
+import {
+  BadgeCheck,
+  Building2,
+  CircleDollarSign,
+  Coins,
+  MapPin,
+  SlidersHorizontal,
+} from "lucide-react";
 import { settings } from "@/Contexts/settings";
 import { useAppData } from "@/Contexts/DataContext";
+import { specsConfig } from "@/Contexts/specsConfig";
 import DynamicFilters from "@/components/Tools/data-collector/DynamicFilters";
 import {
   Amenities,
@@ -49,13 +59,13 @@ const LABELS = {
       advanced: "More Filters",
     },
     placeholders: {
-      locations: "Choose location",
-      departments: "Choose department",
-      price: "Set price range",
-      currency: "Choose currency",
+      locations: "Select location",
+      departments: "Select department",
+      price: "Select price range",
+      currency: "Select currency",
       verified: "Verification status",
-      dynamic: "Choose filter",
-      advanced: "Advanced filters",
+      dynamic: "Select filter",
+      advanced: "Select advanced filters",
     },
     yes: "Yes",
     no: "No",
@@ -129,6 +139,21 @@ const ARABIC_OPTION_LABELS = {
     UNDER_CONSTRUCTION: "تحت الإنشاء",
   },
 };
+
+const FIELD_ICONS = {
+  department_tree: Building2,
+  location_tree: MapPin,
+  price: CircleDollarSign,
+  currency: Coins,
+  is_verified_only: BadgeCheck,
+  ready_to_move: BadgeCheck,
+  furnished: BadgeCheck,
+  amenities: SlidersHorizontal,
+  default: SlidersHorizontal,
+};
+
+const getFieldIcon = (fieldKey) =>
+  specsConfig[fieldKey]?.icon || FIELD_ICONS[fieldKey] || FIELD_ICONS.default;
 
 const RANGE_KEYS = {
   price: ["min_price", "max_price"],
@@ -477,6 +502,7 @@ export default function HeroSearchCard() {
     max_price: 10000000,
     total: 0,
   });
+  const [searchMetaLoading, setSearchMetaLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
 
   const selectedTableId = form.dep || null;
@@ -671,6 +697,7 @@ export default function HeroSearchCard() {
 
     const loadSearchMeta = async () => {
       try {
+        setSearchMetaLoading(true);
         const filters = { page: 1, limit: 1 };
 
         if (form.dep) filters.table_id = form.dep;
@@ -688,6 +715,7 @@ export default function HeroSearchCard() {
           "compound_id",
           "currency",
           "is_verified_only",
+          "amenities",
         ].forEach((key) => {
           if (form[key] !== undefined && form[key] !== null && form[key] !== "") {
             filters[key] = form[key];
@@ -721,11 +749,12 @@ export default function HeroSearchCard() {
           filters[key] = value;
         });
 
-        Object.keys(filters).forEach((key) => {
-          if (String(key).startsWith("am_") && filters[key] !== true) {
-            delete filters[key];
-          }
-        });
+        if (Array.isArray(form.amenities)) {
+          delete filters.amenities;
+          form.amenities.forEach((amenityKey) => {
+            filters[amenityKey] = true;
+          });
+        }
 
         const res = await getAllAds(filters);
         if (!active) return;
@@ -736,6 +765,8 @@ export default function HeroSearchCard() {
         });
       } catch (error) {
         console.error(error);
+      } finally {
+        if (active) setSearchMetaLoading(false);
       }
     };
 
@@ -859,6 +890,25 @@ export default function HeroSearchCard() {
     [availableCategories, availableSubCategories, locale, selectedTableId],
   );
 
+  const quickBooleanFields = useMemo(
+    () =>
+      [
+        verifiedField,
+        ...allDynamicFields.filter((field) =>
+          ["checkbox", "boolean"].includes(field.uiType),
+        ),
+      ].filter(Boolean),
+    [allDynamicFields, verifiedField],
+  );
+
+  const floatingDynamicFields = useMemo(
+    () =>
+      allDynamicFields.filter(
+        (field) => !["checkbox", "boolean"].includes(field.uiType),
+      ),
+    [allDynamicFields],
+  );
+
   const applyFieldValue = (fieldKey, value) => {
     setForm((prev) => {
       const next = { ...prev };
@@ -936,16 +986,8 @@ export default function HeroSearchCard() {
 
       if (fieldKey === "amenities") {
         const selectedAmenities = Array.isArray(value) ? value : [];
-
-        Object.keys(next).forEach((key) => {
-          if (String(key).startsWith("am_")) {
-            delete next[key];
-          }
-        });
-
-        selectedAmenities.forEach((amenityKey) => {
-          next[amenityKey] = true;
-        });
+        if (selectedAmenities.length) next.amenities = selectedAmenities;
+        else delete next.amenities;
 
         return next;
       }
@@ -996,9 +1038,7 @@ export default function HeroSearchCard() {
     }
 
     if (field.uiType === "multiSelect") {
-      return (field.options || [])
-        .filter((option) => form[option.value] === true)
-        .map((option) => option.value);
+      return Array.isArray(form[field.key]) ? form[field.key] : [];
     }
 
     if (field.uiType === "checkbox" || field.uiType === "boolean") {
@@ -1010,22 +1050,39 @@ export default function HeroSearchCard() {
 
   const getTriggerSummary = (field) => {
     const value = buildSelectedValue(field);
+    const hasValue =
+      field.uiType === "range"
+        ? Array.isArray(value)
+        : field.uiType === "nested"
+          ? Boolean(value && Object.keys(value).length)
+          : field.uiType === "multiSelect"
+            ? Array.isArray(value) && value.length > 0
+            : value !== undefined && value !== null && value !== "" && value !== false;
+
+    if (!hasValue) {
+      return locale === "ar"
+        ? `اختر ${field.label?.ar || ""}`.trim()
+        : `Select ${field.label?.en || "filter"}`.trim();
+    }
+
     return field.summary ? field.summary(value) : text.placeholders.dynamic;
   };
 
 
   const searchButtonText = useMemo(() => {
     if (!hasSelectedFilters) return text.search;
+    if (searchMetaLoading) return text.search;
     if (searchMeta.total <= 0) {
       return locale === "ar" ? "لا توجد نتائج" : "No results";
     }
     return locale === "ar"
       ? `عرض ${searchMeta.total} نتيجة`
       : `View ${searchMeta.total} results`;
-  }, [hasSelectedFilters, locale, searchMeta.total, text.search]);
+  }, [hasSelectedFilters, locale, searchMeta.total, searchMetaLoading, text.search]);
 
   const renderFloatingField = (menuKey, field, width = "standard") => {
     const selectedValue = buildSelectedValue(field);
+    const TriggerIcon = getFieldIcon(field.key);
 
     return (
       <div className={`hero-menu-field ${width}`} key={menuKey}>
@@ -1036,7 +1093,17 @@ export default function HeroSearchCard() {
             className="btn"
             onClick={() => setActiveMenu((prev) => (prev === menuKey ? null : menuKey))}
           >
-            <h4 className="ellipsis">{getTriggerSummary(field)}</h4>
+            <div className="hero-trigger-content">
+              <div className="hero-trigger-icon">
+                <TriggerIcon />
+              </div>
+              <div className="hero-trigger-text">
+                <span className="hero-trigger-label">
+                  {field.label?.[locale] || text.filters.dynamic}
+                </span>
+                <h4 className="ellipsis">{getTriggerSummary(field)}</h4>
+              </div>
+            </div>
             <IoIosArrowDown className="main-ico" />
           </div>
 
@@ -1061,11 +1128,42 @@ export default function HeroSearchCard() {
     );
   };
 
+  const renderQuickBooleanField = (field) => {
+    const checked = Boolean(form[field.key]);
+    const Icon = getFieldIcon(field.key);
+
+    return (
+      <label
+        key={field.key}
+        className={`hero-quick-check ${checked ? "active" : ""}`}
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(event) =>
+            applyFieldValue(field.key, event.target.checked ? true : null)
+          }
+        />
+        <span className="hero-check-indicator">
+          <Icon />
+        </span>
+        <span>{field.label?.[locale]}</span>
+      </label>
+    );
+  };
+
   const buildQueryParams = () => {
     const params = new URLSearchParams();
 
     Object.entries(form).forEach(([key, value]) => {
       if (value === null || value === undefined || value === "") return;
+
+      if (key === "amenities") {
+        if (Array.isArray(value) && value.length) {
+          params.set("amenities", value.join(","));
+        }
+        return;
+      }
 
       const mappedKey = QUERY_KEY_MAP[key] || key;
       params.set(mappedKey, String(value));
@@ -1086,7 +1184,7 @@ export default function HeroSearchCard() {
       return;
     }
 
-    if (searchMeta.total <= 0) {
+    if (searchMetaLoading || searchMeta.total <= 0) {
       return;
     }
 
@@ -1098,17 +1196,34 @@ export default function HeroSearchCard() {
   return (
     <div className="hero-search-shell" ref={shellRef}>
       <form className="hero-search-card" onSubmit={handleSubmit}>
+        <div className="hero-search-head">
+          <div className="hero-search-copy">
+            <span className="hero-search-kicker">
+              {locale === "ar" ? "بحث سريع" : "Quick Search"}
+            </span>
+            <p>
+              {locale === "ar"
+                ? "استخدم الفلاتر السريعة للوصول إلى الإعلان المناسب بشكل أسرع."
+                : "Use focused filters to find the right listing faster."}
+            </p>
+          </div>
+        </div>
         <div className="hero-search-row">
           {renderFloatingField("departments", departmentField, "wide")}
           {renderFloatingField("locations", locationField, "wide")}
           {renderFloatingField("price", priceField)}
           {renderFloatingField("currency", currencyField)}
-          {renderFloatingField("verified", verifiedField)}
         </div>
 
-        {selectedTableId && allDynamicFields.length > 0 && (
+        {quickBooleanFields.length > 0 && (
+          <div className="hero-search-row secondary hero-search-chips">
+            {quickBooleanFields.map(renderQuickBooleanField)}
+          </div>
+        )}
+
+        {selectedTableId && floatingDynamicFields.length > 0 && (
           <div className="hero-search-row secondary">
-            {allDynamicFields.map((field) =>
+            {floatingDynamicFields.map((field) =>
               renderFloatingField(`dynamic-${field.key}`, field),
             )}
           </div>
@@ -1118,9 +1233,16 @@ export default function HeroSearchCard() {
           {searchError ? <span className="error">{searchError}</span> : null}
           <button
             type="submit"
-            className={`hero-search-submit ${!hasSelectedFilters || searchMeta.total <= 0 ? "disabled" : ""}`}
+            className={`hero-search-submit ${!hasSelectedFilters || searchMeta.total <= 0 || searchMetaLoading ? "disabled" : ""}`}
           >
-            {searchButtonText}
+            {searchMetaLoading ? (
+              <span className="loader"></span>
+            ) : (
+              <>
+                <IoSearchSharp />
+                {searchButtonText}
+              </>
+            )}
           </button>
         </div>
       </form>

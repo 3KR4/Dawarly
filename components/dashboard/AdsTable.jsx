@@ -9,6 +9,7 @@ import { FaTrashAlt, FaEye } from "react-icons/fa";
 import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
+import { HiExclamation } from "react-icons/hi";
 import React, { useContext, useState, useEffect } from "react";
 import { specsConfig } from "@/Contexts/specsConfig";
 
@@ -207,6 +208,10 @@ export default function AdsTable({
               const paymentMethodLabel = getPaymentMethodLabel(
                 item?.payment_method,
               );
+              const editHref =
+                page == "dashboard"
+                  ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
+                  : `/mylisting/form/${item?.id}?dep=${tableId}`;
               return (
                 <div
                   key={`${tableId}-${item?.id}`}
@@ -401,27 +406,37 @@ export default function AdsTable({
                     </div>
                   ) : (
                     <div className="item-status">
-                      <SelectOptions
-                        size="ultra-small"
-                        className={"centerd"}
-                        options={filteredStatuses}
-                        value={curentStatus}
-                        disabled={
-                          page === "user" && curentStatus.id == "PENDING"
-                        }
-                        hiddenIco={
-                          page === "user" && curentStatus.id == "PENDING"
-                        }
-                        locale={locale}
-                        onChange={(selected) => {
-                          if (selected.id == "REJECTED") {
-                            setMenuType("reject");
-                            setTarget(itemWithTableId);
-                          } else {
-                            changeStatus(itemWithTableId, selected);
+                      {page === "user" && curentStatus.id == "REJECTED" ? (
+                        <Link
+                          href={editHref}
+                          className="pending rejected-status-link"
+                        >
+                          <span>{curentStatus?.[`name_${locale}`]}</span>
+                          <HiExclamation />
+                        </Link>
+                      ) : (
+                        <SelectOptions
+                          size="ultra-small"
+                          className={"centerd"}
+                          options={filteredStatuses}
+                          value={curentStatus}
+                          disabled={
+                            page === "user" && curentStatus.id == "PENDING"
                           }
-                        }}
-                      />
+                          hiddenIco={
+                            page === "user" && curentStatus.id == "PENDING"
+                          }
+                          locale={locale}
+                          onChange={(selected) => {
+                            if (selected.id == "REJECTED") {
+                              setMenuType("reject");
+                              setTarget(itemWithTableId);
+                            } else {
+                              changeStatus(itemWithTableId, selected);
+                            }
+                          }}
+                        />
+                      )}
                     </div>
                   )}
 
@@ -433,11 +448,7 @@ export default function AdsTable({
                     {statusChanger !== "favoriet" && (
                       <>
                         <Link
-                          href={
-                            page == "dashboard"
-                              ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
-                              : `/mylisting/form/${item?.id}?dep=${tableId}`
-                          }
+                          href={editHref}
                         >
                           <MdEdit className="edit" />
                         </Link>
