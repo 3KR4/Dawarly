@@ -15,6 +15,9 @@ const DynamicFilters = ({
   active,
   setActive,
   locale = "en",
+  showViewToggle = true,
+  nestedChildrenAsMenu = true,
+  focusSelectedBranch = false,
 }) => {
   const { theme } = useContext(settings);
   const [localState, setLocalState] = useState({});
@@ -88,7 +91,18 @@ const DynamicFilters = ({
   const getItemName = (item) =>
     item?.[`name_${locale}`] || item?.name_en || item?.name_ar || "";
 
-  const getItemCount = (item) => Number(item?.adsCount || 0);
+  const getAdsCount = (item) =>
+    item?.adsCount ??
+    item?.ads_count ??
+    item?.active_ads_count ??
+    item?.activeAdsCount;
+
+  const hasAds = (item) => {
+    const adsCount = getAdsCount(item);
+    return Number(adsCount || 0) > 0;
+  };
+
+  const getItemCount = (item) => Number(getAdsCount(item) || 0);
 
   const getListKey = (fieldKey, levelKey = "root") => `${fieldKey}:${levelKey}`;
 
@@ -139,6 +153,7 @@ const DynamicFilters = ({
     limit,
     asListItem = false,
   }) => {
+    if (!showViewToggle) return null;
     if (!limit || total <= limit) return null;
 
     const expanded = isListExpanded(fieldKey, levelKey);
@@ -190,17 +205,23 @@ const DynamicFilters = ({
     if (!level) return null;
 
     const items = level.items.filter((item) => {
-      if (level.hasAdsOnly && Number(item?.adsCount || 0) <= 0) return false;
+      if (level.hasAdsOnly && !hasAds(item)) return false;
       if (!level.parentKey) return true;
       return String(item[level.parentKey]) === String(parentItem?.id);
     });
 
-    if (!items.length) return null;
+    const selectedAtThisLevel = currentValue[level.queryKey];
+    const visibleBranchItems =
+      focusSelectedBranch && selectedAtThisLevel
+        ? items.filter((item) => String(item.id) === String(selectedAtThisLevel))
+        : items;
+
+    if (!visibleBranchItems.length) return null;
 
     const limit = level.limit || field.limit || 5;
     const expanded = isListExpanded(field.key, level.queryKey);
     const visibleItems = getVisibleItems({
-      items,
+      items: visibleBranchItems,
       limit,
       expanded,
       selectedId: currentValue[level.queryKey],
@@ -208,7 +229,7 @@ const DynamicFilters = ({
 
     return (
       <ul
-        className={`nisted-list ${levelIndex > 0 ? "menu" : ""}`}
+        className={`nisted-list ${levelIndex > 0 && nestedChildrenAsMenu ? "menu" : ""} ${levelIndex > 0 && !nestedChildrenAsMenu ? "nested-child" : ""}`}
         key={level.queryKey}
       >
         {visibleItems.map((item) => {
@@ -258,14 +279,14 @@ const DynamicFilters = ({
                 {count > 0 && <small>{count}</small>}
               </h5>
 
-              {childList}
+              {(nestedChildrenAsMenu || isOpen) ? childList : null}
             </li>
           );
         })}
         {renderViewToggle({
           fieldKey: field.key,
           levelKey: level.queryKey,
-          total: items.length,
+          total: visibleBranchItems.length,
           limit,
           asListItem: true,
         })}

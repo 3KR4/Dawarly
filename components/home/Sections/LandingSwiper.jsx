@@ -8,19 +8,14 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "@/styles/client/pages/home.css";
-import { slidesEn, slidesAr } from "@/data";
 import { getAllSliders } from "@/services/sliders/sliders.service";
 import MainSliderSkeleton from "@/components/skeletons/MainSliderSkeleton";
+import HeroSearchCard from "@/components/home/Sections/HeroSearchCard";
 
 export default function HeroSwiper() {
   const { locale } = useContext(settings);
   const swiperRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  const handleSlideChange = (swiper) => {
-    setActiveIndex(swiper.activeIndex);
-  };
 
   const [slieds, setSlieds] = useState([]);
 
@@ -50,7 +45,6 @@ export default function HeroSwiper() {
               disableOnInteraction: false,
             }}
             loop={slieds.length > 3}
-            onSlideChange={handleSlideChange}
             onSwiper={(swiper) => (swiperRef.current = swiper)}
             dir={locale === "ar" ? "rtl" : "ltr"}
             pagination={{
@@ -98,6 +92,8 @@ export default function HeroSwiper() {
           <div className="hero-pagination"></div>
         </>
       )}
+
+      <HeroSearchCard />
     </div>
   );
 }

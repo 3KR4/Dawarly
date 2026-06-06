@@ -64,6 +64,26 @@ body:has(.form-holder) footer {
 .form-holder form .top {
   position: relative;
 }
+.form-holder.create-ad form .reject-reason-banner {
+  gap: 4px;
+  background: #ffe2e4;
+  border: 1px solid #f1aeb5;
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+.form-holder.create-ad form .reject-reason-banner .section-title,
+.form-holder.create-ad form .reject-reason-banner p {
+  color: #b42318;
+}
+.form-holder.create-ad form .reject-reason-banner p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  text-align: left;
+}
+[lang="ar"] .form-holder.create-ad form .reject-reason-banner p {
+  text-align: right;
+}
 .form-holder form .row-holder {
   display: flex;
   flex-direction: column;
@@ -217,9 +237,12 @@ body:has(.form-holder) footer {
   height: 40px;
   border-radius: 10px;
 }
-.dashboard .form-holder.create-ad.user-create-ad form .submit-section > .main-button {
+.dashboard
+  .form-holder.create-ad.user-create-ad
+  form
+  .submit-section
+  > .main-button {
   width: 100%;
-
 }
 .form-holder.create-ad.user-create-ad form .submit-section {
   display: flex;

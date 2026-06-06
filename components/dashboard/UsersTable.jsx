@@ -3,7 +3,13 @@ import React, { useContext, useMemo } from "react";
 import { settings } from "@/Contexts/settings";
 import useTranslate from "@/Contexts/useTranslation";
 import { TbListSearch } from "react-icons/tb";
-import { FaCheckCircle, FaClock, FaEye, FaTrashAlt } from "react-icons/fa";
+import {
+  FaBan,
+  FaClock,
+  FaEye,
+  FaTimesCircle,
+  FaTrashAlt,
+} from "react-icons/fa";
 import { Permissions, UserTypes } from "@/data/enums";
 import Link from "next/link";
 import { FaCrown } from "react-icons/fa6";
@@ -95,6 +101,20 @@ export default function UsersTable({
               const type = userTypesMap[user.user_type];
               const isSuper = user.is_super_admin;
               const isAdmin = user.user_type === "ADMIN" || user.is_super_admin;
+              const rejectedAdsCount = Number(user.rejected_ads_count || 0);
+              const totalAdsCount = Number(user.total_ads_count || 0);
+              const activeAdsCount = Number(user.active_ads_count || 0);
+              const pendingAdsCount = Number(user.pending_ads_count || 0);
+              const disabledAdsCount = Number(user.disable_ads_count || 0);
+              const disabledAdsLabel =
+                locale === "ar" ? "إعلانات معطلة" : "Disabled Ads";
+              const visibleCounts = [
+                totalAdsCount,
+                activeAdsCount,
+                !isAdmin ? pendingAdsCount : 0,
+                rejectedAdsCount,
+                disabledAdsCount,
+              ].filter((count) => count > 0).length;
               return (
                 <div key={user.id} className="table-item">
                   <div className="holder">
@@ -212,51 +232,79 @@ export default function UsersTable({
 
                   {/* 📊 Ads counts */}
                   <div className="item-overview users-ads-counts">
-                    <Link href={buildAdsUrl(user)} title={t.common.approvedAds}>
-                      <h4>
-                        {user.approved_ads_count > 0 ? (
-                          <>
-                            {user.approved_ads_count}
-                            <FaCheckCircle />
-                          </>
-                        ) : (
-                          "-"
-                        )}
-                      </h4>
-                    </Link>
+                    {totalAdsCount > 0 && (
+                      <Link href={buildAdsUrl(user)} title={t.common.allAds}>
+                        <h4>
+                          {totalAdsCount}
+                        </h4>
+                      </Link>
+                    )}
 
-                    <Link
-                      href={buildAdsUrl(user, "ACTIVE")}
-                      title={t.common.activeAds}
-                    >
-                      <h4 className="active">
-                        {user.active_ads_count > 0 ? (
+                    {activeAdsCount > 0 && (
+                      <Link
+                        href={buildAdsUrl(user, "ACTIVE")}
+                        title={t.common.activeAds}
+                      >
+                        <h4 className="active">
                           <>
-                            {user.active_ads_count}
+                            {activeAdsCount}
                             <FaEye />
                           </>
-                        ) : (
-                          "-"
-                        )}
-                      </h4>
-                    </Link>
-                    {!isAdmin && (
+                        </h4>
+                      </Link>
+                    )}
+                    {!isAdmin && pendingAdsCount > 0 && (
                       <Link
                         href={buildAdsUrl(user, "PENDING")}
                         title={t.common.pendingAds}
                       >
                         <h4 className="green">
-                          {user.pending_ads_count > 0 ? (
-                            <>
-                              {user.pending_ads_count}
-                              <FaClock />
-                            </>
-                          ) : (
-                            "-"
-                          )}
+                          <>
+                            {pendingAdsCount}
+                            <FaClock />
+                          </>
                         </h4>
                       </Link>
                     )}
+                    {rejectedAdsCount > 0 && (
+                      <Link
+                        href={buildAdsUrl(user, "REJECTED")}
+                        title={t.common.rejectReason}
+                      >
+                        <h4 className="danger">
+                          <>
+                            {rejectedAdsCount}
+                            <FaTimesCircle />
+                          </>
+                        </h4>
+                      </Link>
+                    )}
+                    {disabledAdsCount > 0 && (
+                      <Link
+                        href={buildAdsUrl(user, "DISABLED")}
+                        title={disabledAdsLabel}
+                      >
+                        <h4 className="disabled">
+                          <>
+                            {disabledAdsCount}
+                            <FaBan />
+                          </>
+                        </h4>
+                      </Link>
+                    )}
+                    {visibleCounts === 0 &&
+                      (isAdmin ? (
+                        <Link href={buildAdsUrl(user)} title={t.common.allAds}>
+                          <h4>-</h4>
+                        </Link>
+                      ) : (
+                        <Link
+                          href={buildAdsUrl(user, "PENDING")}
+                          title={t.common.pendingAds}
+                        >
+                          <h4 className="green">-</h4>
+                        </Link>
+                      ))}
                   </div>
                   <p className="date">
                     {formatRelativeDate(user?.created_at, locale, "detailed")}

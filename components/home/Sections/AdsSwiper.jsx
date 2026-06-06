@@ -130,7 +130,7 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
 
   // ================= BREAKPOINT =================
   const breakpoints = {
-    0: { slidesPerView: 1.4 },
+    0: { slidesPerView: 1.2 },
     500: { slidesPerView: 1.5 },
     620: { slidesPerView: 2.2 },
     768: { slidesPerView: 2 },

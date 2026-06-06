@@ -450,6 +450,7 @@ const en = {
     tables: {
       ad_details: "ad details",
       owner_details: "owner details",
+      payment_method: "payment method",
       reach: "reach",
       status: "status",
       permetionsPlaceHolder: "Filter by permetions",

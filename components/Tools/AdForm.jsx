@@ -198,6 +198,8 @@ export default function AdForm({
   anonymousMode = false,
   reviewActions = false,
 }) {
+  const isClientCreateCard = type === "client";
+
   const { locale } = useContext(settings);
   const t = useTranslate();
   const {
@@ -281,6 +283,12 @@ export default function AdForm({
   const isStepped = stepped && type === "client" && !adId;
   const isRequestMode = anonymousMode;
   const needsAnonymousContact = isRequestMode && !authLoading && !user;
+  const rejectReason =
+    adData?.reason ||
+    adData?.reject_reason ||
+    adData?.rejection_reason ||
+    adData?.rejected_reason ||
+    "";
   const STEPS = {
     DEPARTMENT: 1,
     CATEGORY: 1,
@@ -1420,6 +1428,27 @@ export default function AdForm({
 
     setLoadingReviewAction(true);
     try {
+      if (status === "ACTIVE") {
+        setIsSubmitted(true);
+        setContactSubmitAttempted(true);
+
+        const isFormValid = await trigger();
+        const currentData = getValues();
+
+        if (!isFormValid || !validateForm(currentData)) {
+          return;
+        }
+
+        const savedAdId = await submitValidatedAd(currentData, {
+          redirectOnSuccess: false,
+          showSuccessNotification: false,
+        });
+
+        if (!savedAdId) {
+          return;
+        }
+      }
+
       await changeStatus(targetTableId, adId, {
         status,
         ...(reason ? { reason } : {}),
@@ -1467,7 +1496,10 @@ export default function AdForm({
   const showCategoryRootTitle =
     !selectedCats.dep && !selectedVacationGroup && !selectedCats.cat;
 
-  const submitValidatedAd = async (data) => {
+  const submitValidatedAd = async (
+    data,
+    { redirectOnSuccess = true, showSuccessNotification = true } = {},
+  ) => {
     const payload = buildPayload(data);
     setLoadingSubmit(true);
 
@@ -1494,17 +1526,24 @@ export default function AdForm({
         }
       }
 
-      addNotification({
-        type: "success",
-        message: adId ? t.ad.ad_updated : t.ad.ad_created,
-      });
-      redirectAfterLogin(
-        anonymousMode
-          ? "/"
-          : type === "client"
-            ? "/mylisting"
-            : "/dashboard/ads/all",
-      );
+      if (showSuccessNotification) {
+        addNotification({
+          type: "success",
+          message: adId ? t.ad.ad_updated : t.ad.ad_created,
+        });
+      }
+
+      if (redirectOnSuccess) {
+        redirectAfterLogin(
+          anonymousMode
+            ? "/"
+            : type === "client"
+              ? "/mylisting"
+              : "/dashboard/ads/all",
+        );
+      }
+
+      return finalAdId;
     } catch (err) {
       let message = "An error occurred";
 
@@ -1523,6 +1562,7 @@ export default function AdForm({
         type: "error",
         message,
       });
+      return null;
     } finally {
       setLoadingSubmit(false);
     }
@@ -1654,6 +1694,13 @@ export default function AdForm({
             </>
           )}
 
+          {rejectReason && (
+            <div className="form-section reject-reason-banner">
+              <h2 className="section-title">{t.common.rejectReason}</h2>
+              <p>{rejectReason}</p>
+            </div>
+          )}
+
           {type === "admin" &&
             adId &&
             canAssignAdmin &&
@@ -1734,6 +1781,8 @@ export default function AdForm({
                     data={group}
                     type="tables"
                     position="when-create-ad"
+                    className={isClientCreateCard ? "user-create-card" : ""}
+                    hideCount={isClientCreateCard}
                     activeClass={selectedRootGroup?.id === group.id}
                     onSelect={() => selectRootGroup(group)}
                   />
@@ -1776,7 +1825,7 @@ export default function AdForm({
                     {filteredSubCategories.map((subCategory) => (
                       <div
                         key={subCategory.id}
-                        className={`cat-card ${
+                        className={`cat-card ${isClientCreateCard ? "user-create-card" : ""} ${
                           selectedCats.subCat?.id === subCategory.id
                             ? "active"
                             : ""
@@ -1809,7 +1858,7 @@ export default function AdForm({
                         {selectedVacationGroup.children.map((item) => (
                           <div
                             key={item.id}
-                            className={`cat-card ${
+                            className={`cat-card ${isClientCreateCard ? "user-create-card" : ""} ${
                               selectedCats.dep?.id === item.table_id &&
                               selectedCats.cat?.id === item.category_id
                                 ? "active"
@@ -1829,7 +1878,7 @@ export default function AdForm({
                       {selectedRootGroup.children.map((type) => (
                         <div
                           key={type.id}
-                          className={`cat-card ${
+                          className={`cat-card ${isClientCreateCard ? "user-create-card" : ""} ${
                             selectedVacationGroup?.id === type.id
                               ? "active"
                               : ""
@@ -1869,7 +1918,7 @@ export default function AdForm({
                             {BuildingAndLandsTypes.map((item) => (
                               <div
                                 key={item.id}
-                                className={`cat-card ${
+                                className={`cat-card ${isClientCreateCard ? "user-create-card" : ""} ${
                                   additionalData.buildingAndLandsType?.id ===
                                   item.id
                                     ? "active"
@@ -1912,6 +1961,10 @@ export default function AdForm({
                                 data={category}
                                 type="categories"
                                 position="when-create-ad"
+                                className={
+                                  isClientCreateCard ? "user-create-card" : ""
+                                }
+                                hideCount={isClientCreateCard}
                                 activeClass={
                                   selectedCats.cat?.id === category.id
                                 }
@@ -1948,6 +2001,10 @@ export default function AdForm({
                           data={table}
                           type="tables"
                           position="when-create-ad"
+                          className={
+                            isClientCreateCard ? "user-create-card" : ""
+                          }
+                          hideCount={isClientCreateCard}
                           activeClass={selectedCats.dep?.id === table.table_id}
                           onSelect={() => selectTable(table)}
                         />

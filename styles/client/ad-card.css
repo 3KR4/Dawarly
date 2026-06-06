@@ -41,7 +41,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5px;
+  gap: 8px;
 }
 .ad-card .image-holder .top .department {
   color: var(--paragraph);
@@ -75,22 +75,38 @@
   visibility: hidden;
   transition: 0.3s;
 }
-.ad-card .image-holder .top span.verified {
+.ad-card .image-holder .top span.verified,
+.ad-card .image-holder span.verified {
   letter-spacing: 0.3px;
-  border-radius: 13px;
-  padding: 5px 8px;
-  transition: all 0.3s;
-  background: var(--section-color);
+  background: #fffefb;
+  border-radius: 999px;
   align-items: center;
-  gap: 1px;
+  gap: 3px;
+  width: fit-content;
+  max-width: 170px;
+  min-height: 25px;
+  padding: 7px 11px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
+  transition: all 0.3s;
   display: flex;
+  box-shadow: 0 8px 18px #0000001c;
 }
-.ad-card .image-holder .top span svg {
+.ad-card .image-holder .top span.verified svg {
+  flex: 0 0 auto;
   font-size: 14px;
-  color: var(--paragraph);
 }
+.ad-card .image-holder .top span.featured-badge svg,
+.ad-card .image-holder .top span.featured-badge {
+  color: var(--swiper-theme-color);
+  background: #c5e1ff;
+}
+.ad-card .image-holder .top span.verified-badge svg,
+.ad-card .image-holder .top span.verified-badge {
+  color: var(--main-color);
+  background: var(--hover-color);
+}
+
 .ad-card .image-holder .top svg {
   color: var(--main-color);
   font-size: 19px;
@@ -146,6 +162,23 @@
 .ad-card .image-holder .top .info span:empty {
   display: none;
 }
+.ad-card .image-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  min-height: 24px;
+  padding: 3px 0;
+  border-radius: 999px;
+  color: var(--paragraph);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ad-card .image-count-badge svg {
+  color: var(--main-color);
+  font-size: 14px;
+}
 .ad-card .image-holder .bottom {
   justify-content: space-between;
   align-items: flex-start;
@@ -166,15 +199,6 @@
   transition: all 0.3s;
   letter-spacing: 0.3px;
 }
-.ad-card .image-holder span.verified {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  background: var(--section-color);
-  color: var(--paragraph);
-}
-
 .ad-card .body {
   flex-direction: column;
   gap: 10px;
@@ -191,15 +215,41 @@
   gap: 5px;
   justify-content: space-between;
 }
+.ad-card .body .row-holder:has(h3) {
+  justify-content: flex-start;
+  gap: 5px;
+}
+.ad-card .body .row-holder:has(h3) .status {
+  color: var(--main-color);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
 .ad-card > .row {
   align-items: center;
-  gap: 5px;
+  justify-content: space-between;
+  gap: 10px;
   display: flex;
   padding: 10px 14px;
   border-top: 1px solid var(--border-color);
   transition: 0.3s;
 }
-.ad-card > .row > *:hover {
+.ad-card > .row .category-path {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.ad-card > .row .category-path > * {
+  flex: 0 1 auto;
+}
+.ad-card > .row .department {
+  min-width: 0;
+}
+.ad-card > .row .category-separator {
+  flex: 0 0 auto;
+}
+.ad-card > .row .category-path > *:hover {
   color: var(--main-color);
 }
 .ad-card span,
@@ -210,6 +260,16 @@
   font-weight: 700;
   color: var(--paragraph);
   min-width: max-content;
+}
+.ad-card > .row .category-path {
+  flex: 1 1 auto;
+}
+.ad-card > .row .department,
+.ad-card > .row .category-path h5 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ad-card .body span:empty {
   display: none;
@@ -246,7 +306,6 @@
   font-family: sans-serif;
 }
 .ad-card .date-area {
-  border-top: 1px solid var(--border-color);
   justify-content: space-between;
   align-items: center;
   padding: 14px;
@@ -263,6 +322,93 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.3;
+  color: var(--paragraph);
+}
+.ad-card .date-area .area,
+.ad-card .date-area .date {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.ad-card .date-area .area {
+  flex: 1;
+}
+.ad-card .date-area .area svg {
+  flex: 0 0 auto;
+  color: var(--main-color);
+  font-size: 19px;
+}
+.ad-card .date-area .date svg {
+  flex: 0 0 auto;
+  color: var(--paragraph);
+  font-size: 18px;
+}
+.ad-card .date-area .area span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-card .specs-holder {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--body-color);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0;
+  padding: 0 10px;
+  display: grid;
+}
+.ad-card .specs-holder .spec-value small {
+  color: inherit;
+  font-size: 11px;
+  font-weight: inherit;
+  vertical-align: top;
+}
+.ad-card .specs-holder .spec {
+  color: var(--paragraph);
+  background: none;
+  border-radius: 0;
+  gap: 0px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  padding: 10px 8px;
+  position: relative;
+  flex-direction: column;
+}
+
+.ad-card .specs-holder .spec .tops {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-card .specs-holder .spec:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  right: 0;
+  width: 1px;
+  background: var(--border-color);
+}
+
+[lang="ar"] .ad-card .specs-holder .spec:not(:last-child)::after {
+  right: auto;
+  left: 0;
+}
+
+.ad-card .specs-holder .spec-icon {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  color: var(--main-color);
+  font-size: 21px;
+}
+
+.ad-card .specs-holder .spec-value {
   color: var(--paragraph);
 }
 
@@ -287,24 +433,18 @@
     transform: unset;
   }
 
-  .specs-holder .spec {
-    height: 26px;
+  .ad-card .specs-holder {
+    padding: 10px 4px;
   }
-  .specs-holder .spec svg {
-    font-size: 14px;
+  .ad-card .specs-holder .spec {
+    background: transparent;
+    border-radius: 0;
+    height: auto;
+    padding: 0 4px;
+    column-gap: 5px;
   }
-  .specs-holder .spec svg.bedrooms {
-    font-size: 18px;
-  }
-  .specs-holder .spec span {
-    font-size: 12px;
-  }
-  .specs-holder .spec svg.km,
-  .specs-holder .spec svg.engine_cc {
-    font-size: 16px;
-  }
-  .specs-holder .spec svg.model_year {
-    font-size: 15px;
+  .ad-card .specs-holder .spec-icon {
+    font-size: 19px;
   }
 
   .ad-card .date-area {
@@ -317,11 +457,12 @@
     font-size: 15px;
   }
   .ad-card .image-holder .top span.verified {
-    padding: 4px 7px;
-    font-size: 11px;
+    min-height: 32px;
+    padding: 7px 12px;
+    font-size: 14px;
   }
   .ad-card .image-holder .top span svg {
-    font-size: 13px;
+    font-size: 18px;
   }
   .ad-card .image-holder .top svg {
     font-size: 16px;

@@ -22,8 +22,394 @@
 .marketplace .content .main .grid-holder {
   gap: 10px;
   display: grid;
-  flex: 1;
   grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));
+}
+
+.marketplace .content .main .grid-holder.list-holder {
+  display: flex;
+  flex-direction: column;
+}
+
+.ad-card-list {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  background: var(--body-color);
+}
+
+.ad-card-list .list-media {
+  flex: 0 0 clamp(300px, 34vw, 430px);
+  align-self: stretch;
+  background: var(--section-color);
+  min-height: unset;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.ad-card-list .list-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.ad-card-list .list-image img {
+  object-fit: cover;
+  transition: 0.3s;
+}
+
+.ad-card-list:hover .list-image img {
+  transform: scale(1.06);
+}
+
+.ad-card-list .list-media-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[lang="ar"] .ad-card-list .list-media-top {
+  right: 12px;
+  left: auto;
+}
+
+.ad-card-list .list-badge {
+  border-radius: 27px;
+  align-items: center;
+  gap: 4px;
+  min-height: 33px;
+  padding: 2px 12px;
+  font-size: 14px;
+  font-weight: 900;
+  display: inline-flex;
+  box-shadow: 0 10px 24px #00000029;
+}
+
+.ad-card-list .list-badge svg {
+  font-size: 18px;
+}
+
+.ad-card-list .list-badge.verified {
+  background: var(--hover-color);
+  color: var(--main-color);
+}
+
+.ad-card-list .list-image-nav {
+  color: var(--paragraph);
+  background: var(--hover-color);
+  border: 0;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    opacity 0.2s;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ad-card-list .list-image-nav:hover {
+  background: var(--main-color);
+  color: #fff;
+}
+
+.ad-card-list .list-image-nav.prev {
+  left: 14px;
+}
+
+.ad-card-list .list-image-nav.next {
+  right: 14px;
+}
+
+[lang="ar"] .ad-card-list .list-image-nav.prev {
+  right: 14px;
+  left: auto;
+}
+
+[lang="ar"] .ad-card-list .list-image-nav.next {
+  right: auto;
+  left: 14px;
+}
+
+.ad-card-list .list-image-dots {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.ad-card-list .list-image-dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.52);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.ad-card-list .list-image-dots button.active {
+  background: #fff;
+  transform: scale(1.45);
+}
+
+.ad-card-list .list-image-count {
+  color: #fff;
+  background: #0000007a;
+  border-radius: 8px;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  backdrop-filter: blur(2px);
+}
+
+[lang="ar"] .ad-card-list .list-image-count {
+  right: auto;
+  left: 12px;
+}
+
+.ad-card-list .list-image-count svg {
+  color: #fff;
+  font-size: 17px;
+}
+
+.ad-card-list .list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 16px;
+  flex: 1;
+}
+
+.ad-card-list .list-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.ad-card-list .title-link {
+  min-width: 0;
+  color: var(--title-color);
+}
+
+.ad-card-list h4 {
+  font-size: 19px;
+  color: var(--paragraph);
+  line-height: 1.35;
+  transition: 0.3s;
+  text-align: left;
+}
+
+[lang="ar"] .ad-card-list h4 {
+  text-align: right;
+}
+.ad-card-list:hover h4 {
+  color: var(--main-color);
+}
+
+.ad-card-list .list-price-row,
+.ad-card-list .list-category,
+.ad-card-list .list-location,
+.ad-card-list .list-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ad-card-list .list-price-row {
+  justify-content: space-between;
+}
+
+.ad-card-list h3 {
+  color: var(--main-color);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.ad-card-list .list-stats {
+  flex: 0 0 auto;
+  color: var(--paragraph);
+  font-size: 13px;
+  gap: 15px;
+  font-weight: 700;
+}
+.ad-card-list .list-stats svg {
+  font-size: 16px;
+}
+.ad-card-list .list-stats svg,
+.ad-card-list .list-location svg {
+  color: var(--main-color);
+  flex: 0 0 auto;
+}
+
+.ad-card-list .list-category {
+  color: var(--paragraph);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.ad-card-list .list-category span {
+  min-width: 0;
+}
+
+.ad-card-list .list-location {
+  color: var(--paragraph);
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: space-between;
+}
+.ad-card-list .row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-card-list .list-details {
+  border: 1px solid var(--border-color);
+  padding: 0 10px;
+  width: 100%;
+  align-items: center;
+  border-radius: 8px;
+  justify-content: center;
+}
+
+.ad-card-list .list-details .list-chip-icon {
+  font-size: 22px;
+}
+.ad-card-list .list-details,
+.ad-card-list .list-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  border-radius: 8px;
+}
+
+.ad-card-list .list-spec-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 68px;
+  min-height: 42px;
+  padding: 12px 8px;
+  color: var(--paragraph);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border-left: 1px solid var(--border-color);
+  flex: 1;
+}
+.ad-card-list .list-spec-chip:first-child {
+  border: none;
+}
+.ad-card-list .list-spec-top,
+.ad-card-list .list-amenity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ad-card-list .list-spec-top {
+  justify-content: center;
+}
+
+.ad-card-list .list-amenity-chip {
+  border: 1px solid var(--border-color);
+  min-height: 31px;
+  color: var(--paragraph);
+  border-radius: 7px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  min-width: max-content;
+  padding: 8px 15px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ad-card-list .list-amenity-chip svg {
+  font-size: 13px;
+}
+.ad-card-list .list-chip-icon {
+  color: var(--main-color);
+  flex: 0 0 auto;
+  font-size: 17px;
+}
+
+.ad-card-list .list-details strong {
+  color: var(--paragraph);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ad-card-list .list-details b {
+  color: var(--paragraph);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.ad-card-list .list-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.ad-card-list .list-actions .main-button {
+  width: 100%;
+  height: 40px;
+  border: 0;
+  font-size: 13px;
+  color: var(--main-color);
+}
+
+.ad-card-list .list-actions .main-button:hover,
+.ad-card-list .list-actions .main-button:hover > * {
+  color: #fff;
+}
+
+.ad-card-list .list-actions .whatsapp-button,
+.ad-card-list .list-actions .whatsapp-button > * {
+  color: #25d366;
+  background: #d6ffe5;
+}
+
+.ad-card-list .list-actions .whatsapp-button:hover,
+.ad-card-list .list-actions .whatsapp-button:hover > * {
+  background: #1ebe5d;
+  color: #fff;
 }
 
 .marketplace .active-filters-bar {
@@ -169,5 +555,53 @@
   .marketplace .active-filters-bar .filters-header {
     width: 100%;
   }
+}
 
+@media (max-width: 768px) {
+  .ad-card-list {
+    flex-direction: column;
+  }
+
+  .ad-card-list .list-media {
+    flex: none;
+    min-height: 240px;
+    height: 240px;
+  }
+
+  .ad-card-list .list-content {
+    flex-direction: column;
+  }
+
+  .ad-card-list .list-actions {
+    flex: none;
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 520px) {
+  .ad-card-list {
+    padding: 8px;
+  }
+
+  .ad-card-list .list-media {
+    min-height: 210px;
+    height: 210px;
+  }
+
+  .ad-card-list .list-price-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ad-card-list h4 {
+    font-size: 16px;
+  }
+
+  .ad-card-list h3 {
+    font-size: 18px;
+  }
+
+  .ad-card-list .list-actions {
+    flex-direction: column;
+  }
 }

@@ -9,6 +9,7 @@ import { FaTrashAlt, FaEye } from "react-icons/fa";
 import Link from "next/link";
 import { BiSolidPurchaseTagAlt } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
+import { HiExclamation } from "react-icons/hi";
 import React, { useContext, useState, useEffect } from "react";
 import { specsConfig } from "@/Contexts/specsConfig";
 
@@ -17,7 +18,7 @@ import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
 import { useNotification } from "@/Contexts/NotificationContext";
 import { TbListSearch } from "react-icons/tb";
-import { AdStatuses, RentFrequencies } from "@/data/enums";
+import { AdStatuses, PaymentMethod, RentFrequencies } from "@/data/enums";
 import DeleteConfirm from "@/components/Tools/DeleteConfirm";
 import DynamicMenu from "@/components/Tools/DynamicMenu";
 import { FaHeart } from "react-icons/fa";
@@ -45,6 +46,8 @@ export default function AdsTable({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [target, setTarget] = useState(null);
   const [rejectInput, setRejectInput] = useState("");
+  const isDashboardAdsView = page === "dashboard";
+  const isDashboardPendingView = isDashboardAdsView && !activeAds;
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
@@ -54,6 +57,10 @@ export default function AdsTable({
         : status.id === "ACTIVE" || status.id === "REJECTED",
   );
   const getSpecConfig = (key) => specsConfig[key];
+  const getRentFrequencyLabel = (value) =>
+    RentFrequencies.find((item) => item.id == value)?.[`name_${locale}`];
+  const getPaymentMethodLabel = (value) =>
+    PaymentMethod.find((item) => item.id == value)?.[`name_${locale}`];
   const getOwnerInfo = (item) => {
     if (item?.anonymous) {
       return {
@@ -117,9 +124,9 @@ export default function AdsTable({
   return (
     <div className={`body ${page == "user" ? "fluid-container for-user" : ""}`}>
       <div
-        className={`table-container products ${!activeAds ? "pending-ads" : ""} ${
-          showOwnerDetails ? "with-owner-details" : ""
-        }`}
+        className={`table-container products ${
+          isDashboardPendingView ? "pending-ads" : ""
+        } ${showOwnerDetails ? "with-owner-details" : ""}`}
       >
         <div className="table-header">
           {!screenSize.includes("small") && (
@@ -132,8 +139,10 @@ export default function AdsTable({
                   {t.dashboard.tables.owner_details}
                 </div>
               )}
-              <div className="header-item">{t.ad.rentPrice}</div>
-              {!activeAds && (
+              <div className="header-item">
+                {isDashboardAdsView ? t.ad.price : t.ad.rentPrice}
+              </div>
+              {!activeAds && !isDashboardPendingView && (
                 <div className="header-item">{t.ad.deposit_amount}</div>
               )}
 
@@ -193,6 +202,16 @@ export default function AdsTable({
               const tableId = getAdTableId(item);
               const itemWithTableId = { ...item, table_id: tableId };
               const ownerInfo = getOwnerInfo(item);
+              const rentFrequencyLabel = getRentFrequencyLabel(
+                item?.rent_frequency,
+              );
+              const paymentMethodLabel = getPaymentMethodLabel(
+                item?.payment_method,
+              );
+              const editHref =
+                page == "dashboard"
+                  ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
+                  : `/mylisting/form/${item?.id}?dep=${tableId}`;
               return (
                 <div
                   key={`${tableId}-${item?.id}`}
@@ -286,8 +305,10 @@ export default function AdsTable({
 
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
                         {formatCurrency(item?.price, item?.currency, locale)}
+                        {rentFrequencyLabel ? ` - ${rentFrequencyLabel}` : ""}
+                        {paymentMethodLabel ? ` - ${paymentMethodLabel}` : ""}
                       </div>
-                      {!activeAds && (
+                      {!activeAds && !isDashboardPendingView && (
                         <div
                           className="item-price"
                           style={{ lineHeight: `1.3` }}
@@ -303,14 +324,13 @@ export default function AdsTable({
                   ) : (
                     <>
                       <div className="item-price" style={{ lineHeight: `1.3` }}>
-                        {formatCurrency(item?.price, item?.currency, locale)}{" "}
-                        {
-                          RentFrequencies?.find(
-                            (x) => x.id == item?.rent_frequency,
-                          )?.[`name_${locale}`]
-                        }
+                        {formatCurrency(item?.price, item?.currency, locale)}
+                        {rentFrequencyLabel ? ` ${rentFrequencyLabel}` : ""}
+                        {isDashboardAdsView && paymentMethodLabel
+                          ? ` - ${paymentMethodLabel}`
+                          : ""}
                       </div>
-                      {!activeAds && (
+                      {!activeAds && !isDashboardPendingView && (
                         <div
                           className="item-price"
                           style={{ lineHeight: `1.3` }}
@@ -386,27 +406,37 @@ export default function AdsTable({
                     </div>
                   ) : (
                     <div className="item-status">
-                      <SelectOptions
-                        size="ultra-small"
-                        className={"centerd"}
-                        options={filteredStatuses}
-                        value={curentStatus}
-                        disabled={
-                          page === "user" && curentStatus.id == "PENDING"
-                        }
-                        hiddenIco={
-                          page === "user" && curentStatus.id == "PENDING"
-                        }
-                        locale={locale}
-                        onChange={(selected) => {
-                          if (selected.id == "REJECTED") {
-                            setMenuType("reject");
-                            setTarget(itemWithTableId);
-                          } else {
-                            changeStatus(itemWithTableId, selected);
+                      {page === "user" && curentStatus.id == "REJECTED" ? (
+                        <Link
+                          href={editHref}
+                          className="pending rejected-status-link"
+                        >
+                          <span>{curentStatus?.[`name_${locale}`]}</span>
+                          <HiExclamation />
+                        </Link>
+                      ) : (
+                        <SelectOptions
+                          size="ultra-small"
+                          className={"centerd"}
+                          options={filteredStatuses}
+                          value={curentStatus}
+                          disabled={
+                            page === "user" && curentStatus.id == "PENDING"
                           }
-                        }}
-                      />
+                          hiddenIco={
+                            page === "user" && curentStatus.id == "PENDING"
+                          }
+                          locale={locale}
+                          onChange={(selected) => {
+                            if (selected.id == "REJECTED") {
+                              setMenuType("reject");
+                              setTarget(itemWithTableId);
+                            } else {
+                              changeStatus(itemWithTableId, selected);
+                            }
+                          }}
+                        />
+                      )}
                     </div>
                   )}
 
@@ -418,11 +448,7 @@ export default function AdsTable({
                     {statusChanger !== "favoriet" && (
                       <>
                         <Link
-                          href={
-                            page == "dashboard"
-                              ? `/dashboard/ads/form?dep=${tableId}&id=${item?.id}`
-                              : `/mylisting/form/${item?.id}?dep=${tableId}`
-                          }
+                          href={editHref}
                         >
                           <MdEdit className="edit" />
                         </Link>

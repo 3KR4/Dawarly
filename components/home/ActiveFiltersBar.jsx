@@ -12,6 +12,7 @@ const ActiveFiltersBar = ({
   dynamicFilters,
   searchText,
   ownerFilter,
+  sortFilter,
   onRemoveCategory,
   onRemoveFilter,
   onClearAll,
@@ -146,6 +147,14 @@ const ActiveFiltersBar = ({
     });
   }
 
+  if (sortFilter) {
+    activeFilters.push({
+      key: "sort_by_ui",
+      value: sortFilter.id,
+      display: getLocalizedText(sortFilter.name) || sortFilter[`name_${locale}`],
+    });
+  }
+
   if (dynamicFilters) {
     const dynamicFilterEntries = Object.entries(dynamicFilters);
     const departmentFilter = dynamicFilterEntries.find(([key]) => key === "dep");
@@ -187,7 +196,15 @@ const ActiveFiltersBar = ({
   }
 
   const orderedActiveFilters = [...activeFilters].sort((a, b) => {
-    const priority = { owner: 0, dep: 1, category_tree: 1, search: 2, cat: 3, subCat: 4 };
+    const priority = {
+      owner: 0,
+      dep: 1,
+      category_tree: 1,
+      search: 2,
+      sort_by_ui: 3,
+      cat: 4,
+      subCat: 5,
+    };
     return (priority[a.key] ?? 4) - (priority[b.key] ?? 4);
   });
 

@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaMessage, FaAngleDown } from "react-icons/fa6";
+import { FaMessage, FaAngleDown, FaHeadset } from "react-icons/fa6";
 import { settings } from "@/Contexts/settings";
 import {
   FaSearch,
@@ -21,12 +21,13 @@ import {
   FaRegUser,
   FaListUl,
   FaUser,
+  FaHome,
 } from "react-icons/fa";
 import { FiSun } from "react-icons/fi";
 import { GrLanguage } from "react-icons/gr";
 import { usePathname, useRouter } from "next/navigation";
 import { LuMessageSquare } from "react-icons/lu";
-import { MdPostAdd } from "react-icons/md";
+import { MdAddCircle, MdPostAdd } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
 import useTranslate from "@/Contexts/useTranslation";
 import SelectLocation from "@/components/Tools/data-collector/selectLocation";
@@ -46,6 +47,7 @@ function Header() {
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
   const { tables, categories, subCategories } = useAppData();
+  const isSmallScreen = screenSize.includes("small");
 
   const { user, isAuthenticated, loading, logout } = useAuth();
 
@@ -102,6 +104,8 @@ function Header() {
     return buildNavigation(tables, categories, subCategories);
   }, [tables, categories, subCategories]);
 
+
+
   const searchValue = searchText.trim();
   const searchHref = searchValue
     ? `/market?s=${encodeURIComponent(searchValue)}`
@@ -109,6 +113,10 @@ function Header() {
   const blogsSearchHref = searchValue
     ? `/blogs?search=${encodeURIComponent(searchValue)}`
     : "/blogs";
+  const postAdHref =
+    user?.user_type === "USER" ? "/request-ad" : "/mylisting/createAd";
+  const postAdLabel =
+    user?.user_type === "USER" ? t.footer.requestUploadAd : t.actions.postAd;
 
   const normalizeSearchPayload = useCallback((payload = {}) => {
     const data = payload.data || payload;
@@ -511,29 +519,39 @@ function Header() {
                             </li>
                           )}
 
-                          <li>
-                            <Link href={`/account/${user?.id}`} className="btn">
-                              <FaRegUser />
-                              {t.actions.accountSettings}
-                            </Link>
-                          </li>
-                          {user?.user_type !== "USER" && (
+                          {screenSize === "large" && (
                             <li>
-                              <Link href={`/mylisting/createAd`} className="btn">
-                                <MdPostAdd style={{ fontSize: "17px" }} />
-                                {t.actions.postAd}
+                              <Link
+                                href={`/account/${user?.id}`}
+                                className="btn"
+                              >
+                                <FaRegUser />
+                                {t.actions.accountSettings}
                               </Link>
                             </li>
                           )}
-                          {user?.user_type === "USER" && (
-                            <li>
-                              <Link href={`/request-ad`} className="btn">
-                                <MdPostAdd style={{ fontSize: "17px" }} />
-                                Request an ad
-                              </Link>
-                            </li>
-                          )}
-                          {user && (
+                          {screenSize === "large" &&
+                            user?.user_type !== "USER" && (
+                              <li>
+                                <Link
+                                  href={`/mylisting/createAd`}
+                                  className="btn"
+                                >
+                                  <MdPostAdd style={{ fontSize: "17px" }} />
+                                  {t.actions.postAd}
+                                </Link>
+                              </li>
+                            )}
+                          {screenSize === "large" &&
+                            user?.user_type === "USER" && (
+                              <li>
+                                <Link href={`/request-ad`} className="btn">
+                                  <MdPostAdd style={{ fontSize: "17px" }} />
+                                  {t.footer.requestUploadAd}
+                                </Link>
+                              </li>
+                            )}
+                          {screenSize === "large" && user && (
                             <li>
                               <Link href={`/mylisting`} className="btn">
                                 <FaListUl />
@@ -542,14 +560,16 @@ function Header() {
                             </li>
                           )}
 
-                          {screenSize.includes("small") && (
+                          {screenSize !== "large" && (
                             <>
-                              <li>
-                                <Link href={`/`} className="btn">
-                                  <FaRegHeart />
-                                  {t.actions.favorietList}
-                                </Link>
-                              </li>
+                              {screenSize.includes("small") && (
+                                <li>
+                                  <Link href={`/favorites`} className="btn">
+                                    <FaRegHeart />
+                                    {t.actions.favorietList}
+                                  </Link>
+                                </li>
+                              )}
                               {/* <li>
                                 <Link href={`/`} className="btn">
                                   <LuMessageSquare />
@@ -594,7 +614,11 @@ function Header() {
               ) : (
                 <>
                   <Link className="main-button request-ad" href={`/request-ad`}>
-                    {!screenSize.includes("small") ? "Request an ad" : <MdPostAdd />}
+                    {!screenSize.includes("small") ? (
+                      "Request an ad"
+                    ) : (
+                      <MdPostAdd />
+                    )}
                   </Link>
                   <Link className="main-button login-in" href={`/register`}>
                     {!screenSize.includes("small") ? t.auth.login : <FaUser />}
@@ -605,37 +629,38 @@ function Header() {
           </div>
         </div>
       </header>
-      <header>
-        <div className="container">
-          <div className="bottom">
-            <div className="nav">
-              {screenSize.includes("small") && (
-                <h4 onClick={() => setActiveSmallMenu((prev) => !prev)}>
-                  {t.header.filterByCategories} <FaAngleDown />
-                </h4>
-              )}
-              <SelectLocation locale={locale} onSelect={handleLocationSelect} />
+      {!isSmallScreen && (
+        <header>
+          <div className="container">
+            <div className="bottom">
+              <div className="nav">
+                {screenSize !== "large" && (
+                  <h4 onClick={() => setActiveSmallMenu((prev) => !prev)}>
+                    {t.header.filterByCategories} <FaAngleDown />
+                  </h4>
+                )}
+                <SelectLocation locale={locale} onSelect={handleLocationSelect} />
 
-              <div
-                className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
-                ref={menuRef2}
-              >
-                {nav?.map((group) => {
-                  const isActive = activeSubCat === group.id;
+                <div
+                  className={`cats-nav ${activeSmallMenu ? "active" : ""}`}
+                  ref={menuRef2}
+                >
+                  {nav?.map((group) => {
+                    const isActive = activeSubCat === group.id;
 
-                  return (
-                    <div
-                      key={group.id}
-                      className="cat-item"
-                      onMouseEnter={
-                        !screenSize.includes("small")
-                          ? () => openMenu(group.id)
-                          : undefined
-                      }
-                      onMouseLeave={
-                        !screenSize.includes("small") ? closeMenu : undefined
-                      }
-                    >
+                    return (
+                      <div
+                        key={group.id}
+                        className="cat-item"
+                        onMouseEnter={
+                          !screenSize.includes("small")
+                            ? () => openMenu(group.id)
+                            : undefined
+                        }
+                        onMouseLeave={
+                          !screenSize.includes("small") ? closeMenu : undefined
+                        }
+                      >
                       {/* ================= ROOT ================= */}
 
                       <Link
@@ -844,35 +869,64 @@ function Header() {
                           </div>
                         </div>
                       )}
-                    </div>
-                  );
-                })}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+              {screenSize === "large" && (
+                <div className="actions">
+                  <button className="theme" onClick={toggleTheme}>
+                    {theme === "light" ? (
+                      <>
+                        <FaMoon />
+                        <span>{t.actions.darkMode}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiSun />
+                        <span>{t.actions.lightMode}</span>
+                      </>
+                    )}
+                  </button>
+                  <button className="lang" onClick={toggleLocale}>
+                    <GrLanguage />
+                    <span>{t.actions.lang}</span>
+                  </button>
+                  <Link className="contact" href="/contact">
+                    <FaHeadset />
+                    <span style={{fontSize: "13PX"}}>{t.footer.contactUs}</span>
+                  </Link>
+                </div>
+              )}
             </div>
-            {!screenSize.includes("small") && (
-              <div className="actions">
-                <button className="theme" onClick={toggleTheme}>
-                  {theme === "light" ? (
-                    <>
-                      <FaMoon />
-                      <span>{t.actions.darkMode}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FiSun />
-                      <span>{t.actions.lightMode}</span>
-                    </>
-                  )}
-                </button>
-                <button className="lang" onClick={toggleLocale}>
-                  <GrLanguage />
-                  <span>{t.actions.lang}</span>
-                </button>
-              </div>
-            )}
           </div>
-        </div>
-      </header>
+        </header>
+      )}
+      {isAuthenticated && screenSize !== "large" && (
+        <nav className="mobile-bottom-nav" aria-label="Primary navigation">
+          <Link href="/" className="mobile-bottom-link">
+            <FaHome />
+            <span>{t.home.home}</span>
+          </Link>
+          <Link href="/contact" className="mobile-bottom-link">
+            <FaHeadset />
+            <span>{t.footer.contactUs}</span>
+          </Link>
+          <Link href={postAdHref} className="mobile-bottom-link main">
+            <MdAddCircle />
+            <span>{postAdLabel}</span>
+          </Link>
+          <Link href="/mylisting" className="mobile-bottom-link">
+            <FaListUl />
+            <span>Your Ads</span>
+          </Link>
+          <Link href={`/account/${user?.id}`} className="mobile-bottom-link">
+            <FaRegUser />
+            <span>Account</span>
+          </Link>
+        </nav>
+      )}
     </>
   );
 }

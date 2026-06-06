@@ -10,6 +10,7 @@ import React, {
   useState,
 } from "react";
 import AdsCard from "@/components/home/AdsCard";
+import AdsCardList from "@/components/home/AdsCardList";
 import DynamicFilters from "@/components/Tools/data-collector/DynamicFilters";
 import ActiveFiltersBar from "@/components/home/ActiveFiltersBar";
 import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
@@ -78,6 +79,11 @@ const SORT_OPTIONS = [
   },
 ];
 
+const SORT_PLACEHOLDER = {
+  en: "Sort By",
+  ar: "ترتيب حسب",
+};
+
 const rangeQueryKeys = {
   price: ["min_price", "max_price"],
   area_m2: ["min_area_m2", "max_area_m2"],
@@ -144,7 +150,18 @@ const getFilterValueForUrl = (params, field) => {
   );
 };
 
-const hasAds = (item) => Number(item?.adsCount || 0) > 0;
+const getAdsCount = (item) =>
+  item?.adsCount ??
+  item?.ads_count ??
+  item?.active_ads_count ??
+  item?.activeAdsCount;
+
+const hasAds = (item) => {
+  const adsCount = getAdsCount(item);
+  return Number(adsCount || 0) > 0;
+};
+
+const sameId = (a, b) => String(a) === String(b);
 
 const getDynamicFilterDefinitions = (tableId, data = {}) => {
   const {
@@ -214,7 +231,7 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
         {
           queryKey: "dep",
           items: tables.filter((table) =>
-            categories.some((cat) => cat.table_id === table.id && hasAds(cat)),
+            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
           ),
         },
         {
@@ -439,10 +456,8 @@ function MarketplaceContent() {
   }, [activeDynamicFilters, queryString]);
 
   const selectedSort = useMemo(() => {
-    return (
-      SORT_OPTIONS.find((option) => option.id === sortUiParam) ||
-      SORT_OPTIONS[0]
-    );
+    if (!sortUiParam) return null;
+    return SORT_OPTIONS.find((option) => option.id === sortUiParam) || null;
   }, [sortUiParam]);
 
   const [orderBy, setOrderBy] = useState(selectedSort);
@@ -513,6 +528,10 @@ function MarketplaceContent() {
       ) {
         params.delete("s");
         params.delete("search");
+        params.delete("governorate_id");
+        params.delete("city_id");
+        params.delete("area_id");
+        params.delete("compound_id");
       }
 
       Object.entries(updates).forEach(([key, value]) => {
@@ -540,11 +559,12 @@ function MarketplaceContent() {
       const filters = {
         page,
         limit: adsData.pagination.limit,
-        sort: selectedSort.backendSort,
       };
       const search = params.get("s") || params.get("search");
 
-      if (selectedSort.backendOrder) filters.order = selectedSort.backendOrder;
+      if (selectedSort?.backendSort) filters.sort = selectedSort.backendSort;
+      if (selectedSort?.backendOrder) filters.order = selectedSort.backendOrder;
+      if (listGridOption === "list") filters.details_mode = "single";
       if (search) filters.search = search;
       if (params.get("owner")) filters.owner = params.get("owner");
       if (params.get("owner_type")) filters.owner_type = params.get("owner_type");
@@ -602,7 +622,13 @@ function MarketplaceContent() {
 
       return filters;
     },
-    [activeDynamicFilters, adsData.pagination.limit, queryString, selectedSort],
+    [
+      activeDynamicFilters,
+      adsData.pagination.limit,
+      listGridOption,
+      queryString,
+      selectedSort,
+    ],
   );
 
   const fetchAds = useCallback(
@@ -654,7 +680,7 @@ function MarketplaceContent() {
   };
 
   const handleListGridOption = (type) => {
-    setListGridOption((prev) => (prev === type ? "" : type));
+    setListGridOption(type);
   };
 
   const handleCategorySelect = (type, item) => {
@@ -763,6 +789,7 @@ function MarketplaceContent() {
       subcat: null,
       s: null,
       search: null,
+      sort_by_ui: null,
       owner: null,
       owner_type: null,
       owner_id: null,
@@ -816,6 +843,7 @@ function MarketplaceContent() {
                   ownerId: ownerIdParam,
                   ownerName: ownerNameParam,
                 }}
+                sortFilter={selectedSort}
                 onRemoveCategory={handleRemoveCategory}
                 onRemoveFilter={handleRemoveFilter}
                 onClearAll={handleClearAllFilters}
@@ -831,7 +859,7 @@ function MarketplaceContent() {
                       className="ellipsis"
                       onClick={() => setOrderOpen((prev) => !prev)}
                     >
-                      {orderBy.name[locale]}
+                      {orderBy?.name?.[locale] || SORT_PLACEHOLDER[locale]}
                     </h4>
 
                     <IoFilterSharp
@@ -843,7 +871,7 @@ function MarketplaceContent() {
                   {orderOpen && (
                     <div className="menu active">
                       {SORT_OPTIONS.map((item) => {
-                        const isActive = orderBy.id === item.id;
+                        const isActive = orderBy?.id === item.id;
 
                         return (
                           <button
@@ -854,8 +882,7 @@ function MarketplaceContent() {
                               setOrderBy(item);
                               setOrderOpen(false);
                               updateUrl({
-                                sort_by_ui:
-                                  item.id === "newest" ? null : item.id,
+                                sort_by_ui: item.id,
                               });
                             }}
                           >
@@ -881,7 +908,7 @@ function MarketplaceContent() {
             </div>
 
             <div
-              className="grid-holder"
+              className={`grid-holder ${listGridOption === "list" ? "list-holder" : ""}`}
               style={{
                 position: "relative",
                 opacity: loadingContent ? "0.6" : "1",
@@ -901,12 +928,17 @@ function MarketplaceContent() {
                   <p>{"no data found"} </p>
                 </div>
               ) : (
-                adsData?.ads?.map((item, index) => (
-                  <AdsCard
-                    key={`${item.department?.id || "ad"}-${item.id || index}`}
-                    data={item}
-                  />
-                ))
+                adsData?.ads?.map((item, index) => {
+                  const CardComponent =
+                    listGridOption === "list" ? AdsCardList : AdsCard;
+
+                  return (
+                    <CardComponent
+                      key={`${item.department?.id || "ad"}-${item.id || index}`}
+                      data={item}
+                    />
+                  );
+                })
               )}
             </div>
 
