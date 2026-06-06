@@ -18,7 +18,6 @@ import {
   FaPhone,
   FaEye,
 } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa";
 
 import { FaImage } from "react-icons/fa";
 
@@ -464,15 +463,15 @@ export default function AdDetails() {
                 <div className="top">
                   <div className="column">
                     {ad?.featured_priority > 0 ? (
-                      <span className="verified ellipsis">
+                      <span className="verified featured-badge ellipsis">
                         <BsFillLightningChargeFill /> {t.ad.featured_ad}
                       </span>
                     ) : (
                       <span></span>
                     )}
                     {ad?.is_verified && (
-                      <span className="verified ellipsis">
-                        <FaCheck /> {t.ad.verified}
+                      <span className="verified verified-badge ellipsis">
+                        <BsFillPatchCheckFill /> {t.ad.verified}
                       </span>
                     )}
                   </div>

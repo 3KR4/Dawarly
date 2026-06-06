@@ -94,21 +94,49 @@
 }
 .single-page .images-holder > .img .top span.verified {
   letter-spacing: 0.3px;
-  background: var(--section-color);
+  background: #fffefb;
   color: var(--paragraph);
-  border-radius: 13px;
+  border-radius: 999px;
   align-items: center;
   gap: 3px;
-  padding: 5px 8px;
-  font-size: 15px;
+  padding: 7px 11px;
+  min-height: 25px;
+  width: fit-content;
+  max-width: 170px;
+  font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 8px 18px #0000001c;
   transition: all 0.3s;
   display: flex;
-  height: fit-content;
 }
 .single-page .images-holder > .img .top span.verified svg {
-  color: var(--main-color);
+  flex: 0 0 auto;
   font-size: 14px;
+}
+.single-page .images-holder > .img .top span.featured-badge svg,
+.single-page .images-holder > .img .top span.featured-badge {
+  color: var(--swiper-theme-color);
+  background: #d7eaff;
+}
+.single-page .images-holder > .img .top span.featured-badge svg {
+  color: var(--swiper-theme-color);
+}
+.single-page .images-holder > .img .top span.verified-badge svg,
+.single-page .images-holder > .img .top span.verified-badge {
+  color: var(--main-color);
+  background: var(--hover-color);
+}
+.single-page .images-holder > .img .top span.verified-badge svg {
+  color: var(--main-color);
+}
+.single-page .images-holder > .img .top span.image-counter {
+  color: var(--paragraph);
+  background: var(--section-color);
+  height: fit-content;
+  box-shadow: none;
+}
+.single-page .images-holder > .img .top span.image-counter svg {
+  color: var(--main-color);
 }
 .single-page .images-holder > .img .top span:empty {
   visibility: hidden;
@@ -890,6 +918,12 @@
 .single-page .details-holder .main-button svg {
   font-size: 13px;
 }
+.single-page .details-holder .main-button > svg {
+  color: var(--main-color);
+}
+.single-page .details-holder .main-button:hover > svg {
+  color: white;
+}
 [lang="ar"] .single-page .details-holder .main-button:first-child svg {
   transform: scaleX(-1);
 }
@@ -913,12 +947,10 @@
   .user-info
   .main-button.whatsapp-button
   > * {
-  background: #25d366;
-  color: #ffffff;
+  color: #25d366;
+  background: #d6ffe5;
 }
-.single-page .details-holder .right .user-info .main-button.whatsapp-button {
-  border: 1px solid #25d366;
-}
+
 .single-page
   .details-holder
   .right
@@ -943,8 +975,11 @@
   gap: 3px;
   min-width: max-content;
   height: 35px;
+  color: var(--main-color);
 }
-
+.single-page .details-holder .right .user-info .row button:hover {
+  color: white;
+}
 .single-page .details-holder ul.list {
   flex-direction: column;
   gap: 7px;
@@ -1017,7 +1052,7 @@
     grid-template-columns: 1fr;
   }
   .images-fullscreen .images-list {
-        grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
   .single-page .details-holder .left,
   .single-page .details-holder .right {
@@ -1153,7 +1188,12 @@
     height: 84px;
   }
   .single-page .images-holder > .img .top span.verified {
-    font-size: 11px;
+    min-height: 32px;
+    padding: 7px 12px;
+    font-size: 14px;
+  }
+  .single-page .images-holder > .img .top span.verified svg {
+    font-size: 18px;
   }
 }
 @media (max-width: 500px) {

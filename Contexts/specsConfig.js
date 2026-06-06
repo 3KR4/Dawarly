@@ -1,16 +1,17 @@
-import { MdOutlineKingBed } from "react-icons/md";
-import { PiBathtubBold } from "react-icons/pi";
-import { RiStairsLine } from "react-icons/ri";
-
-import { IoIosResize } from "react-icons/io";
+import {
+  PiBathtubDuotone,
+  PiBedDuotone,
+  PiRulerDuotone,
+  PiStepsDuotone,
+} from "react-icons/pi";
 
 export const specsConfig = {
-  bedrooms: { icon: MdOutlineKingBed, showInMini: true },
-  bathrooms: { icon: PiBathtubBold, showInMini: true },
-  level: { icon: RiStairsLine, showInMini: true },
+  bedrooms: { icon: PiBedDuotone, showInMini: true },
+  bathrooms: { icon: PiBathtubDuotone, showInMini: true },
+  level: { icon: PiStepsDuotone, showInMini: true },
 
   area_m2: {
-    icon: IoIosResize,
+    icon: PiRulerDuotone,
     showInMini: true,
     label: "m2",
   },

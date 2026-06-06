@@ -40,7 +40,7 @@ export const metadata = {
     "lazorde bay",
     "لازوردى",
     "north coast",
-    "north cost",
+    "north cost", 
     "sahel",
     "saheel",
     "الساحل",

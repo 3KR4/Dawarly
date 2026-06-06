@@ -91,7 +91,18 @@ const DynamicFilters = ({
   const getItemName = (item) =>
     item?.[`name_${locale}`] || item?.name_en || item?.name_ar || "";
 
-  const getItemCount = (item) => Number(item?.adsCount || 0);
+  const getAdsCount = (item) =>
+    item?.adsCount ??
+    item?.ads_count ??
+    item?.active_ads_count ??
+    item?.activeAdsCount;
+
+  const hasAds = (item) => {
+    const adsCount = getAdsCount(item);
+    return Number(adsCount || 0) > 0;
+  };
+
+  const getItemCount = (item) => Number(getAdsCount(item) || 0);
 
   const getListKey = (fieldKey, levelKey = "root") => `${fieldKey}:${levelKey}`;
 
@@ -194,7 +205,7 @@ const DynamicFilters = ({
     if (!level) return null;
 
     const items = level.items.filter((item) => {
-      if (level.hasAdsOnly && Number(item?.adsCount || 0) <= 0) return false;
+      if (level.hasAdsOnly && !hasAds(item)) return false;
       if (!level.parentKey) return true;
       return String(item[level.parentKey]) === String(parentItem?.id);
     });

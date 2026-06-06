@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
+import { FaCheck } from "react-icons/fa";
 import {
   BadgeCheck,
   Building2,
@@ -171,9 +172,24 @@ const toFilterOption = (option, fieldKey) => ({
 });
 
 const getItemName = (item, locale) =>
-  item?.[`name_${locale}`] || item?.name_en || item?.name_ar || item?.value || "";
+  item?.[`name_${locale}`] ||
+  item?.name_en ||
+  item?.name_ar ||
+  item?.value ||
+  "";
 
-const filterHasAds = (item) => Number(item?.adsCount || 0) > 0;
+const getAdsCount = (item) =>
+  item?.adsCount ??
+  item?.ads_count ??
+  item?.active_ads_count ??
+  item?.activeAdsCount;
+
+const filterHasAds = (item) => {
+  const adsCount = getAdsCount(item);
+  return Number(adsCount || 0) > 0;
+};
+
+const sameId = (a, b) => String(a) === String(b);
 
 const toEnumOption = (item) => ({
   id: item.id,
@@ -184,7 +200,10 @@ const toEnumOption = (item) => ({
   },
 });
 
-const buildLocationField = ({ governorates, cities, areas, compounds }, locale) => ({
+const buildLocationField = (
+  { governorates, cities, areas, compounds },
+  locale,
+) => ({
   key: "location_tree",
   uiType: "nested",
   label: {
@@ -223,10 +242,14 @@ const buildLocationField = ({ governorates, cities, areas, compounds }, locale) 
       value?.city_id ||
       value?.governorate_id;
     const selectedItem =
-      compounds.find((item) => String(item.id) === String(value?.compound_id)) ||
+      compounds.find(
+        (item) => String(item.id) === String(value?.compound_id),
+      ) ||
       areas.find((item) => String(item.id) === String(value?.area_id)) ||
       cities.find((item) => String(item.id) === String(value?.city_id)) ||
-      governorates.find((item) => String(item.id) === String(value?.governorate_id));
+      governorates.find(
+        (item) => String(item.id) === String(value?.governorate_id),
+      );
 
     return selectedKey && selectedItem
       ? getItemName(selectedItem, locale)
@@ -234,7 +257,10 @@ const buildLocationField = ({ governorates, cities, areas, compounds }, locale) 
   },
 });
 
-const buildDepartmentField = ({ departments, categories, subCategories }, locale) => ({
+const buildDepartmentField = (
+  { departments, categories, subCategories },
+  locale,
+) => ({
   key: "department_tree",
   uiType: "nested",
   label: {
@@ -244,8 +270,7 @@ const buildDepartmentField = ({ departments, categories, subCategories }, locale
   levels: [
     {
       queryKey: "dep",
-      items: departments.filter(filterHasAds),
-      hasAdsOnly: true,
+      items: departments,
     },
     {
       queryKey: "cat",
@@ -266,9 +291,10 @@ const buildDepartmentField = ({ departments, categories, subCategories }, locale
       categories.find((item) => String(item.id) === String(value?.cat)),
       subCategories.find((item) => String(item.id) === String(value?.subcat)),
     ].filter(Boolean);
+    const lastSelectedItem = selectedItems[selectedItems.length - 1];
 
-    return selectedItems.length
-      ? selectedItems.map((item) => getItemName(item, locale)).join(" > ")
+    return lastSelectedItem
+      ? getItemName(lastSelectedItem, locale)
       : LABELS[locale].placeholders.departments;
   },
 });
@@ -357,7 +383,8 @@ const buildTableDynamicFields = ({
         label: { en: `${index + 1}`, ar: `${index + 1}` },
       })),
       summary: (value) =>
-        value?.label?.[locale] || (key === "bedrooms" ? "Bedrooms" : "Bathrooms"),
+        value?.label?.[locale] ||
+        (key === "bedrooms" ? "Bedrooms" : "Bathrooms"),
     });
   });
 
@@ -401,7 +428,11 @@ const buildTableDynamicFields = ({
         ar: key === "ready_to_move" ? "Ready to Move" : "Furnished",
       },
       summary: (value) =>
-        value === true ? LABELS[locale].yes : value === false ? LABELS[locale].no : key,
+        value === true
+          ? LABELS[locale].yes
+          : value === false
+            ? LABELS[locale].no
+            : key,
     });
   });
 
@@ -460,7 +491,9 @@ const buildTableDynamicFields = ({
       label: { en: "Amenities", ar: "Amenities" },
       options: amenityOptions,
       summary: (value) =>
-        Array.isArray(value) && value.length ? `${value.length} selected` : "Amenities",
+        Array.isArray(value) && value.length
+          ? `${value.length} selected`
+          : "Amenities",
     });
   }
 
@@ -468,7 +501,7 @@ const buildTableDynamicFields = ({
 };
 
 export default function HeroSearchCard() {
-  const { locale } = useContext(settings);
+  const { locale, screenSize } = useContext(settings);
   const {
     tables = [],
     categories: allCategories = [],
@@ -697,7 +730,15 @@ export default function HeroSearchCard() {
 
     const loadSearchMeta = async () => {
       try {
-        setSearchMetaLoading(true);
+        const hasFilters = Object.entries(form).some(
+          ([, value]) =>
+            value !== undefined &&
+            value !== null &&
+            value !== "" &&
+            value !== false,
+        );
+
+        setSearchMetaLoading(hasFilters);
         const filters = { page: 1, limit: 1 };
 
         if (form.dep) filters.table_id = form.dep;
@@ -717,7 +758,11 @@ export default function HeroSearchCard() {
           "is_verified_only",
           "amenities",
         ].forEach((key) => {
-          if (form[key] !== undefined && form[key] !== null && form[key] !== "") {
+          if (
+            form[key] !== undefined &&
+            form[key] !== null &&
+            form[key] !== ""
+          ) {
             filters[key] = form[key];
           }
         });
@@ -777,24 +822,37 @@ export default function HeroSearchCard() {
     };
   }, [form]);
 
-    const hasSelectedFilters = useMemo(
-      () =>
-        Object.entries(form).some(
-          ([, value]) =>
-            value !== undefined &&
-            value !== null &&
-            value !== "" &&
-            value !== false,
-        ),
-      [form],
-    );
-
+  const hasSelectedFilters = useMemo(
+    () =>
+      Object.entries(form).some(
+        ([, value]) =>
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          value !== false,
+      ),
+    [form],
+  );
 
   useEffect(() => {
     if (searchError && hasSelectedFilters) {
       setSearchError("");
     }
   }, [hasSelectedFilters, searchError]);
+
+  useEffect(() => {
+    const heroSection = shellRef.current?.closest(".hero-section");
+    if (!heroSection) return undefined;
+
+    heroSection.classList.toggle(
+      "hero-has-selected-department",
+      Boolean(selectedTableId),
+    );
+
+    return () => {
+      heroSection.classList.remove("hero-has-selected-department");
+    };
+  }, [selectedTableId]);
 
   const locationField = useMemo(
     () =>
@@ -804,8 +862,14 @@ export default function HeroSearchCard() {
             selectedTableId && options.governorates.length
               ? options.governorates
               : globalGovernorates,
-          cities: selectedTableId && options.cities.length ? options.cities : globalCities,
-          areas: selectedTableId && options.areas.length ? options.areas : globalAreas,
+          cities:
+            selectedTableId && options.cities.length
+              ? options.cities
+              : globalCities,
+          areas:
+            selectedTableId && options.areas.length
+              ? options.areas
+              : globalAreas,
           compounds:
             selectedTableId && options.compounds.length
               ? options.compounds
@@ -830,20 +894,22 @@ export default function HeroSearchCard() {
   const availableCategories = useMemo(() => {
     const source = allCategories.filter(filterHasAds);
     return selectedTableId
-      ? source.filter((item) => Number(item.table_id) === Number(selectedTableId))
+      ? source.filter((item) => sameId(item.table_id, selectedTableId))
       : source;
   }, [allCategories, selectedTableId]);
 
   const availableTables = useMemo(
     () =>
       tables.filter((table) =>
-        availableCategories.some((cat) => Number(cat.table_id) === Number(table.id)),
+        availableCategories.some((cat) => sameId(cat.table_id, table.id)),
       ),
     [availableCategories, tables],
   );
 
   const availableSubCategories = useMemo(() => {
-    const source = options.subCategories.length ? options.subCategories : allSubCategories;
+    const source = options.subCategories.length
+      ? options.subCategories
+      : allSubCategories;
     return source.filter(filterHasAds);
   }, [allSubCategories, options.subCategories]);
 
@@ -914,10 +980,12 @@ export default function HeroSearchCard() {
       const next = { ...prev };
 
       if (fieldKey === "location_tree") {
-        ["governorate_id", "city_id", "area_id", "compound_id"].forEach((key) => {
-          if (!value?.[key]) delete next[key];
-          else next[key] = value[key];
-        });
+        ["governorate_id", "city_id", "area_id", "compound_id"].forEach(
+          (key) => {
+            if (!value?.[key]) delete next[key];
+            else next[key] = value[key];
+          },
+        );
         return next;
       }
 
@@ -935,12 +1003,9 @@ export default function HeroSearchCard() {
         else next.subcat = value.subcat;
 
         if (depChanged) {
-          [
-            "governorate_id",
-            "city_id",
-            "area_id",
-            "compound_id",
-          ].forEach((key) => delete next[key]);
+          ["governorate_id", "city_id", "area_id", "compound_id"].forEach(
+            (key) => delete next[key],
+          );
         }
 
         return next;
@@ -1021,20 +1086,25 @@ export default function HeroSearchCard() {
     if (field.key === "location_tree") return selectedLocation;
     if (field.key === "department_tree") return selectedDepartment;
 
-      const rangeKeys = RANGE_KEYS[field.key];
-      if (rangeKeys) {
-        const [minKey, maxKey] = rangeKeys;
-        if (form[minKey] === undefined && form[maxKey] === undefined) return undefined;
-        const maxValue =
-          field.key === "price" ? searchMeta.max_price || field.max || 10000000 : field.max || 10000000;
-        return [
-          Number(form[minKey] || 0),
-          Math.min(Number(form[maxKey] || maxValue), maxValue),
-        ];
-      }
+    const rangeKeys = RANGE_KEYS[field.key];
+    if (rangeKeys) {
+      const [minKey, maxKey] = rangeKeys;
+      if (form[minKey] === undefined && form[maxKey] === undefined)
+        return undefined;
+      const maxValue =
+        field.key === "price"
+          ? searchMeta.max_price || field.max || 10000000
+          : field.max || 10000000;
+      return [
+        Number(form[minKey] || 0),
+        Math.min(Number(form[maxKey] || maxValue), maxValue),
+      ];
+    }
 
     if (field.uiType === "select") {
-      return field.options?.find((option) => String(option.id) === String(form[field.key]));
+      return field.options?.find(
+        (option) => String(option.id) === String(form[field.key]),
+      );
     }
 
     if (field.uiType === "multiSelect") {
@@ -1057,7 +1127,10 @@ export default function HeroSearchCard() {
           ? Boolean(value && Object.keys(value).length)
           : field.uiType === "multiSelect"
             ? Array.isArray(value) && value.length > 0
-            : value !== undefined && value !== null && value !== "" && value !== false;
+            : value !== undefined &&
+              value !== null &&
+              value !== "" &&
+              value !== false;
 
     if (!hasValue) {
       return locale === "ar"
@@ -1068,17 +1141,28 @@ export default function HeroSearchCard() {
     return field.summary ? field.summary(value) : text.placeholders.dynamic;
   };
 
-
   const searchButtonText = useMemo(() => {
-    if (!hasSelectedFilters) return text.search;
     if (searchMetaLoading) return text.search;
+    if (!hasSelectedFilters) {
+      return searchMeta.total > 0
+        ? locale === "ar"
+          ? ` ابحث في ${searchMeta.total} اعلان`
+          : `search in ${searchMeta.total} ads`
+        : text.search;
+    }
     if (searchMeta.total <= 0) {
       return locale === "ar" ? "لا توجد نتائج" : "No results";
     }
     return locale === "ar"
       ? `عرض ${searchMeta.total} نتيجة`
       : `View ${searchMeta.total} results`;
-  }, [hasSelectedFilters, locale, searchMeta.total, searchMetaLoading, text.search]);
+  }, [
+    hasSelectedFilters,
+    locale,
+    searchMeta.total,
+    searchMetaLoading,
+    text.search,
+  ]);
 
   const renderFloatingField = (menuKey, field, width = "standard") => {
     const selectedValue = buildSelectedValue(field);
@@ -1091,7 +1175,9 @@ export default function HeroSearchCard() {
         >
           <div
             className="btn"
-            onClick={() => setActiveMenu((prev) => (prev === menuKey ? null : menuKey))}
+            onClick={() =>
+              setActiveMenu((prev) => (prev === menuKey ? null : menuKey))
+            }
           >
             <div className="hero-trigger-content">
               <div className="hero-trigger-icon">
@@ -1113,9 +1199,11 @@ export default function HeroSearchCard() {
                 dynamicFilters={[field]}
                 selectedFilters={{ [field.key]: selectedValue }}
                 setSelectedFilters={(key, value) => applyFieldValue(key, value)}
-                screenSize="large"
+                screenSize={screenSize}
                 active={true}
-                setActive={() => {}}
+                setActive={(value) => {
+                  if (value === false) setActiveMenu(null);
+                }}
                 locale={locale}
                 showViewToggle={false}
                 nestedChildrenAsMenu={false}
@@ -1130,7 +1218,6 @@ export default function HeroSearchCard() {
 
   const renderQuickBooleanField = (field) => {
     const checked = Boolean(form[field.key]);
-    const Icon = getFieldIcon(field.key);
 
     return (
       <label
@@ -1145,7 +1232,7 @@ export default function HeroSearchCard() {
           }
         />
         <span className="hero-check-indicator">
-          <Icon />
+          {checked ? <FaCheck /> : null}
         </span>
         <span>{field.label?.[locale]}</span>
       </label>
@@ -1176,6 +1263,12 @@ export default function HeroSearchCard() {
     event.preventDefault();
 
     if (!hasSelectedFilters) {
+      setSearchError("");
+      router.push("/market");
+      return;
+    }
+
+    if (!hasSelectedFilters) {
       setSearchError(
         locale === "ar"
           ? "لازم تختار حاجة من الفلاتر الأول"
@@ -1194,7 +1287,10 @@ export default function HeroSearchCard() {
   };
 
   return (
-    <div className="hero-search-shell" ref={shellRef}>
+    <div
+      className={`hero-search-shell ${selectedTableId ? "has-selected-department" : ""}`}
+      ref={shellRef}
+    >
       <form className="hero-search-card" onSubmit={handleSubmit}>
         <div className="hero-search-head">
           <div className="hero-search-copy">
@@ -1208,7 +1304,7 @@ export default function HeroSearchCard() {
             </p>
           </div>
         </div>
-        <div className="hero-search-row">
+        <div className="hero-search-row primary">
           {renderFloatingField("departments", departmentField, "wide")}
           {renderFloatingField("locations", locationField, "wide")}
           {renderFloatingField("price", priceField)}
@@ -1222,7 +1318,7 @@ export default function HeroSearchCard() {
         )}
 
         {selectedTableId && floatingDynamicFields.length > 0 && (
-          <div className="hero-search-row secondary">
+          <div className="hero-search-row secondary hero-search-dynamic">
             {floatingDynamicFields.map((field) =>
               renderFloatingField(`dynamic-${field.key}`, field),
             )}
@@ -1233,9 +1329,9 @@ export default function HeroSearchCard() {
           {searchError ? <span className="error">{searchError}</span> : null}
           <button
             type="submit"
-            className={`hero-search-submit ${!hasSelectedFilters || searchMeta.total <= 0 || searchMetaLoading ? "disabled" : ""}`}
+            className={`hero-search-submit ${hasSelectedFilters && (searchMeta.total <= 0 || searchMetaLoading) ? "disabled" : ""}`}
           >
-            {searchMetaLoading ? (
+            {hasSelectedFilters && searchMetaLoading ? (
               <span className="loader"></span>
             ) : (
               <>

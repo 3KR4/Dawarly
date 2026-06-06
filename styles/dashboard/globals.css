@@ -382,7 +382,11 @@ header .actions-btns .userMenu .top {
   width: auto;
   min-width: 31%;
   margin: 0;
+  cursor: pointer !important;
   padding: 7px 9px;
+}
+.table-container.for-users .item-overview.users-ads-counts h4 svg {
+  cursor: pointer !important;
 }
 .table-container .nisted {
   display: flex;
@@ -518,6 +522,21 @@ header .actions-btns .userMenu .top {
   gap: 3px;
 }
 
+@media (max-width: 992px) {
+  .dashboard-ads-layout,
+  .dashboard-ads-layout.filters-open {
+    display: block;
+  }
+  .dashboard-ads-sidebar {
+    width: 0 !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .dash-holder.for-client .top {
+    grid-template-columns: 1fr 0.3fr 0.3fr 0.4fr;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-ads-page .dashboard-ads-top {
     grid-template-columns: 1fr;
@@ -557,15 +576,7 @@ header .actions-btns .userMenu .top {
   .dash-holder .top {
     grid-template-columns: 1fr;
   }
-}
-@media (max-width: 992px) {
-  .dashboard-ads-layout,
-  .dashboard-ads-layout.filters-open {
-    display: block;
-  }
-  .dashboard-ads-sidebar {
-    width: 0 !important;
-    opacity: 1;
-    pointer-events: auto;
+  .dash-holder.for-client .top {
+    grid-template-columns: 1fr;
   }
 }

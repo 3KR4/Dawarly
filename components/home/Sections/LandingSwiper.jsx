@@ -30,8 +30,6 @@ export default function HeroSwiper() {
 
   return (
     <div className="hero-section">
-      <HeroSearchCard />
-
       {loading || !slieds?.length ? (
         <MainSliderSkeleton />
       ) : (
@@ -94,6 +92,8 @@ export default function HeroSwiper() {
           <div className="hero-pagination"></div>
         </>
       )}
+
+      <HeroSearchCard />
     </div>
   );
 }

@@ -126,7 +126,18 @@ const getFilterValueForUrl = (params, field) => {
   );
 };
 
-const hasAds = (item) => Number(item?.adsCount || 0) > 0;
+const getAdsCount = (item) =>
+  item?.adsCount ??
+  item?.ads_count ??
+  item?.active_ads_count ??
+  item?.activeAdsCount;
+
+const hasAds = (item) => {
+  const adsCount = getAdsCount(item);
+  return Number(adsCount || 0) > 0;
+};
+
+const sameId = (a, b) => String(a) === String(b);
 
 const getDynamicFilterDefinitions = (tableId, data = {}) => {
   const {
@@ -180,7 +191,7 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
         {
           queryKey: "dep",
           items: tables.filter((table) =>
-            categories.some((cat) => cat.table_id === table.id && hasAds(cat)),
+            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
           ),
         },
         {

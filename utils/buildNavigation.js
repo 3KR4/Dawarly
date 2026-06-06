@@ -3,16 +3,29 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
   // HELPERS
   // =========================
 
-  const hasAds = (item) => Number(item?.adsCount || 0) > 0;
+  const normalizeItems = (items) => (Array.isArray(items) ? items : []);
+
+  const getAdsCount = (item) =>
+    item?.adsCount ??
+    item?.ads_count ??
+    item?.active_ads_count ??
+    item?.activeAdsCount;
+
+  const hasAds = (item) => {
+    const adsCount = getAdsCount(item);
+    return Number(adsCount || 0) > 0;
+  };
+
+  const sameId = (a, b) => String(a) === String(b);
 
   const isVacation = (table) =>
-    table.name_en.toLowerCase().includes("vacation");
+    (table?.name_en || "").toLowerCase().includes("vacation");
 
   const isSaleTable = (table) =>
-    table.name_en.toLowerCase().includes("for sale");
+    (table?.name_en || "").toLowerCase().includes("for sale");
 
   const isRentTable = (table) =>
-    table.name_en.toLowerCase().includes("for rent");
+    (table?.name_en || "").toLowerCase().includes("for rent");
 
   const isPropertyTable = (table) =>
     isVacation(table) || isSaleTable(table) || isRentTable(table);
@@ -27,9 +40,13 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
   const getSubCats = (categoryId) => {
     return subCategories.filter(
       (subCategory) =>
-        subCategory.category_id === categoryId && hasAds(subCategory),
+        sameId(subCategory.category_id, categoryId) && hasAds(subCategory),
     );
   };
+
+  tables = normalizeItems(tables);
+  categories = normalizeItems(categories);
+  subCategories = normalizeItems(subCategories);
 
   // =========================
   // ROOTS
@@ -68,7 +85,7 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
     const mode = isSaleTable(table) ? "sale" : "rent";
 
     categories
-      .filter((cat) => cat.table_id === table.id && hasAds(cat))
+      .filter((cat) => sameId(cat.table_id, table.id) && hasAds(cat))
       .forEach((cat) => {
         const key = cat.name_en.toLowerCase();
 
@@ -148,7 +165,7 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
     };
 
     categories
-      .filter((cat) => cat.table_id === table.id && hasAds(cat))
+      .filter((cat) => sameId(cat.table_id, table.id) && hasAds(cat))
       .forEach((cat) => {
         tableItem.children.push({
           ...cat,
@@ -167,20 +184,22 @@ export function buildNavigation(tables, categories = [], subCategories = []) {
 
   const otherTables = tables.filter((t) => !isPropertyTable(t));
 
-  const otherNavigation = otherTables.map((table) => {
-    return {
-      id: table.id,
-      slug: table.slug,
-      name_en: table.name_en,
-      name_ar: table.name_ar,
-      children: categories
-        .filter((cat) => cat.table_id === table.id && hasAds(cat))
-        .map((cat) => ({
-          ...cat,
-          children: getSubCats(cat.id),
-        })),
-    };
-  }).filter((table) => table.children.length > 0);
+  const otherNavigation = otherTables
+    .map((table) => {
+      return {
+        id: table.id,
+        slug: table.slug,
+        name_en: table.name_en,
+        name_ar: table.name_ar,
+        children: categories
+          .filter((cat) => sameId(cat.table_id, table.id) && hasAds(cat))
+          .map((cat) => ({
+            ...cat,
+            children: getSubCats(cat.id),
+          })),
+      };
+    })
+    .filter((table) => table.children.length > 0);
 
   // =========================
   // FINAL

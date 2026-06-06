@@ -10,8 +10,8 @@ import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { isArabic } from "@/utils/detectDirection";
 import useTranslate from "@/Contexts/useTranslation";
 import { specsConfig } from "@/Contexts/specsConfig";
-import { FaEye } from "react-icons/fa";
-import { RentFrequencies } from "@/data/enums";
+import { FaImages } from "react-icons/fa";
+import { PaymentMethod, RentFrequencies } from "@/data/enums";
 import { toggleFavorite } from "@/services/favorites/favorites.service";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,15 @@ import { playSound } from "@/utils/sounds";
 import { BsFillPatchCheckFill } from "react-icons/bs";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import { getAdTableId } from "@/utils/getAdTableId";
+import { IoLocationOutline } from "react-icons/io5";
+import { LuClock3 } from "react-icons/lu";
+
+const specLabels = {
+  bedrooms: { en: "Bedrooms", ar: "غرف النوم" },
+  bathrooms: { en: "Bathrooms", ar: "الحمامات" },
+  level: { en: "Floor", ar: "الدور" },
+  area_m2: { en: "Area", ar: "المساحة" },
+};
 
 const preventAdImageContextMenu = (e) => {
   e.preventDefault();
@@ -39,6 +48,7 @@ export default function CardItem({ data }) {
   const arabic = isArabic(data?.title);
   const tableId = getAdTableId(data);
   const adHref = `/market/${data?.id}?dep=${tableId || ""}`;
+  const imagesCount = Number(data?.images_count || 0);
   const userHasFavorited = Boolean(
     data?.isFavorite || data?.is_favorite || data?.isFavorited,
   );
@@ -100,6 +110,11 @@ export default function CardItem({ data }) {
     data?.governorate?.[`name_${locale}`],
     data?.compound?.[`name_${locale}`],
   ].filter(Boolean);
+  const priceMeta =
+    RentFrequencies.find((x) => x.id == data?.rent_frequency)?.[
+      `name_${locale}`
+    ] ||
+    PaymentMethod.find((x) => x.id == data?.payment_method)?.[`name_${locale}`];
 
   return (
     <Link
@@ -127,12 +142,12 @@ export default function CardItem({ data }) {
         <div className="top">
           <div className="column">
             {data?.featured_priority > 0 && (
-              <span className="verified ellipsis">
+              <span className="verified ad-badge featured-badge ellipsis">
                 <BsFillLightningChargeFill /> {t.ad.featured_ad}
               </span>
             )}
             {data?.is_verified && (
-              <span className="verified ellipsis">
+              <span className="verified ad-badge verified-badge ellipsis">
                 <BsFillPatchCheckFill /> {t.ad.verified}
               </span>
             )}
@@ -172,33 +187,35 @@ export default function CardItem({ data }) {
         </div>
         <div className="row-holder">
           <h3>{formatCurrency(data?.price, data?.currency, locale)}</h3>
-          <span className={`status`}>
-            {
-              RentFrequencies.find((x) => x.id == data?.rent_frequency)?.[
-                `name_${locale}`
-              ]
-            }
-          </span>
+          {priceMeta && <span className={`status`}>{priceMeta}</span>}
         </div>
       </div>
       <div className="row">
-        <span className="department ellipsis">
-          {data?.department?.[`name_${locale}`]}
-        </span>
-        /
-        <h5
-          onClick={(e) => {
-            e.stopPropagation();
-            const params = new URLSearchParams();
-            if (data?.department?.id || data?.table_id) {
-              params.set("dep", data?.department?.id || data?.table_id);
-            }
-            if (data?.category?.id) params.set("cat", data.category.id);
-            router.push(`/market?${params.toString()}`);
-          }}
-        >
-          {data?.category?.[`name_${locale}`]}
-        </h5>
+        <div className="category-path">
+          <span className="department ellipsis">
+            {data?.department?.[`name_${locale}`]}
+          </span>
+          <span className="category-separator">/</span>
+          <h5
+            onClick={(e) => {
+              e.stopPropagation();
+              const params = new URLSearchParams();
+              if (data?.department?.id || data?.table_id) {
+                params.set("dep", data?.department?.id || data?.table_id);
+              }
+              if (data?.category?.id) params.set("cat", data.category.id);
+              router.push(`/market?${params.toString()}`);
+            }}
+          >
+            {data?.category?.[`name_${locale}`]}
+          </h5>
+        </div>
+        {imagesCount > 0 && (
+          <span className="image-count-badge">
+            <FaImages />
+            {imagesCount}
+          </span>
+        )}
       </div>
       <div className="specs-holder">
         {Object.entries(data?.details || {})
@@ -214,22 +231,44 @@ export default function CardItem({ data }) {
               typeof value === "object"
                 ? (value?.label ?? value?.value)
                 : value;
+            const normalizedValue =
+              key === "level" && Number(displayValue) === 0
+                ? locale === "ar"
+                  ? "أرضي"
+                  : "Ground"
+                : displayValue;
 
             return (
               <div key={key} className="spec">
-                {Icon && <Icon className="spec-icon" />}
-                <span>
-                  {displayValue}
-                  {config?.suffix && ` ${config.suffix}`}
-                </span>
+                <div className="tops">
+                  {Icon && <Icon className="spec-icon" />}
+                  <span className="spec-value">
+                    {normalizedValue}
+                    {key === "area_m2" ? (
+                      <>
+                        {" "}
+                        <small>m²</small>
+                      </>
+                    ) : config?.suffix ? (
+                      ` ${config.suffix}`
+                    ) : (
+                      ""
+                    )}
+                  </span>
+                </div>
+
               </div>
             );
           })}
       </div>
 
       <div className="date-area">
-        <p className="area ellipsis">{locationParts.join(" / ")}</p>
+        <p className="area ellipsis">
+          <IoLocationOutline />
+          <span>{locationParts.join(" / ")}</span>
+        </p>
         <p className="date" style={{ minWidth: "max-content" }}>
+          <LuClock3 />
           {formatRelativeDate(data?.created_at, locale)}
         </p>
       </div>
