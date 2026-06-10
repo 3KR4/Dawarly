@@ -4,7 +4,12 @@ import "@/styles/dashboard/tables.css";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { IoCloseSharp, IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
-import { getAllAds, deleteAd, changeStatus } from "@/services/ads/ads.service";
+import {
+  getAdsRangeMeta,
+  getAllAds,
+  deleteAd,
+  changeStatus,
+} from "@/services/ads/ads.service";
 import { settings } from "@/Contexts/settings";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -599,15 +604,21 @@ export default function ActiveAds() {
     async (page = 1) => {
       try {
         setLoadingContent(true);
-
-        const res = await getAllAds(buildRequestFilters(page));
+        const requestFilters = buildRequestFilters(page);
+        const [res, rangeMeta] = await Promise.all([
+          getAllAds(requestFilters),
+          getAdsRangeMeta(requestFilters),
+        ]);
 
         setAdsData((prev) => ({
           ads: res.data.data || [],
           pagination: res.data.pagination || prev.pagination,
         }));
         setMeta((prev) => {
-          const next = res.data.meta || prev;
+          const next = {
+            ...(res.data.meta || prev),
+            ...rangeMeta,
+          };
           return next.max_price === prev.max_price &&
             next.max_area_m2 === prev.max_area_m2 &&
             next.price_currency === prev.price_currency

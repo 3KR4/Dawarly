@@ -15,6 +15,7 @@ import useTranslate from "@/Contexts/useTranslation";
 import { getSectionsAds } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import AdCardSkeleton from "@/components/skeletons/AdCardSkeleton";
+import { buildMarketUrl } from "@/utils/marketSeo";
 
 const TYPE_ALIASES = {
   gov: "gov",
@@ -69,6 +70,7 @@ const buildSectionTitle = (type, value, table, locale, t) => {
 
 export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
   const {
+    countries,
     categories,
     subCategories,
     governorates,
@@ -272,21 +274,33 @@ export default function AdsSwiper({ type, id, value, tableId, pageSize = 6 }) {
   }
 
   const seeMoreHref = (() => {
-    const params = new URLSearchParams();
+    const filters = {};
     const dep =
       sectionType === "table" ? sectionValue || tableId : inferredTableId;
 
-    if (dep) params.set("dep", dep);
+    if (dep) filters.dep = dep;
     if (sectionType === "category" && sectionValue) {
-      params.set("cat", sectionValue);
+      filters.cat = sectionValue;
     }
     if (sectionType === "subcategory" && sectionValue) {
-      if (selectedItem?.category_id) params.set("cat", selectedItem.category_id);
-      params.set("subcat", sectionValue);
+      if (selectedItem?.category_id) filters.cat = selectedItem.category_id;
+      filters.subcat = sectionValue;
     }
 
-    const query = params.toString();
-    return query ? `/market?${query}` : "/market";
+    return buildMarketUrl(
+      filters,
+      {
+        countries,
+        governorates,
+        cities,
+        areas,
+        compounds,
+        tables,
+        categories,
+        subCategories,
+      },
+      "",
+    );
   })();
 
   return (

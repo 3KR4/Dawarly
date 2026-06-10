@@ -69,14 +69,6 @@ export const refreshAccessToken = async () => {
 
 // -------------------- REQUEST INTERCEPTOR --------------------
 api.interceptors.request.use(async (config) => {
-  if (!accessToken) {
-    try {
-      await refreshAccessToken();
-    } catch (err) {
-      return config;
-    }
-  }
-
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -93,6 +85,7 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       original &&
+      accessToken &&
       !original._retry &&
       !original.url.includes("/auth/refresh-token")
     ) {

@@ -5,6 +5,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import React, { useContext, useState, useEffect } from "react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { settings } from "@/Contexts/settings";
+import { useAppData } from "@/Contexts/DataContext";
 import "@/styles/client/ad-card.css";
 import { formatRelativeDate } from "@/utils/formatRelativeDate";
 import { isArabic } from "@/utils/detectDirection";
@@ -19,6 +20,7 @@ import { playSound } from "@/utils/sounds";
 import { BsFillPatchCheckFill } from "react-icons/bs";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import { getAdTableId } from "@/utils/getAdTableId";
+import { buildMarketUrl } from "@/utils/marketSeo";
 import { IoLocationOutline } from "react-icons/io5";
 import { LuClock3 } from "react-icons/lu";
 
@@ -38,6 +40,16 @@ export default function CardItem({ data }) {
   const t = useTranslate();
   const { user, updateUserFavoritesCount } = useAuth();
   const router = useRouter();
+  const {
+    countries,
+    governorates,
+    cities,
+    areas,
+    compounds,
+    tables,
+    categories,
+    subCategories,
+  } = useAppData();
 
   const [isFavorite, setIsFavorite] = useState(data?.isFavorite);
   const [favoritesCount, setFavoritesCount] = useState(
@@ -198,13 +210,26 @@ export default function CardItem({ data }) {
           <span className="category-separator">/</span>
           <h5
             onClick={(e) => {
-              e.stopPropagation();
-              const params = new URLSearchParams();
-              if (data?.department?.id || data?.table_id) {
-                params.set("dep", data?.department?.id || data?.table_id);
-              }
-              if (data?.category?.id) params.set("cat", data.category.id);
-              router.push(`/market?${params.toString()}`);
+            e.stopPropagation();
+              router.push(
+                buildMarketUrl(
+                  {
+                    dep: data?.department?.id || data?.table_id,
+                    cat: data?.category?.id,
+                  },
+                  {
+                    countries,
+                    governorates,
+                    cities,
+                    areas,
+                    compounds,
+                    tables,
+                    categories,
+                    subCategories,
+                  },
+                  "",
+                ),
+              );
             }}
           >
             {data?.category?.[`name_${locale}`]}
