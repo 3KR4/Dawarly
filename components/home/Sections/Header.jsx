@@ -39,6 +39,7 @@ import { buildNavigation } from "@/utils/buildNavigation";
 import { getHeaderSearch } from "@/services/search/search.service";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { PaymentMethod, RentFrequencies } from "@/data/enums";
+import { buildMarketUrl } from "@/utils/marketSeo";
 
 function Header() {
   const t = useTranslate();
@@ -46,7 +47,16 @@ function Header() {
   const router = useRouter();
   const { screenSize, theme, toggleTheme, locale, toggleLocale } =
     useContext(settings);
-  const { tables, categories, subCategories } = useAppData();
+  const {
+    countries,
+    governorates,
+    cities,
+    areas,
+    compounds,
+    tables,
+    categories,
+    subCategories,
+  } = useAppData();
   const isSmallScreen = screenSize.includes("small");
 
   const { user, isAuthenticated, loading, logout } = useAuth();
@@ -242,12 +252,20 @@ function Header() {
   };
 
   const marketHref = ({ dep, cat, subcat } = {}) => {
-    const params = new URLSearchParams();
-    if (dep) params.set("dep", dep);
-    if (cat) params.set("cat", cat);
-    if (subcat) params.set("subcat", subcat);
-    const query = params.toString();
-    return query ? `/market?${query}` : "/market";
+    return buildMarketUrl(
+      { dep, cat, subcat },
+      {
+        countries,
+        governorates,
+        cities,
+        areas,
+        compounds,
+        tables,
+        categories,
+        subCategories,
+      },
+      "",
+    );
   };
 
   const getNodeHref = (node) => {
@@ -272,12 +290,27 @@ function Header() {
   };
 
   const handleLocationSelect = ({ governorate, city, area, compound }) => {
-    const params = new URLSearchParams();
-    if (governorate?.id) params.set("governorate_id", governorate.id);
-    if (city?.id) params.set("city_id", city.id);
-    if (area?.id) params.set("area_id", area.id);
-    if (compound?.id) params.set("compound_id", compound.id);
-    router.push(`/market?${params.toString()}`);
+    router.push(
+      buildMarketUrl(
+        {
+          governorate_id: governorate?.id,
+          city_id: city?.id,
+          area_id: area?.id,
+          compound_id: compound?.id,
+        },
+        {
+          countries,
+          governorates,
+          cities,
+          areas,
+          compounds,
+          tables,
+          categories,
+          subCategories,
+        },
+        "",
+      ),
+    );
   };
 
   return (

@@ -17,11 +17,11 @@ import CategoriesSwiper from "@/components/home/Sections/CategoriesSwiper";
 import Pagination from "@/components/Tools/Pagination";
 import "@/styles/client/pages/market.css";
 import { settings } from "@/Contexts/settings";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { IoFilterSharp } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
 import { BsGridFill } from "react-icons/bs";
-import { getAllAds } from "@/services/ads/ads.service";
+import { getAdsRangeMeta, getAllAds } from "@/services/ads/ads.service";
 import {
   getAreas,
   getCities,
@@ -43,6 +43,11 @@ import {
   RentFrequencies,
 } from "@/data/enums";
 import { getTableRule } from "@/data/tablesRules";
+import {
+  buildMarketUrl,
+  getRouteFilterKeys,
+  resolveMarketRoute,
+} from "@/utils/marketSeo";
 
 const SORT_OPTIONS = [
   {
@@ -78,6 +83,8 @@ const SORT_OPTIONS = [
     name: { en: "Most Favorites", ar: "الأكثر تفضيلا" },
   },
 ];
+
+const MARKET_VIEW_STORAGE_KEY = "marketplace_view_mode";
 
 const SORT_PLACEHOLDER = {
   en: "Sort By",
@@ -194,6 +201,29 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
   ];
   const fields = [
     {
+      key: "category_tree",
+      uiType: "nested",
+      label: { en: "Departments", ar: "Departments" },
+      levels: [
+        {
+          queryKey: "dep",
+          items: tables.filter((table) =>
+            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
+          ),
+        },
+        {
+          queryKey: "cat",
+          parentKey: "table_id",
+          items: categories.filter(hasAds),
+        },
+        {
+          queryKey: "subcat",
+          parentKey: "category_id",
+          items: subCategories.filter(hasAds),
+        },
+      ],
+    },
+    {
       key: "location_tree",
       uiType: "nested",
       label: { en: "Locations", ar: "Locations" },
@@ -220,29 +250,6 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
           parentKey: "area_id",
           items: compounds,
           hasAdsOnly: true,
-        },
-      ],
-    },
-    {
-      key: "category_tree",
-      uiType: "nested",
-      label: { en: "Departments", ar: "Departments" },
-      levels: [
-        {
-          queryKey: "dep",
-          items: tables.filter((table) =>
-            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
-          ),
-        },
-        {
-          queryKey: "cat",
-          parentKey: "table_id",
-          items: categories.filter(hasAds),
-        },
-        {
-          queryKey: "subcat",
-          parentKey: "category_id",
-          items: subCategories.filter(hasAds),
         },
       ],
     },
@@ -360,10 +367,14 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
   return fields;
 };
 
-function MarketplaceContent() {
+const routeFilterKeys = getRouteFilterKeys();
+const EMPTY_ROUTE_FILTERS = {};
+
+function MarketplaceContent({ routeFilters = EMPTY_ROUTE_FILTERS }) {
   const { screenSize, locale } = useContext(settings);
   const { addNotification } = useNotification();
   const {
+    countries,
     tables,
     categories,
     subCategories,
@@ -372,15 +383,66 @@ function MarketplaceContent() {
     areas,
     compounds,
   } = useAppData();
+  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
-  const tableId = searchParams.get("dep")
-    ? Number(searchParams.get("dep"))
+  const routeResolutionData = useMemo(
+    () => ({
+      countries,
+      tables,
+      categories,
+      subCategories,
+      governorates,
+      cities,
+      areas,
+      compounds,
+    }),
+    [
+      areas,
+      categories,
+      cities,
+      compounds,
+      countries,
+      governorates,
+      subCategories,
+      tables,
+    ],
+  );
+  const pathnameRouteFilters = useMemo(() => {
+    if (!pathname?.startsWith("/market")) return EMPTY_ROUTE_FILTERS;
+
+    const segments = pathname
+      .split("/")
+      .filter(Boolean)
+      .slice(1);
+
+    if (!segments.length) return EMPTY_ROUTE_FILTERS;
+
+    return resolveMarketRoute(segments, routeResolutionData).filters;
+  }, [pathname, routeResolutionData]);
+  const effectiveRouteFilters = useMemo(
+    () =>
+      Object.keys(pathnameRouteFilters).length
+        ? pathnameRouteFilters
+        : routeFilters,
+    [pathnameRouteFilters, routeFilters],
+  );
+  const paramsWithRouteFilters = useMemo(() => {
+    const params = new URLSearchParams(queryString);
+    Object.entries(effectiveRouteFilters).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== "") {
+        params.set(key, String(value));
+      }
+    });
+    return params;
+  }, [effectiveRouteFilters, queryString]);
+  const tableId = paramsWithRouteFilters.get("dep")
+    ? Number(paramsWithRouteFilters.get("dep"))
     : null;
   const currentPage = Number(searchParams.get("page") || 1);
-  const catParam = searchParams.get("cat");
-  const subcatParam = searchParams.get("subcat");
+  const catParam = paramsWithRouteFilters.get("cat");
+  const subcatParam = paramsWithRouteFilters.get("subcat");
   const searchParam = searchParams.get("s") || searchParams.get("search") || "";
   const sortUiParam = searchParams.get("sort_by_ui");
   const ownerParam = searchParams.get("owner");
@@ -408,56 +470,71 @@ function MarketplaceContent() {
   });
   const [tableLocations, setTableLocations] = useState(null);
   const [openFilters, setOpenFilters] = useState(false);
-  const [listGridOption, setListGridOption] = useState("grid");
+  const [listGridOption, setListGridOption] = useState(() => {
+    if (typeof window === "undefined") return "list";
+
+    const savedViewMode = window.localStorage.getItem(MARKET_VIEW_STORAGE_KEY);
+    return savedViewMode === "grid" || savedViewMode === "list"
+      ? savedViewMode
+      : "list";
+  });
   const [orderOpen, setOrderOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState({
     cat: catParam ? { id: parseInt(catParam) } : null,
     subCat: subcatParam ? { id: parseInt(subcatParam) } : null,
   });
 
-  const activeDynamicFilters = useMemo(
-    () =>
-      getDynamicFilterDefinitions(tableId, {
-        maxPrice: meta.max_price,
-        maxAreaM2: meta.max_area_m2,
-        tables,
-        categories,
-        subCategories,
-        governorates: tableLocations?.governorates || governorates,
-        cities: tableLocations?.cities || cities,
-        areas: tableLocations?.areas || areas,
-        compounds: tableLocations?.compounds || compounds,
-        ownerOnly: hasOwnerFilter,
-      }),
+  const routeLookupData = useMemo(
+    () => ({
+      countries,
+      tables,
+      categories,
+      subCategories,
+      governorates: tableLocations?.governorates || governorates,
+      cities: tableLocations?.cities || cities,
+      areas: tableLocations?.areas || areas,
+      compounds: tableLocations?.compounds || compounds,
+    }),
     [
       areas,
       categories,
       cities,
       compounds,
+      countries,
       governorates,
-      meta.max_price,
-      meta.max_area_m2,
-      hasOwnerFilter,
       subCategories,
       tableLocations,
-      tableId,
       tables,
     ],
   );
 
-  const selectedDynamicFilters = useMemo(() => {
-    const params = new URLSearchParams(queryString);
+  const activeDynamicFilters = useMemo(
+    () =>
+      getDynamicFilterDefinitions(tableId, {
+        maxPrice: meta.max_price,
+        maxAreaM2: meta.max_area_m2,
+        ...routeLookupData,
+        ownerOnly: hasOwnerFilter,
+      }),
+    [
+      routeLookupData,
+      meta.max_price,
+      meta.max_area_m2,
+      hasOwnerFilter,
+      tableId,
+    ],
+  );
 
+  const selectedDynamicFilters = useMemo(() => {
     return activeDynamicFilters.reduce((acc, field) => {
-      const value = getFilterValueForUrl(params, field);
+      const value = getFilterValueForUrl(paramsWithRouteFilters, field);
       if (value !== undefined) acc[field.key] = value;
       return acc;
     }, {});
-  }, [activeDynamicFilters, queryString]);
+  }, [activeDynamicFilters, paramsWithRouteFilters]);
 
   const selectedSort = useMemo(() => {
-    if (!sortUiParam) return null;
-    return SORT_OPTIONS.find((option) => option.id === sortUiParam) || null;
+    return SORT_OPTIONS.find((option) => option.id === sortUiParam) || SORT_OPTIONS[0];
   }, [sortUiParam]);
 
   const [orderBy, setOrderBy] = useState(selectedSort);
@@ -503,12 +580,19 @@ function MarketplaceContent() {
   const updateUrl = useCallback(
     (updates = {}, resetPage = true) => {
       const params = new URLSearchParams(queryString);
+      const currentRouteFilters = routeFilterKeys.reduce((acc, key) => {
+        const value = effectiveRouteFilters[key] ?? params.get(key);
+        if (value !== null && value !== undefined && value !== "") {
+          acc[key] = String(value);
+        }
+        return acc;
+      }, {});
       const categoryKeys = ["dep", "cat", "subcat"];
       const shouldResetPriceRange = categoryKeys.some((key) => {
         if (!Object.prototype.hasOwnProperty.call(updates, key)) return false;
 
         const nextValue = updates[key];
-        const currentValue = params.get(key);
+        const currentValue = currentRouteFilters[key] || params.get(key);
         const normalizedNextValue =
           nextValue === null || nextValue === undefined || nextValue === ""
             ? null
@@ -524,22 +608,33 @@ function MarketplaceContent() {
 
       if (
         Object.prototype.hasOwnProperty.call(updates, "dep") &&
-        String(updates.dep || "") !== String(params.get("dep") || "")
+        String(updates.dep || "") !== String(currentRouteFilters.dep || "")
       ) {
         params.delete("s");
         params.delete("search");
-        params.delete("governorate_id");
-        params.delete("city_id");
-        params.delete("area_id");
-        params.delete("compound_id");
+        ["country_id", "governorate_id", "city_id", "area_id", "compound_id"].forEach(
+          (key) => {
+            if (!Object.prototype.hasOwnProperty.call(updates, key)) {
+              updates[key] = null;
+            }
+          },
+        );
       }
 
       Object.entries(updates).forEach(([key, value]) => {
+        const isRouteKey = routeFilterKeys.includes(key);
         const isEmpty =
           value === null ||
           value === undefined ||
           value === "" ||
           (Array.isArray(value) && value.length === 0);
+
+        if (isRouteKey) {
+          if (isEmpty) delete currentRouteFilters[key];
+          else currentRouteFilters[key] = String(value);
+          params.delete(key);
+          return;
+        }
 
         if (isEmpty) params.delete(key);
         else params.set(key, String(value));
@@ -547,15 +642,15 @@ function MarketplaceContent() {
 
       if (resetPage) params.delete("page");
 
-      const nextQuery = params.toString();
-      router.push(nextQuery ? `/market?${nextQuery}` : "/market");
+      const nextUrl = buildMarketUrl(currentRouteFilters, routeLookupData, params);
+      router.push(nextUrl);
     },
-    [queryString, router],
+    [effectiveRouteFilters, queryString, routeLookupData, router],
   );
 
   const buildRequestFilters = useCallback(
     (page = 1) => {
-      const params = new URLSearchParams(queryString);
+      const params = new URLSearchParams(paramsWithRouteFilters.toString());
       const filters = {
         page,
         limit: adsData.pagination.limit,
@@ -626,7 +721,7 @@ function MarketplaceContent() {
       activeDynamicFilters,
       adsData.pagination.limit,
       listGridOption,
-      queryString,
+      paramsWithRouteFilters,
       selectedSort,
     ],
   );
@@ -635,15 +730,21 @@ function MarketplaceContent() {
     async (page = 1) => {
       try {
         setLoadingContent(true);
-
-        const res = await getAllAds(buildRequestFilters(page));
+        const requestFilters = buildRequestFilters(page);
+        const [res, rangeMeta] = await Promise.all([
+          getAllAds(requestFilters),
+          getAdsRangeMeta(requestFilters),
+        ]);
 
         setAdsData((prev) => ({
           ads: res.data.data || [],
           pagination: res.data.pagination || prev.pagination,
         }));
         setMeta((prev) => {
-          const next = res.data.meta || prev;
+          const next = {
+            ...(res.data.meta || prev),
+            ...rangeMeta,
+          };
           return next.max_price === prev.max_price &&
             next.max_area_m2 === prev.max_area_m2 &&
             next.price_currency === prev.price_currency
@@ -670,6 +771,11 @@ function MarketplaceContent() {
     });
     setOrderBy(selectedSort);
   }, [catParam, subcatParam, selectedSort]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(MARKET_VIEW_STORAGE_KEY, listGridOption);
+  }, [listGridOption]);
 
   useEffect(() => {
     fetchAds(currentPage);
@@ -784,6 +890,11 @@ function MarketplaceContent() {
   const handleClearAllFilters = () => {
     setSelectedCategory({ cat: null, subCat: null });
     const updates = {
+      country_id: null,
+      governorate_id: null,
+      city_id: null,
+      area_id: null,
+      compound_id: null,
       dep: null,
       cat: null,
       subcat: null,
@@ -850,61 +961,62 @@ function MarketplaceContent() {
                 onOpenFilters={() => setOpenFilters(true)}
                 screenSize={screenSize}
                 fieldDefinitions={activeDynamicFilters}
-              />
+                controls={
+                  <div className="row-holder">
+                    <div className="selectOptions ultra-small">
+                      <div className="btn">
+                        <h4
+                          className="ellipsis"
+                          onClick={() => setOrderOpen((prev) => !prev)}
+                        >
+                          {orderBy?.name?.[locale] || SORT_PLACEHOLDER[locale]}
+                        </h4>
 
-              <div className="row-holder">
-                <div className="selectOptions ultra-small">
-                  <div className="btn">
-                    <h4
-                      className="ellipsis"
-                      onClick={() => setOrderOpen((prev) => !prev)}
-                    >
-                      {orderBy?.name?.[locale] || SORT_PLACEHOLDER[locale]}
-                    </h4>
+                        <IoFilterSharp
+                          className="main-ico"
+                          onClick={() => setOrderOpen((prev) => !prev)}
+                        />
+                      </div>
 
-                    <IoFilterSharp
-                      className="main-ico"
-                      onClick={() => setOrderOpen((prev) => !prev)}
-                    />
-                  </div>
+                      {orderOpen && (
+                        <div className="menu active">
+                          {SORT_OPTIONS.map((item) => {
+                            const isActive = orderBy?.id === item.id;
 
-                  {orderOpen && (
-                    <div className="menu active">
-                      {SORT_OPTIONS.map((item) => {
-                        const isActive = orderBy?.id === item.id;
-
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            className={isActive ? "active" : ""}
-                            onClick={() => {
-                              setOrderBy(item);
-                              setOrderOpen(false);
-                              updateUrl({
-                                sort_by_ui: item.id,
-                              });
-                            }}
-                          >
-                            {item.name[locale]}
-                          </button>
-                        );
-                      })}
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                className={isActive ? "active" : ""}
+                                onClick={() => {
+                                  setOrderBy(item);
+                                  setOrderOpen(false);
+                                  updateUrl({
+                                    sort_by_ui: item.id,
+                                  });
+                                }}
+                              >
+                                {item.name[locale]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                <div className="grid-option">
-                  <BsGridFill
-                    className={`${listGridOption === "grid" ? "active" : ""}`}
-                    onClick={() => handleListGridOption("grid")}
-                  />
-                  <FaListUl
-                    className={`${listGridOption === "list" ? "active" : ""}`}
-                    onClick={() => handleListGridOption("list")}
-                  />
-                </div>
-              </div>
+                    <div className="grid-option">
+                      <BsGridFill
+                        className={`${listGridOption === "grid" ? "active" : ""}`}
+                        onClick={() => handleListGridOption("grid")}
+                      />
+                      <FaListUl
+                        className={`${listGridOption === "list" ? "active" : ""}`}
+                        onClick={() => handleListGridOption("list")}
+                      />
+                    </div>
+                  </div>
+                }
+              />
             </div>
 
             <div
@@ -958,10 +1070,16 @@ function MarketplaceContent() {
   );
 }
 
-export default function Marketplace() {
+export function MarketplacePageClient({
+  routeFilters = EMPTY_ROUTE_FILTERS,
+} = {}) {
   return (
     <Suspense fallback={null}>
-      <MarketplaceContent />
+      <MarketplaceContent routeFilters={routeFilters} />
     </Suspense>
   );
+}
+
+export default function Marketplace() {
+  return <MarketplacePageClient />;
 }

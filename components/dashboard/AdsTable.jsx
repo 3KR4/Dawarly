@@ -51,7 +51,7 @@ export default function AdsTable({
 
   const filteredStatuses = AdStatuses.filter((status) =>
     statusChanger == "client"
-      ? status.id == "ACTIVE" || status.id == "DISABLED"
+      ? ["ACTIVE", "DISABLED", "EXPIRED"].includes(status.id)
       : statusChanger == "admin"
         ? status.id !== "PENDING" && status.id !== "REJECTED"
         : status.id === "ACTIVE" || status.id === "REJECTED",

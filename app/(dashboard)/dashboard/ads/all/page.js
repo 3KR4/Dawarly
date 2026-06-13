@@ -4,7 +4,12 @@ import "@/styles/dashboard/tables.css";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { IoCloseSharp, IoSearchSharp } from "react-icons/io5";
 import { LuSettings2 } from "react-icons/lu";
-import { getAllAds, deleteAd, changeStatus } from "@/services/ads/ads.service";
+import {
+  getAdsRangeMeta,
+  getAllAds,
+  deleteAd,
+  changeStatus,
+} from "@/services/ads/ads.service";
 import { settings } from "@/Contexts/settings";
 import AdsTable from "@/components/dashboard/AdsTable";
 import SelectOptions from "@/components/Tools/data-collector/SelectOptions";
@@ -154,6 +159,29 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
   const tableRule = getTableRule(tableId);
   const fields = [
     {
+      key: "category_tree",
+      uiType: "nested",
+      label: { en: "Departments", ar: "Departments" },
+      levels: [
+        {
+          queryKey: "dep",
+          items: tables.filter((table) =>
+            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
+          ),
+        },
+        {
+          queryKey: "cat",
+          parentKey: "table_id",
+          items: categories.filter(hasAds),
+        },
+        {
+          queryKey: "subcat",
+          parentKey: "category_id",
+          items: subCategories.filter(hasAds),
+        },
+      ],
+    },
+    {
       key: "location_tree",
       uiType: "nested",
       label: { en: "Locations", ar: "Locations" },
@@ -180,29 +208,6 @@ const getDynamicFilterDefinitions = (tableId, data = {}) => {
           parentKey: "area_id",
           items: compounds,
           hasAdsOnly: true,
-        },
-      ],
-    },
-    {
-      key: "category_tree",
-      uiType: "nested",
-      label: { en: "Departments", ar: "Departments" },
-      levels: [
-        {
-          queryKey: "dep",
-          items: tables.filter((table) =>
-            categories.some((cat) => sameId(cat.table_id, table.id) && hasAds(cat)),
-          ),
-        },
-        {
-          queryKey: "cat",
-          parentKey: "table_id",
-          items: categories.filter(hasAds),
-        },
-        {
-          queryKey: "subcat",
-          parentKey: "category_id",
-          items: subCategories.filter(hasAds),
         },
       ],
     },
@@ -345,6 +350,7 @@ export default function ActiveAds() {
 
   const ownerFilterId = searchParams.get("user");
   const ownerFilterType = searchParams.get("user_type");
+  const ownerFilterName = searchParams.get("owner_name");
   const currentPage = Number(searchParams.get("page") || 1);
   const searchParam = searchParams.get("search") || "";
   const sortUiParam = searchParams.get("sort_by_ui");
@@ -599,15 +605,21 @@ export default function ActiveAds() {
     async (page = 1) => {
       try {
         setLoadingContent(true);
-
-        const res = await getAllAds(buildRequestFilters(page));
+        const requestFilters = buildRequestFilters(page);
+        const [res, rangeMeta] = await Promise.all([
+          getAllAds(requestFilters),
+          getAdsRangeMeta(requestFilters),
+        ]);
 
         setAdsData((prev) => ({
           ads: res.data.data || [],
           pagination: res.data.pagination || prev.pagination,
         }));
         setMeta((prev) => {
-          const next = res.data.meta || prev;
+          const next = {
+            ...(res.data.meta || prev),
+            ...rangeMeta,
+          };
           return next.max_price === prev.max_price &&
             next.max_area_m2 === prev.max_area_m2 &&
             next.price_currency === prev.price_currency
@@ -637,16 +649,47 @@ export default function ActiveAds() {
     updateUrl({ page: newPage }, false);
   };
 
+  const buildOwnerSelectionReset = useCallback(() => {
+    const updates = {
+      status: null,
+      search: null,
+      dep: null,
+      cat: null,
+      subcat: null,
+    };
+
+    activeDynamicFilters.forEach((field) => {
+      if (field.uiType === "range") {
+        const [minKey, maxKey] = rangeQueryKeys[field.key] || [
+          `min_${field.key}`,
+          `max_${field.key}`,
+        ];
+        updates[minKey] = null;
+        updates[maxKey] = null;
+      } else {
+        updates[field.key] = null;
+      }
+
+      if (field.uiType === "nested") {
+        field.levels.forEach((level) => {
+          updates[level.queryKey] = null;
+        });
+      }
+    });
+
+    return updates;
+  }, [activeDynamicFilters]);
+
   const handleOwnerClick = (owner) => {
     if (!owner?.id) return;
 
     setSearchText("");
     setSearchConfirmed(false);
     updateUrl({
+      ...buildOwnerSelectionReset(),
       user: owner.id,
       user_type: owner.type,
-      status: null,
-      search: null,
+      owner_name: owner.name || null,
     });
   };
 
@@ -698,7 +741,7 @@ export default function ActiveAds() {
 
   const handleRemoveFilter = (filterKey) => {
     if (filterKey === "owner") {
-      updateUrl({ user: null, user_type: null });
+      updateUrl({ user: null, user_type: null, owner_name: null });
       return;
     }
 
@@ -746,6 +789,7 @@ export default function ActiveAds() {
       search: null,
       user: null,
       user_type: null,
+      owner_name: null,
       dep: null,
       cat: null,
       subcat: null,
@@ -913,7 +957,7 @@ export default function ActiveAds() {
         ownerFilter={{
           ownerType: ownerFilterType,
           ownerId: ownerFilterId,
-          ownerName: null,
+          ownerName: ownerFilterName,
         }}
         onRemoveCategory={() => {}}
         onRemoveFilter={handleRemoveFilter}

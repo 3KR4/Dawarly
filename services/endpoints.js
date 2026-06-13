@@ -61,6 +61,8 @@ export const ENDPOINTS = {
     DELETE: (tableId, adId) => `/ads/delete/${tableId}/${adId}`,
     ASSIGN_ADMIN: (tableId, adId) => `/ads/assign-admin/${tableId}/${adId}`,
     SHANGE_STATUS: (tableId, adId) => `/ads/update/${tableId}/${adId}/status`,
+    REQUEST_RENEWAL: (tableId, adId) => `/ads/renewal-request/${tableId}/${adId}`,
+    RENEW_ACTIVE_TIME: (tableId, adId) => `/ads/renew/${tableId}/${adId}`,
   },
   SLIDERS: {
     GET_ALL: (page, limit, active_only) => {

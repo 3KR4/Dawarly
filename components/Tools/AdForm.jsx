@@ -20,6 +20,8 @@ import {
   getOneAd,
   assignAdmin,
   changeStatus,
+  requestAdRenewal,
+  renewAdActiveTime,
 } from "@/services/ads/ads.service";
 import { useAppData } from "@/Contexts/DataContext";
 import {
@@ -289,6 +291,35 @@ export default function AdForm({
     adData?.rejection_reason ||
     adData?.rejected_reason ||
     "";
+  const lifecycleInfo = adData?.lifecycle || null;
+  const hasLifecycle = Boolean(lifecycleInfo?.expires_at);
+  const lifecycleDaysLeft = Number(lifecycleInfo?.days_left || 0);
+  const renewalAlreadyRequested = Boolean(lifecycleInfo?.renewal_requested_at);
+  const canRequestRenewal =
+    type === "client" &&
+    adId &&
+    isEditable &&
+    hasLifecycle &&
+    lifecycleInfo?.show_renewal_button;
+  const canAdminRenew = type === "admin" && adId && hasLifecycle;
+  const lifecycleStatusMessage = !hasLifecycle
+    ? ""
+    : lifecycleInfo?.is_expired
+      ? locale === "ar"
+        ? "انتهت مدة الإعلان وأصبح حاليا expired."
+        : "This ad active time has ended and it is currently expired."
+      : locale === "ar"
+        ? `متبقي ${lifecycleDaysLeft} يوم على انتهاء الإعلان.`
+        : `${lifecycleDaysLeft} day${lifecycleDaysLeft === 1 ? "" : "s"} left before this ad expires.`;
+  const lifecycleDateLabel = hasLifecycle
+    ? dayjs(lifecycleInfo.expires_at)
+        .locale(locale === "ar" ? "ar" : "en")
+        .format("DD MMM YYYY")
+    : "";
+  const lifecycleToneClass =
+    !hasLifecycle || lifecycleInfo?.is_expired || lifecycleDaysLeft <= 5
+      ? "is-danger"
+      : "is-warning";
   const STEPS = {
     DEPARTMENT: 1,
     CATEGORY: 1,
@@ -483,7 +514,9 @@ export default function AdForm({
     { id: 1, name: t.ad.userToUser },
     { id: 2, name: t.ad.userToAdmin },
   ];
-  const shouldForceAdminContact = Boolean(adId && adData && !adData.subuser);
+  const shouldForceAdminContact = Boolean(
+    type === "admin" && adId && adData && !adData.subuser,
+  );
   const adminContactMethodOptions = shouldForceAdminContact
     ? contactMethod.filter((method) => method.id === 2)
     : contactMethod;
@@ -777,7 +810,7 @@ export default function AdForm({
 
     setSelectedAmenities(activeAmenities);
 
-    if (ad.admin || !ad.subuser) {
+    if (type === "admin" && (ad.admin || !ad.subuser)) {
       setSelectedAdmin(ad.admin || null);
       setSelectedMediatorMethod({ id: 2, name: t.ad.userToAdmin });
     }
@@ -803,7 +836,7 @@ export default function AdForm({
     if (!selectedLocations.city) {
       newErrors.city = t.ad.errors.city;
     }
-    if (selectedMediatorMethod?.id === 2 && !selectedAdmin) {
+    if (type === "admin" && selectedMediatorMethod?.id === 2 && !selectedAdmin) {
       newErrors.admin = t.ad.errors.admin;
     }
     if (images.length === 0) {
@@ -903,7 +936,7 @@ export default function AdForm({
       display_phone: selectedContactMethods.phone,
       display_whatsapp: selectedContactMethods.chat,
       display_dawaarly_contact: selectedMediatorMethod?.id === 2,
-      tags: tags.join(","),
+      tags: JSON.stringify(tags),
     };
 
     if (needsAnonymousContact) {
@@ -1478,6 +1511,58 @@ export default function AdForm({
     }
   };
 
+  const handleRenewalRequest = async () => {
+    const targetTableId = Number(initialTableId || tableId);
+    if (!targetTableId || !adId) return;
+
+    setLoadingSubmit(true);
+    try {
+      const res = await requestAdRenewal(targetTableId, adId);
+      addNotification({
+        type: "success",
+        message:
+          res?.data?.message ||
+          (locale === "ar"
+            ? "تم إرسال طلب التجديد إلى الإدارة"
+            : "Renewal request sent to the admin"),
+      });
+      await fetchAdData();
+    } catch (error) {
+      addNotification({
+        type: "error",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
+      });
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  const handleAdminRenewal = async () => {
+    const targetTableId = Number(initialTableId || tableId);
+    if (!targetTableId || !adId) return;
+
+    setLoadingReviewAction(true);
+    try {
+      const res = await renewAdActiveTime(targetTableId, adId);
+      addNotification({
+        type: "success",
+        message:
+          res?.data?.message ||
+          (locale === "ar"
+            ? "تم تمديد مدة الإعلان"
+            : "Ad active time renewed successfully"),
+      });
+      await fetchAdData();
+    } catch (error) {
+      addNotification({
+        type: "error",
+        message: error.response?.data?.message || t.common.somethingWentWrong,
+      });
+    } finally {
+      setLoadingReviewAction(false);
+    }
+  };
+
   const closeUpdateWarning = () => {
     setUpdateWarningOpen(false);
     setPendingSubmitData(null);
@@ -1692,6 +1777,57 @@ export default function AdForm({
                 ))}
               </div>
             </>
+          )}
+
+          {hasLifecycle && (
+            <div
+              className={`form-section reject-reason-banner lifecycle-banner ${lifecycleToneClass}`}
+            >
+              <div className="lifecycle-banner__content">
+                <h2 className="section-title">
+                  {locale === "ar" ? "مدة الإعلان" : "Ad active time"}
+                </h2>
+                <p>{lifecycleStatusMessage}</p>
+                <p>
+                  {locale === "ar" ? "تاريخ الانتهاء:" : "Expiration date:"}{" "}
+                  <strong>{lifecycleDateLabel}</strong>
+                </p>
+              </div>
+              {canRequestRenewal && renewalAlreadyRequested ? (
+                <div className="lifecycle-banner__status">
+                  {locale === "ar"
+                    ? "لقد تم ارسال طلبك وبأنتظار موافقة الادمن"
+                    : "Your request has been sent and is awaiting admin approval."}
+                </div>
+              ) : (
+                (canAdminRenew || canRequestRenewal) && (
+                <button
+                  type="button"
+                  className={`main-button lifecycle-banner__action ${
+                    lifecycleToneClass === "is-warning" ? "warning" : "danger"
+                  }`}
+                  onClick={
+                    canAdminRenew ? handleAdminRenewal : handleRenewalRequest
+                  }
+                  disabled={
+                    loadingSubmit ||
+                    loadingReviewAction ||
+                    (canRequestRenewal && renewalAlreadyRequested)
+                  }
+                >
+                  {canAdminRenew
+                    ? loadingReviewAction
+                      ? "Renewing..."
+                      : "Renew ad active time for 30 days"
+                    : loadingSubmit
+                      ? "Sending..."
+                      : renewalAlreadyRequested
+                        ? "Renewal request sent"
+                        : "Renew your ad active time"}
+                </button>
+                )
+              )}
+            </div>
           )}
 
           {rejectReason && (
@@ -3171,6 +3307,44 @@ export default function AdForm({
           )}
 
           <div className="form-section submit-section">
+            {false && canAdminRenew && (
+              <button
+                type="button"
+                className="main-button update-button"
+                onClick={handleAdminRenewal}
+                disabled={loadingSubmit || loadingReviewAction}
+              >
+                {loadingReviewAction
+                  ? locale === "ar"
+                    ? "جارٍ التمديد..."
+                    : "Renewing..."
+                  : locale === "ar"
+                    ? "تمديد مدة الإعلان 30 يوم"
+                    : "Renew ad active time for 30 days"}
+              </button>
+            )}
+            {false && canRequestRenewal && (
+              <button
+                type="button"
+                className="main-button update-button"
+                onClick={handleRenewalRequest}
+                disabled={
+                  loadingSubmit || loadingReviewAction || renewalAlreadyRequested
+                }
+              >
+                {loadingSubmit
+                  ? locale === "ar"
+                    ? "جارٍ الإرسال..."
+                    : "Sending..."
+                  : renewalAlreadyRequested
+                    ? locale === "ar"
+                      ? "تم إرسال طلب التجديد"
+                      : "Renewal request sent"
+                    : locale === "ar"
+                      ? "طلب تجديد مدة الإعلان"
+                      : "Renew your ad active time"}
+              </button>
+            )}
             {canReviewPendingAd && (
               <>
                 <button

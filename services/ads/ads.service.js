@@ -11,6 +11,35 @@ export const getAllAds = (filters) => {
   );
   return api.get(ENDPOINTS.ADS.GET_ALL(), { params });
 };
+
+const omitKeys = (filters = {}, keys = []) => {
+  const omitted = new Set(keys);
+
+  return Object.fromEntries(
+    Object.entries(filters).filter(
+      ([key, value]) =>
+        !omitted.has(key) && value !== null && value !== undefined && value !== "",
+    ),
+  );
+};
+
+export const getAdsRangeMeta = async (filters = {}) => {
+  const sharedKeysToOmit = ["page", "limit", "sort", "order", "details_mode"];
+  const [priceRes, areaRes] = await Promise.all([
+    getAllAds(omitKeys(filters, [...sharedKeysToOmit, "min_price", "max_price"])),
+    getAllAds(
+      omitKeys(filters, [...sharedKeysToOmit, "min_area_m2", "max_area_m2"]),
+    ),
+  ]);
+
+  return {
+    max_price: priceRes.data?.meta?.max_price,
+    max_area_m2: areaRes.data?.meta?.max_area_m2,
+    price_currency:
+      priceRes.data?.meta?.price_currency || areaRes.data?.meta?.price_currency,
+  };
+};
+
 export const getOneAd = (tableId, adId, params) => {
   return api.get(ENDPOINTS.ADS.GET_ONE_AD(tableId, adId, params));
 };
@@ -34,4 +63,10 @@ export const assignAdmin = (tableId, adId, payload) => {
 };
 export const changeStatus = (tableId, adId, payload) => {
   return api.patch(ENDPOINTS.ADS.SHANGE_STATUS(tableId, adId), payload);
+};
+export const requestAdRenewal = (tableId, adId, payload = {}) => {
+  return api.post(ENDPOINTS.ADS.REQUEST_RENEWAL(tableId, adId), payload);
+};
+export const renewAdActiveTime = (tableId, adId, payload = {}) => {
+  return api.patch(ENDPOINTS.ADS.RENEW_ACTIVE_TIME(tableId, adId), payload);
 };

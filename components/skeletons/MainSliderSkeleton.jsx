@@ -7,6 +7,11 @@ export default function MainSliderSkeleton() {
       {/* Background */}
       <Skeleton className="slider-bg element" />
 
+      <div className="mobile-loading-indicator">
+        <Skeleton className="mobile-pill element" />
+        <Skeleton className="mobile-line element" />
+      </div>
+
       {/* Content */}
       <div className="content">
         <Skeleton className="title element text" />

@@ -29,7 +29,7 @@ import {
   RentFrequencies,
 } from "@/data/enums";
 import { getTableRule } from "@/data/tablesRules";
-import { getAllAds } from "@/services/ads/ads.service";
+import { getAdsRangeMeta, getAllAds } from "@/services/ads/ads.service";
 import {
   getAreas,
   getCities,
@@ -38,6 +38,7 @@ import {
   getHeroSearchFilters,
   getSubCategories,
 } from "@/services/data/data.service";
+import { buildMarketUrl } from "@/utils/marketSeo";
 
 const QUERY_KEY_MAP = {
   table_id: "dep",
@@ -503,6 +504,7 @@ const buildTableDynamicFields = ({
 export default function HeroSearchCard() {
   const { locale, screenSize } = useContext(settings);
   const {
+    countries = [],
     tables = [],
     categories: allCategories = [],
     subCategories: allSubCategories = [],
@@ -801,11 +803,15 @@ export default function HeroSearchCard() {
           });
         }
 
-        const res = await getAllAds(filters);
+        const [res, rangeMeta] = await Promise.all([
+          getAllAds(filters),
+          getAdsRangeMeta(filters),
+        ]);
         if (!active) return;
 
         setSearchMeta({
-          max_price: res.data?.meta?.max_price || 10000000,
+          max_price:
+            rangeMeta?.max_price || res.data?.meta?.max_price || 10000000,
           total: res.data?.pagination?.total || 0,
         });
       } catch (error) {
@@ -1283,7 +1289,22 @@ export default function HeroSearchCard() {
 
     setSearchError("");
     const params = buildQueryParams();
-    router.push(params.toString() ? `/market?${params}` : "/market");
+    router.push(
+      buildMarketUrl(
+        Object.fromEntries(params.entries()),
+        {
+          countries,
+          governorates: globalGovernorates,
+          cities: globalCities,
+          areas: globalAreas,
+          compounds: globalCompounds,
+          tables,
+          categories: allCategories,
+          subCategories: allSubCategories,
+        },
+        params,
+      ),
+    );
   };
 
   return (

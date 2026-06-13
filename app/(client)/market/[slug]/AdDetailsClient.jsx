@@ -56,6 +56,7 @@ import { getTableRule } from "@/data/tablesRules";
 import { useAuth } from "@/Contexts/AuthContext";
 import { playSound } from "@/utils/sounds";
 import { getAdTableId } from "@/utils/getAdTableId";
+import { slugifyValue } from "@/utils/marketSeo";
 
 const preventAdImageContextMenu = (e) => {
   e.preventDefault();
@@ -79,6 +80,27 @@ export default function AdDetails() {
   const fullscreenSwiperRef = useRef(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+
+  const getMarketCategoryHref = useMemo(
+    () => (depth = "dep") => {
+      const segments = [];
+
+      if (ad?.department?.name_en) {
+        segments.push("category", slugifyValue(ad.department.name_en));
+      }
+      if ((depth === "cat" || depth === "subcat") && ad?.category?.name_en) {
+        if (!segments.length) segments.push("category");
+        segments.push(slugifyValue(ad.category.name_en));
+      }
+      if (depth === "subcat" && ad?.subCategory?.name_en) {
+        if (!segments.length) segments.push("category");
+        segments.push(slugifyValue(ad.subCategory.name_en));
+      }
+
+      return segments.length ? `/market/${segments.join("/")}` : "/market";
+    },
+    [ad],
+  );
   const [isImagesFullscreenOpen, setIsImagesFullscreenOpen] = useState(false);
   const [fullscreenMode, setFullscreenMode] = useState("grid");
 
@@ -230,15 +252,15 @@ export default function AdDetails() {
     { name: t.market.all_ads, href: "/market" },
     ad?.department?.[`name_${locale}`] && {
       name: ad.department[`name_${locale}`],
-      href: `/market?dep=${activeTableId}`,
+      href: getMarketCategoryHref("dep"),
     },
     ad?.category?.[`name_${locale}`] && {
       name: ad.category[`name_${locale}`],
-      href: `/market?dep=${activeTableId}&cat=${ad.category.id}`,
+      href: getMarketCategoryHref("cat"),
     },
     ad?.subCategory?.[`name_${locale}`] && {
       name: ad.subCategory[`name_${locale}`],
-      href: `/market?dep=${activeTableId}&cat=${ad?.category?.id}&subcat=${ad.subCategory.id}`,
+      href: getMarketCategoryHref("subcat"),
     },
     { name: t.ad.ad_details, href: "" },
   ].filter(Boolean);

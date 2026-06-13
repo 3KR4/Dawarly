@@ -1,6 +1,8 @@
 "use client";
 
 import { settings } from "@/Contexts/settings";
+import { useAppData } from "@/Contexts/DataContext";
+import { buildMarketUrl } from "@/utils/marketSeo";
 import Link from "next/link";
 import { useContext } from "react";
 import { MdOutlineModeEdit } from "react-icons/md";
@@ -18,31 +20,53 @@ function CatCard({
   hideCount = false,
 }) {
   const { locale, setMenuType } = useContext(settings);
+  const {
+    countries,
+    governorates,
+    cities,
+    areas,
+    compounds,
+    tables,
+    categories,
+    subCategories,
+  } = useAppData();
 
   const link = (() => {
-    const params = new URLSearchParams();
+    const filters = {};
 
     if (type === "tables") {
-      params.set("dep", data?.id);
+      filters.dep = data?.id;
     } else if (type === "categories") {
-      if (data?.table_id) params.set("dep", data.table_id);
-      params.set("cat", data?.id);
+      if (data?.table_id) filters.dep = data.table_id;
+      filters.cat = data?.id;
     } else if (type === "subcategories") {
-      if (data?.table_id) params.set("dep", data.table_id);
-      if (data?.category_id) params.set("cat", data.category_id);
-      params.set("subcat", data?.id);
+      if (data?.table_id) filters.dep = data.table_id;
+      if (data?.category_id) filters.cat = data.category_id;
+      filters.subcat = data?.id;
     } else if (type === "governorates") {
-      params.set("governorate_id", data?.id);
+      filters.governorate_id = data?.id;
     } else if (type === "cities") {
-      params.set("city_id", data?.id);
+      filters.city_id = data?.id;
     } else if (type === "areas") {
-      params.set("area_id", data?.id);
+      filters.area_id = data?.id;
     } else if (type === "compounds") {
-      params.set("compound_id", data?.id);
+      filters.compound_id = data?.id;
     }
 
-    const query = params.toString();
-    return query ? `/market?${query}` : "/market";
+    return buildMarketUrl(
+      filters,
+      {
+        countries,
+        governorates,
+        cities,
+        areas,
+        compounds,
+        tables,
+        categories,
+        subCategories,
+      },
+      "",
+    );
   })();
 
   const Icon = data?.icon;

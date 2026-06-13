@@ -160,6 +160,13 @@ export const AdStatuses = [
     tx: "#0F9D58",
   },
   {
+    id: "EXPIRED",
+    name_en: "Expired",
+    name_ar: "Ù…Ù†ØªÙ‡ÙŠ",
+    bg: "#FFF1F2",
+    tx: "#BE123C",
+  },
+  {
     id: "REJECTED",
     name_en: "Rejected",
     name_ar: "مرفوض",

@@ -81,8 +81,88 @@ body:has(.form-holder) footer {
   white-space: pre-wrap;
   text-align: left;
 }
+[lang="ar"] .form-holder.create-ad form .reject-reason-banner {
+  text-align: right;
+}
 [lang="ar"] .form-holder.create-ad form .reject-reason-banner p {
   text-align: right;
+}
+.form-holder.create-ad form .lifecycle-banner {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+}
+.form-holder.create-ad form .lifecycle-banner.is-warning {
+  background: #fff4cc;
+  border-color: #f6c453;
+}
+.form-holder.create-ad form .lifecycle-banner.is-warning .section-title,
+.form-holder.create-ad form .lifecycle-banner.is-warning p {
+  color: #8a5a00;
+}
+.form-holder.create-ad form .lifecycle-banner.is-danger {
+  background: #ffe2e4;
+  border-color: #f1aeb5;
+}
+.form-holder.create-ad form .lifecycle-banner.is-danger .section-title,
+.form-holder.create-ad form .lifecycle-banner.is-danger p {
+  color: #b42318;
+}
+.form-holder.create-ad form .lifecycle-banner__content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-holder.create-ad form .lifecycle-banner__action {
+  flex: 0 0 220px;
+  align-self: stretch;
+  height: auto;
+  min-height: 100%;
+  border-radius: 14px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.form-holder.create-ad form .lifecycle-banner__status {
+  flex: 0 0 220px;
+  align-self: stretch;
+  min-height: 100%;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.45);
+}
+.form-holder.create-ad form .lifecycle-banner.is-warning .lifecycle-banner__status {
+  color: #8a5a00;
+  border: 1px solid #f6c453;
+}
+.form-holder.create-ad form .lifecycle-banner.is-danger .lifecycle-banner__status {
+  color: #b42318;
+  border: 1px solid #f1aeb5;
+}
+.form-holder.create-ad form .lifecycle-banner__action.warning {
+  background: #f6c453;
+  color: #5f3b00;
+  border-color: #5f3b00;
+}
+.form-holder.create-ad form .lifecycle-banner__action.warning:hover {
+  background: #e2b13f;
+}
+.form-holder.create-ad form .lifecycle-banner__action.danger {
+  background: #d92d20;
+  color: #fff;
+  border-color: red;
+}
+.form-holder.create-ad form .lifecycle-banner__action.danger:hover {
+  background: #b42318;
 }
 .form-holder form .row-holder {
   display: flex;
@@ -266,6 +346,18 @@ body:has(.form-holder) footer {
   display: none !important;
 }
 @media (max-width: 767px) {
+  .form-holder.create-ad form .lifecycle-banner {
+    flex-direction: column;
+  }
+  .form-holder.create-ad form .lifecycle-banner__action {
+    flex-basis: auto;
+    min-height: 44px;
+    width: 100%;
+  }
+  .form-holder.create-ad form .lifecycle-banner__status {
+    flex-basis: auto;
+    width: 100%;
+  }
   .form-holder.create-ad.user-create-ad form .row-holder.client-two-grid {
     grid-template-columns: 1fr;
   }
