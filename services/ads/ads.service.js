@@ -64,3 +64,9 @@ export const assignAdmin = (tableId, adId, payload) => {
 export const changeStatus = (tableId, adId, payload) => {
   return api.patch(ENDPOINTS.ADS.SHANGE_STATUS(tableId, adId), payload);
 };
+export const requestAdRenewal = (tableId, adId, payload = {}) => {
+  return api.post(ENDPOINTS.ADS.REQUEST_RENEWAL(tableId, adId), payload);
+};
+export const renewAdActiveTime = (tableId, adId, payload = {}) => {
+  return api.patch(ENDPOINTS.ADS.RENEW_ACTIVE_TIME(tableId, adId), payload);
+};

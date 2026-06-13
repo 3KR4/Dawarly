@@ -172,7 +172,7 @@ header .actions-btns .userMenu .top {
 }
 .dash-holder.for-client .top {
   margin-bottom: 3px;
-  grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .dash-holder.for-client > .top > * {
   width: 100% !important;
@@ -461,6 +461,8 @@ header .actions-btns .userMenu .top {
 }
 .table-container .actions a {
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .table-container .actions svg {
   width: 33px;
@@ -538,6 +540,10 @@ header .actions-btns .userMenu .top {
 }
 
 @media (max-width: 768px) {
+  .table-container .item-image .product-image {
+    width: 100% !important;
+    height: unset !important;
+  }
   .dashboard-ads-page .dashboard-ads-top {
     grid-template-columns: 1fr;
   }

@@ -31,6 +31,27 @@ const truncate = (value, maxLength = 160) => {
   return `${text.slice(0, maxLength - 1).trim()}...`;
 };
 
+const parseAdTags = (tags) => {
+  if (Array.isArray(tags)) {
+    return tags.map((tag) => String(tag).trim()).filter(Boolean);
+  }
+
+  if (typeof tags !== "string") return [];
+
+  try {
+    const parsedTags = JSON.parse(tags);
+
+    if (Array.isArray(parsedTags)) {
+      return parsedTags.map((tag) => String(tag).trim()).filter(Boolean);
+    }
+  } catch {}
+
+  return tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+};
+
 const getAbsoluteUrl = (url) => {
   if (!url) return FALLBACK_IMAGE;
   if (/^https?:\/\//i.test(url)) return url;
@@ -176,11 +197,13 @@ export async function generateMetadata({ params, searchParams }) {
     ad?.images?.find((image) => image?.is_cover)?.secure_url ||
     ad?.images?.[0]?.secure_url ||
     FALLBACK_IMAGE;
+  const keywords = parseAdTags(ad?.tags);
   const url = `${SITE_URL}/market/${adId}${tableId ? `?dep=${tableId}` : ""}`;
 
   return {
     title,
     description,
+    keywords,
     alternates: {
       canonical: url,
     },

@@ -84,6 +84,8 @@ const SORT_OPTIONS = [
   },
 ];
 
+const MARKET_VIEW_STORAGE_KEY = "marketplace_view_mode";
+
 const SORT_PLACEHOLDER = {
   en: "Sort By",
   ar: "ترتيب حسب",
@@ -468,7 +470,14 @@ function MarketplaceContent({ routeFilters = EMPTY_ROUTE_FILTERS }) {
   });
   const [tableLocations, setTableLocations] = useState(null);
   const [openFilters, setOpenFilters] = useState(false);
-  const [listGridOption, setListGridOption] = useState("grid");
+  const [listGridOption, setListGridOption] = useState(() => {
+    if (typeof window === "undefined") return "list";
+
+    const savedViewMode = window.localStorage.getItem(MARKET_VIEW_STORAGE_KEY);
+    return savedViewMode === "grid" || savedViewMode === "list"
+      ? savedViewMode
+      : "list";
+  });
   const [orderOpen, setOrderOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState({
     cat: catParam ? { id: parseInt(catParam) } : null,
@@ -764,6 +773,11 @@ function MarketplaceContent({ routeFilters = EMPTY_ROUTE_FILTERS }) {
   }, [catParam, subcatParam, selectedSort]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(MARKET_VIEW_STORAGE_KEY, listGridOption);
+  }, [listGridOption]);
+
+  useEffect(() => {
     fetchAds(currentPage);
   }, [currentPage, fetchAds]);
 
@@ -947,61 +961,62 @@ function MarketplaceContent({ routeFilters = EMPTY_ROUTE_FILTERS }) {
                 onOpenFilters={() => setOpenFilters(true)}
                 screenSize={screenSize}
                 fieldDefinitions={activeDynamicFilters}
-              />
+                controls={
+                  <div className="row-holder">
+                    <div className="selectOptions ultra-small">
+                      <div className="btn">
+                        <h4
+                          className="ellipsis"
+                          onClick={() => setOrderOpen((prev) => !prev)}
+                        >
+                          {orderBy?.name?.[locale] || SORT_PLACEHOLDER[locale]}
+                        </h4>
 
-              <div className="row-holder">
-                <div className="selectOptions ultra-small">
-                  <div className="btn">
-                    <h4
-                      className="ellipsis"
-                      onClick={() => setOrderOpen((prev) => !prev)}
-                    >
-                      {orderBy?.name?.[locale] || SORT_PLACEHOLDER[locale]}
-                    </h4>
+                        <IoFilterSharp
+                          className="main-ico"
+                          onClick={() => setOrderOpen((prev) => !prev)}
+                        />
+                      </div>
 
-                    <IoFilterSharp
-                      className="main-ico"
-                      onClick={() => setOrderOpen((prev) => !prev)}
-                    />
-                  </div>
+                      {orderOpen && (
+                        <div className="menu active">
+                          {SORT_OPTIONS.map((item) => {
+                            const isActive = orderBy?.id === item.id;
 
-                  {orderOpen && (
-                    <div className="menu active">
-                      {SORT_OPTIONS.map((item) => {
-                        const isActive = orderBy?.id === item.id;
-
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            className={isActive ? "active" : ""}
-                            onClick={() => {
-                              setOrderBy(item);
-                              setOrderOpen(false);
-                              updateUrl({
-                                sort_by_ui: item.id,
-                              });
-                            }}
-                          >
-                            {item.name[locale]}
-                          </button>
-                        );
-                      })}
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                className={isActive ? "active" : ""}
+                                onClick={() => {
+                                  setOrderBy(item);
+                                  setOrderOpen(false);
+                                  updateUrl({
+                                    sort_by_ui: item.id,
+                                  });
+                                }}
+                              >
+                                {item.name[locale]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                <div className="grid-option">
-                  <BsGridFill
-                    className={`${listGridOption === "grid" ? "active" : ""}`}
-                    onClick={() => handleListGridOption("grid")}
-                  />
-                  <FaListUl
-                    className={`${listGridOption === "list" ? "active" : ""}`}
-                    onClick={() => handleListGridOption("list")}
-                  />
-                </div>
-              </div>
+                    <div className="grid-option">
+                      <BsGridFill
+                        className={`${listGridOption === "grid" ? "active" : ""}`}
+                        onClick={() => handleListGridOption("grid")}
+                      />
+                      <FaListUl
+                        className={`${listGridOption === "list" ? "active" : ""}`}
+                        onClick={() => handleListGridOption("list")}
+                      />
+                    </div>
+                  </div>
+                }
+              />
             </div>
 
             <div

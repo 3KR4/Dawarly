@@ -13,6 +13,7 @@ const ActiveFiltersBar = ({
   searchText,
   ownerFilter,
   sortFilter,
+  controls,
   onRemoveCategory,
   onRemoveFilter,
   onClearAll,
@@ -207,16 +208,25 @@ const ActiveFiltersBar = ({
     };
     return (priority[a.key] ?? 4) - (priority[b.key] ?? 4);
   });
+  const activeFiltersCount = orderedActiveFilters.length;
 
   if (screenSize === "large" && orderedActiveFilters.length === 0) return null;
 
   return (
     <div className="active-filters-bar">
-      <div className="filters-header" onClick={onOpenFilters}>
-        {screenSize === "large" ? t.actions.active_filters : t.actions.filterations}
-        <span className="filters-count" style={{ display: "flex" }}>
-          {screenSize !== "large" ? <LuSettings2 /> : ":"}
-        </span>
+      <div className="filters-top-row">
+        <div className="filters-header" onClick={onOpenFilters}>
+          {screenSize === "large"
+            ? `${activeFiltersCount} ${t.actions.active_filters}`
+            : t.actions.filterations}
+          {screenSize !== "large" ? (
+            <span className="filters-count" style={{ display: "flex" }}>
+              <LuSettings2 />
+            </span>
+          ) : null}
+        </div>
+
+        {controls ? <div className="filters-controls">{controls}</div> : null}
       </div>
 
       <div className="filters-list">

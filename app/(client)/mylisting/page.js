@@ -5,7 +5,6 @@ import "@/styles/dashboard/tables.css";
 import "@/styles/dashboard/globals.css";
 import React, { useContext, useState, useEffect } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { LuSettings2 } from "react-icons/lu";
 import {
   getAllAds,
   deleteAd,
@@ -204,13 +203,6 @@ export default function MyAdsListing() {
           }}
         />
 
-        {/* ⚙️ Filters UI */}
-        <div className="filters-header">
-          {t.actions.filterations}
-          <span className="filters-count" style={{ display: "flex" }}>
-            <LuSettings2 />
-          </span>
-        </div>
         <Link
           href="/mylisting/createAd"
           className="main-button"
